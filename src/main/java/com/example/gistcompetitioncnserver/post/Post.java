@@ -1,10 +1,12 @@
 package com.example.gistcompetitioncnserver.post;
 
+import com.example.gistcompetitioncnserver.user.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Data
@@ -12,16 +14,28 @@ import java.util.Date;
 public class Post {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(
+            strategy= GenerationType.AUTO,
+            generator="native"
+    )
+    @GenericGenerator(
+            name = "native",
+            strategy = "native"
+    )
     private Long id;
-
-    private String writer;
 
     private String title;
 
-    private Date created;
-
     private String description;
+
+    private LocalDateTime created;
+
+    private boolean answered;
+
+    private int accepted;
+
+    //foreign key
+    private int user_id;
 
 
 }
