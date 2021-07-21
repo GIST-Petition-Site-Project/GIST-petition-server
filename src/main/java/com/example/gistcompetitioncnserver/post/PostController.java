@@ -20,7 +20,6 @@ public class PostController {
     @Autowired
     private PostRepository postRepository;
 
-
     @GetMapping("")
     public List<Post> retrieveAllPost(){
         return postRepository.findAll();
