@@ -1,23 +1,50 @@
-//package com.example.gistcompetitioncnserver.comment;
+package com.example.gistcompetitioncnserver.comment;
+
+import com.example.gistcompetitioncnserver.post.Post;
+import com.example.gistcompetitioncnserver.post.PostRepository;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
+
+@AllArgsConstructor
+@Service
+public class CommentService {
+
+    private final CommentRepository commentRepository;
+    private final PostRepository postRepository;
+
+
+    @Transactional
+    public void createComment(Long id, Comment request){
+        Post post = postRepository.getById(id);
+        request.setCreated(LocalDateTime.now());
+        request.setPost(post);
+        commentRepository.save(request);
+
+        //
+//        Comment comment = commentRepository.save(
+//                Comment.builder()
+//                .content(request.getContent())
+//                .created(LocalDateTime.now())
+//                .post(post)
+//                .build());
 //
-//import lombok.Data;
-//import lombok.NoArgsConstructor;
-//import lombok.ToString;
-//import org.springframework.stereotype.Service;
-//
-//import javax.persistence.Entity;
-//
-//@Data
-//@NoArgsConstructor
-//@ToString
-//@Service
-//public class CommentDtoService {
-//
-//    private CommentRepository commentRepository;
-//
-//    @Entity
-//
-//
-//
-//
-//}
+//        // return response
+
+    }
+
+    public void deleteComment(Long commentId){
+        commentRepository.deleteById(commentId);
+    }
+
+    public Optional<Comment> getPostComment(Long id){
+        return commentRepository.findById(id);
+    }
+
+
+}

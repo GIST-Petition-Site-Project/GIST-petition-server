@@ -1,13 +1,10 @@
 package com.example.gistcompetitioncnserver.user;
 
-import org.hibernate.EntityMode;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -15,25 +12,22 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
+@RestController
 @RequestMapping("/api/users")
 public class UserController {
 
     @Autowired
-    private UserDaoService service;
-
-    @Autowired
-    private UserRepository userRepository;
+    private UserDaoService userDaoService;
 
     @GetMapping("")
     public List<User> retrieveAllUsers(){
-        return userRepository.findAll();
+        return userDaoService.retrieveAllUsers();
     }
 
     @GetMapping("/{id}")
     public EntityModel<User> retrieveUser(@PathVariable long id){
 
-
-        Optional<User> user = userRepository.findById(id);
+        Optional<User> user = userDaoService.findUserById(id);
 
         if(!user.isPresent()){
             throw new UsernameNotFoundException(String.format("ID[%s] not found", id));
@@ -52,7 +46,7 @@ public class UserController {
     @PostMapping("")
     public ResponseEntity<User> createUser(@RequestBody User user){
 
-        User savedUser = service.save(user);
+        User savedUser = userDaoService.save(user);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
@@ -64,7 +58,7 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable Long id){
-        userRepository.deleteById(id);
+        userDaoService.deleteById(id);
     }
 
 }

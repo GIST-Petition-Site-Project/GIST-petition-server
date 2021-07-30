@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/post")
+@RequestMapping("/gistps/api/v1/post")
 public class PostController {
 
     private final PostService postService;
@@ -29,7 +29,7 @@ public class PostController {
         return ResponseEntity.created(location).build();
     }
 
-    @GetMapping("")
+    @GetMapping("/list")
     public List<Post> retrieveAllPost(){
         return postService.retrieveAllPost();
     }
@@ -43,10 +43,6 @@ public class PostController {
     public Long getPageNumber(){
         return postService.getPageNumber();
     }
-
-//    @GetMapping("/list")
-//    public List
-
 
     @DeleteMapping("/{id}")
     public void deletePost(@PathVariable Long id){
