@@ -5,9 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.security.core.parameters.P;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -25,8 +27,8 @@ public class User {
             name = "native",
             strategy = "native"
     )
-    private long id;
-
+    @Column(name = "ID")
+    private Long id;
 
     private String username;
 

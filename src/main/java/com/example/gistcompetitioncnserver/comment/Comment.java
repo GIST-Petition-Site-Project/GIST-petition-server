@@ -2,6 +2,7 @@ package com.example.gistcompetitioncnserver.comment;
 
 import com.example.gistcompetitioncnserver.post.Post;
 import com.example.gistcompetitioncnserver.post.PostRepository;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,7 +15,6 @@ import java.time.LocalDateTime;
 @Entity
 @Setter
 @Data
-@NoArgsConstructor
 public class Comment {
 
     @Id
@@ -27,15 +27,25 @@ public class Comment {
             name = "native",
             strategy = "native"
     )
-
-    private Long id;
+    @Column(name = "comment_id")
+    private Long commentId;
 
     private String content;
 
     private LocalDateTime created;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="post_id")
     private Post post;
+
+    private Long user_id;
+
+//    @Builder
+//    public Comment( String content, LocalDateTime created, Post post) {
+//        this.content = content;
+//        this.created = created;
+//        this.post = post;
+//    }
 
 
 }
