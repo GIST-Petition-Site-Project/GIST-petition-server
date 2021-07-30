@@ -1,9 +1,6 @@
 package com.example.gistcompetitioncnserver.post;
 
-import com.example.gistcompetitioncnserver.user.User;
-import com.example.gistcompetitioncnserver.user.UserRepository;
-import org.apache.tomcat.jni.Local;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -14,26 +11,15 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/posts")
+@AllArgsConstructor
+@RequestMapping("/post")
 public class PostController {
 
-    @Autowired
-    private PostRepository postRepository;
-
-    @GetMapping("")
-    public List<Post> retrieveAllPost(){
-        return postRepository.findAll();
-    }
-
-    @GetMapping("/{id}")
-    public Optional<Post> retrievePost(@PathVariable Long id){
-        return postRepository.findById(id);
-    }
+    private final PostService postService;
 
     @PostMapping("")
     public ResponseEntity<Post> createUser(@RequestBody Post post){
-        post.setCreated(LocalDateTime.now());
-        Post savedPost = postRepository.save(post);
+        Post savedPost = postService.createPost(post);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
@@ -43,10 +29,31 @@ public class PostController {
         return ResponseEntity.created(location).build();
     }
 
+    @GetMapping("")
+    public List<Post> retrieveAllPost(){
+        return postService.retrieveAllPost();
+    }
+
+    @GetMapping("/{id}")
+    public Optional<Post> retrievePost(@PathVariable Long id){
+        return postService.retrievePost(id);
+    }
+
+    @GetMapping("/count")
+    public Long getPageNumber(){
+        return postService.getPageNumber();
+    }
+
+//    @GetMapping("/list")
+//    public List
+
+
     @DeleteMapping("/{id}")
     public void deletePost(@PathVariable Long id){
-        postRepository.deleteById(id);
+        postService.deletePost(id);
     }
+
+
 
 //    @PutMapping("/{id}")
 //    public void amendPost(@PathVariable Long id, @RequestBody Post post){

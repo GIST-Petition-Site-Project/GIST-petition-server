@@ -32,6 +32,8 @@ public class UserController {
 
     @GetMapping("/{id}")
     public EntityModel<User> retrieveUser(@PathVariable long id){
+
+
         Optional<User> user = userRepository.findById(id);
 
         if(!user.isPresent()){
