@@ -1,5 +1,7 @@
 package com.example.gistcompetitioncnserver.user;
 
+import com.example.gistcompetitioncnserver.post.Post;
+import com.example.gistcompetitioncnserver.post.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
@@ -18,6 +20,9 @@ public class UserController {
 
     @Autowired
     private UserDaoService userDaoService;
+
+    @Autowired
+    private PostService postService;
 
     @GetMapping("")
     public List<User> retrieveAllUsers(){
@@ -41,6 +46,11 @@ public class UserController {
 
         return resource;
 
+    }
+
+    @GetMapping("/{user_id}/post")
+    public List<Post> retrievePostsByUser_id(@PathVariable long user_id){
+        return postService.retrievePostsByUser_id(user_id);
     }
 
     @PostMapping("")

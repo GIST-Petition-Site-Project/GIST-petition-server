@@ -18,7 +18,7 @@ public class PostController {
     private final PostService postService;
 
     @PostMapping("")
-    public ResponseEntity<Post> createUser(@RequestBody Post post){
+    public ResponseEntity<Post> createPost(@RequestBody Post post){
         Post savedPost = postService.createPost(post);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
@@ -29,7 +29,7 @@ public class PostController {
         return ResponseEntity.created(location).build();
     }
 
-    @GetMapping("/list")
+    @GetMapping("")
     public List<Post> retrieveAllPost(){
         return postService.retrieveAllPost();
     }
