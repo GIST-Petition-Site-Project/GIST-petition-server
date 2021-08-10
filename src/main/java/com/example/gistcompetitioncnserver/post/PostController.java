@@ -17,19 +17,28 @@ public class PostController {
 
     private final PostService postService;
 
+//    @PostMapping("")
+//    public ResponseEntity<Post> createPost(@RequestBody Post post){
+//        Post savedPost = postService.createPost(post);
+//
+//        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+//                .path("/{id}")
+//                .buildAndExpand(savedPost)
+//                .toUri();
+//
+//        return ResponseEntity.created(location).build();
+//    }
+
+    //게시글 작성 요청 보냈을 때 정상적으로 게시글이 생성되면 리턴값으로 작성된 게시글 고유 id 반환해주기
     @PostMapping("")
-    public ResponseEntity<Post> createUser(@RequestBody Post post){
+    public Long createPost(@RequestBody Post post){
         Post savedPost = postService.createPost(post);
 
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(savedPost)
-                .toUri();
 
-        return ResponseEntity.created(location).build();
+        return savedPost.getId();
     }
 
-    @GetMapping("/list")
+    @GetMapping("")
     public List<Post> retrieveAllPost(){
         return postService.retrieveAllPost();
     }
