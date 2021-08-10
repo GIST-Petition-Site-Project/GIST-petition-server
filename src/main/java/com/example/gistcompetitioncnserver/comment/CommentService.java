@@ -2,6 +2,7 @@ package com.example.gistcompetitioncnserver.comment;
 
 import com.example.gistcompetitioncnserver.post.Post;
 import com.example.gistcompetitioncnserver.post.PostRepository;
+import com.example.gistcompetitioncnserver.post.PostService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,8 +43,9 @@ public class CommentService {
         commentRepository.deleteById(commentId);
     }
 
-    public Optional<Comment> getPostComment(Long id){
-        return commentRepository.findById(id);
+    public List<Comment> getCommentsByPostId(Long id){
+        Post post = postRepository.getById(id);
+        return post.getComment();
     }
 
 

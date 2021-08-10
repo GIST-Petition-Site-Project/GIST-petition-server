@@ -42,10 +42,9 @@ public class CommentController {
         return "success";
     }
 
-    // need to error Handling
-    @GetMapping("/{id}/comment/{commentId}")
-    public Optional<Comment> getComment(@PathVariable Long id, @PathVariable Long commentId) {
-        return commentService.getPostComment(commentId);
+    @GetMapping("/{id}/comment/")
+    public List<Comment> getComments(@PathVariable Long id) {
+        return commentService.getCommentsByPostId(id);
     }
 
 }
