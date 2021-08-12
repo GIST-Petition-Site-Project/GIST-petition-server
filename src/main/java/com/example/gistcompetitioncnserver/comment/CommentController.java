@@ -21,6 +21,7 @@ import java.util.Optional;
 public class CommentController {
 
     private final CommentService commentService;
+
     private final PostService postService;
 
     @PostMapping("/{id}/comment")
@@ -42,7 +43,7 @@ public class CommentController {
         return "success";
     }
 
-    @GetMapping("/{id}/comment/")
+    @GetMapping("/{id}/comment")
     public List<Comment> getComments(@PathVariable Long id) {
         return commentService.getCommentsByPostId(id);
     }

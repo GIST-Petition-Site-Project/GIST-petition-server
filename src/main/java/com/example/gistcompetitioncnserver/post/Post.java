@@ -25,7 +25,7 @@ public class Post {
             name = "native",
             strategy = "native"
     )
-    @Column(name = "post_id")
+    @Column(name = "postId")
     private Long id;
 
     @OneToMany(mappedBy = "post")
@@ -35,13 +35,15 @@ public class Post {
 
     private String description;
 
-    private LocalDateTime created;
+    private String category;
+
+    private String created;
 
     private boolean answered;
 
     private int accepted;
 
-    private Long user_id;
+    private Long userId;
 
 //    //foreign key
 //    @ManyToOne

@@ -28,7 +28,7 @@ public class Comment {
             name = "native",
             strategy = "native"
     )
-    @Column(name = "comment_id")
+    @Column(name = "commentId")
     private Long commentId;
 
     private String content;
@@ -36,11 +36,11 @@ public class Comment {
     private LocalDateTime created;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="post_id")
+    @JoinColumn(name="postId")
     @JsonIgnore
     private Post post;
 
-    private Long user_id;
+    private Long userId;
 
 //    @Builder
 //    public Comment( String content, LocalDateTime created, Post post) {

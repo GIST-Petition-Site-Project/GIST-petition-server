@@ -48,9 +48,9 @@ public class UserController {
 
     }
 
-    @GetMapping("/{user_id}/post")
-    public List<Post> retrievePostsByUser_id(@PathVariable long user_id){
-        return postService.retrievePostsByUser_id(user_id);
+    @GetMapping("/{userId}/post")
+    public List<Post> retrievePostsByUserId(@PathVariable long userId){
+        return postService.retrievePostsByUserId(userId);
     }
 
     @PostMapping("")

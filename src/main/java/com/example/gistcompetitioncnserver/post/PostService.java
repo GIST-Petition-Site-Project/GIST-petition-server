@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,7 +18,7 @@ public class PostService {
 
 
     public Post createPost(Post post){
-        post.setCreated(LocalDateTime.now());
+        post.setCreated(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
         return postRepository.save(post);
     }
 
@@ -25,8 +26,8 @@ public class PostService {
         return postRepository.findAll();
     }
 
-    public List<Post> retrievePostsByUser_id(Long user_id){
-        return postRepository.findByUser_id(user_id);
+    public List<Post> retrievePostsByUserId(Long user_id){
+        return postRepository.findByUserId(user_id);
     }
 
     public Optional<Post> retrievePost(Long id){
@@ -35,6 +36,10 @@ public class PostService {
 
     public Long getPageNumber(){
         return postRepository.count();
+    }
+
+    public List<Post> getPostsByCategory(String categoryName){
+        return postRepository.findByCategory(categoryName);
     }
 
     @Transactional

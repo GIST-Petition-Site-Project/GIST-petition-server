@@ -34,10 +34,10 @@ public class User {
 
     private String email;
 
-    @Column(name = "user_id")
+    @Column(name = "userId")
     private String userId;
 
-    @Column(name = "user_password")
+    @Column(name = "userPassword")
     private String userPassword;
 
     private boolean enabled;

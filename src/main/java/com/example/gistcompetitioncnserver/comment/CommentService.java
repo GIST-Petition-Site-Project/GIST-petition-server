@@ -43,10 +43,7 @@ public class CommentService {
         commentRepository.deleteById(commentId);
     }
 
-    public List<Comment> getCommentsByPostId(Long id){
-        Post post = postRepository.getById(id);
-        return post.getComment();
-    }
+    public List<Comment> getCommentsByPostId(Long id){ return commentRepository.findByPostId(id);}
 
 
 }

@@ -53,6 +53,11 @@ public class PostController {
         return postService.getPageNumber();
     }
 
+    @GetMapping("/category")
+    public List<Post> getPostsByCategory(@RequestParam("categoryName") String categoryName){
+        return postService.getPostsByCategory(categoryName);
+    }
+
     @DeleteMapping("/{id}")
     public void deletePost(@PathVariable Long id){
         postService.deletePost(id);
