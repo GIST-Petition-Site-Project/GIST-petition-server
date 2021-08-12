@@ -33,7 +33,7 @@ public class Comment {
 
     private String content;
 
-    private LocalDateTime created;
+    private String created;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="postId")

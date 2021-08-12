@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,7 +24,7 @@ public class CommentService {
     @Transactional
     public void createComment(Long id, Comment request){
         Post post = postRepository.getById(id);
-        request.setCreated(LocalDateTime.now());
+        request.setCreated(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         request.setPost(post);
         commentRepository.save(request);
 
