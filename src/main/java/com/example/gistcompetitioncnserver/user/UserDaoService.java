@@ -15,8 +15,7 @@ public class UserDaoService {
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     public List<User> retrieveAllUsers(){
         return userRepository.findAll();
@@ -28,7 +27,7 @@ public class UserDaoService {
 
     @Transactional
     public User save(User user){
-        System.out.println("user = " + user);
+//        System.out.println("user = " + user);
 
         String encodedPassword = bCryptPasswordEncoder.encode(user.getUserPassword());
         user.setUserPassword(encodedPassword);

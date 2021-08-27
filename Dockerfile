@@ -3,6 +3,7 @@ WORKDIR /app
 COPY . .
 RUN ./gradlew build --stacktrace
 
+
 FROM gradle:7.1-jdk11-openj9
 WORKDIR /app
 EXPOSE 8080

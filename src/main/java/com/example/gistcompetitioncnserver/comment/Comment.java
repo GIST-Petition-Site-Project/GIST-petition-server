@@ -1,20 +1,14 @@
 package com.example.gistcompetitioncnserver.comment;
 
 import com.example.gistcompetitioncnserver.post.Post;
-import com.example.gistcompetitioncnserver.post.PostRepository;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.apache.tomcat.jni.Local;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Setter
 @Data
 public class Comment {
 
@@ -23,7 +17,6 @@ public class Comment {
             strategy= GenerationType.AUTO,
             generator="native"
     )
-
     @GenericGenerator(
             name = "native",
             strategy = "native"
