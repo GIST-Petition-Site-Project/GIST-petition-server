@@ -31,7 +31,6 @@ public class PostController {
     }
 
     @GetMapping("/{id}")
-    @Transactional(timeout = 1)
     public Optional<Post> retrievePost(@PathVariable Long id){
         return postService.retrievePost(id);
     }
