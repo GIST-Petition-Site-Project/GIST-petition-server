@@ -6,5 +6,6 @@ create table user
     enabled       bit          not null,
     user_id       varchar(255) null,
     user_password varchar(255) null,
-    username      varchar(255) null
+    username      varchar(255) null,
+    usertype      varchar(255) null
 );

@@ -42,6 +42,12 @@ public class PostService {
         return postRepository.findByCategory(categoryName);
     }
 
+    public void updateAnsweredPost(Long id){
+        Post post = postRepository.getById(id);
+        post.setAnswered(true);
+        postRepository.save(post);
+    }
+
     @Transactional
     public void deletePost(Long id){
         postRepository.deleteById(id);

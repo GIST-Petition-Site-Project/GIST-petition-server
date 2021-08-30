@@ -1,64 +1,77 @@
-package com.example.gistcompetitioncnserver.post;
+package com.example.gistcompetitioncnserver.answer;
 
+import com.example.gistcompetitioncnserver.post.Post;
+import com.example.gistcompetitioncnserver.post.PostRepository;
+import com.example.gistcompetitioncnserver.post.PostService;
+import com.example.gistcompetitioncnserver.user.User;
+import com.example.gistcompetitioncnserver.user.UserDaoService;
 import lombok.AllArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/gistps/api/v1/post") // not used in rest api like v1 url
-public class PostController {
+@RequestMapping("/gistps/api/v1/answer") // not used in rest api like v1 url
+public class AnswerController {
 
+    private final AnswerService answerService;
     private final PostService postService;
-
-    //게시글 작성 요청 보냈을 때 정상적으로 게시글이 생성되면 리턴값으로 작성된 게시글 고유 id 반환해주기
-    @PostMapping("")
-    public Long createPost(@RequestBody Post post){
-        Post savedPost = postService.createPost(post);
-
-        return savedPost.getId();
-    }
+    private final UserDaoService userDaoService;
+    private final PostRepository postRepository;
 
     @PostMapping("/{id}")
-    public Long createAnswerPost(@PathVariable Long id, @RequestBody Post post){
-        Optional<Post> tobeAnsweredPost = retrievePost(id);
-        if(tobeAnsweredPost.isPresent()){
+    public Long createAnswer(@PathVariable Long id, @RequestBody Answer answer){
 
+        Optional<User> isEmployee = userDaoService.findUserById(answer.getUserId());
+        Optional<Post> tobeAnsweredPost = null;
+        Answer savedAnswer = null;
+
+        //현재 글을 작성하는 유저가 직원 타입이  맞는지 확인 후 답변할 글을 불러옴.
+        if(isEmployee.get().getUsertype().equals("employee")) {
+            tobeAnsweredPost = postService.retrievePost(id);
         }
-        Post savedPost = postService.createPost(post);
+        else return -1L;
 
-        return savedPost.getId();
+        //답변할 글이 현재 존재하는지 확인 후 답변 생성.
+        if(tobeAnsweredPost.isPresent()) {
+            savedAnswer = answerService.createAnswer(answer, tobeAnsweredPost.get());
+        }
+        else return -2L;
+
+        //해당게시글에 대한 답변이 생성되었는지 확인 후 게시글의 답변 상태를 true로 변경.
+        if(answerService.retrieveAnswer(id).isPresent()) {
+            postService.updateAnsweredPost(id);
+        }
+        else return -3L;
+
+        return savedAnswer.getId();
     }
 
     @GetMapping("")
-    public List<Post> retrieveAllPost(){
-        return postService.retrieveAllPost();
+    public List<Answer> retrieveAllPost(){
+        return answerService.retrieveAllAnswers();
     }
 
     @GetMapping("/{id}")
-    public Optional<Post> retrievePost(@PathVariable Long id){
-        return postService.retrievePost(id);
+    public Optional<Answer> retrieveAnswer(@PathVariable Long id){
+        return answerService.retrieveAnswer(id);
     }
 
     @GetMapping("/count")
     public Long getPageNumber(){
-        return postService.getPageNumber();
+        return answerService.getPageNumber();
     }
 
     @GetMapping("/category")
-    public List<Post> getPostsByCategory(@RequestParam("categoryName") String categoryName){
-        return postService.getPostsByCategory(categoryName);
+    public List<Answer> getPostsByCategory(@RequestParam("categoryName") String categoryName){
+        return answerService.getAnswersByCategory(categoryName);
     }
 
     @DeleteMapping("/{id}")
     public void deletePost(@PathVariable Long id){
-        postService.deletePost(id);
+        answerService.deleteAnswer(id);
     }
 
 

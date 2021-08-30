@@ -1,20 +1,16 @@
-package com.example.gistcompetitioncnserver.post;
+package com.example.gistcompetitioncnserver.answer;
 
 import com.example.gistcompetitioncnserver.comment.Comment;
-import com.example.gistcompetitioncnserver.user.User;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Data
 @Entity
-public class Post {
+public class Answer {
 
     @Id
     @GeneratedValue(
@@ -25,11 +21,8 @@ public class Post {
             name = "native",
             strategy = "native"
     )
-    @Column(name = "postId")
+    @Column(name = "answerId")
     private Long id;
-
-    @OneToMany(mappedBy = "post")
-    private final List<Comment> comment = new ArrayList<>();
 
     private String title;
 
@@ -38,10 +31,6 @@ public class Post {
     private String category;
 
     private String created;
-
-    private boolean answered;
-
-    private int accepted;
 
     private Long userId;
 

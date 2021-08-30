@@ -1,6 +1,7 @@
-package com.example.gistcompetitioncnserver.post;
+package com.example.gistcompetitioncnserver.answer;
 
 
+import com.example.gistcompetitioncnserver.post.Post;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,39 +13,41 @@ import java.util.Optional;
 
 @Service
 @AllArgsConstructor
-public class PostService {
+public class AnswerService {
 
-    private final PostRepository postRepository;
+    private final AnswerRepository answerRepository;
 
 
-    public Post createPost(Post post){
-        post.setCreated(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-        return postRepository.save(post);
+    public Answer createAnswer(Answer answer, Post post){
+        answer.setCreated(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        answer.setCategory(post.getCategory());
+        answer.setTitle("RE:"+post.getTitle());
+        return answerRepository.save(answer);
     }
 
-    public List<Post> retrieveAllPost(){
-        return postRepository.findAll();
+    public List<Answer> retrieveAllAnswers(){
+        return answerRepository.findAll();
     }
 
-    public List<Post> retrievePostsByUserId(Long user_id){
-        return postRepository.findByUserId(user_id);
+    public List<Answer> retrieveAnswersByUserId(Long user_id){
+        return answerRepository.findByUserId(user_id);
     }
 
-    public Optional<Post> retrievePost(Long id){
-        return postRepository.findById(id);
+    public Optional<Answer> retrieveAnswer(Long id){
+        return answerRepository.findById(id);
     }
 
     public Long getPageNumber(){
-        return postRepository.count();
+        return answerRepository.count();
     }
 
-    public List<Post> getPostsByCategory(String categoryName){
-        return postRepository.findByCategory(categoryName);
+    public List<Answer> getAnswersByCategory(String categoryName){
+        return answerRepository.findByCategory(categoryName);
     }
 
     @Transactional
-    public void deletePost(Long id){
-        postRepository.deleteById(id);
+    public void deleteAnswer(Long id){
+        answerRepository.deleteById(id);
     }
 
 
