@@ -1,4 +1,4 @@
-create table answer
+create table post
 (
     post_id     bigint auto_increment
         primary key,

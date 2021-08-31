@@ -28,25 +28,16 @@ public class AnswerController {
         Optional<Post> tobeAnsweredPost = null;
         Answer savedAnswer = null;
 
-        //현재 글을 작성하는 유저가 직원 타입이  맞는지 확인 후 답변할 글을 불러옴.
+        //현재 글을 작성하는 유저가 직원 타입이  맞는지 확인
+        //답변 생성 및 답변 된 게시글의 상태를 answer로 변경
+        //답변의 id를 return
         if(isEmployee.get().getUsertype().equals("employee")) {
-            tobeAnsweredPost = postService.retrievePost(id);
-        }
-        else return -1L;
-
-        //답변할 글이 현재 존재하는지 확인 후 답변 생성.
-        if(tobeAnsweredPost.isPresent()) {
-            savedAnswer = answerService.createAnswer(answer, tobeAnsweredPost.get());
-        }
-        else return -2L;
-
-        //해당게시글에 대한 답변이 생성되었는지 확인 후 게시글의 답변 상태를 true로 변경.
-        if(answerService.retrieveAnswer(id).isPresent()) {
+            savedAnswer = answerService.createAnswer(answer, postService.retrievePost(id).get());
             postService.updateAnsweredPost(id);
+            return savedAnswer.getId();
         }
-        else return -3L;
 
-        return savedAnswer.getId();
+        return -1L;
     }
 
     @GetMapping("")

@@ -7,6 +7,6 @@ create table comment
     user_id    bigint       null,
     post_id    bigint       null,
     constraint FKs1slvnkuemjsq2kj4h3vhx7i1
-        foreign key (post_id) references answer (post_id)
+        foreign key (post_id) references post (post_id)
 );
 

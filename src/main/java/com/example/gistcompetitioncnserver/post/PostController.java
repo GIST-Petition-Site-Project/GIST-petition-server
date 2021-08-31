@@ -25,17 +25,6 @@ public class PostController {
         return savedPost.getId();
     }
 
-    @PostMapping("/{id}")
-    public Long createAnswerPost(@PathVariable Long id, @RequestBody Post post){
-        Optional<Post> tobeAnsweredPost = retrievePost(id);
-        if(tobeAnsweredPost.isPresent()){
-
-        }
-        Post savedPost = postService.createPost(post);
-
-        return savedPost.getId();
-    }
-
     @GetMapping("")
     public List<Post> retrieveAllPost(){
         return postService.retrieveAllPost();
