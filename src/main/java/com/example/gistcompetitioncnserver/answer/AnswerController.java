@@ -21,24 +21,24 @@ public class AnswerController {
     private final UserDaoService userDaoService;
     private final PostRepository postRepository;
 
-    @PostMapping("/{id}")
-    public Long createAnswer(@PathVariable Long id, @RequestBody Answer answer){
-
-        Optional<User> isEmployee = userDaoService.findUserById(answer.getUserId());
-        Optional<Post> tobeAnsweredPost = null;
-        Answer savedAnswer = null;
-
-        //현재 글을 작성하는 유저가 직원 타입이  맞는지 확인
-        //답변 생성 및 답변 된 게시글의 상태를 answer로 변경
-        //답변의 id를 return
-        if(isEmployee.get().getUsertype().equals("employee")) {
-            savedAnswer = answerService.createAnswer(answer, postService.retrievePost(id).get());
-            postService.updateAnsweredPost(id);
-            return savedAnswer.getId();
-        }
-
-        return -1L;
-    }
+//    @PostMapping("/{id}")
+//    public Long createAnswer(@PathVariable Long id, @RequestBody Answer answer){
+//
+//        Optional<User> isEmployee = userDaoService.findUserById(answer.getUserId());
+//        Optional<Post> tobeAnsweredPost = null;
+//        Answer savedAnswer = null;
+//
+//        //현재 글을 작성하는 유저가 직원 타입이  맞는지 확인
+//        //답변 생성 및 답변 된 게시글의 상태를 answer로 변경
+//        //답변의 id를 return
+//        if(isEmployee.get().getUsertype().equals("employee")) {
+//            savedAnswer = answerService.createAnswer(answer, postService.retrievePost(id).get());
+//            postService.updateAnsweredPost(id);
+//            return savedAnswer.getId();
+//        }
+//
+//        return -1L;
+//    }
 
     @GetMapping("")
     public List<Answer> retrieveAllPost(){

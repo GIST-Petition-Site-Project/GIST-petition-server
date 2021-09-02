@@ -1,6 +1,7 @@
 package com.example.gistcompetitioncnserver.user;
 
 import com.example.gistcompetitioncnserver.post.Post;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,7 +28,6 @@ public class User {
             name = "native",
             strategy = "native"
     )
-    @Column(name = "ID")
     private Long id;
 
     private String username;
@@ -42,6 +42,7 @@ public class User {
 
     private boolean enabled;
 
-    private String usertype = "guest";
+//    @JsonIgnore
+//    private String usertype = "guest";
 
 }
