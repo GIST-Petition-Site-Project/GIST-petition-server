@@ -19,8 +19,8 @@ import java.util.Collections;
 import java.util.List;
 
 @Entity
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Data
 public class User implements UserDetails {
 
@@ -39,9 +39,7 @@ public class User implements UserDetails {
 
     private String email;
 
-    private String userId;
-
-    private String userPassword;
+    private String password;
 
     private boolean locked = false;
 
@@ -49,14 +47,13 @@ public class User implements UserDetails {
     @JsonIgnore
     private UserRole userRole;
 
-    private boolean enabled;
+    private boolean enabled = false;
 
-    public User(String username, String email,
-                String userId, String userPassword, UserRole userRole) {
-        this.username = username;
+
+    public User(String usernamename, String email, String password, UserRole userRole) {
+        this.username = usernamename;
         this.email = email;
-        this.userId = userId;
-        this.userPassword = userPassword;
+        this.password = password;
         this.userRole = userRole;
     }
 
@@ -71,7 +68,12 @@ public class User implements UserDetails {
 
     @Override
     public String getPassword() {
-        return userPassword;
+        return password;
+    }
+
+    @Override
+    public String getUsername() {
+        return username;
     }
 
     @Override
