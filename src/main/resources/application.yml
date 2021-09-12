@@ -3,10 +3,10 @@ spring:
     tomcat:
       remove-abandoned-timeout: 60
       remove-abandoned: true
-    driverClassName: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://patition-db.ckuzxdryb7hz.ap-northeast-2.rds.amazonaws.com:3307/testdb?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&serverTimezone=Asia/Seoul
-    username: admin
-    password: gist2021
+    username: ${USER_NAME}
+    password: ${PASSWORD}
+
   jpa:
     show-sql: true
     hibernate:
@@ -15,5 +15,21 @@ spring:
     include:
       - aws
       - credentials
-#spring.datasource.url=jdbc:mysql://database-2.ckr9u04uxydd.us-east-2.rds.amazonaws.com:3307/test-db?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&serverTimezone=Asia/Seoul
 
+  mail:
+    host: email-smtp.ap-northeast-2.amazonaws.com
+    port: 587
+    username: ${SMTP_KEY}
+    password: ${SMTP_VALUE}
+
+    properties:
+      mail:
+        smtp:
+          ssl:
+            trust: "*"
+          auth: true
+          starttls:
+            enable: true
+          connectiontimeout: 5000
+          timeout: 3000
+          writetimeout: 5000
