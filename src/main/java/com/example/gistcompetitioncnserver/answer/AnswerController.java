@@ -1,10 +1,8 @@
 package com.example.gistcompetitioncnserver.answer;
 
-import com.example.gistcompetitioncnserver.post.Post;
 import com.example.gistcompetitioncnserver.post.PostRepository;
 import com.example.gistcompetitioncnserver.post.PostService;
-import com.example.gistcompetitioncnserver.user.User;
-import com.example.gistcompetitioncnserver.user.UserDaoService;
+import com.example.gistcompetitioncnserver.user.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,7 +16,7 @@ public class AnswerController {
 
     private final AnswerService answerService;
     private final PostService postService;
-    private final UserDaoService userDaoService;
+    private final UserService userService;
     private final PostRepository postRepository;
 
 //    @PostMapping("/{id}")
