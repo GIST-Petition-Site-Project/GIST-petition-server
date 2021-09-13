@@ -16,6 +16,13 @@ public interface EmailConfirmationTokenRepository extends JpaRepository<EmailCon
     Optional<EmailConfirmationToken> findByToken(String token);
 
     @Transactional
+    @Query("SELECT c FROM EmailConfirmationToken c WHERE c.user.id = ?1")
+    Optional<EmailConfirmationToken> findByUserId(Long userId);
+
+
+
+
+    @Transactional
     @Modifying
     @Query("UPDATE EmailConfirmationToken c " +
             "SET c.confirmedAt = ?2 " +

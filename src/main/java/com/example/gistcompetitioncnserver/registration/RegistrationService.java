@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 
 @Service
@@ -21,7 +22,7 @@ public class RegistrationService {
     private final EmailConfirmationTokenService emailConfirmationTokenService;
     private final EmailSender emailSender;
 
-    public String register(RegistrationRequest request){
+    public String register(RegistrationRequest request, HttpServletRequest urlRequest){
         boolean isValidEmail = emailValidator.test(request.getEmail());
         if (!isValidEmail){
             throw new IllegalStateException("email not valid");
@@ -35,6 +36,8 @@ public class RegistrationService {
                         UserRole.USER
                 )
         );
+
+        System.out.println("urlRequest = " + urlRequest.getRequestURL());
 
         String link = "http://localhost:8080/gistps/api/v1/user/confirm?token=" + token; // redirect home page in local
 //        String link = "https://gist-competition-cn-server-zvxvr4r3aa-du.a.run.app/gistps/api/v1/user/confirm?token=" + token; // redirect home page in local
@@ -52,7 +55,9 @@ public class RegistrationService {
                 .orElseThrow(() ->
                         new IllegalStateException("token not found"));
 
+
         if (confirmationToken.getConfirmedAt() != null) {
+            System.out.println("confirmationToken = " + confirmationToken.getConfirmedAt());
             throw new IllegalStateException("이메일이 이미 존재합니다.");
         }
 

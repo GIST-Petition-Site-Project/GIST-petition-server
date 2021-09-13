@@ -2,6 +2,7 @@ package com.example.gistcompetitioncnserver.registration.token;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -18,6 +19,11 @@ public class EmailConfirmationTokenService {
 
     public Optional<EmailConfirmationToken> getToken(String token) {
         return emailConfirmationTokenRepository.findByToken(token);
+    }
+
+    @Transactional
+    public void deleteToken(String token){
+        emailConfirmationTokenRepository.deleteById(getToken(token).get().getEmailTokenId());
     }
 
     public int setConfirmedAt(String token) {

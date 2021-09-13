@@ -92,27 +92,16 @@ public class UserController {
     //MARK: - rr
 
     @PostMapping("/registration")
-    public String register(@RequestBody RegistrationRequest request){
-        return registrationService.register(request);
+    public String register(@RequestBody RegistrationRequest request, HttpServletRequest urlRequest){
+        return registrationService.register(request, urlRequest);
     }
 
     //로그인 시도하려면 이렇게 해도?
     @GetMapping( "/confirm")
     public String confirm(@RequestParam("token") String token) {
         return registrationService.confirmToken(token);
-        //Registrationservice로
     }
 
-//    @PostMapping(path = "/login")
-//    public String login(@RequestBody LoginRequest request){
-//        User user = userRepository.findByEmail(request.getEmail())
-//                .orElseThrow(() -> new IllegalArgumentException("가입되지 않은 회원입니다."));
-//        if (!bCryptPasswordEncoder.encode(request.getPassword())
-//                .matches(user.getPassword())){
-//            throw new IllegalStateException("잘못된 비밀번호입니다.");
-//        }
-//        return jwtTokenProvider.createToken(user.getUsername(), user.getUserRole());
-//    }
     @GetMapping("/token/refresh")
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String authorizationHeader = request.getHeader(AUTHORIZATION);

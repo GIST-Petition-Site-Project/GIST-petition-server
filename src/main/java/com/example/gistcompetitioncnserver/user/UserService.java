@@ -1,9 +1,9 @@
 package com.example.gistcompetitioncnserver.user;
 
 import com.example.gistcompetitioncnserver.registration.token.EmailConfirmationToken;
+import com.example.gistcompetitioncnserver.registration.token.EmailConfirmationTokenRepository;
 import com.example.gistcompetitioncnserver.registration.token.EmailConfirmationTokenService;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -22,6 +22,7 @@ public class UserService implements UserDetailsService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     private final UserRepository userRepository;
+    private final EmailConfirmationTokenRepository emailConfirmationTokenRepository;
 
     // find user once users login
     private final static String USER_NOT_FOUND_MSG = "user with email %s not found";
@@ -47,12 +48,35 @@ public class UserService implements UserDetailsService {
         return userRepository.findByEmail(email);
     }
 
+    @Transactional
     public String signUpUser(User user){
         // check user exists to prevent duplication
-        boolean userExists = userRepository.findByEmail(user.getEmail())
-                .isPresent();
+        Optional<User> userInfo = userRepository.findByEmail(user.getEmail());
+        boolean userExists = userInfo.isPresent();
 
         if (userExists){
+            Optional<EmailConfirmationToken> userEmailToken = emailConfirmationTokenRepository.findByUserId(userInfo.get().getId()) ;
+
+            if((userInfo.get().getEmail()).equals((user.getEmail()))){
+                emailConfirmationTokenService.deleteToken(userEmailToken.get().getToken());
+                String token = UUID.randomUUID().toString();
+
+                // send confirmation token
+                EmailConfirmationToken emailConfirmationToken = new EmailConfirmationToken(
+                        token,
+                        LocalDateTime.now(),
+                        LocalDateTime.now().plusMinutes(15), // set expirestime to 15 minutes
+                        userInfo.get()
+                );
+
+                //save email token
+                emailConfirmationTokenService.
+                        saveEmailConfirmToken(emailConfirmationToken);
+
+                // send mail
+                return token;
+            }
+
             throw new IllegalStateException("이미 존재하는 이메일입니다.");
         }
 
