@@ -26,14 +26,7 @@ public class PostService {
 
     @Transactional
     public Long createPost(PostRequestDto postRequestDto){
-        Long result = postRepository.save(
-                Post.builder()
-                .title(postRequestDto.getTitle())
-                .description(postRequestDto.getDescription())
-                .category(postRequestDto.getCategory())
-                .created(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
-                .userId(postRequestDto.getUserId())
-                .build()
+        Long result = postRepository.save(postRequestDto.toEntity()
         ).getId();
 
         return result;
