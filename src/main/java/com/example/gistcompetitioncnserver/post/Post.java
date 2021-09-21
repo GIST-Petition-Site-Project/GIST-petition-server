@@ -1,18 +1,18 @@
 package com.example.gistcompetitioncnserver.post;
 
 import com.example.gistcompetitioncnserver.comment.Comment;
-import com.example.gistcompetitioncnserver.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
+import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-@Data
+@AllArgsConstructor
+@Builder
+@Getter
+@Setter
 @Entity
 public class Post {
 
@@ -28,9 +28,6 @@ public class Post {
     @Column(name = "postId")
     private Long id;
 
-    @OneToMany(mappedBy = "post")
-    private final List<Comment> comment = new ArrayList<>();
-
     private String title;
 
     private String description;
@@ -45,7 +42,13 @@ public class Post {
 
     private Long userId;
 
-//    //foreign key
+    @OneToMany(mappedBy = "post")
+    private final List<Comment> comment = new ArrayList<>();
+
+    public Post() {
+    }
+
+    //    //foreign key
 //    @ManyToOne
 //    @JoinColumn(name = "id")
 //    private User user;
