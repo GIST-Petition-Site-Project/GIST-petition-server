@@ -16,7 +16,6 @@ import java.util.Optional;
 public class CommentController {
 
     private final CommentService commentService;
-
     private final PostService postService;
 
     @PostMapping("/{id}/comment")
