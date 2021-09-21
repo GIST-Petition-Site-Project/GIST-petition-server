@@ -13,8 +13,4 @@ public class GistCompetitionCnServerApplication {
         SpringApplication.run(GistCompetitionCnServerApplication.class, args);
     }
 
-    @Bean
-    PasswordEncoder passwordEncoder(){
-        return new BCryptPasswordEncoder();
-    }
 }

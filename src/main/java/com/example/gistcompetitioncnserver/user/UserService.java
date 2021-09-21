@@ -3,13 +3,12 @@ package com.example.gistcompetitioncnserver.user;
 import com.example.gistcompetitioncnserver.registration.token.EmailConfirmationToken;
 import com.example.gistcompetitioncnserver.registration.token.EmailConfirmationTokenRepository;
 import com.example.gistcompetitioncnserver.registration.token.EmailConfirmationTokenService;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,7 +19,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class UserService implements UserDetailsService {
 
-    private final PasswordEncoder bCryptPasswordEncoder;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     private final UserRepository userRepository;
     private final EmailConfirmationTokenRepository emailConfirmationTokenRepository;
