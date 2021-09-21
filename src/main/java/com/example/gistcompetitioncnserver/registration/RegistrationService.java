@@ -37,10 +37,9 @@ public class RegistrationService {
                 )
         );
 
-        System.out.println("urlRequest = " + urlRequest.getRequestURL());
+        String baseUrl = urlRequest.getRequestURL().toString();
+        String link = baseUrl.substring(0, baseUrl.length() - 12 ) + "confirm?token=" + token; // redirect home page in local
 
-        String link = "http://localhost:8080/gistps/api/v1/user/confirm?token=" + token; // redirect home page in local
-//        String link = "https://gist-competition-cn-server-zvxvr4r3aa-du.a.run.app/gistps/api/v1/user/confirm?token=" + token; // redirect home page in local
         emailSender.send(
                 request.getEmail(),
                 buildEmail(request.getUsername(), link));
@@ -57,7 +56,6 @@ public class RegistrationService {
 
 
         if (confirmationToken.getConfirmedAt() != null) {
-            System.out.println("confirmationToken = " + confirmationToken.getConfirmedAt());
             throw new IllegalStateException("이메일이 이미 존재합니다.");
         }
 
