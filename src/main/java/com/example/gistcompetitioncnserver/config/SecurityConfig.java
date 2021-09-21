@@ -45,6 +45,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManagerBean());
         customAuthenticationFilter.setFilterProcessesUrl("/gistps/api/v1/login"); // set login url
         http.csrf().disable(); // need to know
+
+        http.cors().configurationSource(corsConfigurationSource()); // CORS 설정
+
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS); // make stateless
         http.authorizeRequests().antMatchers("/gistps/api/v1/login/**", "/gistps/api/v1/user/token/refresh/**","/gistps/api/v1/user/registration/**").permitAll();
         http.authorizeRequests().antMatchers(GET, "/gistps/api/v1/post/**", "/gistps/api/v1/user/confirm/**", "/gistps/api/v1/user/registeration/**").permitAll();
@@ -60,6 +63,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
+    }
+
+    @Bean  //CORS 설정 빈
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+
+        configuration.addAllowedOrigin("http://localhost:3000");
+        configuration.addAllowedOrigin("https://gist-petition-web-i8d9q7xe4-betterit.vercel.app/petitions");
+        configuration.addAllowedHeader("*");
+        configuration.addAllowedMethod("*");
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 
 }
