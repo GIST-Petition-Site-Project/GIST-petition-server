@@ -21,19 +21,16 @@ public class LikeService {
         Post post = postRepository.getById(id);
         List<LikeForPost> likes = likeRepository.findByUserIdAndPostId(userId, post.getId());
 
-        if (likes.isEmpty() == true) {
+        if (likes.isEmpty()) {
             request.setPost(post);
             likeRepository.save(request);
             return true;
         }
-        if (likes.isEmpty() == false){
-            for (LikeForPost like : likes){
+        
+        for (LikeForPost like : likes){
                 likeRepository.delete(like);
             }
-            return false;
-        }
         return false;
-
     }
 
     public int getNumberofLike(Long id) {
