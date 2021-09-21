@@ -44,12 +44,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception{
         CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManagerBean());
         customAuthenticationFilter.setFilterProcessesUrl("/gistps/api/v1/login"); // set login url
-        http.csrf().disable();
+        http.csrf().disable(); // need to know
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS); // make stateless
         http.authorizeRequests().antMatchers("/gistps/api/v1/login/**", "/gistps/api/v1/user/token/refresh/**","/gistps/api/v1/user/registration/**").permitAll();
-        http.authorizeRequests().antMatchers(GET, "/gistps/api/v1/post/**","/gistps/api/v1/comment/**", "/gistps/api/v1/user/confirm/**", "/gistps/api/v1/user/registeration/**").permitAll();
-        http.authorizeRequests().antMatchers(POST, "/gistps/api/v1/**").hasAnyAuthority("USER");
-        http.authorizeRequests().antMatchers( "/gistps/api/v1/**").hasAnyAuthority("ADMIN");
+        http.authorizeRequests().antMatchers(GET, "/gistps/api/v1/post/**", "/gistps/api/v1/user/confirm/**", "/gistps/api/v1/user/registeration/**").permitAll();
+        http.authorizeRequests().antMatchers(POST, "/gistps/api/v1/post").hasAnyAuthority("USER", "ADMIN");
+//        http.authorizeRequests().antMatchers( "/gistps/api/v1/**").hasAnyAuthority("ADMIN");
         http.authorizeRequests().anyRequest().authenticated(); // Specify that URLs are allowed by any authenticated user.
 
         http.addFilter(customAuthenticationFilter);
