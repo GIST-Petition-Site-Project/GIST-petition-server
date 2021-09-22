@@ -57,7 +57,11 @@ public class UserService implements UserDetailsService {
         if (userExists){
             Optional<EmailConfirmationToken> userEmailToken = emailConfirmationTokenRepository.findByUserId(userInfo.get().getId()) ;
 
-            if((userInfo.get().getEmail()).equals((user.getEmail()))){
+            if (!userInfo.get().isEnabled()){
+                throw new IllegalStateException("이미 존재하는 이메일입니다.");
+            }
+
+            if((userInfo.get().getEmail()).equals((user.getEmail())) && !userInfo.get().isEnabled()){
                 emailConfirmationTokenService.deleteToken(userEmailToken.get().getToken());
                 String token = UUID.randomUUID().toString();
 

@@ -1,13 +1,10 @@
 package com.example.gistcompetitioncnserver.post;
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 
@@ -52,10 +49,5 @@ public class PostController {
         return ResponseEntity.noContent().build();
     }
 
-
-//    @PutMapping("/{id}")
-//    public void amendPost(@PathVariable Long id, @RequestBody Post post){
-//        postRepository.
-//    }
 
 }

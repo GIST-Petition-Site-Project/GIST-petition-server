@@ -69,7 +69,7 @@ public class RegistrationService {
         userService.enableAppUser(
                 confirmationToken.getUser().getEmail());
 
-        return "confirmed"; // 홈페이지로 리다이렉트 해도 좋을듯.
+        return "redirect:/url"; // 홈페이지로 리다이렉트 해도 좋을듯.
     }
 
     private String buildEmail(String name, String link) {
