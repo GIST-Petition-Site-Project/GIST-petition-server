@@ -1,19 +1,14 @@
 package com.example.gistcompetitioncnserver.registration.emailsender;
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.ws.wsdl.wsdl11.provider.MessagesProvider;
 
 import javax.mail.MessagingException;
-import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.io.UnsupportedEncodingException;
@@ -22,7 +17,6 @@ import java.io.UnsupportedEncodingException;
 @RequiredArgsConstructor
 public class EmailService implements EmailSender{
 
-    private Environment env;
     private final static Logger LOGGER = LoggerFactory
             .getLogger(EmailService.class);
 
