@@ -36,13 +36,13 @@ public class PostController {
             );
         }
 
+
         return ResponseEntity.created(URI.create("/post/" + postService.createPost(postRequestDto))).build();
     }
 
     @GetMapping("/post")
-    public ResponseEntity<Object> retrieveAllPost(Pageable pageable){
-        Page<Post> posts = postService.retrieveAllPost(pageable);
-        return ResponseEntity.ok().body(posts);
+    public ResponseEntity<Object> retrieveAllPost(){
+        return ResponseEntity.ok().body(postService.retrieveAllPost());
     }
 
     @GetMapping("/post/{id}")
