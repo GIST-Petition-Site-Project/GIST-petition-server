@@ -30,9 +30,8 @@ public class PostService {
         return result;
     }
 
-    public Page<Post> retrieveAllPost(Pageable pageable){
-        pageable = PageRequest.of(pageable.getPageNumber() <= 0 ? 0 : pageable.getPageNumber() -1, pageable.getPageSize(), Sort.by("id").descending());
-        return postRepository.findAll(pageable);
+    public List<Post> retrieveAllPost(){
+        return postRepository.findAllJoinFetch(Sort.by(Sort.Direction.DESC, "id"));
     }
 
     public List<Post> retrievePostsByUserId(Long user_id){
