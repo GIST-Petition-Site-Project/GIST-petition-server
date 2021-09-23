@@ -69,76 +69,126 @@ public class RegistrationService {
         userService.enableAppUser(
                 confirmationToken.getUser().getEmail());
 
-        return "redirect:/url"; // 홈페이지로 리다이렉트 해도 좋을듯.
+        return "https://gist-petition-web-qtmha8hh2-betterit.vercel.app"; // redirect to the page
     }
 
     private String buildEmail(String name, String link) {
-        return "<div style=\"font-family:Helvetica,Arial,sans-serif;font-size:16px;margin:0;color:#0b0c0c\">\n" +
-                "\n" +
-                "<span style=\"display:none;font-size:1px;color:#fff;max-height:0\"></span>\n" +
-                "\n" +
-                "  <table role=\"presentation\" width=\"100%\" style=\"border-collapse:collapse;min-width:100%;width:100%!important\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\">\n" +
-                "    <tbody><tr>\n" +
-                "      <td width=\"100%\" height=\"53\" bgcolor=\"#0b0c0c\">\n" +
-                "        \n" +
-                "        <table role=\"presentation\" width=\"100%\" style=\"border-collapse:collapse;max-width:580px\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\">\n" +
-                "          <tbody><tr>\n" +
-                "            <td width=\"70\" bgcolor=\"#0b0c0c\" valign=\"middle\">\n" +
-                "                <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse\">\n" +
-                "                  <tbody><tr>\n" +
-                "                    <td style=\"padding-left:10px\">\n" +
-                "                  \n" +
-                "                    </td>\n" +
-                "                    <td style=\"font-size:28px;line-height:1.315789474;Margin-top:4px;padding-left:10px\">\n" +
-                "                      <span style=\"font-family:Helvetica,Arial,sans-serif;font-weight:700;color:#ffffff;text-decoration:none;vertical-align:top;display:inline-block\">Confirm your email</span>\n" +
-                "                    </td>\n" +
-                "                  </tr>\n" +
-                "                </tbody></table>\n" +
-                "              </a>\n" +
-                "            </td>\n" +
-                "          </tr>\n" +
-                "        </tbody></table>\n" +
-                "        \n" +
-                "      </td>\n" +
-                "    </tr>\n" +
-                "  </tbody></table>\n" +
-                "  <table role=\"presentation\" class=\"m_-6186904992287805515content\" align=\"center\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;max-width:580px;width:100%!important\" width=\"100%\">\n" +
-                "    <tbody><tr>\n" +
-                "      <td width=\"10\" height=\"10\" valign=\"middle\"></td>\n" +
-                "      <td>\n" +
-                "        \n" +
-                "                <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse\">\n" +
-                "                  <tbody><tr>\n" +
-                "                    <td bgcolor=\"#1D70B8\" width=\"100%\" height=\"10\"></td>\n" +
-                "                  </tr>\n" +
-                "                </tbody></table>\n" +
-                "        \n" +
-                "      </td>\n" +
-                "      <td width=\"10\" valign=\"middle\" height=\"10\"></td>\n" +
-                "    </tr>\n" +
-                "  </tbody></table>\n" +
-                "\n" +
-                "\n" +
-                "\n" +
-                "  <table role=\"presentation\" class=\"m_-6186904992287805515content\" align=\"center\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-collapse:collapse;max-width:580px;width:100%!important\" width=\"100%\">\n" +
-                "    <tbody><tr>\n" +
-                "      <td height=\"30\"><br></td>\n" +
-                "    </tr>\n" +
-                "    <tr>\n" +
-                "      <td width=\"10\" valign=\"middle\"><br></td>\n" +
-                "      <td style=\"font-family:Helvetica,Arial,sans-serif;font-size:19px;line-height:1.315789474;max-width:560px\">\n" +
-                "        \n" +
-                "            <p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\">Hi " + name + ",</p><p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\"> Thank you for registering. Please click on the below link to activate your account: </p><blockquote style=\"Margin:0 0 20px 0;border-left:10px solid #b1b4b6;padding:15px 0 0.1px 15px;font-size:19px;line-height:25px\"><p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\"> <a href=\"" + link + "\">Activate Now</a> </p></blockquote>\n Link will expire in 15 minutes. <p>See you soon</p>" +
-                "        \n" +
-                "      </td>\n" +
-                "      <td width=\"10\" valign=\"middle\"><br></td>\n" +
-                "    </tr>\n" +
-                "    <tr>\n" +
-                "      <td height=\"30\"><br></td>\n" +
-                "    </tr>\n" +
-                "  </tbody></table><div class=\"yj6qo\"></div><div class=\"adL\">\n" +
-                "\n" +
-                "</div></div>";
+        return "<!DOCTYPE html>\n" +
+                "<html>\n" +
+                "  <head>\n" +
+                "    <title>이메일인증</title>\n" +
+                "    <meta charset=\"utf-8\" />\n" +
+                "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n" +
+                "    <style>\n" +
+                "        .title{\n" +
+                "            padding: 20px 0px; \n" +
+                "            border-bottom: 1px solid rgb(223, 223, 223); \n" +
+                "            font-size: 20px;\n" +
+                "        }\n" +
+                "        .table-overall{\n" +
+                "            font-size: 16px; \n" +
+                "            color: rgb(34, 34, 34); \n" +
+                "            line-height: 1.2;\n" +
+                "        }\n" +
+                "        .line-table{\n" +
+                "            height: 1px; \n" +
+                "            background: black; \n" +
+                "            position: relative;\n" +
+                "        }\n" +
+                "        .line-content{\n" +
+                "            width: 20%; \n" +
+                "            height: 1px;    \n" +
+                "        }\n" +
+                "        .content{\n" +
+                "            font-size: 16px;\n" +
+                "            padding:10px;\n" +
+                "            line-height: 160%;\n" +
+                "        }    \n" +
+                "        .footer{\n" +
+                "            font-size: 13px; \n" +
+                "            line-height: 26px; \n" +
+                "            padding:15px; \n" +
+                "            padding-top:0px;\n" +
+                "        }\n" +
+                "    </style>\n" +
+                "  </head>\n" +
+                "  <body>\n" +
+                "      <div>\n" +
+                "        <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"font-family: NanumSquare, sans-serif;\">\n" +
+                "            <tbody><tr>\n" +
+                "                <td align=\"center\" style=\"padding: 25px 18px;\">\n" +
+                "                    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"400px\" class=\"table-overall\">\n" +
+                "                    <tbody>\n" +
+                "                        <tr>\n" +
+                "                            <td align=\"center\" style=\"padding: 25px 0px;\">\n" +
+                "                                <img src=\"https://www.gist.ac.kr/en/img/sub01/01030301_logo.jpg\" \n" +
+                "                                    style=\"display: block; border: 0px; width:200px\"\n" +
+                "                                />\n" +
+                "                            </td>\n" +
+                "                            </tr>\n" +
+                "                        <tr>\n" +
+                "                            <td class=\"line-table\">\n" +
+                "                                <div class=\"line-content\"></div>\n" +
+                "                            </td>\n" +
+                "                        </tr>\n" +
+                "                        <tr>\n" +
+                "                            <td align=\"center\" class=\"title\" >\n" +
+                "                                <b style=\"color: rgb(255, 52, 0);\">이메일 인증</b>을 완료해 주세요\n" +
+                "                            </td>\n" +
+                "                        </tr>\n" +
+                "                        <tr>\n" +
+                "                            <td class=\"line-table\">\n" +
+                "                                <div class=\"line-content\"></div>\n" +
+                "                            </td>\n" +
+                "                        </tr>\n" +
+                "                    \n" +
+                "                        <tr>\n" +
+                "                            <td style=\"line-height: 20px; padding: 23px 0px;\">\n" +
+                "                                <p class=\"content\" style=\" margin: 0px 0px 20px;\">\n" +
+                "                                    안녕하세요 " + name + "님,<br>\n" +
+                "                                    ShouTInG 회원가입 완료를 위한 메일이 발송되었습니다.\n" +
+                "                                </p>\n" +
+                "                                <p class=\"content\" style=\"margin: 0px; padding-top:0; \">\n" +
+                "                                    ShouTInG 회원가입을 위해 이메일 인증이 필요합니다.\n" +
+                "                                    <br>\n" +
+                "                                    <span style=\"color: rgb(255, 52, 0);\">\n" +
+                "                                        아래 링크를 클릭하여 이메일 인증을 완료해 주세요.\n" +
+                "                                    </span> \n" +
+                "                                    <br>\n" +
+                "                                    <div style=\"padding:10px\">\n" +
+                "                                        <a href="+ link + ">링크를 클릭하시면 가입이 완료됩니다</a>\n" +
+                "                                    </div>\n" +
+                "                                    <div style=\"padding:10px; line-height: 160%;\">\n" +
+                "                                        이메일 인증은 메일이 발송된 시점부터 15분 간만 유효합니다.\n" +
+                "                                    </div>\n" +
+                "                                </p>\n" +
+                "                            </td>\n" +
+                "                        </tr> \n" +
+                "                        <tr>\n" +
+                "                            <td class=\"line-table\">\n" +
+                "                                <div class=\"line-content\"></div>\n" +
+                "                            </td>\n" +
+                "                        </tr>\n" +
+                "                        <tr>\n" +
+                "                            <td style=\"padding-top: 25px; padding-bottom: 24px; border-top: 1px solid black;\">\n" +
+                "                                <div class=\"footer\">\n" +
+                "                                    본 메일은 발신전용입니다. 더 궁금한 사항은 ShouTInG 오픈카톡을\n" +
+                "                                    <br> 이용해주시기 바랍니다.\n" +
+                "                                </div>\n" +
+                "                                <div><img\n" +
+                "                                    src=\"https://giai.gist.ac.kr/thumbnail/popupzoneDetail/PHO_201908061057017980.jpg\"\n" +
+                "                                    style=\"display: block; border: 0px; width: 150px\"\n" +
+                "                                />   \n" +
+                "                                </div>     \n" +
+                "                            </td>\n" +
+                "                        </tr></tbody>\n" +
+                "                    </table>\n" +
+                "                </td>\n" +
+                "            </tr></tbody>\n" +
+                "        </table>\n" +
+                "    </div>\n" +
+                "  </body>\n" +
+                "</html>\n";
     }
 
 
