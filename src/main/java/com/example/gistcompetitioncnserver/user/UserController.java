@@ -18,6 +18,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.servlet.view.RedirectView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -98,8 +99,8 @@ public class UserController {
 
     //로그인 시도하려면 이렇게 해도?
     @GetMapping( "/confirm")
-    public String confirm(@RequestParam("token") String token) {
-        return registrationService.confirmToken(token);
+    public void confirm(@RequestParam("token") String token, HttpServletResponse response) throws IOException {
+        response.sendRedirect(registrationService.confirmToken(token)); // redirect the main page
     }
 
     @GetMapping("/token/refresh")
