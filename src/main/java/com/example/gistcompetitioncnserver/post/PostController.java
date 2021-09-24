@@ -2,6 +2,7 @@ package com.example.gistcompetitioncnserver.post;
 
 import com.example.gistcompetitioncnserver.common.ErrorCase;
 import com.example.gistcompetitioncnserver.common.ErrorMessage;
+import com.example.gistcompetitioncnserver.user.User;
 import com.example.gistcompetitioncnserver.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -33,21 +34,28 @@ public class PostController {
     @PostMapping("/post")
     public ResponseEntity<Object> createPost(@RequestBody PostRequestDto postRequestDto, @AuthenticationPrincipal String email){
 
+        Optional<User> user = userService.findUserIdByEmail(email); // change email to userId
+
+        if (user.isEmpty()){
+            return ResponseEntity.badRequest().body(
+                    new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.NO_SUCH_USER_ERROR)
+            );
+        }
+
+        if(!user.get().isEnabled()){
+            return ResponseEntity.badRequest().body(
+                    new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.NO_SUCH_VERIFICATION_ERROR)
+            );
+        }
+
         if (!isRequestBodyValid(postRequestDto)){
             return ResponseEntity.badRequest().body(
                     new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.INVAILD_FILED_ERROR)
             );
         }
 
-        Optional<Long> userId = userService.findUserIdByEmail(email); // change email to userId
 
-        if (userId.isEmpty()){
-            return ResponseEntity.badRequest().body(
-                    new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.NO_SUCH_USER_ERROR)
-            );
-        }
-
-        return ResponseEntity.created(URI.create("/post/" + postService.createPost(postRequestDto, userId.get()))).build();
+        return ResponseEntity.created(URI.create("/post/" + postService.createPost(postRequestDto, user.get().getId()))).build();
     }
 
     @GetMapping("/post")

@@ -130,7 +130,7 @@ public class UserService implements UserDetailsService {
         userRepository.deleteById(id);
     }
 
-    public Optional<Long> findUserIdByEmail(String email){
+    public Optional<User> findUserIdByEmail(String email){
         return userRepository.findIdByEmail(email);
     }
 
