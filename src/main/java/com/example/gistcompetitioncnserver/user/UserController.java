@@ -62,7 +62,6 @@ public class UserController {
         WebMvcLinkBuilder linkTo = WebMvcLinkBuilder
                 .linkTo(WebMvcLinkBuilder.methodOn(this.getClass()).retrieveAllUsers());
         resource.add(linkTo.withRel("all-users"));
-
         return resource;
 
     }
@@ -74,14 +73,11 @@ public class UserController {
 
     @PostMapping("")
     public ResponseEntity<User> createUser(@RequestBody User user){
-
         User savedUser = userService.save(user);
-
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(savedUser)
                 .toUri();
-
         return ResponseEntity.created(location).build();
     }
 
@@ -90,7 +86,7 @@ public class UserController {
         userService.deleteById(id);
     }
 
-    //MARK: - rr
+    //MARK: - try registartion and send email
 
     @PostMapping("/registration")
     public String register(@RequestBody RegistrationRequest request, HttpServletRequest urlRequest){
