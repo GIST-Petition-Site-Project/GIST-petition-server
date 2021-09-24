@@ -13,6 +13,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Optional;
 
 
@@ -58,6 +59,33 @@ public class PostController {
         return ResponseEntity.created(URI.create("/post/" + postService.createPost(postRequestDto, user.get().getId()))).build();
     }
 
+    @GetMapping("/{userEmail}/post")
+    public ResponseEntity<Object> retrievePostsByUserId(@PathVariable String userEmail, @AuthenticationPrincipal String requestEmail){
+
+        Optional<User> user = userService.findUserIdByEmail(requestEmail); // change email to userId
+
+        if (user.isEmpty()){
+            return ResponseEntity.badRequest().body(
+                    new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.NO_SUCH_USER_ERROR)
+            );
+        }
+
+        if(!user.get().isEnabled()){
+            return ResponseEntity.badRequest().body(
+                    new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.NO_SUCH_VERIFICATION_ERROR)
+            );
+        }
+
+        if(!requestEmail.equals(userEmail)){
+            return ResponseEntity.badRequest().body(
+                    new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.BAD_REQUEST_ERROR)
+            );
+
+        }
+
+        return ResponseEntity.ok().body(postService.retrievePostsByUserId(user.get().getId()));
+    }
+
     @GetMapping("/post")
     public ResponseEntity<Object> retrieveAllPost(){
         return ResponseEntity.ok().body(postService.retrieveAllPost());
@@ -78,7 +106,7 @@ public class PostController {
         return ResponseEntity.ok().body(postService.getPostsByCategory(categoryName));
     }
 
-    @DeleteMapping("/post/{id}")
+    @DeleteMapping("/post/{id}") // like도 지워야함
     public ResponseEntity<Object> deletePost(@PathVariable Long id){
         postService.deletePost(id);
         return ResponseEntity.noContent().build();
