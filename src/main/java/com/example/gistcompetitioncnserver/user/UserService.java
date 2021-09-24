@@ -115,20 +115,23 @@ public class UserService implements UserDetailsService {
     public List<User> retrieveAllUsers(){
         return userRepository.findAll();
     }
+
     public Optional<User> findUserById(Long id){
         return userRepository.findById(id);
     }
 
-    @Transactional
     public User save(User user){
         String encodedPassword = bCryptPasswordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
         return userRepository.save(user);
     }
 
-    @Transactional
     public void deleteById(Long id){
         userRepository.deleteById(id);
+    }
+
+    public Optional<Long> findUserIdByEmail(String email){
+        return userRepository.findIdByEmail(email);
     }
 
 
