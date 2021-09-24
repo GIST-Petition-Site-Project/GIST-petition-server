@@ -8,6 +8,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -20,8 +22,15 @@ public class PostService {
     private final CommentRepository commentRepository;
 
     @Transactional
-    public Long createPost(PostRequestDto postRequestDto){
-        Long result = postRepository.save(postRequestDto.toEntity()
+    public Long createPost(PostRequestDto postRequestDto, Long userId){
+        Long result = postRepository.save(
+                Post.builder()
+                .title(postRequestDto.getTitle())
+                .description(postRequestDto.getDescription())
+                .category(postRequestDto.getCategory())
+                .userId(userId)
+                .created(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
+                .build()
         ).getId();
 
         return result;
