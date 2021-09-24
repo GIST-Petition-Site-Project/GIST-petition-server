@@ -2,14 +2,18 @@ package com.example.gistcompetitioncnserver.comment;
 
 import com.example.gistcompetitioncnserver.post.Post;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
+import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 @Entity
-@Data
 public class Comment {
 
     @Id
@@ -34,13 +38,6 @@ public class Comment {
     private Post post;
 
     private Long userId;
-
-//    @Builder
-//    public Comment( String content, LocalDateTime created, Post post) {
-//        this.content = content;
-//        this.created = created;
-//        this.post = post;
-//    }
 
 
 }

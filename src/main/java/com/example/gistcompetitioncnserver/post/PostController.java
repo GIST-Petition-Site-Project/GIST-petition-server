@@ -36,7 +36,6 @@ public class PostController {
             );
         }
 
-
         return ResponseEntity.created(URI.create("/post/" + postService.createPost(postRequestDto))).build();
     }
 
