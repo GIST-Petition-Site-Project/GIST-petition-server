@@ -22,7 +22,7 @@ public class CommentService {
 
 
     @Transactional
-    public Long createComment(Long id, CommentRequestDto commentRequestDto){
+    public Long createComment(Long id, CommentRequestDto commentRequestDto, Long userId){
         Post post = postRepository.getById(id);
 
         Long commentId = commentRepository.save(
@@ -30,7 +30,7 @@ public class CommentService {
                 .content(commentRequestDto.getContent())
                 .created(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
                 .post(post)
-                .userId(commentRequestDto.getUserId())
+                .userId(userId)
                 .build()).getCommentId();
 
         return commentId;
@@ -47,5 +47,9 @@ public class CommentService {
         return commentRepository.findByCommentId(commentId).isPresent();
     }
 
+    // Method to check if the real comment writer delete the comment.
+    public boolean equalUserToComment(Long postCommnetId, Long writerId){
+        return writerId.equals(commentRepository.findUserIdByCommentId(postCommnetId));
+    }
 
 }
