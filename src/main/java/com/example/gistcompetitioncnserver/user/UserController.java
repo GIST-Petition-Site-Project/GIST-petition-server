@@ -71,15 +71,15 @@ public class UserController {
         return postService.retrievePostsByUserId(userId);
     }
 
-//    @PostMapping("")
-//    public ResponseEntity<User> createUser(@RequestBody User user){
-//        User savedUser = userService.save(user);
-//        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-//                .path("/{id}")
-//                .buildAndExpand(savedUser)
-//                .toUri();
-//        return ResponseEntity.created(location).build();
-//    }
+    @PostMapping("")
+    public ResponseEntity<User> createUser(@RequestBody User user){
+        User savedUser = userService.save(user);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(savedUser)
+                .toUri();
+        return ResponseEntity.created(location).build();
+    }
 
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable Long id){
