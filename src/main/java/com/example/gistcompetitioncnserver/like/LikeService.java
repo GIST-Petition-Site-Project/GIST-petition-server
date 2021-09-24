@@ -15,22 +15,38 @@ public class LikeService {
     private final LikeRepository likeRepository;
     private final PostRepository postRepository;
 
-    public boolean LikePost(Long id, LikeForPost request) {
+    public boolean LikePost(Long id, LikeToPost request) {
 
         Long userId = request.getUserId();
         Post post = postRepository.getById(id);
-        List<LikeForPost> likes = likeRepository.findByUserIdAndPostId(userId, post.getId());
+        List<LikeToPost> likes = likeRepository.findByUserIdAndPostId(userId, post.getId());
 
         if (likes.isEmpty()) {
             request.setPost(post);
             likeRepository.save(request);
+            post.setAccepted(getNumberofLike(id));
+            postRepository.save(post);
             return true;
         }
-        
-        for (LikeForPost like : likes){
-                likeRepository.delete(like);
-            }
+
+        for (LikeToPost like : likes) {
+            likeRepository.delete(like);
+            post.setAccepted(getNumberofLike(id));
+            postRepository.save(post);
+        }
         return false;
+    }
+
+    public boolean CheckLikePost(Long id, LikeToPost request) {
+
+        Long userId = request.getUserId();
+        Post post = postRepository.getById(id);
+        List<LikeToPost> likes = likeRepository.findByUserIdAndPostId(userId, post.getId());
+
+        if (likes.isEmpty()) {
+            return false;
+        }
+        return true;
     }
 
     public int getNumberofLike(Long id) {

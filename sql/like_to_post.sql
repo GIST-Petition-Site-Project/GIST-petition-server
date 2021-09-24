@@ -1,5 +1,5 @@
 -- auto-generated definition
-create table like_for_post
+create table like_to_post
 (
     like_id bigint auto_increment
         primary key,
