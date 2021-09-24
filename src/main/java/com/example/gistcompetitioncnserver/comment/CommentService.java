@@ -22,21 +22,18 @@ public class CommentService {
 
 
     @Transactional
-    public void createComment(Long id, Comment request){
+    public Long createComment(Long id, CommentRequestDto commentRequestDto){
         Post post = postRepository.getById(id);
-        request.setCreated(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-        request.setPost(post);
-        commentRepository.save(request);
 
-        //
-//        Comment comment = commentRepository.save(
-//                Comment.builder()
-//                .content(request.getContent())
-//                .created(LocalDateTime.now())
-//                .post(post)
-//                .build());
-//
-//        // return response
+        Long commentId = commentRepository.save(
+                Comment.builder()
+                .content(commentRequestDto.getContent())
+                .created(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                .post(post)
+                .userId(commentRequestDto.getUserId())
+                .build()).getCommentId();
+
+        return commentId;
 
     }
 
@@ -45,6 +42,10 @@ public class CommentService {
     }
 
     public List<Comment> getCommentsByPostId(Long id){ return commentRepository.findByPostId(id);}
+
+    public boolean existCommentId(Long commentId){
+        return commentRepository.findByCommentId(commentId).isPresent();
+    }
 
 
 }
