@@ -1,8 +1,11 @@
 package com.example.gistcompetitioncnserver.post;
 
 import com.example.gistcompetitioncnserver.comment.Comment;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.*;
+import com.example.gistcompetitioncnserver.like.LikeToPost;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -44,6 +47,9 @@ public class Post {
 
     @OneToMany(mappedBy = "post")
     private final List<Comment> comment = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post")
+    private final List<LikeToPost> likes = new ArrayList<>();
 
     public Post() {
     }

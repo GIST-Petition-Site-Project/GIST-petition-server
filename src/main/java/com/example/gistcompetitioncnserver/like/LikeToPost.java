@@ -9,7 +9,7 @@ import javax.persistence.*;
 
 @Entity
 @Data
-public class LikeForPost {
+public class LikeToPost {
 
     @Id
     @GeneratedValue(
