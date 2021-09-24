@@ -2,6 +2,8 @@ package com.example.gistcompetitioncnserver.post;
 
 import com.example.gistcompetitioncnserver.comment.Comment;
 import com.example.gistcompetitioncnserver.like.LikeToPost;
+import com.example.gistcompetitioncnserver.user.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -50,6 +52,7 @@ public class Post {
 
     @OneToMany(mappedBy = "post")
     private final List<LikeToPost> likes = new ArrayList<>();
+
 
     public Post() {
     }

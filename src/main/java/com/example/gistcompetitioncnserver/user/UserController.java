@@ -4,8 +4,6 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.example.gistcompetitioncnserver.post.Post;
-import com.example.gistcompetitioncnserver.post.PostService;
 import com.example.gistcompetitioncnserver.registration.RegistrationRequest;
 import com.example.gistcompetitioncnserver.registration.RegistrationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,7 +16,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import org.springframework.web.servlet.view.RedirectView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -35,9 +32,6 @@ public class UserController {
 
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private PostService postService;
 
     @Autowired
     private RegistrationService registrationService;
@@ -66,10 +60,6 @@ public class UserController {
 
     }
 
-    @GetMapping("/{userId}/post")
-    public List<Post> retrievePostsByUserId(@PathVariable long userId){
-        return postService.retrievePostsByUserId(userId);
-    }
 
     @PostMapping("")
     public ResponseEntity<User> createUser(@RequestBody User user){

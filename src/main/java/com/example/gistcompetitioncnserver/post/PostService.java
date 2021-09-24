@@ -62,7 +62,7 @@ public class PostService {
         postRepository.save(post);
     }
 
-    @Transactional
+    @Transactional // like도 지워야함
     public void deletePost(Long id){
         List<Long> commentIds = new ArrayList<>();
 
@@ -70,7 +70,9 @@ public class PostService {
             commentIds.add(comment.getCommentId());
         }
 
-        commentRepository.deleteAllByPostIdInQuery(commentIds);
+        if(!commentIds.isEmpty()){
+            commentRepository.deleteAllByPostIdInQuery(commentIds);
+        }
         postRepository.deleteById(id);
     }
 
