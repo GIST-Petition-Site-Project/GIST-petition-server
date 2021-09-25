@@ -12,6 +12,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findByUserId(Long userId);
     List<Post> findByCategory(String categoryName);
 
+
     @Query("SELECT distinct p from Post p join fetch p.comment")
     List<Post> findAllJoinFetch(Sort sort);
 }

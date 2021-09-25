@@ -1,6 +1,5 @@
 package com.example.gistcompetitioncnserver.comment;
 
-import com.example.gistcompetitioncnserver.post.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -15,6 +14,9 @@ import java.util.Optional;
 public interface CommentRepository extends JpaRepository<Comment, Long> {
     List<Comment> findByPostId(Long postId);
     Optional<Comment> findByCommentId(Long postId);
+
+    @Query("select c.userId from Comment c where c.commentId = :commentId")
+    Long findUserIdByCommentId(@Param("commentId") Long commentId);
 
     @Transactional
     @Modifying
