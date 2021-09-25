@@ -12,62 +12,54 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
 public class RegistrationService {
 
     private final UserService userService;
-    private final RegistrationEmailValidator emailValidator;
     private final EmailConfirmationTokenService emailConfirmationTokenService;
     private final EmailSender emailSender;
 
     public String register(RegistrationRequest request, HttpServletRequest urlRequest){
-        boolean isValidEmail = emailValidator.test(request.getEmail());
-        if (!isValidEmail){
-            throw new IllegalStateException("email not valid");
-        }
-
-        String token = userService.signUpUser(
-                new User(
-                        request.getUsername(),
-                        request.getEmail(),
-                        request.getPassword(),
-                        UserRole.USER
-                )
+        User user = new User(
+                request.getUsername(),
+                request.getEmail(),
+                request.getPassword(),
+                UserRole.USER
         );
 
         String baseUrl = urlRequest.getRequestURL().toString();
-        String link = baseUrl.substring(0, baseUrl.length() - 12 ) + "confirm?token=" + token; // redirect home page in local
+        String link = baseUrl.substring(0, baseUrl.length() - 12 ) + "confirm?token=" + userService.signUpUser(user); // redirect home page in local
 
         emailSender.send(
                 request.getEmail(),
                 buildEmail(request.getUsername(), link));
-
-        return "redirect:/"; // redirect로 변경 -> 홈페이지 들어가도록 그리고 alert가 나올 수 있도록
+        return user.getId().toString();
     }
 
+    public String resendEmail(User user, HttpServletRequest urlRequest){
+
+        Optional<EmailConfirmationToken> userEmailToken = emailConfirmationTokenService.findEmailTokenByUserId(user.getId()) ;
+        emailConfirmationTokenService.deleteToken(userEmailToken.get().getToken()); // delete previous token
+
+        String token = userService.createToken(user);
+        String baseUrl = urlRequest.getRequestURL().toString();
+        String link = baseUrl.substring(0, baseUrl.length() - 12 ) + "confirm?token=" + token; // redirect home page in local
+
+        emailSender.send(
+                user.getEmail(),
+                buildEmail(user.getUsername(), link));
+        return "email is resent"; // redirect로 변경 -> 홈페이지 들어가도록 그리고 alert가 나올 수 있도록
+    }
+
+
+
     @Transactional
-    public String confirmToken(String token) {
-        EmailConfirmationToken confirmationToken = emailConfirmationTokenService
-                .getToken(token)
-                .orElseThrow(() ->
-                        new IllegalStateException("token not found"));
-
-
-        if (confirmationToken.getConfirmedAt() != null) {
-            throw new IllegalStateException("이메일이 이미 존재합니다.");
-        }
-
-        LocalDateTime expiredAt = confirmationToken.getExpiredAt();
-
-        if (expiredAt.isBefore(LocalDateTime.now())) {
-            throw new IllegalStateException("토큰이 만료되었습니다.");
-        }
-
+    public String confirmToken(String token, String email) {
         emailConfirmationTokenService.setConfirmedAt(token);
-        userService.enableAppUser(
-                confirmationToken.getUser().getEmail());
+        userService.enableAppUser(email);
 
         return "https://gist-petition-web-qtmha8hh2-betterit.vercel.app"; // redirect to the page
     }

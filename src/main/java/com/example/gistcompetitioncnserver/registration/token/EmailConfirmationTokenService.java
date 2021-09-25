@@ -21,6 +21,10 @@ public class EmailConfirmationTokenService {
         return emailConfirmationTokenRepository.findByToken(token);
     }
 
+    public Optional<EmailConfirmationToken> findEmailTokenByUserId(Long userId){
+        return emailConfirmationTokenRepository.findEmailTokenByUserId(userId);
+    }
+
     @Transactional
     public void deleteToken(String token){
         emailConfirmationTokenRepository.deleteById(getToken(token).get().getEmailTokenId());

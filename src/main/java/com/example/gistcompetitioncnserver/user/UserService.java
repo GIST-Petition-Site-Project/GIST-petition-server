@@ -22,13 +22,12 @@ public class UserService implements UserDetailsService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     private final UserRepository userRepository;
-    private final EmailConfirmationTokenRepository emailConfirmationTokenRepository;
 
     // find user once users login
     private final static String USER_NOT_FOUND_MSG = "user with email %s not found";
     private final EmailConfirmationTokenService emailConfirmationTokenService;
 
-    @Override
+    @Override // need to know how this work
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
         Optional<User> user = userRepository.findByEmail(email);
@@ -50,49 +49,15 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public String signUpUser(User user){
-        // check user exists to prevent duplication
-        Optional<User> userInfo = userRepository.findByEmail(user.getEmail());
-        boolean userExists = userInfo.isPresent();
+        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword())); // encode password
+        userRepository.save(user); // save user entity in db
+        return createToken(user);
+    }
 
-        if (userExists){
-            Optional<EmailConfirmationToken> userEmailToken = emailConfirmationTokenRepository.findByUserId(userInfo.get().getId()) ;
-
-            if (!userInfo.get().isEnabled()){
-                throw new IllegalStateException("이미 존재하는 이메일입니다.");
-            }
-
-            if((userInfo.get().getEmail()).equals((user.getEmail())) && !userInfo.get().isEnabled()){
-                emailConfirmationTokenService.deleteToken(userEmailToken.get().getToken());
-                String token = UUID.randomUUID().toString();
-
-                // send confirmation token
-                EmailConfirmationToken emailConfirmationToken = new EmailConfirmationToken(
-                        token,
-                        LocalDateTime.now(),
-                        LocalDateTime.now().plusMinutes(15), // set expirestime to 15 minutes
-                        userInfo.get()
-                );
-
-                //save email token
-                emailConfirmationTokenService.
-                        saveEmailConfirmToken(emailConfirmationToken);
-
-                // send mail
-                return token;
-            }
-
-            throw new IllegalStateException("이미 존재하는 이메일입니다.");
-        }
-
-        // encode password
-        String encodedPassword = bCryptPasswordEncoder.encode(user.getPassword());
-
-        user.setPassword(encodedPassword);
-        userRepository.save(user); // save db
-
+    public String createToken(User user){
         String token = UUID.randomUUID().toString();
 
-        // send confirmation token
+        // make confirmation token
         EmailConfirmationToken emailConfirmationToken = new EmailConfirmationToken(
                 token,
                 LocalDateTime.now(),
@@ -100,13 +65,12 @@ public class UserService implements UserDetailsService {
                 user
         );
 
-        //save email token
+        //save confirmation token in database
         emailConfirmationTokenService.
                 saveEmailConfirmToken(emailConfirmationToken);
 
-        // send email token to RegistrationService
+        // return the token
         return token;
-
     }
 
     public int enableAppUser(String email) { return userRepository.enableAppUser(email); }
@@ -130,7 +94,7 @@ public class UserService implements UserDetailsService {
         userRepository.deleteById(id);
     }
 
-    public Optional<User> findUserIdByEmail(String email){
+    public Optional<User> findUserByEmail(String email){
         return userRepository.findIdByEmail(email);
     }
 

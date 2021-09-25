@@ -35,7 +35,7 @@ public class PostController {
     @PostMapping("/post")
     public ResponseEntity<Object> createPost(@RequestBody PostRequestDto postRequestDto, @AuthenticationPrincipal String email){
 
-        Optional<User> user = userService.findUserIdByEmail(email); // change email to userId
+        Optional<User> user = userService.findUserByEmail(email); // change email to userId
 
         if (user.isEmpty()){
             return ResponseEntity.badRequest().body(
@@ -45,7 +45,7 @@ public class PostController {
 
         if(!user.get().isEnabled()){
             return ResponseEntity.badRequest().body(
-                    new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.NO_SUCH_VERIFICATION_ERROR)
+                    new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.NO_SUCH_VERIFICATION_EMAIL_ERROR)
             );
         }
 
@@ -59,10 +59,10 @@ public class PostController {
         return ResponseEntity.created(URI.create("/post/" + postService.createPost(postRequestDto, user.get().getId()))).build();
     }
 
-    @GetMapping("/{userEmail}/post")
+    @GetMapping("/my-post/{userEmail}")
     public ResponseEntity<Object> retrievePostsByUserId(@PathVariable String userEmail, @AuthenticationPrincipal String requestEmail){
 
-        Optional<User> user = userService.findUserIdByEmail(requestEmail); // change email to userId
+        Optional<User> user = userService.findUserByEmail(requestEmail); // change email to userId
 
         if (user.isEmpty()){
             return ResponseEntity.badRequest().body(
@@ -72,7 +72,7 @@ public class PostController {
 
         if(!user.get().isEnabled()){
             return ResponseEntity.badRequest().body(
-                    new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.NO_SUCH_VERIFICATION_ERROR)
+                    new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.NO_SUCH_VERIFICATION_EMAIL_ERROR)
             );
         }
 
