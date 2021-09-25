@@ -33,7 +33,7 @@ public class CommentController {
     public ResponseEntity<Object> createComment(@PathVariable Long id, @RequestBody CommentRequestDto
                                  commentRequestDto, @AuthenticationPrincipal String email){
 
-        Optional<User> user = userService.findUserIdByEmail(email); // change email to userId
+        Optional<User> user = userService.findUserByEmail(email); // change email to userId
 
         if (user.isEmpty()){
             return ResponseEntity.badRequest().body(
@@ -43,7 +43,7 @@ public class CommentController {
 
         if(!user.get().isEnabled()){
             return ResponseEntity.badRequest().body(
-                    new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.NO_SUCH_VERIFICATION_ERROR)
+                    new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.NO_SUCH_VERIFICATION_EMAIL_ERROR)
             );
         }
 
@@ -60,7 +60,7 @@ public class CommentController {
     @DeleteMapping("/{id}/comment/{commentId}")
     public ResponseEntity<Object> deleteComment(@PathVariable Long id, @PathVariable Long commentId, @AuthenticationPrincipal String email){
 
-        Optional<User> user = userService.findUserIdByEmail(email); // change email to userId
+        Optional<User> user = userService.findUserByEmail(email); // change email to userId
 
         if (user.isEmpty()){
             return ResponseEntity.badRequest().body(
@@ -70,7 +70,7 @@ public class CommentController {
 
         if(!user.get().isEnabled()){
             return ResponseEntity.badRequest().body(
-                    new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.NO_SUCH_VERIFICATION_ERROR)
+                    new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.NO_SUCH_VERIFICATION_EMAIL_ERROR)
             );
         }
 
