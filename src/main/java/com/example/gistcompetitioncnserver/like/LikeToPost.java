@@ -2,13 +2,16 @@ package com.example.gistcompetitioncnserver.like;
 
 import com.example.gistcompetitioncnserver.post.Post;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
+import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 
+@Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
-@Data
 public class LikeToPost {
 
     @Id

@@ -15,15 +15,16 @@ public class LikeService {
     private final LikeRepository likeRepository;
     private final PostRepository postRepository;
 
-    public boolean LikePost(Long id, LikeToPost request) {
+    public boolean LikePost(Long id, Long userId) {
 
-        Long userId = request.getUserId();
         Post post = postRepository.getById(id);
         List<LikeToPost> likes = likeRepository.findByUserIdAndPostId(userId, post.getId());
 
         if (likes.isEmpty()) {
-            request.setPost(post);
-            likeRepository.save(request);
+            likeRepository.save(LikeToPost.builder()
+                    .userId(userId)
+                    .post(post)
+                    .build());
             post.setAccepted(getNumberofLike(id));
             postRepository.save(post);
             return true;
