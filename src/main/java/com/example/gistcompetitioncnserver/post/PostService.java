@@ -36,12 +36,15 @@ public class PostService {
         return result;
     }
 
+//    public List<Post> retrieveAllPost(){
+//        return postRepository.findAllJoinFetch(Sort.by(Sort.Direction.DESC, "id"));
+//    }
     public List<Post> retrieveAllPost(){
         return postRepository.findAllJoinFetch(Sort.by(Sort.Direction.DESC, "id"));
     }
 
     public List<Post> retrievePostsByUserId(Long user_id){
-        return postRepository.findByUserId(user_id);
+        return postRepository.findByUserId(Sort.by(Sort.Direction.DESC, "id"),user_id);
     }
 
     public Optional<Post> retrievePost(Long id){
@@ -53,7 +56,7 @@ public class PostService {
     }
 
     public List<Post> getPostsByCategory(String categoryName){
-        return postRepository.findByCategory(categoryName);
+        return postRepository.findByCategory(Sort.by(Sort.Direction.DESC, "id"),categoryName);
     }
 
     public void updateAnsweredPost(Long id){
