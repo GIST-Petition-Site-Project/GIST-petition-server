@@ -1,6 +1,7 @@
 package com.example.gistcompetitioncnserver.comment;
 
 import com.example.gistcompetitioncnserver.post.Post;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
@@ -17,14 +18,7 @@ import java.time.LocalDateTime;
 public class Comment {
 
     @Id
-    @GeneratedValue(
-            strategy= GenerationType.AUTO,
-            generator="native"
-    )
-    @GenericGenerator(
-            name = "native",
-            strategy = "native"
-    )
+    @GeneratedValue
     @Column(name = "commentId")
     private Long commentId;
 
@@ -32,9 +26,9 @@ public class Comment {
 
     private String created;
 
+    @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="postId")
-    @JsonIgnore
     private Post post;
 
     private Long userId;
