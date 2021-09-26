@@ -37,7 +37,7 @@ public class PostService {
     }
 
     public List<Post> retrieveAllPost(){
-        return postRepository.findAllJoinFetch(Sort.by(Sort.Direction.DESC, "id"));
+        return postRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
     }
 
     public List<Post> retrievePostsByUserId(Long user_id){
