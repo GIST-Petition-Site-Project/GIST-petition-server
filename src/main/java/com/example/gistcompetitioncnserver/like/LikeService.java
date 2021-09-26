@@ -38,9 +38,8 @@ public class LikeService {
         return false;
     }
 
-    public boolean CheckLikePost(Long id, LikeToPost request) {
+    public boolean CheckLikePost(Long id, Long userId) {
 
-        Long userId = request.getUserId();
         Post post = postRepository.getById(id);
         List<LikeToPost> likes = likeRepository.findByUserIdAndPostId(userId, post.getId());
 

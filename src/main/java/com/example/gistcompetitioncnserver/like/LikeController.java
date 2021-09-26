@@ -49,8 +49,25 @@ public class LikeController {
     }
 
     @PostMapping("/{id}/like/check")
-    public boolean CheckLikePost(@PathVariable Long id, @RequestBody LikeToPost LikeToPost) {
-        return likeService.CheckLikePost(id, LikeToPost);
+    public ResponseEntity<Object> CheckLikePost(@PathVariable Long id, @AuthenticationPrincipal String email) {
+
+        Optional<User> user = userService.findUserByEmail(email);
+
+        if (user.isEmpty()){
+            return ResponseEntity.badRequest().body(
+                    new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.NO_SUCH_USER_ERROR)
+            );
+        }
+
+        if(!user.get().isEnabled()){
+            return ResponseEntity.badRequest().body(
+                    new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.NO_SUCH_VERIFICATION_EMAIL_ERROR)
+            );
+        }
+
+        return ResponseEntity
+                .ok()
+                .body(Boolean.toString(likeService.CheckLikePost(id, user.get().getId())));
     }
 
 }
