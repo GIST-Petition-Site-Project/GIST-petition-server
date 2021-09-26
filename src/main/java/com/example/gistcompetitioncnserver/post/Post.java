@@ -4,6 +4,7 @@ import com.example.gistcompetitioncnserver.comment.Comment;
 import com.example.gistcompetitioncnserver.like.LikeToPost;
 import com.example.gistcompetitioncnserver.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,14 +23,7 @@ import java.util.List;
 public class Post {
 
     @Id
-    @GeneratedValue(
-            strategy= GenerationType.AUTO,
-            generator="native"
-    )
-    @GenericGenerator(
-            name = "native",
-            strategy = "native"
-    )
+    @GeneratedValue
     @Column(name = "postId")
     private Long id;
 
@@ -47,6 +41,7 @@ public class Post {
 
     private Long userId;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "post")
     private final List<Comment> comment = new ArrayList<>();
 
