@@ -4,6 +4,7 @@ import com.example.gistcompetitioncnserver.common.ErrorCase;
 import com.example.gistcompetitioncnserver.common.ErrorMessage;
 import com.example.gistcompetitioncnserver.user.User;
 import com.example.gistcompetitioncnserver.user.UserService;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
