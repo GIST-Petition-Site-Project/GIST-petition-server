@@ -10,6 +10,7 @@ import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -54,8 +55,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS); // make stateless
         http.authorizeRequests().antMatchers("/gistps/api/v1/login/**", "/gistps/api/v1/user/token/refresh/**","/gistps/api/v1/user/registration/**").permitAll();
         http.authorizeRequests().antMatchers(GET, "/gistps/api/v1/post/**", "/gistps/api/v1/user/confirm/**", "/gistps/api/v1/user/registeration/**").permitAll();
+        http.authorizeRequests().antMatchers(GET, "/swagger-ui/**","/v3/api-docs").permitAll();
+        http.authorizeRequests().antMatchers(POST, "/swagger-ui/**","/v3/api-docs").hasAnyAuthority("USER", "ADMIN");
         http.authorizeRequests().antMatchers(POST, "/gistps/api/v1/post").hasAnyAuthority("USER", "ADMIN");
 //        http.authorizeRequests().antMatchers( "/gistps/api/v1/**").hasAnyAuthority("ADMIN");
+
         http.authorizeRequests().anyRequest().authenticated(); // Specify that URLs are allowed by any authenticated user.
 
         http.addFilter(customAuthenticationFilter);
@@ -81,6 +85,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
+    }
+
+    private static final String[] AUTH_WHITELIST = {
+            "/swagger-resources/**",
+            "/swagger-ui.html",
+            "/v2/api-docs",
+            "/webjars/**"
+    };
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+        web.ignoring().antMatchers(AUTH_WHITELIST);
     }
 
 }
