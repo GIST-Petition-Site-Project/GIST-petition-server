@@ -20,31 +20,22 @@ import lombok.Setter;
 @Entity
 public class Post {
 
+    @JsonManagedReference
+    @OneToMany(mappedBy = "post")
+    private final List<Comment> comment = new ArrayList<>();
+    @OneToMany(mappedBy = "post")
+    private final List<LikeToPost> likes = new ArrayList<>();
     @Id
     @GeneratedValue
     @Column(name = "postId")
     private Long id;
-
     private String title;
-
     private String description;
-
     private String category;
-
     private String created;
-
     private boolean answered;
-
     private int accepted;
-
     private Long userId;
-
-    @JsonManagedReference
-    @OneToMany(mappedBy = "post")
-    private final List<Comment> comment = new ArrayList<>();
-
-    @OneToMany(mappedBy = "post")
-    private final List<LikeToPost> likes = new ArrayList<>();
 
     protected Post() {
     }
@@ -70,7 +61,7 @@ public class Post {
 
     public boolean applyLike(User user) {
         for (LikeToPost like : likes) {
-            if (like.isLikedBy(user.getId())){
+            if (like.isLikedBy(user.getId())) {
                 likes.remove(like);
                 return false;
             }
