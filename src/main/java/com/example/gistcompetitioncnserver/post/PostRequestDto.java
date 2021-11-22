@@ -1,9 +1,8 @@
 package com.example.gistcompetitioncnserver.post;
 
-import lombok.*;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
