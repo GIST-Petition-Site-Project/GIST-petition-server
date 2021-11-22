@@ -21,10 +21,7 @@ public class LikeService {
         List<LikeToPost> likes = likeRepository.findByUserIdAndPostId(userId, post.getId());
 
         if (likes.isEmpty()) {
-            likeRepository.save(LikeToPost.builder()
-                    .userId(userId)
-                    .post(post)
-                    .build());
+            likeRepository.save(new LikeToPost(post, userId));
             post.setAccepted(getNumberofLike(id));
             postRepository.save(post);
             return true;
