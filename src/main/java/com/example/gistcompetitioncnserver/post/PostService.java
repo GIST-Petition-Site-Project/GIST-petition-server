@@ -77,9 +77,25 @@ public class PostService {
     }
 
     @Transactional
-    public void like(Long postId, Long userId) {
+    public boolean like(Long postId, Long userId) {
         Post post = postRepository.findById(postId).orElseThrow(IllegalArgumentException::new);
         User user = userRepository.findById(userId).orElseThrow(IllegalArgumentException::new);
-        post.applyLike(user);
+        return post.applyLike(user);
+    }
+
+    public int countOfLike(Long postId) {
+        Post post = postRepository.getById(postId);
+        return post.getLikes().size();
+    }
+
+    public boolean checkLikePost(Long postId, Long userId) {
+        Post post = postRepository.getById(postId);
+        List<LikeToPost> likes = post.getLikes();
+        for (LikeToPost like : likes) {
+            if (like.isLikedBy(userId)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

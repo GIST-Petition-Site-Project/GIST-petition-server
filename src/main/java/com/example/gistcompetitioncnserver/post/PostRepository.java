@@ -10,6 +10,5 @@ import java.util.List;
 public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findByUserId(Sort sort, Long userId);
     List<Post> findByCategory(Sort sort, String categoryName);
-
     List<Post> findAll(Sort sort);
 }
