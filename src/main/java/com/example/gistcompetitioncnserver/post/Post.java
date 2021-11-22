@@ -3,20 +3,19 @@ package com.example.gistcompetitioncnserver.post;
 import com.example.gistcompetitioncnserver.comment.Comment;
 import com.example.gistcompetitioncnserver.like.LikeToPost;
 import com.example.gistcompetitioncnserver.user.User;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import org.hibernate.annotations.GenericGenerator;
-
-import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import lombok.Getter;
+import lombok.Setter;
 
-@AllArgsConstructor
-@Builder
 @Getter
 @Setter
 @Entity
@@ -48,14 +47,35 @@ public class Post {
     @OneToMany(mappedBy = "post")
     private final List<LikeToPost> likes = new ArrayList<>();
 
-
-    public Post() {
+    protected Post() {
     }
 
-    //    //foreign key
-//    @ManyToOne
-//    @JoinColumn(name = "id")
-//    private User user;
+    public Post(String title, String description, String category, Long userId) {
+        this(null, title, description, category,
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
+                false, 0, userId);
+    }
 
+    private Post(Long id, String title, String description, String category, String created, boolean answered,
+                 int accepted,
+                 Long userId) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.category = category;
+        this.created = created;
+        this.answered = answered;
+        this.accepted = accepted;
+        this.userId = userId;
+    }
 
+    public void applyLike(User user) {
+        for (LikeToPost like : likes) {
+            if (like.isLikedBy(user)){
+                likes.remove(like);
+                return;
+            }
+        }
+        this.likes.add(new LikeToPost(this, user.getId()));
+    }
 }

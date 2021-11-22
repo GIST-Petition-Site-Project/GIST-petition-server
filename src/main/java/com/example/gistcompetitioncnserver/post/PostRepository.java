@@ -12,5 +12,4 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findByCategory(Sort sort, String categoryName);
 
     List<Post> findAll(Sort sort);
-
 }
