@@ -3,6 +3,8 @@ package com.example.gistcompetitioncnserver.post;
 
 import com.example.gistcompetitioncnserver.comment.Comment;
 import com.example.gistcompetitioncnserver.comment.CommentRepository;
+import com.example.gistcompetitioncnserver.user.User;
+import com.example.gistcompetitioncnserver.user.UserRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -16,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class PostService {
 
     private final PostRepository postRepository;
+    private final UserRepository userRepository;
     private final CommentRepository commentRepository;
 
     @Transactional
@@ -73,5 +76,10 @@ public class PostService {
         postRepository.deleteById(id);
     }
 
-
+    @Transactional
+    public void like(Long postId, Long userId) {
+        Post post = postRepository.findById(postId).orElseThrow(IllegalArgumentException::new);
+        User user = userRepository.findById(userId).orElseThrow(IllegalArgumentException::new);
+        post.applyLike(user);
+    }
 }
