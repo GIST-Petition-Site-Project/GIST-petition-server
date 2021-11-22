@@ -1,4 +1,4 @@
-package com.example.gistcompetitioncnserver.like;
+package com.example.gistcompetitioncnserver.post;
 
 import com.example.gistcompetitioncnserver.post.Post;
 import com.example.gistcompetitioncnserver.user.User;
@@ -40,8 +40,8 @@ public class LikeToPost {
         this.userId = userId;
     }
 
-    public boolean isLikedBy(User user) {
-        return userId.equals(user.getId());
+    public boolean isLikedBy(Long userId) {
+        return this.userId.equals(userId);
     }
 
     public Long getUserId() {

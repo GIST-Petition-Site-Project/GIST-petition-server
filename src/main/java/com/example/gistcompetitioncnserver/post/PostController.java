@@ -4,17 +4,13 @@ import com.example.gistcompetitioncnserver.common.ErrorCase;
 import com.example.gistcompetitioncnserver.common.ErrorMessage;
 import com.example.gistcompetitioncnserver.user.User;
 import com.example.gistcompetitioncnserver.user.UserService;
-import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.List;
 import java.util.Optional;
 
 
@@ -113,5 +109,50 @@ public class PostController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/post/{postId}/like")
+    public ResponseEntity<Object> LikePost(@PathVariable Long postId, @AuthenticationPrincipal String email) {
+        Optional<User> user = userService.findUserByEmail(email);
 
+        if (user.isEmpty()){
+            return ResponseEntity.badRequest().body(
+                    new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.NO_SUCH_USER_ERROR)
+            );
+        }
+
+        if(!user.get().isEnabled()){
+            return ResponseEntity.badRequest().body(
+                    new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.NO_SUCH_VERIFICATION_EMAIL_ERROR)
+            );
+        }
+
+        return ResponseEntity
+                .ok()
+                .body(Boolean.toString(postService.like(postId, user.get().getId())));
+    }
+
+    @GetMapping("/{id}/like")
+    public int countOfLike(@PathVariable Long id) {
+        return postService.countOfLike(id);
+    }
+
+    @GetMapping("/{id}/like/check")
+    public ResponseEntity<Object> CheckLikePost(@PathVariable Long id, @AuthenticationPrincipal String email) {
+        Optional<User> user = userService.findUserByEmail(email);
+
+        if (user.isEmpty()){
+            return ResponseEntity.badRequest().body(
+                    new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.NO_SUCH_USER_ERROR)
+            );
+        }
+
+        if(!user.get().isEnabled()){
+            return ResponseEntity.badRequest().body(
+                    new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.NO_SUCH_VERIFICATION_EMAIL_ERROR)
+            );
+        }
+
+        return ResponseEntity
+                .ok()
+                .body(Boolean.toString(postService.checkLikePost(id, user.get().getId())));
+    }
 }

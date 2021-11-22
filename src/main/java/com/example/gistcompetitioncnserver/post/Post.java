@@ -1,7 +1,6 @@
 package com.example.gistcompetitioncnserver.post;
 
 import com.example.gistcompetitioncnserver.comment.Comment;
-import com.example.gistcompetitioncnserver.like.LikeToPost;
 import com.example.gistcompetitioncnserver.user.User;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import java.time.LocalDateTime;
@@ -69,13 +68,14 @@ public class Post {
         this.userId = userId;
     }
 
-    public void applyLike(User user) {
+    public boolean applyLike(User user) {
         for (LikeToPost like : likes) {
-            if (like.isLikedBy(user)){
+            if (like.isLikedBy(user.getId())){
                 likes.remove(like);
-                return;
+                return false;
             }
         }
         this.likes.add(new LikeToPost(this, user.getId()));
+        return true;
     }
 }
