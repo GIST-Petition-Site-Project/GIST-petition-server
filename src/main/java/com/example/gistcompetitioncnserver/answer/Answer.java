@@ -5,10 +5,12 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
 @Entity
+@Getter
+@Setter
 public class Answer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,4 +26,16 @@ public class Answer {
     private String created;
 
     private Long userId;
+
+    protected Answer() {
+    }
+
+    public Answer(Long id, String title, String description, String category, String created, Long userId) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.category = category;
+        this.created = created;
+        this.userId = userId;
+    }
 }

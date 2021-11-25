@@ -10,17 +10,11 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
-@Setter
 @Entity
 public class Comment {
     @Id
@@ -39,5 +33,14 @@ public class Comment {
 
     private Long userId;
 
+    protected Comment() {
+    }
 
+    public Comment(Long commentId, String content, String created, Post post, Long userId) {
+        this.commentId = commentId;
+        this.content = content;
+        this.created = created;
+        this.post = post;
+        this.userId = userId;
+    }
 }
