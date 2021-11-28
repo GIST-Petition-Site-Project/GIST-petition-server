@@ -1,6 +1,5 @@
-package com.example.gistcompetitioncnserver.like;
+package com.example.gistcompetitioncnserver.post;
 
-import com.example.gistcompetitioncnserver.post.Post;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -10,17 +9,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
-@Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
 public class LikeToPost {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "likeId")
@@ -33,4 +25,24 @@ public class LikeToPost {
 
     private Long userId;
 
+    protected LikeToPost() {
+    }
+
+    public LikeToPost(Post post, Long userId) {
+        this(null, post, userId);
+    }
+
+    private LikeToPost(Long likeId, Post post, Long userId) {
+        this.likeId = likeId;
+        this.post = post;
+        this.userId = userId;
+    }
+
+    public boolean isLikedBy(Long userId) {
+        return this.userId.equals(userId);
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
 }
