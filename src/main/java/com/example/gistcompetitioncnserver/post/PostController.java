@@ -1,13 +1,11 @@
 package com.example.gistcompetitioncnserver.post;
 
-import com.example.gistcompetitioncnserver.common.ErrorCase;
-import com.example.gistcompetitioncnserver.common.ErrorMessage;
+import com.example.gistcompetitioncnserver.exception.CustomException;
+import com.example.gistcompetitioncnserver.exception.ErrorCase;
 import com.example.gistcompetitioncnserver.user.User;
 import com.example.gistcompetitioncnserver.user.UserService;
 import java.net.URI;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -38,57 +36,26 @@ public class PostController {
     @PostMapping("/post")
     public ResponseEntity<Object> createPost(@RequestBody PostRequestDto postRequestDto,
                                              @AuthenticationPrincipal String email) {
-
-        Optional<User> user = userService.findUserByEmail(email); // change email to userId
-
-        if (user.isEmpty()) {
-            return ResponseEntity.badRequest().body(
-                    new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.NO_SUCH_USER_ERROR)
-            );
-        }
-
-        if (!user.get().isEnabled()) {
-            return ResponseEntity.badRequest().body(
-                    new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.NO_SUCH_VERIFICATION_EMAIL_ERROR)
-            );
-        }
+        User user = userService.findUserByEmail2(email);
 
         if (!isRequestBodyValid(postRequestDto)) {
-            return ResponseEntity.badRequest().body(
-                    new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.INVAILD_FILED_ERROR)
-            );
+            throw new CustomException(ErrorCase.INVAILD_FILED_ERROR);
         }
 
-        return ResponseEntity.created(URI.create("/post/" + postService.createPost(postRequestDto, user.get().getId())))
+        return ResponseEntity.created(URI.create("/post/" + postService.createPost(postRequestDto, user.getId())))
                 .build();
     }
 
     @GetMapping("/my-post/{userEmail}")
     public ResponseEntity<Object> retrievePostsByUserId(@PathVariable String userEmail,
                                                         @AuthenticationPrincipal String requestEmail) {
-
-        Optional<User> user = userService.findUserByEmail(requestEmail); // change email to userId
-
-        if (user.isEmpty()) {
-            return ResponseEntity.badRequest().body(
-                    new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.NO_SUCH_USER_ERROR)
-            );
-        }
-
-        if (!user.get().isEnabled()) {
-            return ResponseEntity.badRequest().body(
-                    new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.NO_SUCH_VERIFICATION_EMAIL_ERROR)
-            );
-        }
+        User user = userService.findUserByEmail2(userEmail);
 
         if (!requestEmail.equals(userEmail)) {
-            return ResponseEntity.badRequest().body(
-                    new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.BAD_REQUEST_ERROR)
-            );
-
+            throw new CustomException(ErrorCase.BAD_REQUEST_ERROR);
         }
 
-        return ResponseEntity.ok().body(postService.retrievePostsByUserId(user.get().getId()));
+        return ResponseEntity.ok().body(postService.retrievePostsByUserId(user.getId()));
     }
 
     @GetMapping("/post")
@@ -119,48 +86,10 @@ public class PostController {
 
     @PostMapping("/post/{postId}/like")
     public ResponseEntity<Object> LikePost(@PathVariable Long postId, @AuthenticationPrincipal String email) {
-        Optional<User> user = userService.findUserByEmail(email);
-
-        if (user.isEmpty()) {
-            return ResponseEntity.badRequest().body(
-                    new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.NO_SUCH_USER_ERROR)
-            );
-        }
-
-        if (!user.get().isEnabled()) {
-            return ResponseEntity.badRequest().body(
-                    new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.NO_SUCH_VERIFICATION_EMAIL_ERROR)
-            );
-        }
+        User user = userService.findUserByEmail2(email);
 
         return ResponseEntity
                 .ok()
-                .body(Boolean.toString(postService.like(postId, user.get().getId())));
-    }
-
-    @GetMapping("/{id}/like")
-    public int countOfLike(@PathVariable Long id) {
-        return postService.countOfLike(id);
-    }
-
-    @GetMapping("/{id}/like/check")
-    public ResponseEntity<Object> CheckLikePost(@PathVariable Long id, @AuthenticationPrincipal String email) {
-        Optional<User> user = userService.findUserByEmail(email);
-
-        if (user.isEmpty()) {
-            return ResponseEntity.badRequest().body(
-                    new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.NO_SUCH_USER_ERROR)
-            );
-        }
-
-        if (!user.get().isEnabled()) {
-            return ResponseEntity.badRequest().body(
-                    new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.NO_SUCH_VERIFICATION_EMAIL_ERROR)
-            );
-        }
-
-        return ResponseEntity
-                .ok()
-                .body(Boolean.toString(postService.checkLikePost(id, user.get().getId())));
+                .body(Boolean.toString(postService.like(postId, user.getId())));
     }
 }

@@ -1,4 +1,4 @@
-package com.example.gistcompetitioncnserver.common;
+package com.example.gistcompetitioncnserver.exception;
 
 public class ErrorCase {
     public static final String DATABASE_CONNECTION_ERROR = "데이터베이스 등 인터넷 연결에 문제가 있습니다. ";

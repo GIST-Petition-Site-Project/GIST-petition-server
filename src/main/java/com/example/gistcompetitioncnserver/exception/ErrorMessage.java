@@ -1,4 +1,4 @@
-package com.example.gistcompetitioncnserver.common;
+package com.example.gistcompetitioncnserver.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

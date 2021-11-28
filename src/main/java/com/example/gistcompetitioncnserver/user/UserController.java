@@ -1,18 +1,31 @@
 package com.example.gistcompetitioncnserver.user;
 
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
+
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.example.gistcompetitioncnserver.common.ErrorCase;
-import com.example.gistcompetitioncnserver.common.ErrorMessage;
+import com.example.gistcompetitioncnserver.exception.CustomException;
+import com.example.gistcompetitioncnserver.exception.ErrorCase;
+import com.example.gistcompetitioncnserver.exception.ErrorMessage;
 import com.example.gistcompetitioncnserver.registration.RegistrationRequest;
 import com.example.gistcompetitioncnserver.registration.RegistrationService;
 import com.example.gistcompetitioncnserver.registration.token.EmailConfirmationToken;
 import com.example.gistcompetitioncnserver.registration.token.EmailConfirmationTokenService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.net.URI;
+import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
-import org.apache.tomcat.jni.Local;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
@@ -21,17 +34,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.util.MimeTypeUtils;
-import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.net.URI;
-import java.time.LocalDateTime;
-import java.util.*;
-
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import static org.springframework.http.HttpStatus.FORBIDDEN;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/gistps/api/v1/user")
@@ -44,20 +54,19 @@ public class UserController {
 
 
     @GetMapping("")
-    public List<User> retrieveAllUsers(){
+    public List<User> retrieveAllUsers() {
         return userService.retrieveAllUsers();
     }
 
-    @GetMapping("/{id}") // user 조회 방식 논의 필요
-    public EntityModel<User> retrieveUser(@PathVariable long id){
+    @GetMapping("/{id}")
+    public EntityModel<User> retrieveUser(@PathVariable long id) {
 
         Optional<User> user = userService.findUserById(id);
 
-        if(!user.isPresent()){
+        if (!user.isPresent()) {
             throw new UsernameNotFoundException(String.format("ID[%s] not found", id));
         }
 
-        // use HATEOS
         EntityModel<User> resource = new EntityModel<>(user.get());
         WebMvcLinkBuilder linkTo = WebMvcLinkBuilder
                 .linkTo(WebMvcLinkBuilder.methodOn(this.getClass()).retrieveAllUsers());
@@ -66,83 +75,68 @@ public class UserController {
 
     }
 
-
-//    @PostMapping("")
-//    public ResponseEntity<User> createUser(@RequestBody User user){
-//        User savedUser = userService.save(user);
-//        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-//                .path("/{id}")
-//                .buildAndExpand(savedUser)
-//                .toUri();
-//        return ResponseEntity.created(location).build();
-//    }
-
     @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable Long id){
+    public void deleteUser(@PathVariable Long id) {
         userService.deleteById(id);
     }
 
-    //MARK: - try registartion and send email
     @PostMapping("/registration")
-    public ResponseEntity<Object> register(@RequestBody RegistrationRequest request, HttpServletRequest urlRequest){
+    public ResponseEntity<Object> register(@RequestBody RegistrationRequest request, HttpServletRequest urlRequest) {
         String email = request.getEmail();
         Optional<User> user = userService.findUserByEmail(email);
-        if(user.isPresent()){
-            return ResponseEntity.badRequest().body(
-                    new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.USER_ALREADY_EXIST)
-            );
+        if (user.isPresent()) {
+            throw new CustomException(ErrorCase.USER_ALREADY_EXIST);
         }
 
-        if (!email.contains("@gm.gist.ac.kr") && !email.contains("@gist.ac.kr")){
-            return ResponseEntity.badRequest().body(
-                    new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.INVALID_EMAIL)
-            );
+        if (!email.contains("@gm.gist.ac.kr") && !email.contains("@gist.ac.kr")) {
+            throw new CustomException(ErrorCase.INVALID_EMAIL);
         }
 
         return ResponseEntity.created(URI.create("/user/" + registrationService.register(request, urlRequest))).build();
     }
 
     @GetMapping("/resend-email")
-    public ResponseEntity<Object> resendEmailVerification(@AuthenticationPrincipal String email, HttpServletRequest urlRequest) {
+    public ResponseEntity<Object> resendEmailVerification(@AuthenticationPrincipal String email,
+                                                          HttpServletRequest urlRequest) {
 
         User user = userService.findUserByEmail(email).get();
-        if (user.isEnabled()) { // enabled 된 계정이면 안돼
-            return ResponseEntity.badRequest().body(
-                    new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.USER_ALREADY_EXIST)
-            );
+        if (user.isEnabled()) {
+            throw new CustomException(ErrorCase.USER_ALREADY_EXIST);
         }
 
         return ResponseEntity.ok().body(registrationService.resendEmail(user, urlRequest));
     }
 
 
-
-    @GetMapping( "/confirm")
-    public ResponseEntity<Object> confirm(@RequestParam("token") String token, HttpServletResponse response) throws IOException {
+    @GetMapping("/confirm")
+    public ResponseEntity<Object> confirm(@RequestParam("token") String token, HttpServletResponse response)
+            throws IOException {
         Optional<EmailConfirmationToken> emailConfirmationToken = emailConfirmationTokenService.getToken(token);
-        if (emailConfirmationToken.isEmpty()){
-            return ResponseEntity.badRequest().body(new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.NO_SUCH_TOKEN_ERROR));
+        if (emailConfirmationToken.isEmpty()) {
+            throw new CustomException(ErrorCase.NO_SUCH_TOKEN_ERROR);
         }
 
-        if(emailConfirmationToken.get().getConfirmedAt() != null){
-            return ResponseEntity.badRequest().body(new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.USER_ALREADY_EXIST));
+        if (emailConfirmationToken.get().getConfirmedAt() != null) {
+            throw new CustomException(ErrorCase.USER_ALREADY_EXIST);
         }
 
         LocalDateTime expiredAt = emailConfirmationToken.get().getExpiredAt();
 
-        if (expiredAt.isBefore(LocalDateTime.now())){
-            return ResponseEntity.badRequest().body(new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.EXPIRED_TOKEN_ERROR));
+        if (expiredAt.isBefore(LocalDateTime.now())) {
+            throw new CustomException(ErrorCase.EXPIRED_TOKEN_ERROR);
         }
 
-        response.sendRedirect(registrationService.confirmToken(token, emailConfirmationToken.get().getUser().getEmail())); // redirect the main page
-        return ResponseEntity.badRequest().body(new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.BAD_REQUEST_ERROR));
+        response.sendRedirect(registrationService.confirmToken(token,
+                emailConfirmationToken.get().getUser().getEmail())); // redirect the main page
+        return ResponseEntity.badRequest()
+                .body(new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.BAD_REQUEST_ERROR));
     }
 
 
     @GetMapping("/token/refresh")
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String authorizationHeader = request.getHeader(AUTHORIZATION);
-        if(authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             try {
                 String refresh_token = authorizationHeader.substring("Bearer ".length());
                 Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
@@ -161,7 +155,7 @@ public class UserController {
                 tokens.put("access_token", access_token);
                 response.setContentType(MediaType.APPLICATION_JSON_VALUE);
                 new ObjectMapper().writeValue(response.getOutputStream(), tokens);
-            }catch (Exception exception) {
+            } catch (Exception exception) {
                 response.setHeader("error", exception.getMessage());
                 response.setStatus(FORBIDDEN.value());
                 Map<String, String> error = new HashMap<>();
@@ -173,6 +167,4 @@ public class UserController {
             throw new RuntimeException("Refresh token is missing");
         }
     }
-
-
 }

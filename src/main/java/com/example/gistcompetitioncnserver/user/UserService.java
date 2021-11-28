@@ -1,8 +1,15 @@
 package com.example.gistcompetitioncnserver.user;
 
+import com.example.gistcompetitioncnserver.exception.CustomException;
+import com.example.gistcompetitioncnserver.exception.ErrorCase;
 import com.example.gistcompetitioncnserver.registration.token.EmailConfirmationToken;
-import com.example.gistcompetitioncnserver.registration.token.EmailConfirmationTokenRepository;
 import com.example.gistcompetitioncnserver.registration.token.EmailConfirmationTokenService;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,9 +18,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -32,14 +36,15 @@ public class UserService implements UserDetailsService {
 
         Optional<User> user = userRepository.findByEmail(email);
 
-        if(user.isEmpty()) {
+        if (user.isEmpty()) {
 //            log.error("User not found in the database");
             throw new UsernameNotFoundException(USER_NOT_FOUND_MSG);
         }
 
         Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority(user.get().getUserRole().toString()));
-        return new org.springframework.security.core.userdetails.User(user.get().getEmail(), user.get().getPassword(), authorities);
+        return new org.springframework.security.core.userdetails.User(user.get().getEmail(), user.get().getPassword(),
+                authorities);
 
     }
 
@@ -48,13 +53,13 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
-    public String signUpUser(User user){
+    public String signUpUser(User user) {
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword())); // encode password
         userRepository.save(user); // save user entity in db
         return createToken(user);
     }
 
-    public String createToken(User user){
+    public String createToken(User user) {
         String token = UUID.randomUUID().toString();
 
         // make confirmation token
@@ -73,30 +78,43 @@ public class UserService implements UserDetailsService {
         return token;
     }
 
-    public int enableAppUser(String email) { return userRepository.enableAppUser(email); }
+    public int enableAppUser(String email) {
+        return userRepository.enableAppUser(email);
+    }
 
 
-    public List<User> retrieveAllUsers(){
+    public List<User> retrieveAllUsers() {
         return userRepository.findAll();
     }
 
-    public Optional<User> findUserById(Long id){
+    public Optional<User> findUserById(Long id) {
         return userRepository.findById(id);
     }
 
-    public User save(User user){
+    public User save(User user) {
         String encodedPassword = bCryptPasswordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
         return userRepository.save(user);
     }
 
-    public void deleteById(Long id){
+    public void deleteById(Long id) {
         userRepository.deleteById(id);
     }
 
-    public Optional<User> findUserByEmail(String email){
+    public Optional<User> findUserByEmail(String email) {
         return userRepository.findIdByEmail(email);
     }
 
+    public User findUserByEmail2(String email) {
+        Optional<User> user = userRepository.findIdByEmail(email);
+        if (user.isEmpty()) {
+            throw new CustomException(ErrorCase.NO_SUCH_USER_ERROR);
+        }
 
+        if (!user.get().isEnabled()) {
+            throw new CustomException(ErrorCase.NO_SUCH_VERIFICATION_EMAIL_ERROR);
+        }
+
+        return user.get();
+    }
 }
