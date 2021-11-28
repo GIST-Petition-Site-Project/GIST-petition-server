@@ -4,20 +4,23 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import java.io.InputStream;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-import java.io.InputStream;
-
-@RequiredArgsConstructor
 @Component
-public class S3UploadService implements UploadService{
+@Profile("prod")
+@RequiredArgsConstructor
+public class S3UploadService implements UploadService {
     private final AmazonS3 amazonS3;
     private final S3Component component;
 
     @Override
     public void uploadFile(InputStream inputStream, ObjectMetadata objectMetadata, String fileName) {
-        amazonS3.putObject(new PutObjectRequest(component.getBucket(), fileName, inputStream, objectMetadata).withCannedAcl(CannedAccessControlList.PublicRead));
+        amazonS3.putObject(
+                new PutObjectRequest(component.getBucket(), fileName, inputStream, objectMetadata).withCannedAcl(
+                        CannedAccessControlList.PublicRead));
     }
 
     @Override
