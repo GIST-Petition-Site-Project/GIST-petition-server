@@ -1,5 +1,6 @@
 package com.example.gistcompetitioncnserver.comment;
 
+import com.example.gistcompetitioncnserver.exception.CustomException;
 import com.example.gistcompetitioncnserver.exception.ErrorCase;
 import com.example.gistcompetitioncnserver.exception.ErrorMessage;
 import com.example.gistcompetitioncnserver.post.Post;
@@ -40,8 +41,7 @@ public class CommentController {
         User user = userService.findUserByEmail2(email);
 
         if (!isRequestBodyValid(commentRequestDto)) {
-            return ResponseEntity.badRequest()
-                    .body(new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.INVAILD_FILED_ERROR));
+            throw new CustomException(ErrorCase.INVAILD_FILED_ERROR);
         }
 
         return ResponseEntity
@@ -58,19 +58,15 @@ public class CommentController {
 
         Optional<Post> post = postService.retrievePost(id);
         if (post.isEmpty()) {
-            return ResponseEntity.badRequest()
-                    .body(new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.NO_SUCH_POST_ERROR));
+            throw new CustomException(ErrorCase.NO_SUCH_POST_ERROR);
         }
 
         if (!commentService.existCommentId(commentId)) {
-            return ResponseEntity.badRequest()
-                    .body(new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.NO_SUCH_COMMENT_ERROR));
+            throw new CustomException(ErrorCase.NO_SUCH_COMMENT_ERROR);
         }
 
         if (!commentService.equalUserToComment(commentId, user.getId())) {
-            return ResponseEntity.badRequest().body(
-                    new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.FORBIDDEN_ERROR)
-            );
+            throw new CustomException(ErrorCase.FORBIDDEN_ERROR);
         }
 
         commentService.deleteComment(commentId);

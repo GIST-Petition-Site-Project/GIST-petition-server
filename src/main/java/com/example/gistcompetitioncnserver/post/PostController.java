@@ -1,5 +1,6 @@
 package com.example.gistcompetitioncnserver.post;
 
+import com.example.gistcompetitioncnserver.exception.CustomException;
 import com.example.gistcompetitioncnserver.exception.ErrorCase;
 import com.example.gistcompetitioncnserver.exception.ErrorMessage;
 import com.example.gistcompetitioncnserver.user.User;
@@ -33,9 +34,7 @@ public class PostController {
         User user = userService.findUserByEmail2(email);
 
         if (!isRequestBodyValid(postRequestDto)){
-            return ResponseEntity.badRequest().body(
-                    new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.INVAILD_FILED_ERROR)
-            );
+            throw new CustomException(ErrorCase.INVAILD_FILED_ERROR);
         }
 
         return ResponseEntity.created(URI.create("/post/" + postService.createPost(postRequestDto, user.getId()))).build();
@@ -46,10 +45,7 @@ public class PostController {
         User user = userService.findUserByEmail2(userEmail);
 
         if(!requestEmail.equals(userEmail)){
-            return ResponseEntity.badRequest().body(
-                    new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.BAD_REQUEST_ERROR)
-            );
-
+            throw new CustomException(ErrorCase.BAD_REQUEST_ERROR);
         }
 
         return ResponseEntity.ok().body(postService.retrievePostsByUserId(user.getId()));
