@@ -4,18 +4,20 @@ import com.example.gistcompetitioncnserver.common.ErrorCase;
 import com.example.gistcompetitioncnserver.common.ErrorMessage;
 import com.example.gistcompetitioncnserver.user.User;
 import com.example.gistcompetitioncnserver.user.UserService;
-import io.swagger.annotations.ApiOperation;
+import java.net.URI;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
-
-import java.net.URI;
-import java.util.List;
-import java.util.Optional;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
@@ -26,58 +28,60 @@ public class PostController {
     private final PostService postService;
     private final UserService userService;
 
-    private boolean isRequestBodyValid(PostRequestDto postRequestDto){
-        return  postRequestDto.getTitle() != null &&
+    private boolean isRequestBodyValid(PostRequestDto postRequestDto) {
+        return postRequestDto.getTitle() != null &&
                 postRequestDto.getDescription() != null &&
-                postRequestDto.getCategory() != null ;
+                postRequestDto.getCategory() != null;
     }
 
     //게시글 작성 요청 보냈을 때 정상적으로 게시글이 생성되면 리턴값으로 작성된 게시글 고유 id 반환해주기
     @PostMapping("/post")
-    public ResponseEntity<Object> createPost(@RequestBody PostRequestDto postRequestDto, @AuthenticationPrincipal String email){
+    public ResponseEntity<Object> createPost(@RequestBody PostRequestDto postRequestDto,
+                                             @AuthenticationPrincipal String email) {
 
         Optional<User> user = userService.findUserByEmail(email); // change email to userId
 
-        if (user.isEmpty()){
+        if (user.isEmpty()) {
             return ResponseEntity.badRequest().body(
                     new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.NO_SUCH_USER_ERROR)
             );
         }
 
-        if(!user.get().isEnabled()){
+        if (!user.get().isEnabled()) {
             return ResponseEntity.badRequest().body(
                     new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.NO_SUCH_VERIFICATION_EMAIL_ERROR)
             );
         }
 
-        if (!isRequestBodyValid(postRequestDto)){
+        if (!isRequestBodyValid(postRequestDto)) {
             return ResponseEntity.badRequest().body(
                     new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.INVAILD_FILED_ERROR)
             );
         }
 
-
-        return ResponseEntity.created(URI.create("/post/" + postService.createPost(postRequestDto, user.get().getId()))).build();
+        return ResponseEntity.created(URI.create("/post/" + postService.createPost(postRequestDto, user.get().getId())))
+                .build();
     }
 
     @GetMapping("/my-post/{userEmail}")
-    public ResponseEntity<Object> retrievePostsByUserId(@PathVariable String userEmail, @AuthenticationPrincipal String requestEmail){
+    public ResponseEntity<Object> retrievePostsByUserId(@PathVariable String userEmail,
+                                                        @AuthenticationPrincipal String requestEmail) {
 
         Optional<User> user = userService.findUserByEmail(requestEmail); // change email to userId
 
-        if (user.isEmpty()){
+        if (user.isEmpty()) {
             return ResponseEntity.badRequest().body(
                     new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.NO_SUCH_USER_ERROR)
             );
         }
 
-        if(!user.get().isEnabled()){
+        if (!user.get().isEnabled()) {
             return ResponseEntity.badRequest().body(
                     new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.NO_SUCH_VERIFICATION_EMAIL_ERROR)
             );
         }
 
-        if(!requestEmail.equals(userEmail)){
+        if (!requestEmail.equals(userEmail)) {
             return ResponseEntity.badRequest().body(
                     new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.BAD_REQUEST_ERROR)
             );
@@ -88,30 +92,75 @@ public class PostController {
     }
 
     @GetMapping("/post")
-    public ResponseEntity<Object> retrieveAllPost(){
+    public ResponseEntity<Object> retrieveAllPost() {
         return ResponseEntity.ok().body(postService.retrieveAllPost());
     }
 
     @GetMapping("/post/{id}")
-    public ResponseEntity<Object> retrievePost(@PathVariable Long id){
+    public ResponseEntity<Object> retrievePost(@PathVariable Long id) {
         return ResponseEntity.ok().body(postService.retrievePost(id));
     }
 
     @GetMapping("/post/count")
-    public ResponseEntity<Object> getPageNumber(){
+    public ResponseEntity<Object> getPageNumber() {
         return ResponseEntity.ok().body(postService.getPageNumber());
     }
 
     @GetMapping("/post/category")
-    public ResponseEntity<Object> getPostsByCategory(@RequestParam("categoryName") String categoryName){
+    public ResponseEntity<Object> getPostsByCategory(@RequestParam("categoryName") String categoryName) {
         return ResponseEntity.ok().body(postService.getPostsByCategory(categoryName));
     }
 
     @DeleteMapping("/post/{id}") // like도 지워야함
-    public ResponseEntity<Object> deletePost(@PathVariable Long id){
+    public ResponseEntity<Object> deletePost(@PathVariable Long id) {
         postService.deletePost(id);
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/post/{postId}/like")
+    public ResponseEntity<Object> LikePost(@PathVariable Long postId, @AuthenticationPrincipal String email) {
+        Optional<User> user = userService.findUserByEmail(email);
 
+        if (user.isEmpty()) {
+            return ResponseEntity.badRequest().body(
+                    new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.NO_SUCH_USER_ERROR)
+            );
+        }
+
+        if (!user.get().isEnabled()) {
+            return ResponseEntity.badRequest().body(
+                    new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.NO_SUCH_VERIFICATION_EMAIL_ERROR)
+            );
+        }
+
+        return ResponseEntity
+                .ok()
+                .body(Boolean.toString(postService.like(postId, user.get().getId())));
+    }
+
+    @GetMapping("/{id}/like")
+    public int countOfLike(@PathVariable Long id) {
+        return postService.countOfLike(id);
+    }
+
+    @GetMapping("/{id}/like/check")
+    public ResponseEntity<Object> CheckLikePost(@PathVariable Long id, @AuthenticationPrincipal String email) {
+        Optional<User> user = userService.findUserByEmail(email);
+
+        if (user.isEmpty()) {
+            return ResponseEntity.badRequest().body(
+                    new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.NO_SUCH_USER_ERROR)
+            );
+        }
+
+        if (!user.get().isEnabled()) {
+            return ResponseEntity.badRequest().body(
+                    new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.NO_SUCH_VERIFICATION_EMAIL_ERROR)
+            );
+        }
+
+        return ResponseEntity
+                .ok()
+                .body(Boolean.toString(postService.checkLikePost(id, user.get().getId())));
+    }
 }

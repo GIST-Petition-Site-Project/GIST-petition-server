@@ -9,5 +9,4 @@ public class GistCompetitionCnServerApplication {
     public static void main(String[] args) {
         SpringApplication.run(GistCompetitionCnServerApplication.class, args);
     }
-
 }

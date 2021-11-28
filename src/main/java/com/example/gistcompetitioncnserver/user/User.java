@@ -9,23 +9,29 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import org.hibernate.annotations.GenericGenerator;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Data
 public class User implements UserDetails {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(
+            strategy = GenerationType.AUTO,
+            generator = "native"
+    )
+    @GenericGenerator(
+            name = "native",
+            strategy = "native"
+    )
     private Long id;
 
     private String username;
@@ -42,6 +48,7 @@ public class User implements UserDetails {
 
     private boolean enabled = false;
 
+
     public User(String usernamename, String email, String password, UserRole userRole) {
         this.username = usernamename;
         this.email = email;
@@ -49,6 +56,17 @@ public class User implements UserDetails {
         this.userRole = userRole;
     }
 
+    public User(Long id, String username, String email, String password, boolean locked,
+                UserRole userRole, boolean enabled) {
+        this.id = id;
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.locked = locked;
+        this.userRole = userRole;
+        this.enabled = enabled;
+    }
+    // user detail in spring security
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
