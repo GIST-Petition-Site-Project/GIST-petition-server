@@ -1,7 +1,7 @@
 package com.example.gistcompetitioncnserver.comment;
 
-import com.example.gistcompetitioncnserver.common.ErrorCase;
-import com.example.gistcompetitioncnserver.common.ErrorMessage;
+import com.example.gistcompetitioncnserver.exception.ErrorCase;
+import com.example.gistcompetitioncnserver.exception.ErrorMessage;
 import com.example.gistcompetitioncnserver.post.Post;
 import com.example.gistcompetitioncnserver.post.PostService;
 import com.example.gistcompetitioncnserver.user.User;

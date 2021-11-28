@@ -1,6 +1,6 @@
 package com.example.gistcompetitioncnserver.user;
 
-import com.example.gistcompetitioncnserver.common.ErrorCase;
+import com.example.gistcompetitioncnserver.exception.ErrorCase;
 import com.example.gistcompetitioncnserver.registration.token.EmailConfirmationToken;
 import com.example.gistcompetitioncnserver.registration.token.EmailConfirmationTokenService;
 import java.time.LocalDateTime;
