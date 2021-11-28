@@ -31,13 +31,13 @@ public class RegistrationService {
                 new User(
                         request.getUsername(),
                         request.getEmail(),
-                        request.getUserId(),
-                        request.getUserPassword(),
+                        request.getPassword(),
                         UserRole.USER
                 )
         );
 
-        String link = "http://localhost:8080/gistps/api/v1/user/confirm?token=" + token; // redirect home page
+        String link = "http://localhost:8080/gistps/api/v1/user/confirm?token=" + token; // redirect home page in local
+//        String link = "https://gist-competition-cn-server-zvxvr4r3aa-du.a.run.app/gistps/api/v1/user/confirm?token=" + token; // redirect home page in local
         emailSender.send(
                 request.getEmail(),
                 buildEmail(request.getUsername(), link));

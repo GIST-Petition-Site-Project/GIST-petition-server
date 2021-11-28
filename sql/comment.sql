@@ -1,3 +1,4 @@
+-- auto-generated definition
 create table comment
 (
     comment_id bigint auto_increment

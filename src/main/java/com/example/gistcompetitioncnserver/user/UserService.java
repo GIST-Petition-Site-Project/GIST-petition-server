@@ -4,6 +4,7 @@ import com.example.gistcompetitioncnserver.registration.token.EmailConfirmationT
 import com.example.gistcompetitioncnserver.registration.token.EmailConfirmationTokenService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -12,9 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -25,21 +24,30 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
 
     // find user once users login
-    private final static String USER_NOT_FOUND_MSG =
-            "user with email %s not found";
+    private final static String USER_NOT_FOUND_MSG = "user with email %s not found";
     private final EmailConfirmationTokenService emailConfirmationTokenService;
 
     @Override
-    public UserDetails loadUserByUsername(String email)
-            throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
-        return userRepository.findByEmail(email)
-                .orElseThrow(() ->
-                        new UsernameNotFoundException(String.format(USER_NOT_FOUND_MSG, email)));
+        Optional<User> user = userRepository.findByEmail(email);
+
+        if(user.isEmpty()) {
+//            log.error("User not found in the database");
+            throw new UsernameNotFoundException(USER_NOT_FOUND_MSG);
+        }
+
+        Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority(user.get().getUserRole().toString()));
+        return new org.springframework.security.core.userdetails.User(user.get().getEmail(), user.get().getPassword(), authorities);
+
+    }
+
+    public Optional<User> getUser(String email) {
+        return userRepository.findByEmail(email);
     }
 
     public String signUpUser(User user){
-
         // check user exists to prevent duplication
         boolean userExists = userRepository.findByEmail(user.getEmail())
                 .isPresent();
@@ -49,11 +57,9 @@ public class UserService implements UserDetailsService {
         }
 
         // encode password
-        String encodedPassword = bCryptPasswordEncoder
-                .encode(user.getPassword());
+        String encodedPassword = bCryptPasswordEncoder.encode(user.getPassword());
 
-        user.setUserPassword(encodedPassword);
-
+        user.setPassword(encodedPassword);
         userRepository.save(user); // save db
 
         String token = UUID.randomUUID().toString();
@@ -62,8 +68,7 @@ public class UserService implements UserDetailsService {
         EmailConfirmationToken emailConfirmationToken = new EmailConfirmationToken(
                 token,
                 LocalDateTime.now(),
-                // set expirestime to 15 minutes
-                LocalDateTime.now().plusMinutes(15),
+                LocalDateTime.now().plusMinutes(15), // set expirestime to 15 minutes
                 user
         );
 
@@ -76,29 +81,21 @@ public class UserService implements UserDetailsService {
 
     }
 
-    public int enableAppUser(String email) {
-        return userRepository.enableAppUser(email);
-    }
-
+    public int enableAppUser(String email) { return userRepository.enableAppUser(email); }
 
 
     public List<User> retrieveAllUsers(){
         return userRepository.findAll();
     }
-
     public Optional<User> findUserById(Long id){
         return userRepository.findById(id);
     }
 
     @Transactional
     public User save(User user){
-//        System.out.println("user = " + user);
-
-        String encodedPassword = bCryptPasswordEncoder.encode(user.getUserPassword());
-        user.setUserPassword(encodedPassword);
-
+        String encodedPassword = bCryptPasswordEncoder.encode(user.getPassword());
+        user.setPassword(encodedPassword);
         return userRepository.save(user);
-
     }
 
     @Transactional
