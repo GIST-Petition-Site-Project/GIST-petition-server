@@ -1,35 +1,15 @@
 spring:
   datasource:
-    tomcat:
-      remove-abandoned-timeout: 60
-      remove-abandoned: true
-    url: jdbc:mysql://patition-db.ckuzxdryb7hz.ap-northeast-2.rds.amazonaws.com:3307/testdb?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&serverTimezone=Asia/Seoul
-    username: ${USER_NAME}
-    password: ${PASSWORD}
-
+    url: jdbc:h2:mem:testdb
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
   jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
     show-sql: true
-    hibernate:
-      use-new-id-generator-mappings: false
-  profiles:
-    include:
-      - aws
-      - credentials
-
-  mail:
-    host: email-smtp.ap-northeast-2.amazonaws.com
-    port: 587
-    username: ${SMTP_KEY}
-    password: ${SMTP_VALUE}
-
     properties:
-      mail:
-        smtp:
-          ssl:
-            trust: "*"
-          auth: true
-          starttls:
-            enable: true
-          connectiontimeout: 5000
-          timeout: 3000
-          writetimeout: 5000
+      hibernate:
+        format_sql: true
