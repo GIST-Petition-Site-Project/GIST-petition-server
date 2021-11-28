@@ -1,5 +1,6 @@
 package com.example.gistcompetitioncnserver.user;
 
+import com.example.gistcompetitioncnserver.exception.CustomException;
 import com.example.gistcompetitioncnserver.exception.ErrorCase;
 import com.example.gistcompetitioncnserver.registration.token.EmailConfirmationToken;
 import com.example.gistcompetitioncnserver.registration.token.EmailConfirmationTokenService;
@@ -107,11 +108,11 @@ public class UserService implements UserDetailsService {
     public User findUserByEmail2(String email) {
         Optional<User> user = userRepository.findIdByEmail(email);
         if (user.isEmpty()) {
-            throw new IllegalArgumentException(ErrorCase.NO_SUCH_USER_ERROR);
+            throw new CustomException(ErrorCase.NO_SUCH_USER_ERROR);
         }
 
         if (!user.get().isEnabled()) {
-            throw new IllegalArgumentException(ErrorCase.NO_SUCH_VERIFICATION_EMAIL_ERROR);
+            throw new CustomException(ErrorCase.NO_SUCH_VERIFICATION_EMAIL_ERROR);
         }
 
         return user.get();

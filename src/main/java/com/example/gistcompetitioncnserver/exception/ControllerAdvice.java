@@ -6,8 +6,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class ControllerAdvice {
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ErrorMessage> handle(IllegalArgumentException ex) {
+    @ExceptionHandler(CustomException.class)
+    public ResponseEntity<ErrorMessage> handle(CustomException ex) {
         return ResponseEntity.badRequest()
                 .body(new ErrorMessage(400, ex.getMessage()));
     }
