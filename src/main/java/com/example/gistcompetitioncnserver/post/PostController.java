@@ -35,20 +35,7 @@ public class PostController {
     //게시글 작성 요청 보냈을 때 정상적으로 게시글이 생성되면 리턴값으로 작성된 게시글 고유 id 반환해주기
     @PostMapping("/post")
     public ResponseEntity<Object> createPost(@RequestBody PostRequestDto postRequestDto, @AuthenticationPrincipal String email){
-
-        Optional<User> user = userService.findUserByEmail(email); // change email to userId
-
-        if (user.isEmpty()){
-            return ResponseEntity.badRequest().body(
-                    new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.NO_SUCH_USER_ERROR)
-            );
-        }
-
-        if(!user.get().isEnabled()){
-            return ResponseEntity.badRequest().body(
-                    new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.NO_SUCH_VERIFICATION_EMAIL_ERROR)
-            );
-        }
+        User user = userService.findUserByEmail2(email);
 
         if (!isRequestBodyValid(postRequestDto)){
             return ResponseEntity.badRequest().body(
@@ -56,26 +43,12 @@ public class PostController {
             );
         }
 
-
-        return ResponseEntity.created(URI.create("/post/" + postService.createPost(postRequestDto, user.get().getId()))).build();
+        return ResponseEntity.created(URI.create("/post/" + postService.createPost(postRequestDto, user.getId()))).build();
     }
 
     @GetMapping("/my-post/{userEmail}")
     public ResponseEntity<Object> retrievePostsByUserId(@PathVariable String userEmail, @AuthenticationPrincipal String requestEmail){
-
-        Optional<User> user = userService.findUserByEmail(requestEmail); // change email to userId
-
-        if (user.isEmpty()){
-            return ResponseEntity.badRequest().body(
-                    new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.NO_SUCH_USER_ERROR)
-            );
-        }
-
-        if(!user.get().isEnabled()){
-            return ResponseEntity.badRequest().body(
-                    new ErrorMessage(HttpStatus.BAD_REQUEST.value(), ErrorCase.NO_SUCH_VERIFICATION_EMAIL_ERROR)
-            );
-        }
+        User user = userService.findUserByEmail2(userEmail);
 
         if(!requestEmail.equals(userEmail)){
             return ResponseEntity.badRequest().body(
@@ -84,7 +57,7 @@ public class PostController {
 
         }
 
-        return ResponseEntity.ok().body(postService.retrievePostsByUserId(user.get().getId()));
+        return ResponseEntity.ok().body(postService.retrievePostsByUserId(user.getId()));
     }
 
     @GetMapping("/post")
