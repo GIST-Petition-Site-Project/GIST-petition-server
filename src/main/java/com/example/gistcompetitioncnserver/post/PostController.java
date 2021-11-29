@@ -79,7 +79,7 @@ public class PostController {
     }
 
     @PostMapping("/posts/{postId}/like")
-    public ResponseEntity<Object> LikePost(@PathVariable Long postId, @AuthenticationPrincipal String email) {
+    public ResponseEntity<Object> likePost(@PathVariable Long postId, @AuthenticationPrincipal String email) {
         User user = userService.findUserByEmail2(email);
 
         return ResponseEntity
