@@ -78,7 +78,7 @@ public class PostController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/posts/{postId}/like")
+    @PostMapping("/posts/{postId}/agreements")
     public ResponseEntity<Object> likePost(@PathVariable Long postId, @AuthenticationPrincipal String email) {
         User user = userService.findUserByEmail2(email);
 
