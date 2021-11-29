@@ -48,6 +48,11 @@ public class CommentController {
                 .build();
     }
 
+    @GetMapping("/posts/{postId}/comments")
+    public ResponseEntity<Object> getComments(@PathVariable Long postId) {
+        return ResponseEntity.ok().body(commentService.getCommentsByPostId(postId));
+    }
+
     @DeleteMapping("/posts/{postId}/comments/{commentId}")
     public ResponseEntity<Object> deleteComment(@PathVariable Long postId, @PathVariable Long commentId,
                                                 @AuthenticationPrincipal String email) {
@@ -69,10 +74,5 @@ public class CommentController {
 
         commentService.deleteComment(commentId);
         return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/posts/{postId}/comments")
-    public ResponseEntity<Object> getComments(@PathVariable Long postId) {
-        return ResponseEntity.ok().body(commentService.getCommentsByPostId(postId));
     }
 }

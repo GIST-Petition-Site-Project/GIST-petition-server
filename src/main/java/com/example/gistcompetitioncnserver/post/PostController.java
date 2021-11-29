@@ -45,13 +45,6 @@ public class PostController {
                 .build();
     }
 
-    @GetMapping("/posts/me")
-    public ResponseEntity<Object> retrievePostsByUserId(@AuthenticationPrincipal String email) {
-        User user = userService.findUserByEmail2(email);
-
-        return ResponseEntity.ok().body(postService.retrievePostsByUserId(user.getId()));
-    }
-
     @GetMapping("/posts")
     public ResponseEntity<Object> retrieveAllPost() {
         return ResponseEntity.ok().body(postService.retrieveAllPost());
@@ -60,6 +53,13 @@ public class PostController {
     @GetMapping("/posts/{postId}")
     public ResponseEntity<Object> retrievePost(@PathVariable Long postId) {
         return ResponseEntity.ok().body(postService.retrievePost(postId));
+    }
+
+    @GetMapping("/posts/me")
+    public ResponseEntity<Object> retrievePostsByUserId(@AuthenticationPrincipal String email) {
+        User user = userService.findUserByEmail2(email);
+
+        return ResponseEntity.ok().body(postService.retrievePostsByUserId(user.getId()));
     }
 
     @GetMapping("/posts/count")

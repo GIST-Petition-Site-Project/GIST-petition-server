@@ -52,6 +52,21 @@ public class UserController {
     private final RegistrationService registrationService;
     private final EmailConfirmationTokenService emailConfirmationTokenService;
 
+    @PostMapping("/users")
+    public ResponseEntity<Object> register(@RequestBody RegistrationRequest request, HttpServletRequest urlRequest) {
+        String email = request.getEmail();
+        Optional<User> user = userService.findUserByEmail(email);
+        if (user.isPresent()) {
+            throw new CustomException(ErrorCase.USER_ALREADY_EXIST);
+        }
+
+        if (!email.contains("@gm.gist.ac.kr") && !email.contains("@gist.ac.kr")) {
+            throw new CustomException(ErrorCase.INVALID_EMAIL);
+        }
+
+        return ResponseEntity.created(URI.create("/user/" + registrationService.register(request, urlRequest))).build();
+    }
+
     @GetMapping("/users")
     public List<User> retrieveAllUsers() {
         return userService.retrieveAllUsers();
@@ -77,21 +92,6 @@ public class UserController {
     @DeleteMapping("/users/{userId}")
     public void deleteUser(@PathVariable Long userId) {
         userService.deleteById(userId);
-    }
-
-    @PostMapping("/users")
-    public ResponseEntity<Object> register(@RequestBody RegistrationRequest request, HttpServletRequest urlRequest) {
-        String email = request.getEmail();
-        Optional<User> user = userService.findUserByEmail(email);
-        if (user.isPresent()) {
-            throw new CustomException(ErrorCase.USER_ALREADY_EXIST);
-        }
-
-        if (!email.contains("@gm.gist.ac.kr") && !email.contains("@gist.ac.kr")) {
-            throw new CustomException(ErrorCase.INVALID_EMAIL);
-        }
-
-        return ResponseEntity.created(URI.create("/user/" + registrationService.register(request, urlRequest))).build();
     }
 
     @GetMapping("/resend-email")
