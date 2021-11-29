@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/gistps/api/v1/answer") // not used in rest api like v1 url
+@RequestMapping("/v1/answer") // not used in rest api like v1 url
 public class AnswerController {
 
     private final AnswerService answerService;
