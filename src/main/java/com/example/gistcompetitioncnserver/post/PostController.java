@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/gistps/api/v1") // not used in rest api like v1 url
+@RequestMapping("/v1")
 public class PostController {
 
     private final PostService postService;
@@ -32,8 +32,7 @@ public class PostController {
                 postRequestDto.getCategory() != null;
     }
 
-    //게시글 작성 요청 보냈을 때 정상적으로 게시글이 생성되면 리턴값으로 작성된 게시글 고유 id 반환해주기
-    @PostMapping("/post")
+    @PostMapping("/posts")
     public ResponseEntity<Object> createPost(@RequestBody PostRequestDto postRequestDto,
                                              @AuthenticationPrincipal String email) {
         User user = userService.findUserByEmail2(email);
@@ -42,49 +41,44 @@ public class PostController {
             throw new CustomException(ErrorCase.INVAILD_FILED_ERROR);
         }
 
-        return ResponseEntity.created(URI.create("/post/" + postService.createPost(postRequestDto, user.getId())))
+        return ResponseEntity.created(URI.create("/posts/" + postService.createPost(postRequestDto, user.getId())))
                 .build();
     }
 
-    @GetMapping("/my-post/{userEmail}")
-    public ResponseEntity<Object> retrievePostsByUserId(@PathVariable String userEmail,
-                                                        @AuthenticationPrincipal String requestEmail) {
-        User user = userService.findUserByEmail2(userEmail);
-
-        if (!requestEmail.equals(userEmail)) {
-            throw new CustomException(ErrorCase.BAD_REQUEST_ERROR);
-        }
+    @GetMapping("/posts/me")
+    public ResponseEntity<Object> retrievePostsByUserId(@AuthenticationPrincipal String email) {
+        User user = userService.findUserByEmail2(email);
 
         return ResponseEntity.ok().body(postService.retrievePostsByUserId(user.getId()));
     }
 
-    @GetMapping("/post")
+    @GetMapping("/posts")
     public ResponseEntity<Object> retrieveAllPost() {
         return ResponseEntity.ok().body(postService.retrieveAllPost());
     }
 
-    @GetMapping("/post/{id}")
-    public ResponseEntity<Object> retrievePost(@PathVariable Long id) {
-        return ResponseEntity.ok().body(postService.retrievePost(id));
+    @GetMapping("/posts/{postId}")
+    public ResponseEntity<Object> retrievePost(@PathVariable Long postId) {
+        return ResponseEntity.ok().body(postService.retrievePost(postId));
     }
 
-    @GetMapping("/post/count")
+    @GetMapping("/posts/count")
     public ResponseEntity<Object> getPageNumber() {
         return ResponseEntity.ok().body(postService.getPageNumber());
     }
 
-    @GetMapping("/post/category")
+    @GetMapping("/posts/category")
     public ResponseEntity<Object> getPostsByCategory(@RequestParam("categoryName") String categoryName) {
         return ResponseEntity.ok().body(postService.getPostsByCategory(categoryName));
     }
 
-    @DeleteMapping("/post/{id}") // like도 지워야함
-    public ResponseEntity<Object> deletePost(@PathVariable Long id) {
-        postService.deletePost(id);
+    @DeleteMapping("/posts/{postId}") // like도 지워야함
+    public ResponseEntity<Object> deletePost(@PathVariable Long postId) {
+        postService.deletePost(postId);
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/post/{postId}/like")
+    @PostMapping("/posts/{postId}/like")
     public ResponseEntity<Object> LikePost(@PathVariable Long postId, @AuthenticationPrincipal String email) {
         User user = userService.findUserByEmail2(email);
 
