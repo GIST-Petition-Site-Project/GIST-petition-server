@@ -9,12 +9,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/gistps/api/v1/file")
+@RequestMapping("/v1")
 public class FileUploadController {
 
     private final FileUploadService fileUploadService;
 
-    @PostMapping("/upload")
+    @PostMapping("/file/upload")
     public String uploadImage(@RequestPart MultipartFile file){
         return fileUploadService.uploadImage(file);
     }
