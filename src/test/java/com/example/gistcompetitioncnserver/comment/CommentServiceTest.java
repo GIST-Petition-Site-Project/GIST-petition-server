@@ -28,9 +28,9 @@ class CommentServiceTest {
         Long userId = 1L;
         Long postId = 1L;
         String content = "test contents";
-        CommentRequestDto commentRequestDto = new CommentRequestDto(content);
+        CommentRequest commentRequest = new CommentRequest(content);
 
-        Long commentId = commentService.createComment(postId, commentRequestDto, userId);
+        Long commentId = commentService.createComment(postId, commentRequest, userId);
 
         Comment comment = commentRepository.findById(commentId).orElseThrow(IllegalArgumentException::new);
         assertThat(comment.getId()).isEqualTo(commentId);
@@ -44,9 +44,9 @@ class CommentServiceTest {
         doThrow(new CustomException("error")).when(commentValidator).validate(any());
 
         String content = "test contents";
-        CommentRequestDto commentRequestDto = new CommentRequestDto(content);
+        CommentRequest commentRequest = new CommentRequest(content);
 
-        assertThatThrownBy(() -> commentService.createComment(Long.MAX_VALUE, commentRequestDto, Long.MAX_VALUE))
+        assertThatThrownBy(() -> commentService.createComment(Long.MAX_VALUE, commentRequest, Long.MAX_VALUE))
                 .isInstanceOf(CustomException.class);
     }
 }

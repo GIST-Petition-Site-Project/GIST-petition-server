@@ -17,8 +17,8 @@ public class CommentService {
     }
 
     @Transactional
-    public Long createComment(Long postId, CommentRequestDto commentRequestDto, Long userId) {
-        Comment comment = new Comment(commentRequestDto.getContent(), postId, userId);
+    public Long createComment(Long postId, CommentRequest commentRequest, Long userId) {
+        Comment comment = new Comment(commentRequest.getContent(), postId, userId);
         comment.validate(commentValidator);
         return commentRepository.save(comment).getId();
     }

@@ -30,11 +30,11 @@ public class CommentController {
     private final UserService userService;
 
     @PostMapping("/{id}/comment")
-    public ResponseEntity<Object> createComment(@PathVariable Long id, @RequestBody CommentRequestDto
-            commentRequestDto, @AuthenticationPrincipal String email) {
+    public ResponseEntity<Object> createComment(@PathVariable Long id, @RequestBody CommentRequest
+            commentRequest, @AuthenticationPrincipal String email) {
         User user = userService.findUserByEmail2(email);
 
-        Long commentId = commentService.createComment(id, commentRequestDto, user.getId());
+        Long commentId = commentService.createComment(id, commentRequest, user.getId());
         return ResponseEntity
                 .created(URI.create("/post/" + id + "/comment/" + commentId))
                 .build();

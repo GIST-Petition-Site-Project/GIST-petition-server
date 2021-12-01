@@ -6,10 +6,10 @@ import org.springframework.context.annotation.Bean;
 
 @Getter
 @NoArgsConstructor
-public class CommentRequestDto {
+public class CommentRequest {
     private String content;
 
-    public CommentRequestDto(String content) {
+    public CommentRequest(String content) {
         this.content = content;
     }
 
