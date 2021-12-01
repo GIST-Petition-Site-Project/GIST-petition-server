@@ -64,7 +64,7 @@ public class PostService {
         List<Long> commentIds = new ArrayList<>();
 
         for (Comment comment : commentRepository.findByPostId(id)) {
-            commentIds.add(comment.getCommentId());
+            commentIds.add(comment.getId());
         }
 
         if (!commentIds.isEmpty()) {
