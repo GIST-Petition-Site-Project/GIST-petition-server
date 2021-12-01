@@ -8,14 +8,18 @@ import org.springframework.transaction.annotation.Transactional;
 public class CommentService {
 
     private final CommentRepository commentRepository;
+    private final CommentValidator commentValidator;
 
-    public CommentService(CommentRepository commentRepository) {
+    public CommentService(CommentRepository commentRepository,
+                          CommentValidator commentValidator) {
         this.commentRepository = commentRepository;
+        this.commentValidator = commentValidator;
     }
 
     @Transactional
     public Long createComment(Long postId, CommentRequestDto commentRequestDto, Long userId) {
         Comment comment = new Comment(commentRequestDto.getContent(), postId, userId);
+        comment.validate(commentValidator);
         return commentRepository.save(comment).getId();
     }
 
@@ -31,7 +35,7 @@ public class CommentService {
         return commentRepository.findById(commentId).isPresent();
     }
 
-    public boolean equalUserToComment(Long postCommnetId, Long writerId) {
-        return writerId.equals(commentRepository.findUserIdById(postCommnetId));
+    public boolean equalUserToComment(Long commentId, Long writerId) {
+        return writerId.equals(commentRepository.findUserIdById(commentId));
     }
 }

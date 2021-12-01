@@ -13,7 +13,6 @@ public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String content;
     private Long postId;
     private Long userId;
@@ -32,5 +31,9 @@ public class Comment {
         this.postId = postId;
         this.userId = userId;
         this.created = created;
+    }
+
+    public void validate(CommentValidator commentValidator) {
+        commentValidator.validate(this);
     }
 }
