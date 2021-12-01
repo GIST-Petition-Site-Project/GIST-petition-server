@@ -2,7 +2,6 @@ package com.example.gistcompetitioncnserver.comment;
 
 import com.example.gistcompetitioncnserver.exception.CustomException;
 import com.example.gistcompetitioncnserver.exception.ErrorCase;
-import com.example.gistcompetitioncnserver.exception.ErrorMessage;
 import com.example.gistcompetitioncnserver.post.Post;
 import com.example.gistcompetitioncnserver.post.PostService;
 import com.example.gistcompetitioncnserver.user.User;
@@ -10,7 +9,6 @@ import com.example.gistcompetitioncnserver.user.UserService;
 import java.net.URI;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -31,22 +29,14 @@ public class CommentController {
     private final PostService postService;
     private final UserService userService;
 
-    private boolean isRequestBodyValid(CommentRequestDto commentRequestDto) {
-        return commentRequestDto.getContent() != null;
-    }
-
     @PostMapping("/{id}/comment")
     public ResponseEntity<Object> createComment(@PathVariable Long id, @RequestBody CommentRequestDto
             commentRequestDto, @AuthenticationPrincipal String email) {
         User user = userService.findUserByEmail2(email);
 
-        if (!isRequestBodyValid(commentRequestDto)) {
-            throw new CustomException(ErrorCase.INVAILD_FILED_ERROR);
-        }
-
+        Long commentId = commentService.createComment(id, commentRequestDto, user.getId());
         return ResponseEntity
-                .created(URI.create("/post/" + id + "/comment/" + commentService.createComment(id, commentRequestDto,
-                        user.getId())))
+                .created(URI.create("/post/" + id + "/comment/" + commentId))
                 .build();
     }
 
