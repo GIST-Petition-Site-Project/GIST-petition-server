@@ -20,14 +20,8 @@ import lombok.Setter;
 @Entity
 public class Post {
 
-    @JsonManagedReference
-    @OneToMany(mappedBy = "post")
-    private final List<Comment> comment = new ArrayList<>();
-    @OneToMany(mappedBy = "post")
-    private final List<LikeToPost> likes = new ArrayList<>();
     @Id
     @GeneratedValue
-    @Column(name = "postId")
     private Long id;
     private String title;
     private String description;
@@ -36,6 +30,8 @@ public class Post {
     private boolean answered;
     private int accepted;
     private Long userId;
+    @OneToMany(mappedBy = "post")
+    private final List<LikeToPost> likes = new ArrayList<>();
 
     protected Post() {
     }
