@@ -42,19 +42,41 @@ public class CommentService {
     }
 
     @Transactional
+    public void updateComment(Long updaterId, Long commentId, CommentRequest changeRequest) {
+        Comment comment = findCommentById(commentId);
+        User user = findUserById(updaterId);
+        if (!canUpdate(user, comment)) {
+            throw new CustomException("지울 수 있는 권한이 없습니다");
+        }
+        comment.updateContent(changeRequest.getContent());
+    }
+
+    private boolean canUpdate(User user, Comment comment) {
+        Long commentOwnerId = comment.getUserId();
+        return commentOwnerId.equals(user.getId());
+    }
+
+    @Transactional
     public void deleteComment(Long eraserId, Long commentId) {
-        Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new CustomException("존재하지 않는 Comment 입니다"));
-        if (!canDelete(eraserId, comment)) {
+        Comment comment = findCommentById(commentId);
+        User user = findUserById(eraserId);
+        if (!canDelete(user, comment)) {
             throw new CustomException("지울 수 있는 권한이 없습니다");
         }
         commentRepository.deleteById(commentId);
     }
 
-    private boolean canDelete(Long userId, Comment comment) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new CustomException("존재하지 않는 User 입니다"));
-
+    private boolean canDelete(User user, Comment comment) {
         Long commentOwnerId = comment.getUserId();
-        return user.isAdmin() || commentOwnerId.equals(userId);
+        return user.isAdmin() || commentOwnerId.equals(user.getId());
+    }
+
+    private User findUserById(Long updaterId) {
+        return userRepository.findById(updaterId).orElseThrow(() -> new CustomException("존재하지 않는 User 입니다"));
+    }
+
+    private Comment findCommentById(Long commentId) {
+        return commentRepository.findById(commentId)
+                .orElseThrow(() -> new CustomException("존재하지 않는 Comment 입니다"));
     }
 }

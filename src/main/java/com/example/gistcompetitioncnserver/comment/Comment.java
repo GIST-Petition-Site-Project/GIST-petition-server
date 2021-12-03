@@ -36,4 +36,8 @@ public class Comment {
     public void validate(CommentValidator commentValidator) {
         commentValidator.validate(this);
     }
+
+    public void updateContent(String changedContent) {
+        this.content = changedContent;
+    }
 }

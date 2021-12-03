@@ -18,6 +18,8 @@ import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -89,6 +91,28 @@ class CommentServiceTest {
         Long notExistingPostId = Long.MAX_VALUE;
         assertThatThrownBy(
                 () -> commentService.getCommentsByPostId(notExistingPostId)
+        ).isInstanceOf(CustomException.class);
+    }
+
+    @Test
+    void updateCommentByOwner() {
+        String contentToChange = "changed Content";
+        Long savedId = commentRepository.save(new Comment(CONTENT, postId, userId)).getId();
+
+        commentService.updateComment(userId, savedId, new CommentRequest(contentToChange));
+
+        Comment comment = commentRepository.findById(savedId).orElseThrow(IllegalArgumentException::new);
+        assertThat(comment.getContent()).isEqualTo(contentToChange);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = UserRole.class)
+    void updateCommentByOther(UserRole userRole) {
+        User other = userRepository.save(new User("other", "other@other.com", "password", userRole));
+        CommentRequest updateRequest = new CommentRequest("changed Content");
+        Long savedId = commentRepository.save(new Comment(CONTENT, postId, userId)).getId();
+        assertThatThrownBy(
+                () -> commentService.updateComment(other.getId(), savedId, updateRequest)
         ).isInstanceOf(CustomException.class);
     }
 
