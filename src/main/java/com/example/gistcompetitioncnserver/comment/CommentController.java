@@ -1,5 +1,6 @@
 package com.example.gistcompetitioncnserver.comment;
 
+
 import com.example.gistcompetitioncnserver.user.User;
 import com.example.gistcompetitioncnserver.user.UserService;
 import java.net.URI;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("/gistps/api/v1/post")
+@RequestMapping("/v1")
 public class CommentController {
 
     private final CommentService commentService;
@@ -27,6 +28,7 @@ public class CommentController {
     public ResponseEntity<Void> createComment(@PathVariable Long postId,
                                               @RequestBody CommentRequest commentRequest,
                                               @AuthenticationPrincipal String email) {
+
         User user = userService.findUserByEmail2(email);
 
         Long commentId = commentService.createComment(postId, commentRequest, user.getId());
@@ -42,6 +44,7 @@ public class CommentController {
     public ResponseEntity<Object> updateComment(@PathVariable Long postId,
                                                 @PathVariable Long commentId,
                                                 @RequestBody CommentRequest updateRequest,
+
                                                 @AuthenticationPrincipal String email) {
         User user = userService.findUserByEmail2(email);
 
@@ -58,4 +61,5 @@ public class CommentController {
         commentService.deleteComment(user.getId(), commentId);
         return ResponseEntity.noContent().build();
     }
+
 }
