@@ -1,5 +1,7 @@
 package com.example.gistcompetitioncnserver.comment;
 
+import com.example.gistcompetitioncnserver.exception.CustomException;
+import com.example.gistcompetitioncnserver.post.PostRepository;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -8,11 +10,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class CommentService {
 
     private final CommentRepository commentRepository;
+    private final PostRepository postRepository;
     private final CommentValidator commentValidator;
 
     public CommentService(CommentRepository commentRepository,
+                          PostRepository postRepository,
                           CommentValidator commentValidator) {
         this.commentRepository = commentRepository;
+        this.postRepository = postRepository;
         this.commentValidator = commentValidator;
     }
 
@@ -23,8 +28,11 @@ public class CommentService {
         return commentRepository.save(comment).getId();
     }
 
+    @Transactional(readOnly = true)
     public List<Comment> getCommentsByPostId(Long postId) {
-        // comment가 없는 post, post자체가 없는 경우
+        if (!postRepository.existsById(postId)) {
+            throw new CustomException("존재하지 않는 Post입니다");
+        }
         return commentRepository.findByPostId(postId);
     }
 
