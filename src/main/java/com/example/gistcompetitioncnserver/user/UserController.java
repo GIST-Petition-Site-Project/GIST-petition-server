@@ -44,7 +44,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/gistps/api/v1/user")
+@RequestMapping("/v1")
 @AllArgsConstructor
 public class UserController {
 
@@ -52,35 +52,7 @@ public class UserController {
     private final RegistrationService registrationService;
     private final EmailConfirmationTokenService emailConfirmationTokenService;
 
-
-    @GetMapping("")
-    public List<User> retrieveAllUsers() {
-        return userService.retrieveAllUsers();
-    }
-
-    @GetMapping("/{id}")
-    public EntityModel<User> retrieveUser(@PathVariable long id) {
-
-        Optional<User> user = userService.findUserById(id);
-
-        if (!user.isPresent()) {
-            throw new UsernameNotFoundException(String.format("ID[%s] not found", id));
-        }
-
-        EntityModel<User> resource = new EntityModel<>(user.get());
-        WebMvcLinkBuilder linkTo = WebMvcLinkBuilder
-                .linkTo(WebMvcLinkBuilder.methodOn(this.getClass()).retrieveAllUsers());
-        resource.add(linkTo.withRel("all-users"));
-        return resource;
-
-    }
-
-    @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable Long id) {
-        userService.deleteById(id);
-    }
-
-    @PostMapping("/registration")
+    @PostMapping("/users")
     public ResponseEntity<Object> register(@RequestBody RegistrationRequest request, HttpServletRequest urlRequest) {
         String email = request.getEmail();
         Optional<User> user = userService.findUserByEmail(email);
@@ -93,6 +65,33 @@ public class UserController {
         }
 
         return ResponseEntity.created(URI.create("/user/" + registrationService.register(request, urlRequest))).build();
+    }
+
+    @GetMapping("/users")
+    public List<User> retrieveAllUsers() {
+        return userService.retrieveAllUsers();
+    }
+
+    @GetMapping("/users/{userId}")
+    public EntityModel<User> retrieveUser(@PathVariable long userId) {
+
+        Optional<User> user = userService.findUserById(userId);
+
+        if (!user.isPresent()) {
+            throw new UsernameNotFoundException(String.format("ID[%s] not found", userId));
+        }
+
+        EntityModel<User> resource = new EntityModel<>(user.get());
+        WebMvcLinkBuilder linkTo = WebMvcLinkBuilder
+                .linkTo(WebMvcLinkBuilder.methodOn(this.getClass()).retrieveAllUsers());
+        resource.add(linkTo.withRel("all-users"));
+        return resource;
+
+    }
+
+    @DeleteMapping("/users/{userId}")
+    public void deleteUser(@PathVariable Long userId) {
+        userService.deleteById(userId);
     }
 
     @GetMapping("/resend-email")
