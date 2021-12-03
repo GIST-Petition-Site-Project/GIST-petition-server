@@ -23,12 +23,13 @@ public class CommentService {
         return commentRepository.save(comment).getId();
     }
 
-    public void deleteComment(Long commentId) {
-        commentRepository.deleteById(commentId);
+    public List<Comment> getCommentsByPostId(Long postId) {
+        // comment가 없는 post, post자체가 없는 경우
+        return commentRepository.findByPostId(postId);
     }
 
-    public List<Comment> getCommentsByPostId(Long id) {
-        return commentRepository.findByPostId(id);
+    public void deleteComment(Long commentId) {
+        commentRepository.deleteById(commentId);
     }
 
     public boolean existCommentId(Long commentId) {
