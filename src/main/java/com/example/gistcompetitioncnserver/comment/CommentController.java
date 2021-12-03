@@ -1,13 +1,8 @@
 package com.example.gistcompetitioncnserver.comment;
 
-import com.example.gistcompetitioncnserver.exception.CustomException;
-import com.example.gistcompetitioncnserver.exception.ErrorCase;
-import com.example.gistcompetitioncnserver.post.Post;
-import com.example.gistcompetitioncnserver.post.PostService;
 import com.example.gistcompetitioncnserver.user.User;
 import com.example.gistcompetitioncnserver.user.UserService;
 import java.net.URI;
-import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -25,7 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class CommentController {
 
     private final CommentService commentService;
-    private final PostService postService;
     private final UserService userService;
 
     @PostMapping("/{postId}/comment")
@@ -38,32 +32,18 @@ public class CommentController {
         return ResponseEntity.created(URI.create("/post/" + postId + "/comment/" + commentId)).build();
     }
 
-    @DeleteMapping("/{id}/comment/{commentId}")
-    public ResponseEntity<Object> deleteComment(@PathVariable Long id,
-                                                @PathVariable Long commentId,
-                                                @AuthenticationPrincipal String email) {
-
-        User user = userService.findUserByEmail2(email);
-
-        Optional<Post> post = postService.retrievePost(id);
-        if (post.isEmpty()) {
-            throw new CustomException(ErrorCase.NO_SUCH_POST_ERROR);
-        }
-
-        if (!commentService.existCommentId(commentId)) {
-            throw new CustomException(ErrorCase.NO_SUCH_COMMENT_ERROR);
-        }
-
-        if (!commentService.equalUserToComment(commentId, user.getId())) {
-            throw new CustomException(ErrorCase.FORBIDDEN_ERROR);
-        }
-
-        commentService.deleteComment(commentId);
-        return ResponseEntity.noContent().build();
-    }
-
     @GetMapping("/{id}/comment")
     public ResponseEntity<Object> getComments(@PathVariable Long id) {
         return ResponseEntity.ok().body(commentService.getCommentsByPostId(id));
+    }
+
+    @DeleteMapping("/{postId}/comment/{commentId}")
+    public ResponseEntity<Object> deleteComment(@PathVariable Long postId,
+                                                @PathVariable Long commentId,
+                                                @AuthenticationPrincipal String email) {
+        User user = userService.findUserByEmail2(email);
+
+        commentService.deleteComment(user.getId(), commentId);
+        return ResponseEntity.noContent().build();
     }
 }

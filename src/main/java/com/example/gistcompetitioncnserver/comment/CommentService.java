@@ -2,6 +2,8 @@ package com.example.gistcompetitioncnserver.comment;
 
 import com.example.gistcompetitioncnserver.exception.CustomException;
 import com.example.gistcompetitioncnserver.post.PostRepository;
+import com.example.gistcompetitioncnserver.user.User;
+import com.example.gistcompetitioncnserver.user.UserRepository;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,13 +13,16 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
+    private final UserRepository userRepository;
     private final CommentValidator commentValidator;
 
     public CommentService(CommentRepository commentRepository,
                           PostRepository postRepository,
+                          UserRepository userRepository,
                           CommentValidator commentValidator) {
         this.commentRepository = commentRepository;
         this.postRepository = postRepository;
+        this.userRepository = userRepository;
         this.commentValidator = commentValidator;
     }
 
@@ -36,15 +41,20 @@ public class CommentService {
         return commentRepository.findByPostId(postId);
     }
 
-    public void deleteComment(Long commentId) {
+    @Transactional
+    public void deleteComment(Long eraserId, Long commentId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new CustomException("존재하지 않는 Comment 입니다"));
+        if (!canDelete(eraserId, comment)) {
+            throw new CustomException("지울 수 있는 권한이 없습니다");
+        }
         commentRepository.deleteById(commentId);
     }
 
-    public boolean existCommentId(Long commentId) {
-        return commentRepository.findById(commentId).isPresent();
-    }
+    private boolean canDelete(Long userId, Comment comment) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new CustomException("존재하지 않는 User 입니다"));
 
-    public boolean equalUserToComment(Long commentId, Long writerId) {
-        return writerId.equals(commentRepository.findUserIdById(commentId));
+        Long commentOwnerId = comment.getUserId();
+        return user.isAdmin() || commentOwnerId.equals(userId);
     }
 }
