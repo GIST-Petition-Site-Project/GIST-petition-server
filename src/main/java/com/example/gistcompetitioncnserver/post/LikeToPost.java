@@ -1,6 +1,5 @@
 package com.example.gistcompetitioncnserver.post;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -11,9 +10,7 @@ public class LikeToPost {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "likeId")
-    private Long likeId;
-
+    private Long id;
     private Long userId;
 
     protected LikeToPost() {
@@ -23,8 +20,8 @@ public class LikeToPost {
         this(null, userId);
     }
 
-    private LikeToPost(Long likeId, Long userId) {
-        this.likeId = likeId;
+    private LikeToPost(Long id, Long userId) {
+        this.id = id;
         this.userId = userId;
     }
 

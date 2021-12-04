@@ -14,7 +14,6 @@ import lombok.Setter;
 public class Answer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "answerId")
     private Long id;
 
     private String title;
