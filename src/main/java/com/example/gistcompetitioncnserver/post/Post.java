@@ -17,6 +17,9 @@ import java.util.List;
 @Entity
 public class Post {
 
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "post_id")
+    private final List<Agreement> agreements = new ArrayList<>();
     @Id
     @GeneratedValue
     private Long id;
@@ -27,9 +30,6 @@ public class Post {
     private boolean answered;
     private int accepted;
     private Long userId;
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "post_id")
-    private final List<Agreement> agreements = new ArrayList<>();
 
     protected Post() {
     }
@@ -62,7 +62,8 @@ public class Post {
         this.agreements.add(new Agreement(user.getId()));
         return true;
     }
-    public boolean  getStateOfAgreement(User user) {
+
+    public boolean getStateOfAgreement(User user) {
         for (Agreement agreement : agreements) {
             if (agreement.isAgreedBy(user.getId())) {
                 return true;

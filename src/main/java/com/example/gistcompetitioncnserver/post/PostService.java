@@ -87,7 +87,7 @@ public class PostService {
         return agreements.size();
     }
 
-    public Boolean getStateOfAgreement(Long postId,Long userId) {
+    public Boolean getStateOfAgreement(Long postId, Long userId) {
         Post post = postRepository.findById(postId).orElseThrow(IllegalArgumentException::new);
         User user = userRepository.findById(userId).orElseThrow(IllegalArgumentException::new);
         return post.getStateOfAgreement(user);
