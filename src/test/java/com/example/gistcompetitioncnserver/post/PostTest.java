@@ -1,11 +1,13 @@
 package com.example.gistcompetitioncnserver.post;
 
+import com.example.gistcompetitioncnserver.exception.CustomException;
 import com.example.gistcompetitioncnserver.user.User;
 import com.example.gistcompetitioncnserver.user.UserRole;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class PostTest {
     private User user;
@@ -19,16 +21,17 @@ class PostTest {
 
     @Test
     void agree() {
+        assertThat(post.getAgreements()).hasSize(0);
         post.applyAgreement(user);
         assertThat(post.getAgreements()).hasSize(1);
     }
 
     @Test
-    void disagree() {
+    void agreeTwiceFailTest() {
         post.applyAgreement(user);
-        assertThat(post.getAgreements()).hasSize(1);
-        post.applyAgreement(user);
-        assertThat(post.getAgreements()).hasSize(0);
+        assertThatThrownBy(
+                () -> post.applyAgreement(user)
+        ).isInstanceOf(CustomException.class);
     }
 
     @Test
@@ -40,4 +43,6 @@ class PostTest {
         post.applyAgreement(user3);
         assertThat(post.getAgreements()).hasSize(3);
     }
+
+
 }

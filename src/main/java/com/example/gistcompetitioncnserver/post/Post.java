@@ -1,5 +1,7 @@
 package com.example.gistcompetitioncnserver.post;
 
+import com.example.gistcompetitioncnserver.exception.CustomException;
+import com.example.gistcompetitioncnserver.exception.ErrorCase;
 import com.example.gistcompetitioncnserver.user.User;
 import lombok.Getter;
 import lombok.Setter;
@@ -54,8 +56,7 @@ public class Post {
     public boolean applyAgreement(User user) {
         for (Agreement agreement : agreements) {
             if (agreement.isAgreedBy(user.getId())) {
-                agreements.remove(agreement);
-                return false;
+                throw new CustomException(ErrorCase.INVALID_AGREEMENT);
             }
         }
         this.agreements.add(new Agreement(user.getId()));
