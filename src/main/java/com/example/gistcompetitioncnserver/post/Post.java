@@ -63,7 +63,7 @@ public class Post {
         return true;
     }
 
-    public boolean getStateOfAgreement(User user) {
+    public boolean isAgreedBy(User user) {
         for (Agreement agreement : agreements) {
             if (agreement.isAgreedBy(user.getId())) {
                 return true;

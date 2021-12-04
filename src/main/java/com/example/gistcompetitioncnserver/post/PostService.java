@@ -78,21 +78,25 @@ public class PostService {
 
     @Transactional
     public Boolean agree(Long postId, Long userId) {
-        Post post = postRepository.findById(postId).orElseThrow( () -> new CustomException(ErrorCase.NO_SUCH_POST_ERROR));
+        Post post = findPostById(postId);
         User user = userRepository.findById(userId).orElseThrow( () -> new CustomException(ErrorCase.NO_SUCH_USER_ERROR));
         return post.applyAgreement(user);
     }
 
     @Transactional(readOnly = true)
     public int getNumberOfAgreements(Long id) {
-        Post post = postRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCase.NO_SUCH_POST_ERROR));
+        Post post = findPostById(id);
         return post.getAgreements().size();
     }
 
     @Transactional(readOnly = true)
     public Boolean getStateOfAgreement(Long postId, Long userId) {
-        Post post = postRepository.findById(postId).orElseThrow(() -> new CustomException(ErrorCase.NO_SUCH_POST_ERROR));
+        Post post = findPostById(postId);
         User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCase.NO_SUCH_USER_ERROR));
-        return post.getStateOfAgreement(user);
+        return post.isAgreedBy(user);
+    }
+
+    private Post findPostById(Long id) {
+        return postRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCase.NO_SUCH_POST_ERROR));
     }
 }
