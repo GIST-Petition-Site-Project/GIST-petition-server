@@ -4,11 +4,11 @@ import com.example.gistcompetitioncnserver.user.User;
 import com.example.gistcompetitioncnserver.user.UserRepository;
 import com.example.gistcompetitioncnserver.user.UserRole;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -24,11 +24,19 @@ public class PostServiceTest {
     @Autowired
     private AgreementRepository agreementRepository;
 
+    private User user;
+    private Long postId;
+
+    @BeforeEach
+    void setUp() {
+        user = userRepository.save(new User("userName", "email", "password", UserRole.USER));
+        postId = postService.createPost(
+                new PostRequestDto("title", "description", "category", user.getId()), user.getId());
+
+    }
+
     @Test
     void agree() {
-        User user = userRepository.save(new User("userName", "email", "password", UserRole.USER));
-        Long postId = postService.createPost(
-                new PostRequestDto("title", "description", "category", user.getId()), user.getId());
         Post post = postRepository.findPostByWithEagerMode(postId);
         assertThat(post.getAgreements()).hasSize(0);
 
@@ -36,17 +44,15 @@ public class PostServiceTest {
         post = postRepository.findPostByWithEagerMode(postId);
         assertThat(post.getAgreements()).hasSize(1);
     }
+
     @Test
     void numberOfagreements() {
-        User user1 = userRepository.save(new User("userName", "email", "password", UserRole.USER));
         User user2 = userRepository.save(new User("userName", "email", "password", UserRole.USER));
         User user3 = userRepository.save(new User("userName", "email", "password", UserRole.USER));
-        Long postId = postService.createPost(
-                new PostRequestDto("title", "description", "category", user1.getId()), user1.getId());
 
         assertThat(postService.getNumberOfAgreements(postId)).isEqualTo(0);
 
-        postService.agree(postId, user1.getId());
+        postService.agree(postId, user.getId());
         postService.agree(postId, user2.getId());
         postService.agree(postId, user3.getId());
 
@@ -55,12 +61,9 @@ public class PostServiceTest {
 
     @Test
     void getStateOfagreement() {
-        User user = userRepository.save(new User("userName", "email", "password", UserRole.USER));
-        Long postId = postService.createPost(
-                new PostRequestDto("title", "description", "category", user.getId()), user.getId());
-        assertThat(postService.getStateOfAgreement(postId,user.getId())).isFalse();
+        assertThat(postService.getStateOfAgreement(postId, user.getId())).isFalse();
         postService.agree(postId, user.getId());
-        assertThat(postService.getStateOfAgreement(postId,user.getId())).isTrue();
+        assertThat(postService.getStateOfAgreement(postId, user.getId())).isTrue();
     }
 
     @AfterEach

@@ -79,7 +79,7 @@ public class PostService {
     @Transactional
     public Boolean agree(Long postId, Long userId) {
         Post post = findPostById(postId);
-        User user = userRepository.findById(userId).orElseThrow( () -> new CustomException(ErrorCase.NO_SUCH_USER_ERROR));
+        User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCase.NO_SUCH_USER_ERROR));
         return post.applyAgreement(user);
     }
 
