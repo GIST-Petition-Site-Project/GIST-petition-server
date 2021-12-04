@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -34,6 +35,32 @@ public class PostServiceTest {
         postService.agree(postId, user.getId());
         post = postRepository.findPostByWithEagerMode(postId);
         assertThat(post.getAgreements()).hasSize(1);
+    }
+    @Test
+    void numberOfagreements() {
+        User user1 = userRepository.save(new User("userName", "email", "password", UserRole.USER));
+        User user2 = userRepository.save(new User("userName", "email", "password", UserRole.USER));
+        User user3 = userRepository.save(new User("userName", "email", "password", UserRole.USER));
+        Long postId = postService.createPost(
+                new PostRequestDto("title", "description", "category", user1.getId()), user1.getId());
+
+        assertThat(postService.getNumberOfAgreements(postId)).isEqualTo(0);
+
+        postService.agree(postId, user1.getId());
+        postService.agree(postId, user2.getId());
+        postService.agree(postId, user3.getId());
+
+        assertThat(postService.getNumberOfAgreements(postId)).isEqualTo(3);
+    }
+
+    @Test
+    void getStateOfagreement() {
+        User user = userRepository.save(new User("userName", "email", "password", UserRole.USER));
+        Long postId = postService.createPost(
+                new PostRequestDto("title", "description", "category", user.getId()), user.getId());
+        assertThat(postService.getStateOfAgreement(postId,user.getId())).isFalse();
+        postService.agree(postId, user.getId());
+        assertThat(postService.getStateOfAgreement(postId,user.getId())).isTrue();
     }
 
     @AfterEach
