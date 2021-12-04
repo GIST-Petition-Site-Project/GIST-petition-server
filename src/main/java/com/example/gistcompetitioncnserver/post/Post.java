@@ -1,16 +1,15 @@
 package com.example.gistcompetitioncnserver.post;
 
-import com.example.gistcompetitioncnserver.comment.Comment;
 import com.example.gistcompetitioncnserver.user.User;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.Column;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,7 +29,8 @@ public class Post {
     private boolean answered;
     private int accepted;
     private Long userId;
-    @OneToMany(mappedBy = "post")
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "post_id")
     private final List<LikeToPost> likes = new ArrayList<>();
 
     protected Post() {
@@ -62,7 +62,7 @@ public class Post {
                 return false;
             }
         }
-        this.likes.add(new LikeToPost(this, user.getId()));
+        this.likes.add(new LikeToPost(user.getId()));
         return true;
     }
 }
