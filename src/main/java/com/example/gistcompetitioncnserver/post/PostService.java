@@ -75,9 +75,21 @@ public class PostService {
     }
 
     @Transactional
-    public boolean agree(Long postId, Long userId) {
+    public Boolean agree(Long postId, Long userId) {
         Post post = postRepository.findById(postId).orElseThrow(IllegalArgumentException::new);
         User user = userRepository.findById(userId).orElseThrow(IllegalArgumentException::new);
         return post.applyAgreement(user);
+    }
+
+    public int getNumberOfAgreements(Long id) {
+        Post post = postRepository.findById(id).orElseThrow(IllegalArgumentException::new);
+        List<Agreement> agreements = post.getAgreements();
+        return agreements.size();
+    }
+
+    public Boolean getStateOfAgreement(Long postId,Long userId) {
+        Post post = postRepository.findById(postId).orElseThrow(IllegalArgumentException::new);
+        User user = userRepository.findById(userId).orElseThrow(IllegalArgumentException::new);
+        return post.getStateOfAgreement(user);
     }
 }

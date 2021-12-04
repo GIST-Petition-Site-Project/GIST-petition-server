@@ -78,6 +78,6 @@ public class PostController {
 
         return ResponseEntity
                 .ok()
-                .body(Boolean.toString(postService.agree(postId, user.getId())));
+                .body(postService.agree(postId, user.getId()).toString());
     }
 }
