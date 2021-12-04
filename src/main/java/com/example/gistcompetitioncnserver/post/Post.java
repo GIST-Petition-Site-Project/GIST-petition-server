@@ -1,18 +1,14 @@
 package com.example.gistcompetitioncnserver.post;
 
 import com.example.gistcompetitioncnserver.user.User;
+import lombok.Getter;
+import lombok.Setter;
+
+import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-import lombok.Getter;
-import lombok.Setter;
 
 @Getter
 @Setter
@@ -31,7 +27,7 @@ public class Post {
     private Long userId;
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "post_id")
-    private final List<LikeToPost> likes = new ArrayList<>();
+    private final List<Agreement> agreements = new ArrayList<>();
 
     protected Post() {
     }
@@ -55,14 +51,14 @@ public class Post {
         this.userId = userId;
     }
 
-    public boolean applyLike(User user) {
-        for (LikeToPost like : likes) {
-            if (like.isLikedBy(user.getId())) {
-                likes.remove(like);
+    public boolean applyAgreement(User user) {
+        for (Agreement agreement : agreements) {
+            if (agreement.isAgreedBy(user.getId())) {
+                agreements.remove(agreement);
                 return false;
             }
         }
-        this.likes.add(new LikeToPost(user.getId()));
+        this.agreements.add(new Agreement(user.getId()));
         return true;
     }
 }
