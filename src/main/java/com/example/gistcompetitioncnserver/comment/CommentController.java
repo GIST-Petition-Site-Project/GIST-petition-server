@@ -24,7 +24,7 @@ public class CommentController {
     private final CommentService commentService;
     private final UserService userService;
 
-    @PostMapping("/{postId}/comment")
+    @PostMapping("/posts/{postId}/comments")
     public ResponseEntity<Void> createComment(@PathVariable Long postId,
                                               @RequestBody CommentRequest commentRequest,
                                               @AuthenticationPrincipal String email) {
@@ -35,12 +35,12 @@ public class CommentController {
         return ResponseEntity.created(URI.create("/post/" + postId + "/comment/" + commentId)).build();
     }
 
-    @GetMapping("/{id}/comment")
-    public ResponseEntity<Object> getComments(@PathVariable Long id) {
-        return ResponseEntity.ok().body(commentService.getCommentsByPostId(id));
+    @GetMapping("/posts/{postId}/comments")
+    public ResponseEntity<Object> getComments(@PathVariable Long postId) {
+        return ResponseEntity.ok().body(commentService.getCommentsByPostId(postId));
     }
 
-    @PutMapping("/{postId}/comment/{commentId}")
+    @PutMapping("/posts/{postId}/comment/{commentId}")
     public ResponseEntity<Object> updateComment(@PathVariable Long postId,
                                                 @PathVariable Long commentId,
                                                 @RequestBody CommentRequest updateRequest,
@@ -52,7 +52,7 @@ public class CommentController {
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/{postId}/comment/{commentId}")
+    @DeleteMapping("/posts/{postId}/comment/{commentId}")
     public ResponseEntity<Object> deleteComment(@PathVariable Long postId,
                                                 @PathVariable Long commentId,
                                                 @AuthenticationPrincipal String email) {
