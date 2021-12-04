@@ -62,4 +62,13 @@ public class Post {
         this.agreements.add(new Agreement(user.getId()));
         return true;
     }
+    public boolean  getStateOfAgreement(User user) {
+        for (Agreement agreement : agreements) {
+            if (agreement.isAgreedBy(user.getId())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

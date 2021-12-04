@@ -80,4 +80,18 @@ public class PostController {
                 .ok()
                 .body(postService.agree(postId, user.getId()).toString());
     }
+
+    @GetMapping("/posts/{postId}/agreements")
+    public ResponseEntity<Object> getNumberOfAgreement(@PathVariable Long postId) {
+        return ResponseEntity
+                .ok()
+                .body(postService.getNumberOfAgreements(postId));
+    }
+    @GetMapping("/posts/{postId}/agreements/me")
+    public ResponseEntity<Object> getStateOfAgreement(@PathVariable Long postId,@AuthenticationPrincipal String email) {
+        User user = userService.findUserByEmail2(email);
+        return ResponseEntity
+                .ok()
+                .body(postService.getStateOfAgreement(postId,user.getId()));
+    }
 }
