@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @ActiveProfiles(profiles = "test")
@@ -21,23 +20,26 @@ public class PostServiceTest {
     private UserRepository userRepository;
     @Autowired
     private PostRepository postRepository;
+    @Autowired
+    private AgreementRepository agreementRepository;
 
     @Test
     void like() {
         User user = userRepository.save(new User("userName", "email", "password", UserRole.USER));
         Long postId = postService.createPost(
                 new PostRequestDto("title", "description", "category", user.getId()), user.getId());
-        Post post = postRepository.findById(postId).orElseThrow(IllegalArgumentException::new);
+        Post post = postRepository.findPostByWithEagerMode(postId);
         assertThat(post.getLikes()).hasSize(0);
 
         postService.like(postId, user.getId());
-        post = postRepository.findById(postId).orElseThrow(IllegalArgumentException::new);
+        post = postRepository.findPostByWithEagerMode(postId);
         assertThat(post.getLikes()).hasSize(1);
     }
 
     @AfterEach
     void tearDown() {
         userRepository.deleteAllInBatch();
+        agreementRepository.deleteAllInBatch();
         postRepository.deleteAllInBatch();
     }
 }

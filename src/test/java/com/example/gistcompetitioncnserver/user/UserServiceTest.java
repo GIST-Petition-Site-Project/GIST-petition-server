@@ -2,6 +2,7 @@ package com.example.gistcompetitioncnserver.user;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.example.gistcompetitioncnserver.exception.CustomException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,6 +15,6 @@ class UserServiceTest {
     @Test
     void findUserById() {
         assertThatThrownBy(() -> userService.findUserByEmail2("hello@hello.com"))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(CustomException.class);
     }
 }
