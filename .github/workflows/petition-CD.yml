@@ -39,4 +39,6 @@ jobs:
           host: ${{ secrets.HOST }}
           key: ${{ secrets.PRIVATE_KEY }}
           script_stop: true
-          script: chmod +x /home/ubuntu/deploy/deploy.sh && sh /home/ubuntu/deploy/deploy.sh
+          script: |
+            chmod +x /home/ubuntu/deploy/deploy.sh
+            sh /home/ubuntu/deploy/deploy.sh
