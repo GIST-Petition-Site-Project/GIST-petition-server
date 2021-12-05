@@ -15,5 +15,5 @@ cd /home/ubuntu/deploy
 JAR_NAME=$(ls | grep 'gist-competition' | tail -n 1)
 echo "> JAR Name: $JAR_NAME"
 
-nohup java -jar -Duser.timezone=Asia/Seoul $JAR_NAME 1>/nohup/stdout.txt 2>nohup/stderr.txt &
+nohup java -jar -Duser.timezone=Asia/Seoul $JAR_NAME 1>nohup/stdout.txt 2>nohup/stderr.txt &
 sleep 2
