@@ -6,26 +6,26 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity
-public class LikeToPost {
+public class Agreement {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Long userId;
 
-    protected LikeToPost() {
+    protected Agreement() {
     }
 
-    public LikeToPost(Long userId) {
+    public Agreement(Long userId) {
         this(null, userId);
     }
 
-    private LikeToPost(Long id, Long userId) {
+    private Agreement(Long id, Long userId) {
         this.id = id;
         this.userId = userId;
     }
 
-    public boolean isLikedBy(Long userId) {
+    public boolean isAgreedBy(Long userId) {
         return this.userId.equals(userId);
     }
 

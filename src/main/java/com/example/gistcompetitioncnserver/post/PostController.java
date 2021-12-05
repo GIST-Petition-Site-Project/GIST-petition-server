@@ -4,18 +4,12 @@ import com.example.gistcompetitioncnserver.exception.CustomException;
 import com.example.gistcompetitioncnserver.exception.ErrorCase;
 import com.example.gistcompetitioncnserver.user.User;
 import com.example.gistcompetitioncnserver.user.UserService;
-import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.net.URI;
 
 
 @RestController
@@ -72,18 +66,32 @@ public class PostController {
         return ResponseEntity.ok().body(postService.getPostsByCategory(categoryName));
     }
 
-    @DeleteMapping("/posts/{postId}") // like도 지워야함
+    @DeleteMapping("/posts/{postId}")
     public ResponseEntity<Object> deletePost(@PathVariable Long postId) {
         postService.deletePost(postId);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/posts/{postId}/agreements")
-    public ResponseEntity<Object> likePost(@PathVariable Long postId, @AuthenticationPrincipal String email) {
+    public ResponseEntity<Object> agreePost(@PathVariable Long postId, @AuthenticationPrincipal String email) {
         User user = userService.findUserByEmail2(email);
 
         return ResponseEntity
                 .ok()
-                .body(Boolean.toString(postService.like(postId, user.getId())));
+                .body(postService.agree(postId, user.getId()).toString());
+    }
+
+    @GetMapping("/posts/{postId}/agreements")
+    public ResponseEntity<Object> getNumberOfAgreement(@PathVariable Long postId) {
+        return ResponseEntity
+                .ok()
+                .body(postService.getNumberOfAgreements(postId));
+    }
+    @GetMapping("/posts/{postId}/agreements/me")
+    public ResponseEntity<Object> getStateOfAgreement(@PathVariable Long postId,@AuthenticationPrincipal String email) {
+        User user = userService.findUserByEmail2(email);
+        return ResponseEntity
+                .ok()
+                .body(postService.getStateOfAgreement(postId,user.getId()));
     }
 }

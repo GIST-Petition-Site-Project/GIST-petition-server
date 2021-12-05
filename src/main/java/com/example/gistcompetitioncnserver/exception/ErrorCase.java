@@ -14,4 +14,5 @@ public class ErrorCase {
     public static final String EXPIRED_TOKEN_ERROR = "토큰이 만료됐습니다. ";
     public static final String USER_ALREADY_EXIST = "이미 존재하는 이메일입니다. ";
     public static final String INVALID_EMAIL = "유효한 이메일이 아닙니다. gm 혹은 gist 메일을 이용해주세요. ";
+    public static final String INVALID_AGREEMENT = "동의는 한 번만 할 수 있습니다. ";
 }
