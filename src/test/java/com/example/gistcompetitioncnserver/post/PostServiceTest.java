@@ -10,7 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.time.LocalDateTime;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 @ActiveProfiles(profiles = "test")
@@ -41,6 +44,18 @@ public class PostServiceTest {
         assertThat(post.getCategory()).isEqualTo(POST_REQUEST_DTO.getCategory());
         assertThat(post.getUserId()).isEqualTo(user.getId());
         assertThat(post.getCreatedAt()).isNotNull();
+    }
+
+    @Test
+    void updatePostDescription() {
+        Post post = postService.createPost(POST_REQUEST_DTO, user.getId());
+        LocalDateTime initialTime = post.getUpdatedAt();
+
+        postService.updatePostDescription(post.getId(), "updated");
+
+        Post updatedPost = postService.retrievePost(post.getId());
+        LocalDateTime updatedTime = updatedPost.getUpdatedAt();
+        assertTrue(updatedTime.isAfter(initialTime));
     }
 
     @Test

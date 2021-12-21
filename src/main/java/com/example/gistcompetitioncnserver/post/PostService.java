@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -42,8 +41,8 @@ public class PostService {
         return postRepository.findByUserId(Sort.by(Sort.Direction.DESC, "id"), user_id);
     }
 
-    public Optional<Post> retrievePost(Long id) {
-        return postRepository.findById(id);
+    public Post retrievePost(Long id) {
+        return findPostById(id);
     }
 
     public Long getPageNumber() {
@@ -58,6 +57,12 @@ public class PostService {
         Post post = postRepository.getById(id);
         post.setAnswered(true);
         postRepository.save(post);
+    }
+
+    @Transactional
+    public void updatePostDescription(Long id, String description) {
+        Post post = findPostById(id);
+        post.setDescription(description);
     }
 
     @Transactional

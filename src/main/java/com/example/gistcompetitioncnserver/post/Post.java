@@ -5,20 +5,15 @@ import com.example.gistcompetitioncnserver.exception.CustomException;
 import com.example.gistcompetitioncnserver.exception.ErrorCase;
 import com.example.gistcompetitioncnserver.user.User;
 import lombok.Getter;
-import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-@Setter
 @Entity
 public class Post extends BaseEntity {
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "post_id")
-    private final List<Agreement> agreements = new ArrayList<>();
     @Id
     @GeneratedValue
     private Long id;
@@ -28,6 +23,9 @@ public class Post extends BaseEntity {
     private boolean answered;
     private int accepted;
     private Long userId;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "post_id")
+    private final List<Agreement> agreements = new ArrayList<>();
 
     protected Post() {
     }
@@ -65,4 +63,11 @@ public class Post extends BaseEntity {
         return false;
     }
 
+    public void setAnswered(boolean b) {
+        this.answered = b;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 }
