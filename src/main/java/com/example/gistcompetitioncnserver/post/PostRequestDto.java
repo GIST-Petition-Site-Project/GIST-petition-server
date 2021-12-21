@@ -12,11 +12,9 @@ public class PostRequestDto {
     private String category;
 
     @Builder // for test code
-    public PostRequestDto(String title, String description, String category, Long userId) {
+    public PostRequestDto(String title, String description, String category) {
         this.title = title;
         this.description = description;
         this.category = category;
     }
-
-
 }

@@ -25,15 +25,13 @@ public class PostService {
     private final CommentRepository commentRepository;
 
     @Transactional
-    public Long createPost(PostRequestDto postRequestDto, Long userId) {
-        Long result = postRepository.save(
+    public Post createPost(PostRequestDto postRequestDto, Long userId) {
+        return postRepository.save(
                 new Post(postRequestDto.getTitle(),
                         postRequestDto.getDescription(),
                         postRequestDto.getCategory(),
                         userId)
-        ).getId();
-
-        return result;
+        );
     }
 
     public List<Post> retrieveAllPost() {

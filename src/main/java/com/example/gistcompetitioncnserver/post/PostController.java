@@ -35,7 +35,7 @@ public class PostController {
             throw new CustomException(ErrorCase.INVAILD_FILED_ERROR);
         }
 
-        return ResponseEntity.created(URI.create("/posts/" + postService.createPost(postRequestDto, user.getId())))
+        return ResponseEntity.created(URI.create("/posts/" + postService.createPost(postRequestDto, user.getId()).getId()))
                 .build();
     }
 
@@ -87,11 +87,12 @@ public class PostController {
                 .ok()
                 .body(postService.getNumberOfAgreements(postId));
     }
+
     @GetMapping("/posts/{postId}/agreements/me")
-    public ResponseEntity<Object> getStateOfAgreement(@PathVariable Long postId,@AuthenticationPrincipal String email) {
+    public ResponseEntity<Object> getStateOfAgreement(@PathVariable Long postId, @AuthenticationPrincipal String email) {
         User user = userService.findUserByEmail2(email);
         return ResponseEntity
                 .ok()
-                .body(postService.getStateOfAgreement(postId,user.getId()));
+                .body(postService.getStateOfAgreement(postId, user.getId()));
     }
 }
