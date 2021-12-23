@@ -15,26 +15,19 @@ public class Answer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    private String title;
-
-    private String description;
-
-    private String category;
-
+    private String content;
     private String created;
-
+    private Long postId;
     private Long userId;
 
     protected Answer() {
     }
 
-    public Answer(Long id, String title, String description, String category, String created, Long userId) {
+    public Answer(Long id, String content, String created, Long postId, Long userId) {
         this.id = id;
-        this.title = title;
-        this.description = description;
-        this.category = category;
+        this.content = content;
         this.created = created;
+        this.postId = postId;
         this.userId = userId;
     }
 }
