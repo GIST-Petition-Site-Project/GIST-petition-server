@@ -8,5 +8,4 @@ import java.util.List;
 @Repository
 public interface AnswerRepository extends JpaRepository<Answer, Long> {
     List<Answer> findByUserId(Long userId);
-    List<Answer> findByCategory(String categoryName);
 }
