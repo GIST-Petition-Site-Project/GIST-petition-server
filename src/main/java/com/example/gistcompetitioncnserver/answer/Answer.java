@@ -8,22 +8,27 @@ import javax.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
-@Setter
 public class Answer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String content;
-    private String created;
+    private LocalDateTime created;
     private Long postId;
     private Long userId;
 
     protected Answer() {
     }
 
-    public Answer(Long id, String content, String created, Long postId, Long userId) {
+    public Answer(AnswerRequestDto answerRequestDto, Long postId, Long userId) {
+        this(null, answerRequestDto.getContent(), LocalDateTime.now(), postId, userId);
+    }
+
+    public Answer(Long id, String content, LocalDateTime created, Long postId, Long userId) {
         this.id = id;
         this.content = content;
         this.created = created;

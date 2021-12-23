@@ -18,11 +18,11 @@ public class AnswerService {
     private final AnswerRepository answerRepository;
 
 
-    public Answer createAnswer(Answer answer, Post post){
-        answer.setCreated(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-        answer.setCategory(post.getCategory());
-        answer.setTitle("RE:"+post.getTitle());
-        return answerRepository.save(answer);
+    @Transactional
+    public Long createAnswer(Long postId, AnswerRequestDto answerRequestDto, Long userId) {
+        Answer answer = new Answer(answerRequestDto, postId, userId);
+        // TODO answer 검증하기
+        return answerRepository.save(answer).getId();
     }
 
     public List<Answer> retrieveAllAnswers(){
@@ -37,12 +37,8 @@ public class AnswerService {
         return answerRepository.findById(id);
     }
 
-    public Long getPageNumber(){
+    public Long getNumberOfAnswers(){
         return answerRepository.count();
-    }
-
-    public List<Answer> getAnswersByCategory(String categoryName){
-        return answerRepository.findByCategory(categoryName);
     }
 
     @Transactional
