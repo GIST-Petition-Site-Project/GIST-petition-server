@@ -36,8 +36,7 @@ public class PostController {
             throw new CustomException(ErrorCase.INVAILD_FILED_ERROR);
         }
 
-        return ResponseEntity.created(URI.create("/posts/" + postService.createPost(postRequestDto, user.getId()).getId()))
-                .build();
+        return ResponseEntity.created(URI.create("/posts/" + postService.createPost(postRequestDto, user.getId()))).build();
     }
 
     @GetMapping("/posts")

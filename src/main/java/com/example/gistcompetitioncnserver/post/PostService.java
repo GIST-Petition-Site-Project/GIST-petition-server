@@ -24,13 +24,13 @@ public class PostService {
     private final CommentRepository commentRepository;
 
     @Transactional
-    public Post createPost(PostRequestDto postRequestDto, Long userId) {
+    public Long createPost(PostRequestDto postRequestDto, Long userId) {
         return postRepository.save(
                 new Post(postRequestDto.getTitle(),
                         postRequestDto.getDescription(),
                         postRequestDto.getCategory(),
                         userId)
-        );
+        ).getId();
     }
 
     public List<Post> retrieveAllPost() {

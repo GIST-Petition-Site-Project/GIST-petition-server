@@ -37,7 +37,8 @@ public class PostServiceTest {
 
     @Test
     void createPost() {
-        Post post = postService.createPost(POST_REQUEST_DTO, user.getId());
+        Long postId = postService.createPost(POST_REQUEST_DTO, user.getId());
+        Post post = postRepository.findById(postId).orElseThrow(IllegalArgumentException::new);
 
         assertThat(post.getTitle()).isEqualTo(POST_REQUEST_DTO.getTitle());
         assertThat(post.getDescription()).isEqualTo(POST_REQUEST_DTO.getDescription());
@@ -48,19 +49,21 @@ public class PostServiceTest {
 
     @Test
     void updatePostDescription() {
-        Post post = postService.createPost(POST_REQUEST_DTO, user.getId());
+        Long postId = postService.createPost(POST_REQUEST_DTO, user.getId());
+        Post post = postRepository.findById(postId).orElseThrow(IllegalArgumentException::new);
+
         LocalDateTime initialTime = post.getUpdatedAt();
 
         postService.updatePostDescription(post.getId(), "updated");
 
-        Post updatedPost = postService.retrievePost(post.getId());
+        Post updatedPost = postRepository.findById(postId).orElseThrow(IllegalArgumentException::new);
         LocalDateTime updatedTime = updatedPost.getUpdatedAt();
         assertTrue(updatedTime.isAfter(initialTime));
     }
 
     @Test
     void agree() {
-        Long postId = postService.createPost(POST_REQUEST_DTO, user.getId()).getId();
+        Long postId = postService.createPost(POST_REQUEST_DTO, user.getId());
 
         Post post = postRepository.findPostByWithEagerMode(postId);
         assertThat(post.getAgreements()).hasSize(0);
@@ -72,7 +75,7 @@ public class PostServiceTest {
 
     @Test
     void numberOfAgreements() {
-        Long postId = postService.createPost(POST_REQUEST_DTO, user.getId()).getId();
+        Long postId = postService.createPost(POST_REQUEST_DTO, user.getId());
 
         User user2 = userRepository.save(new User("userName", "email", "password", UserRole.USER));
         User user3 = userRepository.save(new User("userName", "email", "password", UserRole.USER));
@@ -88,7 +91,7 @@ public class PostServiceTest {
 
     @Test
     void getStateOfAgreement() {
-        Long postId = postService.createPost(POST_REQUEST_DTO, user.getId()).getId();
+        Long postId = postService.createPost(POST_REQUEST_DTO, user.getId());
 
         assertThat(postService.getStateOfAgreement(postId, user.getId())).isFalse();
         postService.agree(postId, user.getId());
