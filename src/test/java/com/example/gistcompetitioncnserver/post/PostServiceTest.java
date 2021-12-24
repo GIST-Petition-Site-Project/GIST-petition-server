@@ -95,7 +95,10 @@ public class PostServiceTest {
 
         assertThat(postService.getStateOfAgreement(postId, user.getId())).isFalse();
         postService.agree(postId, user.getId());
+
         assertThat(postService.getStateOfAgreement(postId, user.getId())).isTrue();
+        Agreement agreement = agreementRepository.findByUserId(user.getId()).orElseThrow(IllegalArgumentException::new);
+        assertThat(agreement.getCreatedAt()).isNotNull();
     }
 
     @AfterEach
