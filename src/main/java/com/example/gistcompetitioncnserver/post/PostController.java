@@ -20,11 +20,6 @@ public class PostController {
     private final PostService postService;
     private final UserService userService;
 
-    private boolean isRequestBodyValid(PostRequestDto postRequestDto) {
-        return postRequestDto.getTitle() != null &&
-                postRequestDto.getDescription() != null &&
-                postRequestDto.getCategory() != null;
-    }
 
     @PostMapping("/posts")
     public ResponseEntity<Object> createPost(@RequestBody PostRequestDto postRequestDto,
@@ -37,6 +32,12 @@ public class PostController {
 
         return ResponseEntity.created(URI.create("/posts/" + postService.createPost(postRequestDto, user.getId())))
                 .build();
+    }
+
+    private boolean isRequestBodyValid(PostRequestDto postRequestDto) {
+        return postRequestDto.getTitle() != null &&
+                postRequestDto.getDescription() != null &&
+                postRequestDto.getCategory() != null;
     }
 
     @GetMapping("/posts")
