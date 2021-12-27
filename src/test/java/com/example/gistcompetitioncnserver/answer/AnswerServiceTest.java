@@ -89,6 +89,32 @@ class AnswerServiceTest {
         ).isInstanceOf(CustomException.class);
     }
 
+    @Test
+    void retrieveAnswer(){
+        Answer answer= new Answer(CONTENT,postId,managerUserId);
+        answerRepository.save(answer);
+        Answer retrievedAnswer = answerService.retrieveAnswerByPostId(postId);
+        assertThat(answer.getId()).isEqualTo(retrievedAnswer.getId());
+    }
+
+    @Test
+    void retrieveAnswerWithNoAnswer(){
+        assertThatThrownBy(
+                () -> answerService.retrieveAnswerByPostId(postId)
+        ).isInstanceOf(CustomException.class);
+    }
+
+    @Test
+    void retrieveAnswerByNonExistentPost(){
+        Answer answer= new Answer(CONTENT,postId,managerUserId);
+        answerRepository.save(answer);
+
+        Long fakePostId = Long.MAX_VALUE;
+        assertThatThrownBy(
+                () -> answerService.retrieveAnswerByPostId(fakePostId)
+        ).isInstanceOf(CustomException.class);
+    }
+
     @AfterEach
     void tearDown() {
         userRepository.deleteAllInBatch();
