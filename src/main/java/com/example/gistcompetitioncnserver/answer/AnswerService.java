@@ -41,7 +41,7 @@ public class AnswerService {
     }
 
     @Transactional(readOnly = true)
-    public Answer retrieveAnswerByPostId(Long postId) throws CustomException{
+    public Answer retrieveAnswerByPostId(Long postId){
         if (!postRepository.existsById(postId)) {
             throw new CustomException("존재하지 않는 post입니다");
         }
