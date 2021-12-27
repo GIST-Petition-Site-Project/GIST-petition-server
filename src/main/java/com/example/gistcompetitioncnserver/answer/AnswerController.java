@@ -41,13 +41,9 @@ public class AnswerController {
         return ResponseEntity.ok().body(answerService.retrieveAnswerByPostId(postId));
     }
 
-
-//    @DeleteMapping("/posts/{postId}/answer/{answerId}")
-//    public void deleteAnswer(@PathVariable Long postId,@PathVariable Long answerId)){
-//        answerService.deleteAnswer(answerId);
-//    }
-
-
-
+    @GetMapping("/answers/count")
+    public ResponseEntity<Long> getNumberOfAnswers() {
+        return ResponseEntity.ok().body(answerService.getNumberOfAnswers());
+    }
 
 }
