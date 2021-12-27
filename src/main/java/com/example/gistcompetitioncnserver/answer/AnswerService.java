@@ -1,5 +1,6 @@
 package com.example.gistcompetitioncnserver.answer;
 
+import com.example.gistcompetitioncnserver.comment.Comment;
 import com.example.gistcompetitioncnserver.exception.CustomException;
 import com.example.gistcompetitioncnserver.post.Post;
 import com.example.gistcompetitioncnserver.post.PostRepository;
@@ -68,8 +69,20 @@ public class AnswerService {
     }
 
     @Transactional
-    public void deleteAnswer(Long id){
-        answerRepository.deleteById(id);
+    public void deleteAnswer(Long eraserId, Long postId) {
+        checkExistenceByPostId(postId);
+        Answer answer = findAnswerByPostId(postId);
+
+        User eraser = findUserById(eraserId);
+        if (!canDelete(eraser, answer)) {
+            throw new CustomException("지울 수 있는 권한이 없습니다");
+        }
+        answerRepository.deleteByPostId(postId);
+    }
+
+    private boolean canDelete(User user, Answer answer) {
+        Long answerOwner = answer.getUserId();
+        return user.getUserRole()==UserRole.ADMIN || answerOwner.equals(user.getId()) && user.getUserRole()==UserRole.MANAGER;
     }
 
 

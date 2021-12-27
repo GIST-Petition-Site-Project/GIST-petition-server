@@ -41,6 +41,11 @@ public class AnswerController {
         return ResponseEntity.ok().body(answerService.retrieveAnswerByPostId(postId));
     }
 
+    @GetMapping("/answers/count")
+    public ResponseEntity<Long> getNumberOfAnswers() {
+        return ResponseEntity.ok().body(answerService.getNumberOfAnswers());
+    }
+
     @PutMapping("/posts/{postId}/answer")
     public ResponseEntity<Void> updateAnswer(@PathVariable Long postId
             , AnswerRequestDto changeRequest
@@ -50,9 +55,12 @@ public class AnswerController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/answers/count")
-    public ResponseEntity<Long> getNumberOfAnswers() {
-        return ResponseEntity.ok().body(answerService.getNumberOfAnswers());
-    }
+    @DeleteMapping("/posts/{postId}/answer")
+    public ResponseEntity<Object> deleteComment(@PathVariable Long postId,
+                                                @AuthenticationPrincipal String email) {
+        User user = userService.findUserByEmail2(email);
 
+        answerService.deleteAnswer(user.getId(), postId);
+        return ResponseEntity.noContent().build();
+    }
 }

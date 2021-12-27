@@ -32,12 +32,14 @@ class AnswerServiceTest {
 
     private Long normalUserId;
     private Long managerUserId;
+    private Long adminUserId;
     private Long postId;
 
     @BeforeEach
     void setup() {
         normalUserId = userRepository.save(new User("userName", "normal@email.com", "password", UserRole.USER)).getId();
         managerUserId = userRepository.save(new User("userName", "manager@email.com", "password", UserRole.MANAGER)).getId();
+        adminUserId = userRepository.save(new User("userName", "admin@email.com", "password", UserRole.ADMIN)).getId();
         postId = postRepository.save(new Post("title", "description", "category", normalUserId)).getId();
     }
 
@@ -180,6 +182,54 @@ class AnswerServiceTest {
 
         assertThatThrownBy(
                 () -> answerService.updateAnswer(managerUserId, postId, changeRequest)
+        ).isInstanceOf(CustomException.class);
+    }
+
+    @Test
+    void deleteAnswerByOwner() {
+        Answer answer = new Answer(CONTENT, postId, managerUserId);
+        answerRepository.save(answer);
+
+        answerService.deleteAnswer(managerUserId, postId);
+
+        assertFalse(answerRepository.existsById(answer.getId()));
+    }
+
+    @Test
+    void deleteAnswerByAdmin() {
+        Answer answer = new Answer(CONTENT, postId, managerUserId);
+        answerRepository.save(answer);
+
+        answerService.deleteAnswer(managerUserId, postId);
+
+        assertFalse(answerRepository.existsById(answer.getId()));
+    }
+
+    @Test
+    void deleteAnswerByOther() {
+        Answer answer = new Answer(CONTENT, postId, managerUserId);
+        answerRepository.save(answer);
+
+        User other = userRepository.save(
+                new User("other", "otherManager", "pswd", UserRole.MANAGER)
+        );
+
+        assertThatThrownBy(
+                () ->  answerService.deleteAnswer(other.getId(), postId)
+        ).isInstanceOf(CustomException.class);
+    }
+
+    @Test
+    void deleteAnswerByOwnerButNormalUser() {
+        Answer answer = new Answer(CONTENT, postId, managerUserId);
+        answerRepository.save(answer);
+
+        User user = userRepository.findById(managerUserId).orElseThrow(() -> new CustomException(""));
+        user.setUserRole(UserRole.USER);
+        userRepository.save(user);
+
+        assertThatThrownBy(
+                () -> answerService.deleteAnswer(user.getId(), postId)
         ).isInstanceOf(CustomException.class);
     }
 
