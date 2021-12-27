@@ -26,7 +26,7 @@ public class AnswerService {
 
     @Transactional
     public Long createAnswer(Long postId, AnswerRequestDto answerRequestDto, Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(()-> new CustomException("존재하지 않는 user입니다"));
+        User user = findUserById(userId);
         if (user.getUserRole() != UserRole.MANAGER){
             throw new CustomException("답변권한이 없는 user입니다.");
         }
@@ -42,17 +42,29 @@ public class AnswerService {
 
     @Transactional(readOnly = true)
     public Answer retrieveAnswerByPostId(Long postId){
-        if (!postRepository.existsById(postId)) {
-            throw new CustomException("존재하지 않는 post입니다");
-        }
-
-        return answerRepository.findByPostId(postId).orElseThrow(
-                () -> new CustomException("해당 post에는 답변이 존재하지 않습니다.")
-        );
+        checkExistenceByPostId(postId);
+        return findAnswerByPostId(postId);
     }
 
     public Long getNumberOfAnswers(){
         return answerRepository.count();
+    }
+
+    @Transactional
+    public void updateAnswer(Long updaterId, Long postId, AnswerRequestDto changeRequest) {
+        checkExistenceByPostId(postId);
+        Answer answer = findAnswerByPostId(postId);
+
+        User updater = findUserById(updaterId);
+        if (!canUpdate(updater, answer)) {
+            throw new CustomException("수정권한이 없는 user입니다.");
+        }
+        answer.updateContent(changeRequest.getContent());
+    }
+
+    private boolean canUpdate(User user, Answer answer) {
+        Long answerOwner = answer.getUserId();
+        return answerOwner.equals(user.getId()) && user.getUserRole()==UserRole.MANAGER;
     }
 
     @Transactional
@@ -61,6 +73,21 @@ public class AnswerService {
     }
 
 
+    private void checkExistenceByPostId(Long postId) {
+        if (!postRepository.existsById(postId)) {
+            throw new CustomException("존재하지 않는 post입니다");
+        }
+    }
+
+    private User findUserById(Long userId) {
+        return userRepository.findById(userId).orElseThrow(()-> new CustomException("존재하지 않는 user입니다"));
+    }
+
+    private Answer findAnswerByPostId(Long postId) {
+        return answerRepository.findByPostId(postId).orElseThrow(
+                () -> new CustomException("해당 post에는 답변이 존재하지 않습니다.")
+        );
+    }
 
 
 

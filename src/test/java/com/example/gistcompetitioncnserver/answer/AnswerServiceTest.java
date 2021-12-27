@@ -93,7 +93,9 @@ class AnswerServiceTest {
     void retrieveAnswer(){
         Answer answer= new Answer(CONTENT,postId,managerUserId);
         answerRepository.save(answer);
+
         Answer retrievedAnswer = answerService.retrieveAnswerByPostId(postId);
+
         assertThat(answer.getId()).isEqualTo(retrievedAnswer.getId());
     }
 
@@ -112,6 +114,72 @@ class AnswerServiceTest {
         Long fakePostId = Long.MAX_VALUE;
         assertThatThrownBy(
                 () -> answerService.retrieveAnswerByPostId(fakePostId)
+        ).isInstanceOf(CustomException.class);
+    }
+
+    @Test
+    void updateAnswer() {
+        Answer answer = new Answer(CONTENT, postId, managerUserId);
+        answerRepository.save(answer);
+        String changContent = "change contents";
+        AnswerRequestDto changeRequest = new AnswerRequestDto(changContent);
+
+        answerService.updateAnswer(managerUserId, postId, changeRequest);
+
+        Answer updatedAnswer = answerRepository.findByPostId(postId).orElseThrow(() -> new CustomException(""));
+        assertThat(answer.getId()).isEqualTo(updatedAnswer.getId());
+        assertThat(updatedAnswer.getContent()).isEqualTo(changContent);
+    }
+
+    @Test
+    void updateAnswerByOwnerButNormalUser() {
+        Answer answer = new Answer(CONTENT, postId, managerUserId);
+        answerRepository.save(answer);
+        String changContent = "change contents";
+        AnswerRequestDto changeRequest = new AnswerRequestDto(changContent);
+
+        User user = userRepository.findById(managerUserId).orElseThrow(() -> new CustomException(""));
+        user.setUserRole(UserRole.USER);
+        userRepository.save(user);
+
+        assertThatThrownBy(
+                () -> answerService.updateAnswer(user.getId(), postId, changeRequest)
+        ).isInstanceOf(CustomException.class);
+    }
+
+    @Test
+    void updateAnswerByOtherManager() {
+        Answer answer = new Answer(CONTENT, postId, managerUserId);
+        answerRepository.save(answer);
+        String changContent = "change contents";
+        AnswerRequestDto changeRequest = new AnswerRequestDto(changContent);
+
+        User otherManager = new User("testUser", "otherManager@email.com", "pw", UserRole.MANAGER);
+        userRepository.save(otherManager);
+
+        assertThatThrownBy(
+                () -> answerService.updateAnswer(otherManager.getId(), postId, changeRequest)
+        ).isInstanceOf(CustomException.class);
+    }
+
+    @Test
+    void updateAnswerWithNonExistentPost() {
+        Long fakePostId = Long.MAX_VALUE;
+        String changContent = "change contents";
+        AnswerRequestDto changeRequest = new AnswerRequestDto(changContent);
+
+        assertThatThrownBy(
+                () -> answerService.updateAnswer(managerUserId, fakePostId, changeRequest)
+        ).isInstanceOf(CustomException.class);
+    }
+
+    @Test
+    void updateAnswerWithNoAnswer() {
+        String changContent = "change contents";
+        AnswerRequestDto changeRequest = new AnswerRequestDto(changContent);
+
+        assertThatThrownBy(
+                () -> answerService.updateAnswer(managerUserId, postId, changeRequest)
         ).isInstanceOf(CustomException.class);
     }
 

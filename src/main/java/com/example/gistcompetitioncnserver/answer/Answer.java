@@ -1,12 +1,10 @@
 package com.example.gistcompetitioncnserver.answer;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 
@@ -34,5 +32,9 @@ public class Answer {
         this.created = created;
         this.postId = postId;
         this.userId = userId;
+    }
+
+    public void updateContent(String content) {
+        this.content = content;
     }
 }

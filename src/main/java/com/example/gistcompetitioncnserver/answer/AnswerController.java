@@ -41,6 +41,15 @@ public class AnswerController {
         return ResponseEntity.ok().body(answerService.retrieveAnswerByPostId(postId));
     }
 
+    @PutMapping("/posts/{postId}/answer")
+    public ResponseEntity<Void> updateAnswer(@PathVariable Long postId
+            , AnswerRequestDto changeRequest
+            ,@AuthenticationPrincipal String email) {
+        User user = userService.findUserByEmail2(email);
+        answerService.updateAnswer(postId, user.getId(), changeRequest);
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/answers/count")
     public ResponseEntity<Long> getNumberOfAnswers() {
         return ResponseEntity.ok().body(answerService.getNumberOfAnswers());
