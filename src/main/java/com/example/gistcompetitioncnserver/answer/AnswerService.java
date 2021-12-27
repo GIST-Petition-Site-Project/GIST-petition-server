@@ -8,8 +8,6 @@ import com.example.gistcompetitioncnserver.user.UserRepository;
 import com.example.gistcompetitioncnserver.user.UserRole;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class AnswerService {
@@ -42,16 +40,15 @@ public class AnswerService {
         return answerRepository.save(answer).getId();
     }
 
-    public List<Answer> retrieveAllAnswers(){
-        return answerRepository.findAll();
-    }
+    @Transactional(readOnly = true)
+    public Answer retrieveAnswerByPostId(Long postId) throws CustomException{
+        if (!postRepository.existsById(postId)) {
+            throw new CustomException("존재하지 않는 post입니다");
+        }
 
-    public List<Answer> retrieveAnswersByUserId(Long user_id){
-        return answerRepository.findByUserId(user_id);
-    }
-
-    public Optional<Answer> retrieveAnswer(Long id){
-        return answerRepository.findById(id);
+        return answerRepository.findByPostId(postId).orElseThrow(
+                () -> new CustomException("해당 post에는 답변이 존재하지 않습니다.")
+        );
     }
 
     public Long getNumberOfAnswers(){
