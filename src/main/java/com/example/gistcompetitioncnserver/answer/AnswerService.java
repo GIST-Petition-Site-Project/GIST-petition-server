@@ -37,7 +37,7 @@ public class AnswerService {
             throw new CustomException("이미 답변이 된 post입니다.");
         }
 
-        Answer answer = new Answer(answerRequestDto, postId, userId);
+        Answer answer = new Answer(answerRequestDto.getContent(), postId, userId);
         post.setAnswered(true);
         return answerRepository.save(answer).getId();
     }

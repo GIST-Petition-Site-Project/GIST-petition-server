@@ -24,8 +24,8 @@ public class Answer {
     protected Answer() {
     }
 
-    public Answer(AnswerRequestDto answerRequestDto, Long postId, Long userId) {
-        this(null, answerRequestDto.getContent(), LocalDateTime.now(), postId, userId);
+    public Answer(String content, Long postId, Long userId) {
+        this(null, content, LocalDateTime.now(), postId, userId);
     }
 
     public Answer(Long id, String content, LocalDateTime created, Long postId, Long userId) {
