@@ -44,6 +44,21 @@ class AnswerServiceTest {
     }
 
     @Test
+    void createAnswerByAdmin() {
+        AnswerRequestDto answerRequestDto = new AnswerRequestDto(CONTENT);
+
+        Long savedAnswer = answerService.createAnswer(postId, answerRequestDto, adminUserId);
+
+        Answer answer = answerRepository.findById(savedAnswer).orElseThrow(()-> new CustomException("존재하지 않는 answer입니다.;"));
+        assertThat(answer.getId()).isEqualTo(savedAnswer);
+        assertThat(answer.getContent()).isEqualTo(CONTENT);
+        assertThat(answer.getUserId()).isEqualTo(adminUserId);
+        assertThat(answer.getPostId()).isEqualTo(postId);
+
+        Post post = postRepository.findById(postId).orElseThrow(() -> new CustomException("존재하지 않는 post입니다"));
+        assertTrue(post.isAnswered());
+    }
+    @Test
     void createAnswerByManager() {
         AnswerRequestDto answerRequestDto = new AnswerRequestDto(CONTENT);
 
@@ -58,7 +73,6 @@ class AnswerServiceTest {
         Post post = postRepository.findById(postId).orElseThrow(() -> new CustomException("존재하지 않는 post입니다"));
         assertTrue(post.isAnswered());
     }
-
     @Test
     void createAnswerByNormalUser() {
         AnswerRequestDto answerRequestDto = new AnswerRequestDto(CONTENT);
@@ -70,7 +84,6 @@ class AnswerServiceTest {
         Post post = postRepository.findById(postId).orElseThrow(() -> new CustomException("존재하지 않는 post입니다"));
         assertFalse(post.isAnswered());
     }
-
     @Test
     void createAnswerByNonExistentUser() {
         AnswerRequestDto answerRequestDto = new AnswerRequestDto(CONTENT);
@@ -82,7 +95,7 @@ class AnswerServiceTest {
     }
 
     @Test
-    void createAnswerByNonExistentPost() {
+    void createAnswerToNonExistentPost() {
         AnswerRequestDto answerRequestDto = new AnswerRequestDto(CONTENT);
 
         Long fakePostId = Long.MAX_VALUE;
@@ -92,7 +105,7 @@ class AnswerServiceTest {
     }
 
     @Test
-    void retrieveAnswer(){
+    void retrieveAnswerByALL(){
         Answer answer= new Answer(CONTENT,postId,managerUserId);
         answerRepository.save(answer);
 
@@ -109,7 +122,7 @@ class AnswerServiceTest {
     }
 
     @Test
-    void retrieveAnswerByNonExistentPost(){
+    void retrieveAnswerFromNonExistentPost(){
         Answer answer= new Answer(CONTENT,postId,managerUserId);
         answerRepository.save(answer);
 
@@ -120,7 +133,20 @@ class AnswerServiceTest {
     }
 
     @Test
-    void updateAnswer() {
+    void updateAnswerByAdmin() {
+        Answer answer = new Answer(CONTENT, postId, managerUserId);
+        answerRepository.save(answer);
+        String changContent = "change contents";
+        AnswerRequestDto changeRequest = new AnswerRequestDto(changContent);
+
+        answerService.updateAnswer(adminUserId, postId, changeRequest);
+
+        Answer updatedAnswer = answerRepository.findByPostId(postId).orElseThrow(() -> new CustomException(""));
+        assertThat(answer.getId()).isEqualTo(updatedAnswer.getId());
+        assertThat(updatedAnswer.getContent()).isEqualTo(changContent);
+    }
+    @Test
+    void updateAnswerByOwnerManager() {
         Answer answer = new Answer(CONTENT, postId, managerUserId);
         answerRepository.save(answer);
         String changContent = "change contents";
@@ -131,22 +157,6 @@ class AnswerServiceTest {
         Answer updatedAnswer = answerRepository.findByPostId(postId).orElseThrow(() -> new CustomException(""));
         assertThat(answer.getId()).isEqualTo(updatedAnswer.getId());
         assertThat(updatedAnswer.getContent()).isEqualTo(changContent);
-    }
-
-    @Test
-    void updateAnswerByOwnerButNormalUser() {
-        Answer answer = new Answer(CONTENT, postId, managerUserId);
-        answerRepository.save(answer);
-        String changContent = "change contents";
-        AnswerRequestDto changeRequest = new AnswerRequestDto(changContent);
-
-        User user = userRepository.findById(managerUserId).orElseThrow(() -> new CustomException(""));
-        user.setUserRole(UserRole.USER);
-        userRepository.save(user);
-
-        assertThatThrownBy(
-                () -> answerService.updateAnswer(user.getId(), postId, changeRequest)
-        ).isInstanceOf(CustomException.class);
     }
 
     @Test
@@ -163,9 +173,25 @@ class AnswerServiceTest {
                 () -> answerService.updateAnswer(otherManager.getId(), postId, changeRequest)
         ).isInstanceOf(CustomException.class);
     }
+    @Test
+    void updateAnswerByOwnerButNormalUser() {
+        Answer answer = new Answer(CONTENT, postId, managerUserId);
+        answerRepository.save(answer);
+        String changContent = "change contents";
+        AnswerRequestDto changeRequest = new AnswerRequestDto(changContent);
+
+        User user = userRepository.findById(managerUserId).orElseThrow(() -> new CustomException(""));
+        user.setUserRole(UserRole.USER);
+        userRepository.save(user);
+
+        assertThatThrownBy(
+                () -> answerService.updateAnswer(user.getId(), postId, changeRequest)
+        ).isInstanceOf(CustomException.class);
+    }
+
 
     @Test
-    void updateAnswerWithNonExistentPost() {
+    void updateAnswerFromNonExistentPost() {
         Long fakePostId = Long.MAX_VALUE;
         String changContent = "change contents";
         AnswerRequestDto changeRequest = new AnswerRequestDto(changContent);
@@ -176,7 +202,7 @@ class AnswerServiceTest {
     }
 
     @Test
-    void updateAnswerWithNoAnswer() {
+    void updateNonExistentAnswer() {
         String changContent = "change contents";
         AnswerRequestDto changeRequest = new AnswerRequestDto(changContent);
 
@@ -186,13 +212,13 @@ class AnswerServiceTest {
     }
 
     @Test
-    void deleteAnswerByOwner() {
+    void deleteAnswerByOwnerManager() {
         Answer answer = new Answer(CONTENT, postId, managerUserId);
         answerRepository.save(answer);
 
         answerService.deleteAnswer(managerUserId, postId);
 
-        assertFalse(answerRepository.existsById(answer.getId()));
+        assertTrue(!answerRepository.existsById(answer.getId()));
     }
 
     @Test
@@ -200,13 +226,13 @@ class AnswerServiceTest {
         Answer answer = new Answer(CONTENT, postId, managerUserId);
         answerRepository.save(answer);
 
-        answerService.deleteAnswer(managerUserId, postId);
+        answerService.deleteAnswer(adminUserId, postId);
 
-        assertFalse(answerRepository.existsById(answer.getId()));
+        assertTrue(!answerRepository.existsById(answer.getId()));
     }
 
     @Test
-    void deleteAnswerByOther() {
+    void deleteAnswerByOtherManager() {
         Answer answer = new Answer(CONTENT, postId, managerUserId);
         answerRepository.save(answer);
 

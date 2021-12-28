@@ -13,7 +13,7 @@ import java.net.URI;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/v1") // not used in rest api like v1 url
+@RequestMapping("/v1")
 public class AnswerController {
 
     private final AnswerService answerService;

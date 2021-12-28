@@ -1,6 +1,5 @@
 package com.example.gistcompetitioncnserver.answer;
 
-import com.example.gistcompetitioncnserver.comment.Comment;
 import com.example.gistcompetitioncnserver.exception.CustomException;
 import com.example.gistcompetitioncnserver.post.Post;
 import com.example.gistcompetitioncnserver.post.PostRepository;
@@ -28,7 +27,7 @@ public class AnswerService {
     @Transactional
     public Long createAnswer(Long postId, AnswerRequestDto answerRequestDto, Long userId) {
         User user = findUserById(userId);
-        if (user.getUserRole() != UserRole.MANAGER){
+        if (user.getUserRole() != UserRole.MANAGER && user.getUserRole() != UserRole.ADMIN){
             throw new CustomException("답변권한이 없는 user입니다.");
         }
         Post post = postRepository.findById(postId).orElseThrow(()-> new CustomException("존재하지 않는 post입니다"));
@@ -65,7 +64,7 @@ public class AnswerService {
 
     private boolean canUpdate(User user, Answer answer) {
         Long answerOwner = answer.getUserId();
-        return answerOwner.equals(user.getId()) && user.getUserRole()==UserRole.MANAGER;
+        return user.getUserRole() == UserRole.ADMIN || (answerOwner.equals(user.getId()) && user.getUserRole()==UserRole.MANAGER);
     }
 
     @Transactional
@@ -82,7 +81,7 @@ public class AnswerService {
 
     private boolean canDelete(User user, Answer answer) {
         Long answerOwner = answer.getUserId();
-        return user.getUserRole()==UserRole.ADMIN || answerOwner.equals(user.getId()) && user.getUserRole()==UserRole.MANAGER;
+        return user.getUserRole()==UserRole.ADMIN || (answerOwner.equals(user.getId()) && user.getUserRole()==UserRole.MANAGER);
     }
 
 
