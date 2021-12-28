@@ -6,8 +6,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,42 +15,34 @@ public class AnswerService {
 
     private final AnswerRepository answerRepository;
 
-
-    public Answer createAnswer(Answer answer, Post post){
-        answer.setCreated(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+    public Answer createAnswer(Answer answer, Post post) {
         answer.setCategory(post.getCategory());
-        answer.setTitle("RE:"+post.getTitle());
+        answer.setTitle("RE:" + post.getTitle());
         return answerRepository.save(answer);
     }
 
-    public List<Answer> retrieveAllAnswers(){
+    public List<Answer> retrieveAllAnswers() {
         return answerRepository.findAll();
     }
 
-    public List<Answer> retrieveAnswersByUserId(Long user_id){
+    public List<Answer> retrieveAnswersByUserId(Long user_id) {
         return answerRepository.findByUserId(user_id);
     }
 
-    public Optional<Answer> retrieveAnswer(Long id){
+    public Optional<Answer> retrieveAnswer(Long id) {
         return answerRepository.findById(id);
     }
 
-    public Long getPageNumber(){
+    public Long getPageNumber() {
         return answerRepository.count();
     }
 
-    public List<Answer> getAnswersByCategory(String categoryName){
+    public List<Answer> getAnswersByCategory(String categoryName) {
         return answerRepository.findByCategory(categoryName);
     }
 
     @Transactional
-    public void deleteAnswer(Long id){
+    public void deleteAnswer(Long id) {
         answerRepository.deleteById(id);
     }
-
-
-
-
-
-
 }
