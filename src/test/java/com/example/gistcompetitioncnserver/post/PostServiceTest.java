@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @SpringBootTest
 @ActiveProfiles(profiles = "test")
 public class PostServiceTest {
-    private static final PostRequestDto POST_REQUEST_DTO = new PostRequestDto("title", "description", "category");
+    private static final PostRequest POST_REQUEST_DTO = new PostRequest("title", "description", "category");
     @Autowired
     private PostService postService;
     @Autowired

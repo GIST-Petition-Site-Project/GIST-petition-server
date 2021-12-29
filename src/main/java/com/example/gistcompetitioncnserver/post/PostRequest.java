@@ -6,13 +6,13 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class PostRequestDto {
+public class PostRequest {
     private String title;
     private String description;
     private String category;
 
     @Builder
-    public PostRequestDto(String title, String description, String category) {
+    public PostRequest(String title, String description, String category) {
         this.title = title;
         this.description = description;
         this.category = category;

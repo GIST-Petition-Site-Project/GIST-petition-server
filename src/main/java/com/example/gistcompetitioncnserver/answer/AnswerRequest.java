@@ -5,10 +5,10 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class AnswerRequestDto {
+public class AnswerRequest {
     private String content;
 
-    public AnswerRequestDto(String content) {
+    public AnswerRequest(String content) {
         this.content = content;
     }
 }

@@ -20,19 +20,19 @@ public class AnswerController {
     private final UserService userService;
 
     @PostMapping("/posts/{postId}/answer")
-    public ResponseEntity<Object> createAnswer(@PathVariable Long postId, @RequestBody AnswerRequestDto answerRequestDto, @AuthenticationPrincipal String email) {
+    public ResponseEntity<Object> createAnswer(@PathVariable Long postId, @RequestBody AnswerRequest answerRequest, @AuthenticationPrincipal String email) {
         User user = userService.findUserByEmail2(email);
 
-        if (!isRequestBodyValid(answerRequestDto)) {
+        if (!isRequestBodyValid(answerRequest)) {
             throw new CustomException(ErrorCase.INVAILD_FILED_ERROR);
         }
 
-        Long answerId = answerService.createAnswer(postId, answerRequestDto, user.getId());
+        Long answerId = answerService.createAnswer(postId, answerRequest, user.getId());
         return ResponseEntity.created(URI.create("/posts/" + postId + "/answer/" + answerId)).build();
     }
 
-    private boolean isRequestBodyValid(AnswerRequestDto answerRequestDto) {
-        return answerRequestDto.getContent() != null;
+    private boolean isRequestBodyValid(AnswerRequest answerRequest) {
+        return answerRequest.getContent() != null;
     }
 
     @GetMapping("/posts/{postId}/answer")
@@ -47,7 +47,7 @@ public class AnswerController {
 
     @PutMapping("/posts/{postId}/answer")
     public ResponseEntity<Void> updateAnswer(@PathVariable Long postId,
-                                             AnswerRequestDto changeRequest,
+                                             AnswerRequest changeRequest,
                                              @AuthenticationPrincipal String email) {
         User user = userService.findUserByEmail2(email);
         answerService.updateAnswer(postId, user.getId(), changeRequest);

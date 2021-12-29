@@ -25,7 +25,7 @@ public class AnswerService {
     }
 
     @Transactional
-    public Long createAnswer(Long postId, AnswerRequestDto answerRequestDto, Long userId) {
+    public Long createAnswer(Long postId, AnswerRequest answerRequest, Long userId) {
         User user = findUserById(userId);
         if (user.getUserRole() != UserRole.MANAGER && user.getUserRole() != UserRole.ADMIN) {
             throw new CustomException("답변권한이 없는 user입니다.");
@@ -35,7 +35,7 @@ public class AnswerService {
             throw new CustomException("이미 답변이 된 post입니다.");
         }
 
-        Answer answer = new Answer(answerRequestDto.getContent(), postId, userId);
+        Answer answer = new Answer(answerRequest.getContent(), postId, userId);
         post.setAnswered(true);
         return answerRepository.save(answer).getId();
     }
@@ -51,7 +51,7 @@ public class AnswerService {
     }
 
     @Transactional
-    public void updateAnswer(Long updaterId, Long postId, AnswerRequestDto changeRequest) {
+    public void updateAnswer(Long updaterId, Long postId, AnswerRequest changeRequest) {
         checkExistenceByPostId(postId);
         Answer answer = findAnswerByPostId(postId);
 
