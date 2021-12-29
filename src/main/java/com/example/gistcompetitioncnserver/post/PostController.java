@@ -1,7 +1,5 @@
 package com.example.gistcompetitioncnserver.post;
 
-import com.example.gistcompetitioncnserver.exception.CustomException;
-import com.example.gistcompetitioncnserver.exception.ErrorCase;
 import com.example.gistcompetitioncnserver.user.User;
 import com.example.gistcompetitioncnserver.user.UserService;
 import lombok.RequiredArgsConstructor;
@@ -22,23 +20,11 @@ public class PostController {
     private final PostService postService;
     private final UserService userService;
 
-
     @PostMapping("/posts")
     public ResponseEntity<Void> createPost(@Validated @RequestBody PostRequest postRequest,
                                            @AuthenticationPrincipal String email) {
         User user = userService.findUserByEmail2(email);
-
-        if (!isRequestBodyValid(postRequest)) {
-            throw new CustomException(ErrorCase.INVAILD_FILED_ERROR);
-        }
-
         return ResponseEntity.created(URI.create("/posts/" + postService.createPost(postRequest, user.getId()))).build();
-    }
-
-    private boolean isRequestBodyValid(PostRequest postRequest) {
-        return postRequest.getTitle() != null &&
-                postRequest.getDescription() != null &&
-                postRequest.getCategory() != null;
     }
 
     @GetMapping("/posts")
@@ -78,23 +64,17 @@ public class PostController {
     public ResponseEntity<Boolean> agreePost(@PathVariable Long postId, @AuthenticationPrincipal String email) {
         User user = userService.findUserByEmail2(email);
 
-        return ResponseEntity
-                .ok()
-                .body(postService.agree(postId, user.getId()));
+        return ResponseEntity.ok().body(postService.agree(postId, user.getId()));
     }
 
     @GetMapping("/posts/{postId}/agreements")
     public ResponseEntity<Integer> getNumberOfAgreement(@PathVariable Long postId) {
-        return ResponseEntity
-                .ok()
-                .body(postService.getNumberOfAgreements(postId));
+        return ResponseEntity.ok().body(postService.getNumberOfAgreements(postId));
     }
 
     @GetMapping("/posts/{postId}/agreements/me")
     public ResponseEntity<Boolean> getStateOfAgreement(@PathVariable Long postId, @AuthenticationPrincipal String email) {
         User user = userService.findUserByEmail2(email);
-        return ResponseEntity
-                .ok()
-                .body(postService.getStateOfAgreement(postId, user.getId()));
+        return ResponseEntity.ok().body(postService.getStateOfAgreement(postId, user.getId()));
     }
 }
