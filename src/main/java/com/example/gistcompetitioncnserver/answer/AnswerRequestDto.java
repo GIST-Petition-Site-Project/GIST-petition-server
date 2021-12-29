@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 public class AnswerRequestDto {
     private String content;
 
-    public AnswerRequestDto(String content){
+    public AnswerRequestDto(String content) {
         this.content = content;
     }
 }

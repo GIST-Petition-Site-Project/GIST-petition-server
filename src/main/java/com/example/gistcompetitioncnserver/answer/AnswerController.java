@@ -20,8 +20,7 @@ public class AnswerController {
     private final UserService userService;
 
     @PostMapping("/posts/{postId}/answer")
-    public ResponseEntity<Object> createAnswer(@PathVariable Long postId, @RequestBody AnswerRequestDto answerRequestDto,
-                                             @AuthenticationPrincipal String email) {
+    public ResponseEntity<Object> createAnswer(@PathVariable Long postId, @RequestBody AnswerRequestDto answerRequestDto, @AuthenticationPrincipal String email) {
         User user = userService.findUserByEmail2(email);
 
         if (!isRequestBodyValid(answerRequestDto)) {
@@ -33,11 +32,11 @@ public class AnswerController {
     }
 
     private boolean isRequestBodyValid(AnswerRequestDto answerRequestDto) {
-        return answerRequestDto.getContent() != null ;
+        return answerRequestDto.getContent() != null;
     }
 
     @GetMapping("/posts/{postId}/answer")
-    public ResponseEntity<Answer> retrieveAnswer(@PathVariable Long postId){
+    public ResponseEntity<Answer> retrieveAnswer(@PathVariable Long postId) {
         return ResponseEntity.ok().body(answerService.retrieveAnswerByPostId(postId));
     }
 
@@ -47,9 +46,9 @@ public class AnswerController {
     }
 
     @PutMapping("/posts/{postId}/answer")
-    public ResponseEntity<Void> updateAnswer(@PathVariable Long postId
-            , AnswerRequestDto changeRequest
-            ,@AuthenticationPrincipal String email) {
+    public ResponseEntity<Void> updateAnswer(@PathVariable Long postId,
+                                             AnswerRequestDto changeRequest,
+                                             @AuthenticationPrincipal String email) {
         User user = userService.findUserByEmail2(email);
         answerService.updateAnswer(postId, user.getId(), changeRequest);
         return ResponseEntity.ok().build();
