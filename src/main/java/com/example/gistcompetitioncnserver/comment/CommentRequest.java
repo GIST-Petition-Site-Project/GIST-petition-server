@@ -1,13 +1,18 @@
 package com.example.gistcompetitioncnserver.comment;
 
 
-import lombok.*;
-import org.springframework.context.annotation.Bean;
+import javax.validation.constraints.NotBlank;
 
-@Getter
-@NoArgsConstructor
 public class CommentRequest {
+    @NotBlank
     private String content;
+
+    protected CommentRequest() {
+    }
+
+    public String getContent() {
+        return content;
+    }
 
     public CommentRequest(String content) {
         this.content = content;
