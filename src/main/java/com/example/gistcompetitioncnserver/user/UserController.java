@@ -1,8 +1,5 @@
 package com.example.gistcompetitioncnserver.user;
 
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import static org.springframework.http.HttpStatus.FORBIDDEN;
-
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -15,16 +12,6 @@ import com.example.gistcompetitioncnserver.registration.RegistrationService;
 import com.example.gistcompetitioncnserver.registration.token.EmailConfirmationToken;
 import com.example.gistcompetitioncnserver.registration.token.EmailConfirmationTokenService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
-import java.net.URI;
-import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
@@ -34,14 +21,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.util.MimeTypeUtils;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.net.URI;
+import java.time.LocalDateTime;
+import java.util.*;
+
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
 
 @RestController
 @RequestMapping("/v1")
@@ -53,7 +44,8 @@ public class UserController {
     private final EmailConfirmationTokenService emailConfirmationTokenService;
 
     @PostMapping("/users")
-    public ResponseEntity<Object> register(@RequestBody RegistrationRequest request, HttpServletRequest urlRequest) {
+    public ResponseEntity<Object> register(@Validated @RequestBody RegistrationRequest request,
+                                           HttpServletRequest urlRequest) {
         String email = request.getEmail();
         Optional<User> user = userService.findUserByEmail(email);
         if (user.isPresent()) {
