@@ -8,6 +8,8 @@ import com.example.gistcompetitioncnserver.user.UserRepository;
 import com.example.gistcompetitioncnserver.user.UserRole;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
+import java.util.Optional
 
 @Service
 public class AnswerService {
@@ -23,7 +25,6 @@ public class AnswerService {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
     }
-
     @Transactional
     public Long createAnswer(Long postId, AnswerRequestDto answerRequestDto, Long userId) {
         User user = findUserById(userId);
@@ -100,8 +101,4 @@ public class AnswerService {
                 () -> new CustomException("해당 post에는 답변이 존재하지 않습니다.")
         );
     }
-
-
-
-
 }
