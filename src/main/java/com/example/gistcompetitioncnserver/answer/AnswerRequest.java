@@ -1,12 +1,18 @@
 package com.example.gistcompetitioncnserver.answer;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import javax.validation.constraints.NotBlank;
 
-@Getter
-@NoArgsConstructor
 public class AnswerRequest {
+
+    @NotBlank
     private String content;
+
+    protected AnswerRequest() {
+    }
+
+    public String getContent() {
+        return content;
+    }
 
     public AnswerRequest(String content) {
         this.content = content;
