@@ -3,8 +3,10 @@ package com.example.gistcompetitioncnserver.user;
 import com.example.gistcompetitioncnserver.exception.CustomException;
 import com.example.gistcompetitioncnserver.exception.ErrorCase;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService2 {
@@ -37,11 +39,23 @@ public class UserService2 {
 //        if (!user.isEnabled()) {
 //            throw new CustomException(ErrorCase.NO_SUCH_VERIFICATION_EMAIL_ERROR);
 //        }
+    public User2 findUserById(Long userId) {
+        return user2Repository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCase.NO_SUCH_USER_ERROR));
+    }
+
+    @Transactional(readOnly = true)
     public User2 findUserByEmail(String email) {
         return user2Repository.findByUsername(email)
                 .orElseThrow(() -> new CustomException(ErrorCase.NO_SUCH_USER_ERROR));
     }
 
+    @Transactional(readOnly = true)
+    public List<User2> findAllUsers() {
+        return user2Repository.findAll();
+    }
+
+    @Transactional
     public void deleteUser(Long userId) {
         if (!user2Repository.existsById(userId)) {
             throw new CustomException("존재하지 않는 유저입니다");

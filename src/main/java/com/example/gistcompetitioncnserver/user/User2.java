@@ -11,19 +11,21 @@ public class User2 {
     private String password;
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
+    private Boolean enabled;
 
     protected User2() {
     }
 
     public User2(String username, String password, UserRole userRole) {
-        this(null, username, password, userRole);
+        this(null, username, password, userRole, false);
     }
 
-    private User2(Long id, String username, String password, UserRole userRole) {
+    private User2(Long id, String username, String password, UserRole userRole, Boolean enabled) {
         this.id = id;
         this.username = username;
         this.password = password;
         this.userRole = userRole;
+        this.enabled = enabled;
     }
 
     public boolean isAdmin() {
@@ -44,5 +46,9 @@ public class User2 {
 
     public UserRole getUserRole() {
         return userRole;
+    }
+
+    public Boolean isEnabled() {
+        return enabled;
     }
 }
