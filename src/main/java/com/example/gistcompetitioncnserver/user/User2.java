@@ -33,4 +33,16 @@ public class User2 {
     public Long getId() {
         return id;
     }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public UserRole getUserRole() {
+        return userRole;
+    }
 }
