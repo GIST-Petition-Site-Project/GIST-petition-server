@@ -2,119 +2,60 @@ package com.example.gistcompetitioncnserver.user;
 
 import com.example.gistcompetitioncnserver.exception.CustomException;
 import com.example.gistcompetitioncnserver.exception.ErrorCase;
-import com.example.gistcompetitioncnserver.registration.token.EmailConfirmationToken;
-import com.example.gistcompetitioncnserver.registration.token.EmailConfirmationTokenService;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
-@RequiredArgsConstructor
-public class UserService implements UserDetailsService {
-
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
-
+public class UserService {
     private final UserRepository userRepository;
+    private final Encryptor encryptor;
 
-    // find user once users login
-    private final static String USER_NOT_FOUND_MSG = "user with email %s not found";
-    private final EmailConfirmationTokenService emailConfirmationTokenService;
-
-    @Override // need to know how this work
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-
-        Optional<User> user = userRepository.findByEmail(email);
-
-        if (user.isEmpty()) {
-//            log.error("User not found in the database");
-            throw new UsernameNotFoundException(USER_NOT_FOUND_MSG);
-        }
-
-        Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority(user.get().getUserRole().toString()));
-        return new org.springframework.security.core.userdetails.User(user.get().getEmail(), user.get().getPassword(),
-                authorities);
-
-    }
-
-    public Optional<User> getUser(String email) {
-        return userRepository.findByEmail(email);
+    public UserService(UserRepository userRepository, Encryptor encryptor) {
+        this.userRepository = userRepository;
+        this.encryptor = encryptor;
     }
 
     @Transactional
-    public String signUpUser(User user) {
-        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword())); // encode password
-        userRepository.save(user); // save user entity in db
-        return createToken(user);
+    public Long signUp(SignUpRequest request) {
+        String username = request.getUsername();
+        if (userRepository.existsByUsername(username)) {
+            throw new CustomException("이미 존재하는 회원입니다");
+        }
+        if (!EmailDomain.has(EmailParser.parseDomainFrom(username))) {
+            throw new CustomException("유효하지 않은 이메일 형태입니다");
+        }
+
+        User user = new User(
+                username,
+                encryptor.encode(request.getPassword()),
+                UserRole.USER);
+        return userRepository.save(user).getId();
     }
 
-    public String createToken(User user) {
-        String token = UUID.randomUUID().toString();
-
-        // make confirmation token
-        EmailConfirmationToken emailConfirmationToken = new EmailConfirmationToken(
-                token,
-                LocalDateTime.now(),
-                LocalDateTime.now().plusMinutes(15), // set expirestime to 15 minutes
-                user
-        );
-
-        //save confirmation token in database
-        emailConfirmationTokenService.
-                saveEmailConfirmToken(emailConfirmationToken);
-
-        // return the token
-        return token;
+    @Transactional(readOnly = true)
+    public User findUserById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCase.NO_SUCH_USER_ERROR));
     }
 
-    public int enableAppUser(String email) {
-        return userRepository.enableAppUser(email);
+    @Transactional(readOnly = true)
+    public User findUserByEmail(String email) {
+        return userRepository.findByUsername(email)
+                .orElseThrow(() -> new CustomException(ErrorCase.NO_SUCH_USER_ERROR));
     }
 
-
-    public List<User> retrieveAllUsers() {
+    @Transactional(readOnly = true)
+    public List<User> findAllUsers() {
         return userRepository.findAll();
     }
 
-    public Optional<User> findUserById(Long id) {
-        return userRepository.findById(id);
-    }
-
-    public User save(User user) {
-        String encodedPassword = bCryptPasswordEncoder.encode(user.getPassword());
-        user.setPassword(encodedPassword);
-        return userRepository.save(user);
-    }
-
-    public void deleteById(Long id) {
-        userRepository.deleteById(id);
-    }
-
-    public Optional<User> findUserByEmail(String email) {
-        return userRepository.findIdByEmail(email);
-    }
-
-    public User findUserByEmail2(String email) {
-        Optional<User> user = userRepository.findIdByEmail(email);
-        if (user.isEmpty()) {
-            throw new CustomException(ErrorCase.NO_SUCH_USER_ERROR);
+    @Transactional
+    public void deleteUser(Long userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new CustomException("존재하지 않는 유저입니다");
         }
-
-        if (!user.get().isEnabled()) {
-            throw new CustomException(ErrorCase.NO_SUCH_VERIFICATION_EMAIL_ERROR);
-        }
-
-        return user.get();
+        userRepository.deleteById(userId);
     }
 }

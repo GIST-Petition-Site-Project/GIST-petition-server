@@ -1,7 +1,5 @@
 package com.example.gistcompetitioncnserver.comment;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 import com.example.gistcompetitioncnserver.exception.CustomException;
 import com.example.gistcompetitioncnserver.post.Post;
 import com.example.gistcompetitioncnserver.post.PostRepository;
@@ -12,6 +10,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
 class CommentValidatorTest {
@@ -28,7 +28,7 @@ class CommentValidatorTest {
 
     @BeforeEach
     void setUp() {
-        user = userRepository.save(new User("userName", "email", "password", UserRole.USER));
+        user = userRepository.save(new User("email@email.com", "password", UserRole.USER));
         post = postRepository.save(new Post("title", "description", "category", user.getId()));
     }
 

@@ -1,20 +1,11 @@
 package com.example.gistcompetitioncnserver.comment;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-
 import com.example.gistcompetitioncnserver.exception.CustomException;
 import com.example.gistcompetitioncnserver.post.Post;
 import com.example.gistcompetitioncnserver.post.PostRepository;
 import com.example.gistcompetitioncnserver.user.User;
 import com.example.gistcompetitioncnserver.user.UserRepository;
 import com.example.gistcompetitioncnserver.user.UserRole;
-import java.util.ArrayList;
-import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,6 +14,16 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 
 @SpringBootTest
 class CommentServiceTest {
@@ -44,7 +45,7 @@ class CommentServiceTest {
 
     @BeforeEach
     void setUp() {
-        userId = userRepository.save(new User("userName", "email@email.com", "password", UserRole.USER)).getId();
+        userId = userRepository.save(new User("email@email.com", "password", UserRole.USER)).getId();
         postId = postRepository.save(new Post("title", "description", "category", userId)).getId();
     }
 
@@ -108,7 +109,7 @@ class CommentServiceTest {
     @ParameterizedTest
     @EnumSource(value = UserRole.class)
     void updateCommentByOther(UserRole userRole) {
-        User other = userRepository.save(new User("other", "other@other.com", "password", userRole));
+        User other = userRepository.save(new User("other@other.com", "password", userRole));
         CommentRequest updateRequest = new CommentRequest("changed Content");
         Long savedId = commentRepository.save(new Comment(CONTENT, postId, userId)).getId();
         assertThatThrownBy(
@@ -127,7 +128,7 @@ class CommentServiceTest {
 
     @Test
     void deleteByAdmin() {
-        User admin = userRepository.save(new User("admin", "admin@admin.com", "password", UserRole.ADMIN));
+        User admin = userRepository.save(new User("admin@admin.com", "password", UserRole.ADMIN));
         Comment saved = commentRepository.save(new Comment(CONTENT, postId, userId));
 
         commentService.deleteComment(admin.getId(), saved.getId());
@@ -137,7 +138,7 @@ class CommentServiceTest {
 
     @Test
     void deleteByOther() {
-        User other = userRepository.save(new User("other", "other@other.com", "password", UserRole.USER));
+        User other = userRepository.save(new User("other@other.com", "password", UserRole.USER));
         Comment saved = commentRepository.save(new Comment(CONTENT, postId, userId));
 
         assertThatThrownBy(

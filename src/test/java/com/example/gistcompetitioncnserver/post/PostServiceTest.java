@@ -32,7 +32,7 @@ public class PostServiceTest {
 
     @BeforeEach
     void setUp() {
-        user = userRepository.save(new User("userName", "email", "password", UserRole.USER));
+        user = userRepository.save(new User("email@email.com", "password", UserRole.USER));
     }
 
     @Test
@@ -75,15 +75,15 @@ public class PostServiceTest {
 
     @Test
     void numberOfAgreements() {
-        Long postId = postService.createPost(POST_REQUEST_DTO, user.getId());
+        Long postId = postService.createPost(POST_REQUEST_DTO, this.user.getId());
 
-        User user2 = userRepository.save(new User("userName", "email", "password", UserRole.USER));
-        User user3 = userRepository.save(new User("userName", "email", "password", UserRole.USER));
+        User user = userRepository.save(new User("email@email.com", "password", UserRole.USER));
+        User user3 = userRepository.save(new User("email@email.com", "password", UserRole.USER));
 
         assertThat(postService.getNumberOfAgreements(postId)).isEqualTo(0);
 
+        postService.agree(postId, this.user.getId());
         postService.agree(postId, user.getId());
-        postService.agree(postId, user2.getId());
         postService.agree(postId, user3.getId());
 
         assertThat(postService.getNumberOfAgreements(postId)).isEqualTo(3);

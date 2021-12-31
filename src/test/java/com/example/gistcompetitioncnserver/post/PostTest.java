@@ -15,7 +15,7 @@ class PostTest {
 
     @BeforeEach
     void setUp() {
-        user = new User(1L, "userName", "email@email.com", "password", false, UserRole.USER, true);
+        user = new User(1L, "email@email.com", "password", UserRole.USER, true);
         post = new Post("title", "description", "category", user.getId());
     }
 
@@ -36,10 +36,10 @@ class PostTest {
 
     @Test
     void agreeByMultipleUser() {
-        User user2 = new User(2L, "userName", "email@email.com", "password", false, UserRole.USER, true);
-        User user3 = new User(3L, "userName", "email@email.com", "password", false, UserRole.USER, true);
+        User user = new User(2L, "email@email.com", "password", UserRole.USER, true);
+        User user3 = new User(3L, "email@email.com", "password", UserRole.USER, true);
+        post.applyAgreement(this.user);
         post.applyAgreement(user);
-        post.applyAgreement(user2);
         post.applyAgreement(user3);
         assertThat(post.getAgreements()).hasSize(3);
     }
