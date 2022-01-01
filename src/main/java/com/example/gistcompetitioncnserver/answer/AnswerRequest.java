@@ -1,21 +1,20 @@
-package com.example.gistcompetitioncnserver.comment;
-
+package com.example.gistcompetitioncnserver.answer;
 
 import javax.validation.constraints.NotBlank;
 
-public class CommentRequest {
+public class AnswerRequest {
+
     @NotBlank
     private String content;
 
-    protected CommentRequest() {
+    protected AnswerRequest() {
     }
 
     public String getContent() {
         return content;
     }
 
-    public CommentRequest(String content) {
+    public AnswerRequest(String content) {
         this.content = content;
     }
-
 }

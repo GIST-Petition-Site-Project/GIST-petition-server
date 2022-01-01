@@ -2,6 +2,7 @@ package com.example.gistcompetitioncnserver.user;
 
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -15,7 +16,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/users")
-    public ResponseEntity<Void> register(@RequestBody SignUpRequest request) {
+    public ResponseEntity<Void> register(@Validated @RequestBody SignUpRequest request) {
         return ResponseEntity.created(URI.create("/users/" + userService.signUp(request))).build();
     }
 

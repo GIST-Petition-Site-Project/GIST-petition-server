@@ -1,12 +1,10 @@
 package com.example.gistcompetitioncnserver.post;
 
-import com.example.gistcompetitioncnserver.exception.CustomException;
-import com.example.gistcompetitioncnserver.exception.ErrorCase;
 import com.example.gistcompetitioncnserver.user.User;
 import com.example.gistcompetitioncnserver.user.UserRole;
-import com.example.gistcompetitioncnserver.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -20,21 +18,10 @@ public class PostController {
     private final static User user = new User(1L, "email@email.com", "password", UserRole.USER, true);
 
     private final PostService postService;
-    private final UserService userService;
-
 
     @PostMapping("/posts")
-    public ResponseEntity<Void> createPost(@RequestBody PostRequestDto postRequestDto) {
-        if (!isRequestBodyValid(postRequestDto)) {
-            throw new CustomException(ErrorCase.INVAILD_FILED_ERROR);
-        }
-        return ResponseEntity.created(URI.create("/posts/" + postService.createPost(postRequestDto, user.getId()))).build();
-    }
-
-    private boolean isRequestBodyValid(PostRequestDto postRequestDto) {
-        return postRequestDto.getTitle() != null &&
-                postRequestDto.getDescription() != null &&
-                postRequestDto.getCategory() != null;
+    public ResponseEntity<Void> createPost(@Validated @RequestBody PostRequest postRequest) {
+        return ResponseEntity.created(URI.create("/posts/" + postService.createPost(postRequest, user.getId()))).build();
     }
 
     @GetMapping("/posts")

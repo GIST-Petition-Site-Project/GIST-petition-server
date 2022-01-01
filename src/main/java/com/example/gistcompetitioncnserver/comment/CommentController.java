@@ -5,6 +5,7 @@ import com.example.gistcompetitioncnserver.user.User;
 import com.example.gistcompetitioncnserver.user.UserRole;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -22,7 +23,7 @@ public class CommentController {
                                               @RequestBody CommentRequest commentRequest) {
 
         Long commentId = commentService.createComment(postId, commentRequest, user.getId());
-        return ResponseEntity.created(URI.create("/post/" + postId + "/comment/" + commentId)).build();
+        return ResponseEntity.created(URI.create("/posts/" + postId + "/comments/" + commentId)).build();
     }
 
     @GetMapping("/posts/{postId}/comments")
@@ -30,15 +31,15 @@ public class CommentController {
         return ResponseEntity.ok().body(commentService.getCommentsByPostId(postId));
     }
 
-    @PutMapping("/posts/{postId}/comment/{commentId}")
+    @PutMapping("/posts/{postId}/comments/{commentId}")
     public ResponseEntity<Object> updateComment(@PathVariable Long postId,
                                                 @PathVariable Long commentId,
-                                                @RequestBody CommentRequest updateRequest) {
+                                                @Validated @RequestBody CommentRequest updateRequest) {
         commentService.updateComment(user.getId(), commentId, updateRequest);
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/posts/{postId}/comment/{commentId}")
+    @DeleteMapping("/posts/{postId}/comments/{commentId}")
     public ResponseEntity<Object> deleteComment(@PathVariable Long postId,
                                                 @PathVariable Long commentId) {
         commentService.deleteComment(user.getId(), commentId);
