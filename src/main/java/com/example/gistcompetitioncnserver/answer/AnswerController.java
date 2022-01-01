@@ -1,10 +1,9 @@
 package com.example.gistcompetitioncnserver.answer;
 
 import com.example.gistcompetitioncnserver.user.User;
-import com.example.gistcompetitioncnserver.user.UserService;
+import com.example.gistcompetitioncnserver.user.UserRole;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,19 +13,16 @@ import java.net.URI;
 @AllArgsConstructor
 @RequestMapping("/v1")
 public class AnswerController {
+    private final static User user = new User(1L, "email@email.com", "password", UserRole.USER, true);
 
     private final AnswerService answerService;
-    private final UserService userService;
 
     @PostMapping("/posts/{postId}/answer")
     public ResponseEntity<Object> createAnswer(@PathVariable Long postId,
-                                               @Validated @RequestBody AnswerRequest answerRequest,
-                                               @AuthenticationPrincipal String email) {
-        User user = userService.findUserByEmail2(email);
+                                               @Validated @RequestBody AnswerRequest answerRequest) {
         Long answerId = answerService.createAnswer(postId, answerRequest, user.getId());
         return ResponseEntity.created(URI.create("/posts/" + postId + "/answer/" + answerId)).build();
     }
-
 
     @GetMapping("/posts/{postId}/answer")
     public ResponseEntity<Answer> retrieveAnswer(@PathVariable Long postId) {
@@ -40,18 +36,13 @@ public class AnswerController {
 
     @PutMapping("/posts/{postId}/answer")
     public ResponseEntity<Void> updateAnswer(@PathVariable Long postId,
-                                             @Validated @RequestBody AnswerRequest changeRequest,
-                                             @AuthenticationPrincipal String email) {
-        User user = userService.findUserByEmail2(email);
+                                             @Validated @RequestBody AnswerRequest changeRequest) {
         answerService.updateAnswer(postId, user.getId(), changeRequest);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/posts/{postId}/answer")
-    public ResponseEntity<Object> deleteComment(@PathVariable Long postId,
-                                                @AuthenticationPrincipal String email) {
-        User user = userService.findUserByEmail2(email);
-
+    public ResponseEntity<Object> deleteComment(@PathVariable Long postId) {
         answerService.deleteAnswer(user.getId(), postId);
         return ResponseEntity.noContent().build();
     }

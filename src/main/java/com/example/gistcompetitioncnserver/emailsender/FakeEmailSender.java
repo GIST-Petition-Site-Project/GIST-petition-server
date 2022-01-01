@@ -1,4 +1,4 @@
-package com.example.gistcompetitioncnserver.registration.emailsender;
+package com.example.gistcompetitioncnserver.emailsender;
 
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;

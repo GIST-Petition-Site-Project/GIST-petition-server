@@ -12,9 +12,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 class AnswerServiceTest {
@@ -37,9 +38,9 @@ class AnswerServiceTest {
 
     @BeforeEach
     void setup() {
-        normalUserId = userRepository.save(new User("userName", "normal@email.com", "password", UserRole.USER)).getId();
-        managerUserId = userRepository.save(new User("userName", "manager@email.com", "password", UserRole.MANAGER)).getId();
-        adminUserId = userRepository.save(new User("userName", "admin@email.com", "password", UserRole.ADMIN)).getId();
+        normalUserId = userRepository.save(new User("normal@email.com", "password", UserRole.USER)).getId();
+        managerUserId = userRepository.save(new User("manager@email.com", "password", UserRole.MANAGER)).getId();
+        adminUserId = userRepository.save(new User("admin@email.com", "password", UserRole.ADMIN)).getId();
         postId = postRepository.save(new Post("title", "description", "category", normalUserId)).getId();
     }
 
@@ -49,7 +50,7 @@ class AnswerServiceTest {
 
         Long savedAnswer = answerService.createAnswer(postId, answerRequest, adminUserId);
 
-        Answer answer = answerRepository.findById(savedAnswer).orElseThrow(()-> new CustomException("존재하지 않는 answer입니다.;"));
+        Answer answer = answerRepository.findById(savedAnswer).orElseThrow(() -> new CustomException("존재하지 않는 answer입니다.;"));
         assertThat(answer.getId()).isEqualTo(savedAnswer);
         assertThat(answer.getContent()).isEqualTo(CONTENT);
         assertThat(answer.getUserId()).isEqualTo(adminUserId);
@@ -58,13 +59,14 @@ class AnswerServiceTest {
         Post post = postRepository.findById(postId).orElseThrow(() -> new CustomException("존재하지 않는 post입니다"));
         assertTrue(post.isAnswered());
     }
+
     @Test
     void createAnswerByManager() {
         AnswerRequest answerRequest = new AnswerRequest(CONTENT);
 
         Long savedAnswer = answerService.createAnswer(postId, answerRequest, managerUserId);
 
-        Answer answer = answerRepository.findById(savedAnswer).orElseThrow(()-> new CustomException("존재하지 않는 answer입니다.;"));
+        Answer answer = answerRepository.findById(savedAnswer).orElseThrow(() -> new CustomException("존재하지 않는 answer입니다.;"));
         assertThat(answer.getId()).isEqualTo(savedAnswer);
         assertThat(answer.getContent()).isEqualTo(CONTENT);
         assertThat(answer.getUserId()).isEqualTo(managerUserId);
@@ -73,6 +75,7 @@ class AnswerServiceTest {
         Post post = postRepository.findById(postId).orElseThrow(() -> new CustomException("존재하지 않는 post입니다"));
         assertTrue(post.isAnswered());
     }
+
     @Test
     void createAnswerByNormalUser() {
         AnswerRequest answerRequest = new AnswerRequest(CONTENT);
@@ -84,6 +87,7 @@ class AnswerServiceTest {
         Post post = postRepository.findById(postId).orElseThrow(() -> new CustomException("존재하지 않는 post입니다"));
         assertFalse(post.isAnswered());
     }
+
     @Test
     void createAnswerByNonExistentUser() {
         AnswerRequest answerRequest = new AnswerRequest(CONTENT);
@@ -105,8 +109,8 @@ class AnswerServiceTest {
     }
 
     @Test
-    void retrieveAnswerByALL(){
-        Answer answer= new Answer(CONTENT,postId,managerUserId);
+    void retrieveAnswerByALL() {
+        Answer answer = new Answer(CONTENT, postId, managerUserId);
         answerRepository.save(answer);
 
         Answer retrievedAnswer = answerService.retrieveAnswerByPostId(postId);
@@ -115,15 +119,15 @@ class AnswerServiceTest {
     }
 
     @Test
-    void retrieveAnswerWithNoAnswer(){
+    void retrieveAnswerWithNoAnswer() {
         assertThatThrownBy(
                 () -> answerService.retrieveAnswerByPostId(postId)
         ).isInstanceOf(CustomException.class);
     }
 
     @Test
-    void retrieveAnswerFromNonExistentPost(){
-        Answer answer= new Answer(CONTENT,postId,managerUserId);
+    void retrieveAnswerFromNonExistentPost() {
+        Answer answer = new Answer(CONTENT, postId, managerUserId);
         answerRepository.save(answer);
 
         Long fakePostId = Long.MAX_VALUE;
@@ -145,6 +149,7 @@ class AnswerServiceTest {
         assertThat(answer.getId()).isEqualTo(updatedAnswer.getId());
         assertThat(updatedAnswer.getContent()).isEqualTo(changContent);
     }
+
     @Test
     void updateAnswerByOwnerManager() {
         Answer answer = new Answer(CONTENT, postId, managerUserId);
@@ -166,13 +171,14 @@ class AnswerServiceTest {
         String changContent = "change contents";
         AnswerRequest changeRequest = new AnswerRequest(changContent);
 
-        User otherManager = new User("testUser", "otherManager@email.com", "pw", UserRole.MANAGER);
+        User otherManager = new User("otherManager@email.com", "pw", UserRole.MANAGER);
         userRepository.save(otherManager);
 
         assertThatThrownBy(
                 () -> answerService.updateAnswer(otherManager.getId(), postId, changeRequest)
         ).isInstanceOf(CustomException.class);
     }
+
     @Test
     void updateAnswerByOwnerButNormalUser() {
         Answer answer = new Answer(CONTENT, postId, managerUserId);
@@ -218,7 +224,7 @@ class AnswerServiceTest {
 
         answerService.deleteAnswer(managerUserId, postId);
 
-        assertTrue(!answerRepository.existsById(answer.getId()));
+        assertFalse(answerRepository.existsById(answer.getId()));
     }
 
     @Test
@@ -228,7 +234,7 @@ class AnswerServiceTest {
 
         answerService.deleteAnswer(adminUserId, postId);
 
-        assertTrue(!answerRepository.existsById(answer.getId()));
+        assertFalse(answerRepository.existsById(answer.getId()));
     }
 
     @Test
@@ -237,11 +243,11 @@ class AnswerServiceTest {
         answerRepository.save(answer);
 
         User other = userRepository.save(
-                new User("other", "otherManager", "pswd", UserRole.MANAGER)
+                new User("otherManager@email.com", "pswd", UserRole.MANAGER)
         );
 
         assertThatThrownBy(
-                () ->  answerService.deleteAnswer(other.getId(), postId)
+                () -> answerService.deleteAnswer(other.getId(), postId)
         ).isInstanceOf(CustomException.class);
     }
 
