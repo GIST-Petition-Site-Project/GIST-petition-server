@@ -8,8 +8,6 @@ import com.example.gistcompetitioncnserver.user.UserRepository;
 import com.example.gistcompetitioncnserver.user.UserRole;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class AnswerService {
@@ -18,41 +16,42 @@ public class AnswerService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
 
-    public AnswerService (AnswerRepository answerRepository,
-                          PostRepository postRepository,
-                          UserRepository userRepository) {
+    public AnswerService(AnswerRepository answerRepository,
+                         PostRepository postRepository,
+                         UserRepository userRepository) {
         this.answerRepository = answerRepository;
         this.postRepository = postRepository;
         this.userRepository = userRepository;
     }
+
     @Transactional
-    public Long createAnswer(Long postId, AnswerRequestDto answerRequestDto, Long userId) {
+    public Long createAnswer(Long postId, AnswerRequest answerRequest, Long userId) {
         User user = findUserById(userId);
-        if (user.getUserRole() != UserRole.MANAGER && user.getUserRole() != UserRole.ADMIN){
+        if (user.getUserRole() != UserRole.MANAGER && user.getUserRole() != UserRole.ADMIN) {
             throw new CustomException("답변권한이 없는 user입니다.");
         }
-        Post post = postRepository.findById(postId).orElseThrow(()-> new CustomException("존재하지 않는 post입니다"));
-        if (post.isAnswered()){
+        Post post = postRepository.findById(postId).orElseThrow(() -> new CustomException("존재하지 않는 post입니다"));
+        if (post.isAnswered()) {
             throw new CustomException("이미 답변이 된 post입니다.");
         }
 
-        Answer answer = new Answer(answerRequestDto.getContent(), postId, userId);
+        Answer answer = new Answer(answerRequest.getContent(), postId, userId);
         post.setAnswered(true);
         return answerRepository.save(answer).getId();
     }
 
     @Transactional(readOnly = true)
-    public Answer retrieveAnswerByPostId(Long postId){
+    public Answer retrieveAnswerByPostId(Long postId) {
         checkExistenceByPostId(postId);
         return findAnswerByPostId(postId);
     }
 
-    public Long getNumberOfAnswers(){
+    public Long getNumberOfAnswers() {
         return answerRepository.count();
     }
 
     @Transactional
-    public void updateAnswer(Long updaterId, Long postId, AnswerRequestDto changeRequest) {
+    public void updateAnswer(Long updaterId, Long postId, AnswerRequest changeRequest) {
         checkExistenceByPostId(postId);
         Answer answer = findAnswerByPostId(postId);
 
@@ -65,7 +64,7 @@ public class AnswerService {
 
     private boolean canUpdate(User user, Answer answer) {
         Long answerOwner = answer.getUserId();
-        return user.getUserRole() == UserRole.ADMIN || (answerOwner.equals(user.getId()) && user.getUserRole()==UserRole.MANAGER);
+        return user.getUserRole() == UserRole.ADMIN || (answerOwner.equals(user.getId()) && user.getUserRole() == UserRole.MANAGER);
     }
 
     @Transactional
@@ -82,7 +81,7 @@ public class AnswerService {
 
     private boolean canDelete(User user, Answer answer) {
         Long answerOwner = answer.getUserId();
-        return user.getUserRole()==UserRole.ADMIN || (answerOwner.equals(user.getId()) && user.getUserRole()==UserRole.MANAGER);
+        return user.getUserRole() == UserRole.ADMIN || (answerOwner.equals(user.getId()) && user.getUserRole() == UserRole.MANAGER);
     }
 
 
@@ -93,7 +92,7 @@ public class AnswerService {
     }
 
     private User findUserById(Long userId) {
-        return userRepository.findById(userId).orElseThrow(()-> new CustomException("존재하지 않는 user입니다"));
+        return userRepository.findById(userId).orElseThrow(() -> new CustomException("존재하지 않는 user입니다"));
     }
 
     private Answer findAnswerByPostId(Long postId) {

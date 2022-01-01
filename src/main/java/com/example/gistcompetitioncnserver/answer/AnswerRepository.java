@@ -8,5 +8,6 @@ import java.util.Optional;
 @Repository
 public interface AnswerRepository extends JpaRepository<Answer, Long> {
     Optional<Answer> findByPostId(Long postId);
+
     void deleteByPostId(Long postId);
 }

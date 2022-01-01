@@ -45,9 +45,9 @@ class AnswerServiceTest {
 
     @Test
     void createAnswerByAdmin() {
-        AnswerRequestDto answerRequestDto = new AnswerRequestDto(CONTENT);
+        AnswerRequest answerRequest = new AnswerRequest(CONTENT);
 
-        Long savedAnswer = answerService.createAnswer(postId, answerRequestDto, adminUserId);
+        Long savedAnswer = answerService.createAnswer(postId, answerRequest, adminUserId);
 
         Answer answer = answerRepository.findById(savedAnswer).orElseThrow(()-> new CustomException("존재하지 않는 answer입니다.;"));
         assertThat(answer.getId()).isEqualTo(savedAnswer);
@@ -60,9 +60,9 @@ class AnswerServiceTest {
     }
     @Test
     void createAnswerByManager() {
-        AnswerRequestDto answerRequestDto = new AnswerRequestDto(CONTENT);
+        AnswerRequest answerRequest = new AnswerRequest(CONTENT);
 
-        Long savedAnswer = answerService.createAnswer(postId, answerRequestDto, managerUserId);
+        Long savedAnswer = answerService.createAnswer(postId, answerRequest, managerUserId);
 
         Answer answer = answerRepository.findById(savedAnswer).orElseThrow(()-> new CustomException("존재하지 않는 answer입니다.;"));
         assertThat(answer.getId()).isEqualTo(savedAnswer);
@@ -75,10 +75,10 @@ class AnswerServiceTest {
     }
     @Test
     void createAnswerByNormalUser() {
-        AnswerRequestDto answerRequestDto = new AnswerRequestDto(CONTENT);
+        AnswerRequest answerRequest = new AnswerRequest(CONTENT);
 
         assertThatThrownBy(
-                () -> answerService.createAnswer(postId, answerRequestDto, normalUserId)
+                () -> answerService.createAnswer(postId, answerRequest, normalUserId)
         ).isInstanceOf(CustomException.class);
 
         Post post = postRepository.findById(postId).orElseThrow(() -> new CustomException("존재하지 않는 post입니다"));
@@ -86,21 +86,21 @@ class AnswerServiceTest {
     }
     @Test
     void createAnswerByNonExistentUser() {
-        AnswerRequestDto answerRequestDto = new AnswerRequestDto(CONTENT);
+        AnswerRequest answerRequest = new AnswerRequest(CONTENT);
 
         Long fakeUserId = Long.MAX_VALUE;
         assertThatThrownBy(
-                () -> answerService.createAnswer(postId, answerRequestDto, fakeUserId)
+                () -> answerService.createAnswer(postId, answerRequest, fakeUserId)
         ).isInstanceOf(CustomException.class);
     }
 
     @Test
     void createAnswerToNonExistentPost() {
-        AnswerRequestDto answerRequestDto = new AnswerRequestDto(CONTENT);
+        AnswerRequest answerRequest = new AnswerRequest(CONTENT);
 
         Long fakePostId = Long.MAX_VALUE;
         assertThatThrownBy(
-                () -> answerService.createAnswer(fakePostId, answerRequestDto, managerUserId)
+                () -> answerService.createAnswer(fakePostId, answerRequest, managerUserId)
         ).isInstanceOf(CustomException.class);
     }
 
@@ -137,7 +137,7 @@ class AnswerServiceTest {
         Answer answer = new Answer(CONTENT, postId, managerUserId);
         answerRepository.save(answer);
         String changContent = "change contents";
-        AnswerRequestDto changeRequest = new AnswerRequestDto(changContent);
+        AnswerRequest changeRequest = new AnswerRequest(changContent);
 
         answerService.updateAnswer(adminUserId, postId, changeRequest);
 
@@ -150,7 +150,7 @@ class AnswerServiceTest {
         Answer answer = new Answer(CONTENT, postId, managerUserId);
         answerRepository.save(answer);
         String changContent = "change contents";
-        AnswerRequestDto changeRequest = new AnswerRequestDto(changContent);
+        AnswerRequest changeRequest = new AnswerRequest(changContent);
 
         answerService.updateAnswer(managerUserId, postId, changeRequest);
 
@@ -164,7 +164,7 @@ class AnswerServiceTest {
         Answer answer = new Answer(CONTENT, postId, managerUserId);
         answerRepository.save(answer);
         String changContent = "change contents";
-        AnswerRequestDto changeRequest = new AnswerRequestDto(changContent);
+        AnswerRequest changeRequest = new AnswerRequest(changContent);
 
         User otherManager = new User("testUser", "otherManager@email.com", "pw", UserRole.MANAGER);
         userRepository.save(otherManager);
@@ -178,7 +178,7 @@ class AnswerServiceTest {
         Answer answer = new Answer(CONTENT, postId, managerUserId);
         answerRepository.save(answer);
         String changContent = "change contents";
-        AnswerRequestDto changeRequest = new AnswerRequestDto(changContent);
+        AnswerRequest changeRequest = new AnswerRequest(changContent);
 
         User user = userRepository.findById(managerUserId).orElseThrow(() -> new CustomException(""));
         user.setUserRole(UserRole.USER);
@@ -194,7 +194,7 @@ class AnswerServiceTest {
     void updateAnswerFromNonExistentPost() {
         Long fakePostId = Long.MAX_VALUE;
         String changContent = "change contents";
-        AnswerRequestDto changeRequest = new AnswerRequestDto(changContent);
+        AnswerRequest changeRequest = new AnswerRequest(changContent);
 
         assertThatThrownBy(
                 () -> answerService.updateAnswer(managerUserId, fakePostId, changeRequest)
@@ -204,7 +204,7 @@ class AnswerServiceTest {
     @Test
     void updateNonExistentAnswer() {
         String changContent = "change contents";
-        AnswerRequestDto changeRequest = new AnswerRequestDto(changContent);
+        AnswerRequest changeRequest = new AnswerRequest(changContent);
 
         assertThatThrownBy(
                 () -> answerService.updateAnswer(managerUserId, postId, changeRequest)
