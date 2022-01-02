@@ -1,7 +1,5 @@
 package com.example.gistcompetitioncnserver.post;
 
-import com.example.gistcompetitioncnserver.user.User;
-import com.example.gistcompetitioncnserver.user.UserRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -10,18 +8,18 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.util.List;
 
+import static com.example.gistcompetitioncnserver.DataLoader.ADMIN;
+
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1")
 public class PostController {
-    private final static User user = new User(1L, "email@email.com", "password", UserRole.USER, true);
-
     private final PostService postService;
 
     @PostMapping("/posts")
     public ResponseEntity<Void> createPost(@Validated @RequestBody PostRequest postRequest) {
-        return ResponseEntity.created(URI.create("/posts/" + postService.createPost(postRequest, user.getId()))).build();
+        return ResponseEntity.created(URI.create("/posts/" + postService.createPost(postRequest, ADMIN.getId()))).build();
     }
 
     @GetMapping("/posts")
@@ -36,7 +34,7 @@ public class PostController {
 
     @GetMapping("/posts/me")
     public ResponseEntity<List<Post>> retrievePostsByUserId() {
-        return ResponseEntity.ok().body(postService.retrievePostsByUserId(user.getId()));
+        return ResponseEntity.ok().body(postService.retrievePostsByUserId(ADMIN.getId()));
     }
 
     @GetMapping("/posts/count")
@@ -57,7 +55,7 @@ public class PostController {
 
     @PostMapping("/posts/{postId}/agreements")
     public ResponseEntity<Boolean> agreePost(@PathVariable Long postId) {
-        return ResponseEntity.ok().body(postService.agree(postId, user.getId()));
+        return ResponseEntity.ok().body(postService.agree(postId, ADMIN.getId()));
     }
 
     @GetMapping("/posts/{postId}/agreements")
@@ -67,6 +65,6 @@ public class PostController {
 
     @GetMapping("/posts/{postId}/agreements/me")
     public ResponseEntity<Boolean> getStateOfAgreement(@PathVariable Long postId) {
-        return ResponseEntity.ok().body(postService.getStateOfAgreement(postId, user.getId()));
+        return ResponseEntity.ok().body(postService.getStateOfAgreement(postId, ADMIN.getId()));
     }
 }
