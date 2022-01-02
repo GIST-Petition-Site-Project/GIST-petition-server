@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: Checkout source code
         uses: actions/checkout@v2
-        
+
       - name: Build App
         run: ./gradlew bootJar
 
@@ -24,14 +24,14 @@ jobs:
           source: "./build/libs/*.jar"
           target: "/home/ubuntu/deploy"
           strip_components: 2
-          
+
       - name: Transfer Deploy Script use SCP
         uses: appleboy/scp-action@master
         with:
           username: ubuntu
           host: ${{ secrets.HOST }}
           key: ${{ secrets.PRIVATE_KEY }}
-          source: "deploy.sh"
+          source: "dev-deploy.sh"
           target: "/home/ubuntu/deploy"
 
       - name: Execute Server Init Script
