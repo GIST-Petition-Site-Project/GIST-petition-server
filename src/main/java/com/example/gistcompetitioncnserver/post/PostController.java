@@ -49,7 +49,7 @@ public class PostController {
 
     @DeleteMapping("/posts/{postId}")
     public ResponseEntity<Void> deletePost(@PathVariable Long postId) {
-        postService.deletePost(postId);
+        postService.deletePost(ADMIN.getId(), postId);
         return ResponseEntity.noContent().build();
     }
 
