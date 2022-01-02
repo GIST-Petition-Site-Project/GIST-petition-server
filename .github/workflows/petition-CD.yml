@@ -15,7 +15,7 @@ jobs:
       - name: Build App
         run: ./gradlew bootJar
 
-      - name: Deploy Prod use SCP
+      - name: Deploy Dev use SCP
         uses: appleboy/scp-action@master
         with:
           username: ubuntu
@@ -43,5 +43,5 @@ jobs:
           script_stop: true
           script: |
             cd /home/ubuntu/deploy
-            chmod u+x deploy.sh
-            ./deploy.sh
+            chmod u+x dev-deploy.sh
+            ./dev-deploy.sh
