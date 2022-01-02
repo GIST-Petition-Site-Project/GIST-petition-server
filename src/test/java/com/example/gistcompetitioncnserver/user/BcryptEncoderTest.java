@@ -3,8 +3,9 @@ package com.example.gistcompetitioncnserver.user;
 import org.junit.jupiter.api.Test;
 import org.mindrot.jbcrypt.BCrypt;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class BcryptEncoderTest {
 
@@ -24,6 +25,7 @@ class BcryptEncoderTest {
         String password = "test-password";
         assertTrue(encoder.isMatch(password, BCrypt.hashpw(password, BCrypt.gensalt())));
     }
+
     @Test
     void isMatchFailed() {
         String own = "own-password";
