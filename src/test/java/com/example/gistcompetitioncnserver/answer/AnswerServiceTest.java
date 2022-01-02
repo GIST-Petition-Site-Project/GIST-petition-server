@@ -171,12 +171,13 @@ class AnswerServiceTest {
         String changContent = "change contents";
         AnswerRequest changeRequest = new AnswerRequest(changContent);
 
-        User otherManager = new User("otherManager@email.com", "pw", UserRole.MANAGER);
-        userRepository.save(otherManager);
+        User otherManager = userRepository.save(new User("otherManager@email.com", "pw", UserRole.MANAGER));
 
-        assertThatThrownBy(
-                () -> answerService.updateAnswer(otherManager.getId(), postId, changeRequest)
-        ).isInstanceOf(CustomException.class);
+        answerService.updateAnswer(otherManager.getId(), postId, changeRequest);
+
+        Answer updatedAnswer = answerRepository.findByPostId(postId).orElseThrow(() -> new CustomException(""));
+        assertThat(answer.getId()).isEqualTo(updatedAnswer.getId());
+        assertThat(updatedAnswer.getContent()).isEqualTo(changContent);
     }
 
     @Test
@@ -238,17 +239,16 @@ class AnswerServiceTest {
     }
 
     @Test
-    void deleteAnswerByOtherManager() {
+    void deleteAnswerByManager() {
         Answer answer = new Answer(CONTENT, postId, managerUserId);
         answerRepository.save(answer);
 
-        User other = userRepository.save(
+        User otherManager = userRepository.save(
                 new User("otherManager@email.com", "pswd", UserRole.MANAGER)
         );
+        answerService.deleteAnswer(otherManager.getId(), postId);
 
-        assertThatThrownBy(
-                () -> answerService.deleteAnswer(other.getId(), postId)
-        ).isInstanceOf(CustomException.class);
+        assertFalse(answerRepository.existsById(answer.getId()));
     }
 
     @Test
@@ -271,5 +271,4 @@ class AnswerServiceTest {
         postRepository.deleteAllInBatch();
         answerRepository.deleteAllInBatch();
     }
-
 }
