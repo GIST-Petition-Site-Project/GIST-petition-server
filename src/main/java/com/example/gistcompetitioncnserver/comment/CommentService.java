@@ -47,14 +47,14 @@ public class CommentService {
         Comment comment = findCommentById(commentId);
         User user = findUserById(updaterId);
         if (!canUpdate(user, comment)) {
-            throw new CustomException("지울 수 있는 권한이 없습니다");
+            throw new CustomException("댓글 수정 권한이 없습니다");
         }
         comment.updateContent(changeRequest.getContent());
     }
 
     private boolean canUpdate(User user, Comment comment) {
         Long commentOwnerId = comment.getUserId();
-        return commentOwnerId.equals(user.getId());
+        return user.isAdmin() || user.isManager() || commentOwnerId.equals(user.getId());
     }
 
     @Transactional
@@ -62,14 +62,14 @@ public class CommentService {
         Comment comment = findCommentById(commentId);
         User user = findUserById(eraserId);
         if (!canDelete(user, comment)) {
-            throw new CustomException("지울 수 있는 권한이 없습니다");
+            throw new CustomException("댓글 삭제 권한이 없습니다");
         }
         commentRepository.deleteById(commentId);
     }
 
     private boolean canDelete(User user, Comment comment) {
         Long commentOwnerId = comment.getUserId();
-        return user.isAdmin() || commentOwnerId.equals(user.getId());
+        return user.isAdmin() || user.isManager() || commentOwnerId.equals(user.getId());
     }
 
     private User findUserById(Long updaterId) {

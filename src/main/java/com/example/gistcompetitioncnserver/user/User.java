@@ -32,6 +32,10 @@ public class User {
         return this.userRole == UserRole.ADMIN;
     }
 
+    public boolean isManager() {
+        return this.userRole == UserRole.MANAGER;
+    }
+
     public Long getId() {
         return id;
     }
