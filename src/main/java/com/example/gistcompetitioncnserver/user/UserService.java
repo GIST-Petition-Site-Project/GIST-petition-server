@@ -29,7 +29,7 @@ public class UserService {
 
         User user = new User(
                 username,
-                encryptor.encode(request.getPassword()),
+                encryptor.hashPassword(request.getPassword()),
                 UserRole.USER);
         return userRepository.save(user).getId();
     }
