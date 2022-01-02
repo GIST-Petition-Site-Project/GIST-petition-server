@@ -46,6 +46,7 @@ public class AnswerService {
         return findAnswerByPostId(postId);
     }
 
+    @Transactional(readOnly = true)
     public Long getNumberOfAnswers() {
         return answerRepository.count();
     }
@@ -56,32 +57,29 @@ public class AnswerService {
         Answer answer = findAnswerByPostId(postId);
 
         User updater = findUserById(updaterId);
-        if (!canUpdate(updater, answer)) {
+        if (!canUpdate(updater)) {
             throw new CustomException("수정권한이 없는 user입니다.");
         }
         answer.updateContent(changeRequest.getContent());
     }
 
-    private boolean canUpdate(User user, Answer answer) {
-        Long answerOwner = answer.getUserId();
-        return user.getUserRole() == UserRole.ADMIN || (answerOwner.equals(user.getId()) && user.getUserRole() == UserRole.MANAGER);
+    private boolean canUpdate(User user) {
+        return user.isAdmin() || user.isManager();
     }
 
     @Transactional
     public void deleteAnswer(Long eraserId, Long postId) {
         checkExistenceByPostId(postId);
-        Answer answer = findAnswerByPostId(postId);
 
         User eraser = findUserById(eraserId);
-        if (!canDelete(eraser, answer)) {
+        if (!canDelete(eraser)) {
             throw new CustomException("지울 수 있는 권한이 없습니다");
         }
         answerRepository.deleteByPostId(postId);
     }
 
-    private boolean canDelete(User user, Answer answer) {
-        Long answerOwner = answer.getUserId();
-        return user.getUserRole() == UserRole.ADMIN || (answerOwner.equals(user.getId()) && user.getUserRole() == UserRole.MANAGER);
+    private boolean canDelete(User user) {
+        return user.isAdmin() || user.isManager();
     }
 
 
