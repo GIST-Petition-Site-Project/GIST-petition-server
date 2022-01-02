@@ -36,7 +36,6 @@ class UserServiceTest {
         assertThat(userId).isNotNull();
         assertThat(user.getUsername()).isEqualTo(email);
         assertTrue(encoder.isMatch(PASSWORD, user.getPassword()));
-//        assertThat(user.getPassword()).isEqualTo(encryptor.hashPassword(PASSWORD));
         assertThat(user.getUserRole()).isEqualTo(UserRole.USER);
     }
 
