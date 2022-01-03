@@ -32,6 +32,8 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
+    implementation 'org.mindrot:jbcrypt:0.4'
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
