@@ -75,7 +75,7 @@ class UserServiceTest {
     @Test
     void signInFailedIfNotValidUsername() {
         User registeredUser = userRepository.save(new User(GIST_EMAIL, encoder.hashPassword(PASSWORD), UserRole.USER));
-        String fakeUsername = "not-a-name";
+        String fakeUsername = "wrong@gist.ac.kr";
         SignInRequest signInRequest = new SignInRequest(fakeUsername, PASSWORD);
 
         assertThatThrownBy(
@@ -87,7 +87,7 @@ class UserServiceTest {
     @Test
     void signInFailedIfNotValidPassword() {
         User registeredUser = userRepository.save(new User(GIST_EMAIL, encoder.hashPassword(PASSWORD), UserRole.USER));
-        String fakePassword = "not-a-password";
+        String fakePassword = "wrongpassword";
         SignInRequest signInRequest = new SignInRequest(GIST_EMAIL, fakePassword);
 
         assertThatThrownBy(
