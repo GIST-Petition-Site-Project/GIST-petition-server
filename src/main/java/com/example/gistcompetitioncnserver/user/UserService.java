@@ -1,5 +1,6 @@
 package com.example.gistcompetitioncnserver.user;
 
+import com.example.gistcompetitioncnserver.emailsender.EmailSender;
 import com.example.gistcompetitioncnserver.exception.CustomException;
 import com.example.gistcompetitioncnserver.exception.ErrorCase;
 import org.springframework.stereotype.Service;
@@ -10,10 +11,14 @@ import java.util.List;
 @Service
 public class UserService {
     private final UserRepository userRepository;
+    private final VerificationService verificationService;
+    private final EmailSender emailSender;
     private final Encryptor encryptor;
 
-    public UserService(UserRepository userRepository, Encryptor encryptor) {
+    public UserService(UserRepository userRepository, VerificationService verificationService, EmailSender emailSender, Encryptor encryptor) {
         this.userRepository = userRepository;
+        this.verificationService = verificationService;
+        this.emailSender = emailSender;
         this.encryptor = encryptor;
     }
 
@@ -27,10 +32,9 @@ public class UserService {
             throw new CustomException("유효하지 않은 이메일 형태입니다");
         }
 
-        User user = new User(
-                username,
-                encryptor.hashPassword(request.getPassword()),
-                UserRole.USER);
+        User user = new User(username, encryptor.hashPassword(request.getPassword()), UserRole.USER);
+        String token = verificationService.createToken(user);
+        emailSender.send(user.getUsername(), token);
         return userRepository.save(user).getId();
     }
 

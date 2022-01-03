@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 public class VerificationService {
@@ -13,6 +14,13 @@ public class VerificationService {
 
     public VerificationService(VerificationTokenRepository verificationTokenRepository) {
         this.verificationTokenRepository = verificationTokenRepository;
+    }
+
+    @Transactional
+    public String createToken(User user) {
+        String token = UUID.randomUUID().toString();
+        verificationTokenRepository.save(new VerificationToken(token, user, 20));
+        return token;
     }
 
     @Transactional
