@@ -10,11 +10,11 @@ import java.util.List;
 @Service
 public class UserService {
     private final UserRepository userRepository;
-    private final Encryptor encryptor;
+    private final BcryptEncoder encoder;
 
-    public UserService(UserRepository userRepository, Encryptor encryptor) {
+    public UserService(UserRepository userRepository, BcryptEncoder encoder) {
         this.userRepository = userRepository;
-        this.encryptor = encryptor;
+        this.encoder = encoder;
     }
 
     @Transactional
@@ -29,9 +29,19 @@ public class UserService {
 
         User user = new User(
                 username,
-                encryptor.hashPassword(request.getPassword()),
+                encoder.hashPassword(request.getPassword()),
                 UserRole.USER);
         return userRepository.save(user).getId();
+    }
+
+    @Transactional(readOnly = true)
+    public void signIn(SignInRequest request) {
+        User user = userRepository.findByUsername(request.getUsername())
+                .orElseThrow(() -> new CustomException("존재하지 않는 회원 입니다."));
+        if (!encoder.isMatch(request.getPassword(), user.getPassword())) {
+            throw new CustomException("비밀번호를 다시 확인해주세요");
+        }
+        // session 만들기
     }
 
     @Transactional(readOnly = true)
