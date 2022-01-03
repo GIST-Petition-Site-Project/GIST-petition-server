@@ -33,9 +33,10 @@ public class UserService {
         }
 
         User user = new User(username, encryptor.hashPassword(request.getPassword()), UserRole.USER);
+        userRepository.save(user);
         String token = verificationService.createToken(user);
         emailSender.send(user.getUsername(), token);
-        return userRepository.save(user).getId();
+        return user.getId();
     }
 
     @Transactional(readOnly = true)

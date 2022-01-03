@@ -13,14 +13,14 @@ class VerificationTokenTest {
 
     @Test
     void isValidToken() {
-        VerificationToken validToken = new VerificationToken(1L, "token", USER, TIME.plusMinutes(20));
+        VerificationToken validToken = new VerificationToken("token", USER, TIME.plusMinutes(20));
 
         assertTrue(validToken.isValidAt(TIME));
     }
 
     @Test
     void isExpiredToken() {
-        VerificationToken expiredToken = new VerificationToken(1L, "token", USER, TIME.minusMinutes(20));
+        VerificationToken expiredToken = new VerificationToken("token", USER, TIME.minusMinutes(20));
 
         assertFalse(expiredToken.isValidAt(TIME));
     }

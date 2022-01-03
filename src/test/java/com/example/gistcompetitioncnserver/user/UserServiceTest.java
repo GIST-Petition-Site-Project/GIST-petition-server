@@ -23,6 +23,8 @@ class UserServiceTest {
     @Autowired
     private UserRepository userRepository;
     @Autowired
+    private VerificationTokenRepository verificationTokenRepository;
+    @Autowired
     private BcryptEncoder encoder;
 
     @ParameterizedTest
@@ -74,6 +76,7 @@ class UserServiceTest {
 
     @AfterEach
     void tearDown() {
+        verificationTokenRepository.deleteAllInBatch();
         userRepository.deleteAllInBatch();
     }
 }
