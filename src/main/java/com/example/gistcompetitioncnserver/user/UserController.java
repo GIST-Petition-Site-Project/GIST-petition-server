@@ -1,8 +1,6 @@
 package com.example.gistcompetitioncnserver.user;
 
-import com.example.gistcompetitioncnserver.exception.CustomException;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -24,11 +22,7 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<Void> login(@Validated @RequestBody SignInRequest request) {
-        try {
-            userService.signIn(request);
-        } catch (CustomException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
+        userService.signIn(request);
         return ResponseEntity.ok().build();
     }
 

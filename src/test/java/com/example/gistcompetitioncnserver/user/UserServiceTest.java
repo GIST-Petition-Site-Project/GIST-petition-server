@@ -8,6 +8,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import javax.servlet.http.HttpSession;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -24,6 +26,8 @@ class UserServiceTest {
     private UserRepository userRepository;
     @Autowired
     private BcryptEncoder encoder;
+    @Autowired
+    private HttpSession httpSession;
 
     @ParameterizedTest
     @ValueSource(strings = {"email@gist.ac.kr", "email@gm.gist.ac.kr"})
@@ -53,6 +57,43 @@ class UserServiceTest {
         SignUpRequest signUpRequest = new SignUpRequest(notGistEmail, PASSWORD);
 
         assertThatThrownBy(() -> userService.signUp(signUpRequest)).isInstanceOf(CustomException.class);
+    }
+
+    @Test
+    void signIn() {
+        User registeredUser = userRepository.save(new User(GIST_EMAIL, encoder.hashPassword(PASSWORD), UserRole.USER));
+        SignInRequest signInRequest = new SignInRequest(GIST_EMAIL, PASSWORD);
+
+        userService.signIn(signInRequest);
+
+        assertTrue(httpSession.isNew());
+        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
+        assertThat(sessionUser.getId()).isEqualTo(registeredUser.getId());
+        assertThat(sessionUser.getUserRole()).isEqualTo(registeredUser.getUserRole());
+    }
+
+    @Test
+    void signInFailedIfNotValidUsername() {
+        User registeredUser = userRepository.save(new User(GIST_EMAIL, encoder.hashPassword(PASSWORD), UserRole.USER));
+        String fakeUsername = "not-a-name";
+        SignInRequest signInRequest = new SignInRequest(fakeUsername, PASSWORD);
+
+        assertThatThrownBy(
+                () -> userService.signIn(signInRequest)
+        ).isInstanceOf(CustomException.class);
+        assertThat(httpSession.getAttribute("user")).isNull();
+    }
+
+    @Test
+    void signInFailedIfNotValidPassword() {
+        User registeredUser = userRepository.save(new User(GIST_EMAIL, encoder.hashPassword(PASSWORD), UserRole.USER));
+        String fakePassword = "not-a-password";
+        SignInRequest signInRequest = new SignInRequest(GIST_EMAIL, fakePassword);
+
+        assertThatThrownBy(
+                () -> userService.signIn(signInRequest)
+        ).isInstanceOf(CustomException.class);
+        assertThat(httpSession.getAttribute("user")).isNull();
     }
 
     @Test

@@ -5,16 +5,19 @@ import com.example.gistcompetitioncnserver.exception.ErrorCase;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpSession;
 import java.util.List;
 
 @Service
 public class UserService {
     private final UserRepository userRepository;
     private final BcryptEncoder encoder;
+    private final HttpSession httpSession;
 
-    public UserService(UserRepository userRepository, BcryptEncoder encoder) {
+    public UserService(UserRepository userRepository, BcryptEncoder encoder, HttpSession httpSession) {
         this.userRepository = userRepository;
         this.encoder = encoder;
+        this.httpSession = httpSession;
     }
 
     @Transactional
@@ -41,7 +44,7 @@ public class UserService {
         if (!encoder.isMatch(request.getPassword(), user.getPassword())) {
             throw new CustomException("비밀번호를 다시 확인해주세요");
         }
-        // session 만들기
+        httpSession.setAttribute("user", new SessionUser(user));
     }
 
     @Transactional(readOnly = true)
