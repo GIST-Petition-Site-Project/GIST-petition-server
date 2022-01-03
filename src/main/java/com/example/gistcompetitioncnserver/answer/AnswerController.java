@@ -1,13 +1,15 @@
 package com.example.gistcompetitioncnserver.answer;
 
+import com.example.gistcompetitioncnserver.exception.CustomException;
+import com.example.gistcompetitioncnserver.user.SessionUser;
+import com.example.gistcompetitioncnserver.user.UserRole;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpSession;
 import java.net.URI;
-
-import static com.example.gistcompetitioncnserver.DataLoader.ADMIN;
 
 @RestController
 @AllArgsConstructor
@@ -15,11 +17,19 @@ import static com.example.gistcompetitioncnserver.DataLoader.ADMIN;
 public class AnswerController {
 
     private final AnswerService answerService;
+    private final HttpSession httpSession;
 
     @PostMapping("/posts/{postId}/answer")
     public ResponseEntity<Object> createAnswer(@PathVariable Long postId,
                                                @Validated @RequestBody AnswerRequest answerRequest) {
-        Long answerId = answerService.createAnswer(postId, answerRequest, ADMIN.getId());
+        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
+        if (!sessionUser.getEnabled()) {
+            throw new CustomException("이메일 인증이 필요합니다!");
+        }
+        if (sessionUser.getUserRole() != UserRole.MANAGER && sessionUser.getUserRole() != UserRole.ADMIN) {
+            throw new CustomException("답변 권한이 없습니다.");
+        }
+        Long answerId = answerService.createAnswer(postId, answerRequest, sessionUser.getId());
         return ResponseEntity.created(URI.create("/posts/" + postId + "/answer/" + answerId)).build();
     }
 
@@ -36,13 +46,27 @@ public class AnswerController {
     @PutMapping("/posts/{postId}/answer")
     public ResponseEntity<Void> updateAnswer(@PathVariable Long postId,
                                              @Validated @RequestBody AnswerRequest changeRequest) {
-        answerService.updateAnswer(postId, ADMIN.getId(), changeRequest);
+        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
+        if (!sessionUser.getEnabled()) {
+            throw new CustomException("이메일 인증이 필요합니다!");
+        }
+        if (sessionUser.getUserRole() != UserRole.MANAGER && sessionUser.getUserRole() != UserRole.ADMIN) {
+            throw new CustomException("답변 수정 권한이 없습니다.");
+        }
+        answerService.updateAnswer(postId, sessionUser.getId(), changeRequest);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/posts/{postId}/answer")
     public ResponseEntity<Object> deleteComment(@PathVariable Long postId) {
-        answerService.deleteAnswer(ADMIN.getId(), postId);
+        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
+        if (!sessionUser.getEnabled()) {
+            throw new CustomException("이메일 인증이 필요합니다!");
+        }
+        if (sessionUser.getUserRole() != UserRole.MANAGER && sessionUser.getUserRole() != UserRole.ADMIN) {
+            throw new CustomException("답변 삭제 권한이 없습니다.");
+        }
+        answerService.deleteAnswer(sessionUser.getId(), postId);
         return ResponseEntity.noContent().build();
     }
 }
