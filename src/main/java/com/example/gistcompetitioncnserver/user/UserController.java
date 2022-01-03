@@ -1,5 +1,6 @@
 package com.example.gistcompetitioncnserver.user;
 
+import com.example.gistcompetitioncnserver.emailsender.EmailSender;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -14,10 +15,18 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private final VerificationService verificationService;
 
     @PostMapping("/users")
     public ResponseEntity<Void> register(@Validated @RequestBody SignUpRequest request) {
-        return ResponseEntity.created(URI.create("/users/" + userService.signUp(request))).build();
+        Long userId = userService.signUp(request);
+        return ResponseEntity.created(URI.create("/users/" + userId)).build();
+    }
+
+    @PostMapping("/confirm")
+    public ResponseEntity<Void> register(@RequestParam String token) {
+        verificationService.confirm(token);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/users")

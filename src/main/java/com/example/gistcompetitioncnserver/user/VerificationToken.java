@@ -21,6 +21,10 @@ public class VerificationToken {
         this(null, token, user, LocalDateTime.now().plusMinutes(expiryTimeInMinutes));
     }
 
+    public VerificationToken(String token, User user, LocalDateTime expiryTime) {
+        this(null, token, user, expiryTime);
+    }
+
     public VerificationToken(Long id, String token, User user, LocalDateTime expiryTime) {
         this.id = id;
         this.token = token;
@@ -30,6 +34,10 @@ public class VerificationToken {
 
     public User getUser() {
         return user;
+    }
+
+    public String getToken() {
+        return token;
     }
 
     public boolean isValidAt(LocalDateTime time) {

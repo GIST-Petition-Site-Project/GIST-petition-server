@@ -20,6 +20,10 @@ public class User {
         this(null, username, password, userRole, false);
     }
 
+    public User(String username, String password, UserRole userRole, Boolean enabled) {
+        this(null, username, password, userRole, enabled);
+    }
+
     public User(Long id, String username, String password, UserRole userRole, Boolean enabled) {
         this.id = id;
         this.username = username;
@@ -58,5 +62,9 @@ public class User {
 
     public void setUserRole(UserRole userRole) {
         this.userRole = userRole;
+    }
+
+    public void setEnabled(){
+        this.enabled = true;
     }
 }
