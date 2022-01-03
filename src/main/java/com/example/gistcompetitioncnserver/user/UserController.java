@@ -1,11 +1,12 @@
 package com.example.gistcompetitioncnserver.user;
 
-import com.example.gistcompetitioncnserver.emailsender.EmailSender;
 import lombok.AllArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.util.List;
 
@@ -16,17 +17,19 @@ public class UserController {
 
     private final UserService userService;
     private final VerificationService verificationService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @PostMapping("/users")
-    public ResponseEntity<Void> register(@Validated @RequestBody SignUpRequest request) {
-        Long userId = userService.signUp(request);
+    public ResponseEntity<Void> register(@Validated @RequestBody SignUpRequest signUpRequest, HttpServletRequest request) {
+        Long userId = userService.signUp(signUpRequest);
+        eventPublisher.publishEvent(new OnRegistrationCompleteEvent(userId, request.getRequestURL().toString()));
         return ResponseEntity.created(URI.create("/users/" + userId)).build();
     }
 
-    @PostMapping("/confirm")
-    public ResponseEntity<Void> register(@RequestParam String token) {
+    @GetMapping("/users/confirm")
+    public ResponseEntity<String> register(@RequestParam String token) {
         verificationService.confirm(token);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().body("인증되었습니다.");
     }
 
     @GetMapping("/users")

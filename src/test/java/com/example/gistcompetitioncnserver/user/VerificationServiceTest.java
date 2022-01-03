@@ -33,7 +33,7 @@ class VerificationServiceTest {
 
     @Test
     void confirm() {
-        VerificationToken validToken = tokenRepository.save(new VerificationToken(TOKEN, unEnabledUser, LocalDateTime.now().plusMinutes(10)));
+        VerificationToken validToken = tokenRepository.save(new VerificationToken(TOKEN, unEnabledUser.getId(), LocalDateTime.now().plusMinutes(10)));
 
         tokenService.confirm(validToken.getToken());
 
@@ -44,14 +44,14 @@ class VerificationServiceTest {
     @Test
     void confirmFailedIfExpired() {
         LocalDateTime pastTime = LocalDateTime.now().minusMinutes(10);
-        VerificationToken expiredToken = tokenRepository.save(new VerificationToken(TOKEN, unEnabledUser, pastTime));
+        VerificationToken expiredToken = tokenRepository.save(new VerificationToken(TOKEN, unEnabledUser.getId(), pastTime));
 
         assertThatThrownBy(() -> tokenService.confirm(expiredToken.getToken())).isInstanceOf(CustomException.class);
     }
 
     @Test
     void confirmAlreadyConfirmedUser() {
-        VerificationToken alreadyConfirmedToken = tokenRepository.save(new VerificationToken(TOKEN, enabledUser, LocalDateTime.now().plusMinutes(10)));
+        VerificationToken alreadyConfirmedToken = tokenRepository.save(new VerificationToken(TOKEN, enabledUser.getId(), LocalDateTime.now().plusMinutes(10)));
 
         assertThatThrownBy(() -> tokenService.confirm(alreadyConfirmedToken.getToken())).isInstanceOf(CustomException.class);
     }

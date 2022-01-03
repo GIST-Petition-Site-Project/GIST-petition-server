@@ -18,12 +18,12 @@ public class VerificationToken {
     protected VerificationToken() {
     }
 
-    public VerificationToken(String token, User user, int expiryTimeInMinutes) {
-        this(null, token, user.getId(), LocalDateTime.now().plusMinutes(expiryTimeInMinutes));
+    public VerificationToken(String token, Long userId, int expiryTimeInMinutes) {
+        this(null, token, userId, LocalDateTime.now().plusMinutes(expiryTimeInMinutes));
     }
 
-    public VerificationToken(String token, User user, LocalDateTime expiryTime) {
-        this(null, token, user.getId(), expiryTime);
+    public VerificationToken(String token, Long userId, LocalDateTime expiryTime) {
+        this(null, token, userId, expiryTime);
     }
 
     public VerificationToken(Long id, String token, Long userId, LocalDateTime expiryTime) {
@@ -31,6 +31,10 @@ public class VerificationToken {
         this.token = token;
         this.userId = userId;
         this.expiryTime = expiryTime;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public Long getUserId() {
