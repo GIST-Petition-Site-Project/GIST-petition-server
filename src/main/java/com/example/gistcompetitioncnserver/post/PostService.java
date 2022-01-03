@@ -1,7 +1,6 @@
 package com.example.gistcompetitioncnserver.post;
 
 
-import com.example.gistcompetitioncnserver.comment.Comment;
 import com.example.gistcompetitioncnserver.comment.CommentRepository;
 import com.example.gistcompetitioncnserver.exception.CustomException;
 import com.example.gistcompetitioncnserver.exception.ErrorCase;
@@ -12,7 +11,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -33,56 +31,61 @@ public class PostService {
         ).getId();
     }
 
+    @Transactional(readOnly = true)
     public List<Post> retrieveAllPost() {
         return postRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
     }
 
+    @Transactional(readOnly = true)
     public List<Post> retrievePostsByUserId(Long user_id) {
         return postRepository.findByUserId(Sort.by(Sort.Direction.DESC, "id"), user_id);
     }
 
-    public Post retrievePost(Long id) {
-        return findPostById(id);
+    @Transactional(readOnly = true)
+    public Post retrievePost(Long postId) {
+        return findPostById(postId);
     }
 
+    @Transactional(readOnly = true)
     public Long getPageNumber() {
         return postRepository.count();
     }
 
+    @Transactional(readOnly = true)
     public List<Post> getPostsByCategory(String categoryName) {
         return postRepository.findByCategory(Sort.by(Sort.Direction.DESC, "id"), categoryName);
     }
 
-    public void updateAnsweredPost(Long id) {
-        Post post = postRepository.getById(id);
-        post.setAnswered(true);
-        postRepository.save(post);
-    }
-
     @Transactional
-    public void updatePostDescription(Long id, String description) {
-        Post post = findPostById(id);
+    public void updatePostDescription(Long updaterId, Long postId, String description) {
+        Post post = findPostById(postId);
+        if (!canUpdate(findUserById(updaterId))) {
+            throw new CustomException("청원을 수정할 권한이 없습니다.");
+        }
         post.setDescription(description);
     }
 
+    private boolean canUpdate(User user) {
+        return user.isAdmin() || user.isManager();
+    }
+
     @Transactional
-    public void deletePost(Long id) {
-        List<Long> commentIds = new ArrayList<>();
-
-        for (Comment comment : commentRepository.findByPostId(id)) {
-            commentIds.add(comment.getId());
+    public void deletePost(Long eraserId, Long postId) {
+        if (!canDelete(findUserById(eraserId))) {
+            throw new CustomException("청원을 삭제할 권한이 없습니다.");
         }
+        commentRepository.deleteByPostId(postId);
+        postRepository.deleteById(postId);
+    }
 
-        if (!commentIds.isEmpty()) {
-            commentRepository.deleteAllByPostIdInQuery(commentIds);
-        }
-        postRepository.deleteById(id);
+    private boolean canDelete(User user) {
+        return user.isAdmin() || user.isManager();
     }
 
     @Transactional
     public Boolean agree(Long postId, Long userId) {
         Post post = findPostById(postId);
-        User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCase.NO_SUCH_USER_ERROR));
+        User user = findUserById(userId);
         return post.applyAgreement(user);
     }
 
@@ -95,11 +98,15 @@ public class PostService {
     @Transactional(readOnly = true)
     public Boolean getStateOfAgreement(Long postId, Long userId) {
         Post post = findPostById(postId);
-        User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCase.NO_SUCH_USER_ERROR));
+        User user = findUserById(userId);
         return post.isAgreedBy(user);
     }
 
-    private Post findPostById(Long id) {
-        return postRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCase.NO_SUCH_POST_ERROR));
+    private User findUserById(Long userId) {
+        return userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCase.NO_SUCH_USER_ERROR));
+    }
+
+    private Post findPostById(Long postId) {
+        return postRepository.findById(postId).orElseThrow(() -> new CustomException(ErrorCase.NO_SUCH_POST_ERROR));
     }
 }

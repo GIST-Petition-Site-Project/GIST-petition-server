@@ -1,5 +1,6 @@
 package com.example.gistcompetitioncnserver.post;
 
+import com.example.gistcompetitioncnserver.exception.CustomException;
 import com.example.gistcompetitioncnserver.user.User;
 import com.example.gistcompetitioncnserver.user.UserRepository;
 import com.example.gistcompetitioncnserver.user.UserRole;
@@ -13,6 +14,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
@@ -29,10 +31,12 @@ public class PostServiceTest {
     private AgreementRepository agreementRepository;
 
     private User user;
+    private User admin;
 
     @BeforeEach
     void setUp() {
         user = userRepository.save(new User("email@email.com", "password", UserRole.USER));
+        admin = userRepository.save(new User("admin@admin.com", "password", UserRole.ADMIN));
     }
 
     @Test
@@ -48,17 +52,27 @@ public class PostServiceTest {
     }
 
     @Test
-    void updatePostDescription() {
+    void updatePostDescriptionByAdmin() {
         Long postId = postService.createPost(POST_REQUEST_DTO, user.getId());
         Post post = postRepository.findById(postId).orElseThrow(IllegalArgumentException::new);
 
         LocalDateTime initialTime = post.getUpdatedAt();
 
-        postService.updatePostDescription(post.getId(), "updated");
+        postService.updatePostDescription(admin.getId(), post.getId(), "updated");
 
         Post updatedPost = postRepository.findById(postId).orElseThrow(IllegalArgumentException::new);
         LocalDateTime updatedTime = updatedPost.getUpdatedAt();
         assertTrue(updatedTime.isAfter(initialTime));
+    }
+
+    @Test
+    void updatePostDescriptionFailedByUser() {
+        Long postId = postService.createPost(POST_REQUEST_DTO, user.getId());
+        Post post = postRepository.findById(postId).orElseThrow(IllegalArgumentException::new);
+
+        assertThatThrownBy(() ->
+                postService.updatePostDescription(user.getId(), post.getId(), "updated")
+        ).isInstanceOf(CustomException.class);
     }
 
     @Test
@@ -99,6 +113,12 @@ public class PostServiceTest {
         assertThat(postService.getStateOfAgreement(postId, user.getId())).isTrue();
         Agreement agreement = agreementRepository.findByUserId(user.getId()).orElseThrow(IllegalArgumentException::new);
         assertThat(agreement.getCreatedAt()).isNotNull();
+    }
+
+    @Test
+    void deletePost() {
+        Long postId = postService.createPost(POST_REQUEST_DTO, user.getId());
+
     }
 
     @AfterEach
