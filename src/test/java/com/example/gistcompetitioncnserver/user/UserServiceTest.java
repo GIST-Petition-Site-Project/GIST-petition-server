@@ -11,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 class UserServiceTest {
@@ -22,7 +23,7 @@ class UserServiceTest {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private Encryptor encryptor;
+    private BcryptEncoder encoder;
 
     @ParameterizedTest
     @ValueSource(strings = {"email@gist.ac.kr", "email@gm.gist.ac.kr"})
@@ -34,7 +35,7 @@ class UserServiceTest {
         User user = userRepository.findById(userId).orElseThrow(IllegalArgumentException::new);
         assertThat(userId).isNotNull();
         assertThat(user.getUsername()).isEqualTo(email);
-        assertThat(user.getPassword()).isEqualTo(encryptor.encode(PASSWORD));
+        assertTrue(encoder.isMatch(PASSWORD, user.getPassword()));
         assertThat(user.getUserRole()).isEqualTo(UserRole.USER);
     }
 
