@@ -2,7 +2,6 @@ package com.example.gistcompetitioncnserver.user;
 
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +16,7 @@ public class UserController {
 
     private final UserService userService;
     private final HttpSession httpSession;
+
     @PostMapping("/users")
     public ResponseEntity<Void> register(@Validated @RequestBody SignUpRequest request) {
         return ResponseEntity.created(URI.create("/users/" + userService.signUp(request))).build();
@@ -25,26 +25,28 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<Void> login(@Validated @RequestBody SignInRequest request) {
         userService.signIn(request);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
+
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(){
-        httpSession.removeAttribute("user");
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Void> logout() {
+        httpSession.invalidate();
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/users")
-    public List<User> retrieveAllUsers() {
-        return userService.findAllUsers();
+    public ResponseEntity<List<User>> retrieveAllUsers() {
+        return ResponseEntity.ok().body(userService.findAllUsers());
     }
 
     @GetMapping("/users/{userId}")
-    public User retrieveUser(@PathVariable Long userId) {
-        return userService.findUserById(userId);
+    public ResponseEntity<User> retrieveUser(@PathVariable Long userId) {
+        return ResponseEntity.ok().body(userService.findUserById(userId));
     }
 
     @DeleteMapping("/users/{userId}")
-    public void deleteUser(@PathVariable Long userId) {
+    public ResponseEntity<Void> deleteUser(@PathVariable Long userId) {
         userService.deleteUser(userId);
+        return ResponseEntity.noContent().build();
     }
 }
