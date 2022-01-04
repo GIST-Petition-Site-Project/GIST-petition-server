@@ -18,8 +18,8 @@ import java.util.List;
 public class PostService {
 
     private final PostRepository postRepository;
-    private final UserRepository userRepository;
     private final CommentRepository commentRepository;
+    private final UserRepository userRepository;
 
     @Transactional
     public Long createPost(PostRequest postRequest, Long userId) {
@@ -59,28 +59,15 @@ public class PostService {
     @Transactional
     public void updatePostDescription(Long updaterId, Long postId, String description) {
         Post post = findPostById(postId);
-        if (!canUpdate(findUserById(updaterId))) {
-            throw new CustomException("청원을 수정할 권한이 없습니다.");
-        }
         post.setDescription(description);
     }
 
-    private boolean canUpdate(User user) {
-        return user.isAdmin() || user.isManager();
-    }
-
     @Transactional
-    public void deletePost(Long eraserId, Long postId) {
-        if (!canDelete(findUserById(eraserId))) {
-            throw new CustomException("청원을 삭제할 권한이 없습니다.");
-        }
+    public void deletePost(Long postId) {
         commentRepository.deleteByPostId(postId);
         postRepository.deleteById(postId);
     }
 
-    private boolean canDelete(User user) {
-        return user.isAdmin() || user.isManager();
-    }
 
     @Transactional
     public Boolean agree(Long postId, Long userId) {

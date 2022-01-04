@@ -66,7 +66,7 @@ public class PostController {
         if (sessionUser.getUserRole() != UserRole.MANAGER && sessionUser.getUserRole() != UserRole.ADMIN) {
             throw new CustomException("삭제 권한이 없습니다.");
         }
-        postService.deletePost(sessionUser.getId(), postId);
+        postService.deletePost(postId);
         return ResponseEntity.noContent().build();
     }
 
