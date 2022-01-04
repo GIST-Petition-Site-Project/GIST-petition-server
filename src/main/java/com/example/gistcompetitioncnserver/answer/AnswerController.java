@@ -53,7 +53,7 @@ public class AnswerController {
         if (sessionUser.getUserRole() != UserRole.MANAGER && sessionUser.getUserRole() != UserRole.ADMIN) {
             throw new CustomException("답변 수정 권한이 없습니다.");
         }
-        answerService.updateAnswer(postId, sessionUser.getId(), changeRequest);
+        answerService.updateAnswer(postId, changeRequest);
         return ResponseEntity.ok().build();
     }
 
@@ -66,7 +66,7 @@ public class AnswerController {
         if (sessionUser.getUserRole() != UserRole.MANAGER && sessionUser.getUserRole() != UserRole.ADMIN) {
             throw new CustomException("답변 삭제 권한이 없습니다.");
         }
-        answerService.deleteAnswer(sessionUser.getId(), postId);
+        answerService.deleteAnswer(postId);
         return ResponseEntity.noContent().build();
     }
 }
