@@ -1,4 +1,4 @@
-package com.example.gistcompetitioncnserver.user;
+package com.example.gistcompetitioncnserver.verification;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

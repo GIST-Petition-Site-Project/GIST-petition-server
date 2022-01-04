@@ -1,6 +1,8 @@
-package com.example.gistcompetitioncnserver.user;
+package com.example.gistcompetitioncnserver.verification;
 
 import com.example.gistcompetitioncnserver.exception.CustomException;
+import com.example.gistcompetitioncnserver.user.User;
+import com.example.gistcompetitioncnserver.user.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

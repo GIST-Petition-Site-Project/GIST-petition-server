@@ -1,7 +1,10 @@
-package com.example.gistcompetitioncnserver.user;
+package com.example.gistcompetitioncnserver.verification;
 
 import com.example.gistcompetitioncnserver.emailsender.EmailSender;
 import com.example.gistcompetitioncnserver.exception.CustomException;
+import com.example.gistcompetitioncnserver.user.OnRegistrationCompleteEvent;
+import com.example.gistcompetitioncnserver.user.User;
+import com.example.gistcompetitioncnserver.user.UserRepository;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.context.Context;

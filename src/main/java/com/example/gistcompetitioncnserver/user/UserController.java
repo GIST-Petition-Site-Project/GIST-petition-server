@@ -16,7 +16,6 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
-    private final VerificationService verificationService;
     private final ApplicationEventPublisher eventPublisher;
 
     @PostMapping("/users")
@@ -24,12 +23,6 @@ public class UserController {
         Long userId = userService.signUp(signUpRequest);
         eventPublisher.publishEvent(new OnRegistrationCompleteEvent(userId, request.getRequestURL().toString()));
         return ResponseEntity.created(URI.create("/users/" + userId)).build();
-    }
-
-    @GetMapping("/users/confirm")
-    public ResponseEntity<String> register(@RequestParam String token) {
-        verificationService.confirm(token);
-        return ResponseEntity.ok().body("인증되었습니다.");
     }
 
     @GetMapping("/users")

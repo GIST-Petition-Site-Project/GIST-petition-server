@@ -1,6 +1,9 @@
-package com.example.gistcompetitioncnserver.user;
+package com.example.gistcompetitioncnserver.verification;
 
 import com.example.gistcompetitioncnserver.exception.CustomException;
+import com.example.gistcompetitioncnserver.user.User;
+import com.example.gistcompetitioncnserver.user.UserRepository;
+import com.example.gistcompetitioncnserver.user.UserRole;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
