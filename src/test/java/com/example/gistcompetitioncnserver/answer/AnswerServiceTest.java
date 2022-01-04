@@ -77,28 +77,6 @@ class AnswerServiceTest {
     }
 
     @Test
-    void createAnswerByNormalUser() {
-        AnswerRequest answerRequest = new AnswerRequest(CONTENT);
-
-        assertThatThrownBy(
-                () -> answerService.createAnswer(postId, answerRequest, normalUserId)
-        ).isInstanceOf(CustomException.class);
-
-        Post post = postRepository.findById(postId).orElseThrow(() -> new CustomException("존재하지 않는 post입니다"));
-        assertFalse(post.isAnswered());
-    }
-
-    @Test
-    void createAnswerByNonExistentUser() {
-        AnswerRequest answerRequest = new AnswerRequest(CONTENT);
-
-        Long fakeUserId = Long.MAX_VALUE;
-        assertThatThrownBy(
-                () -> answerService.createAnswer(postId, answerRequest, fakeUserId)
-        ).isInstanceOf(CustomException.class);
-    }
-
-    @Test
     void createAnswerToNonExistentPost() {
         AnswerRequest answerRequest = new AnswerRequest(CONTENT);
 
@@ -137,64 +115,19 @@ class AnswerServiceTest {
     }
 
     @Test
-    void updateAnswerByAdmin() {
+    void updateAnswer() {
         Answer answer = new Answer(CONTENT, postId, managerUserId);
         answerRepository.save(answer);
         String changContent = "change contents";
         AnswerRequest changeRequest = new AnswerRequest(changContent);
 
-        answerService.updateAnswer(adminUserId, postId, changeRequest);
+        answerService.updateAnswer(postId, changeRequest);
 
         Answer updatedAnswer = answerRepository.findByPostId(postId).orElseThrow(() -> new CustomException(""));
         assertThat(answer.getId()).isEqualTo(updatedAnswer.getId());
         assertThat(updatedAnswer.getContent()).isEqualTo(changContent);
     }
 
-    @Test
-    void updateAnswerByOwnerManager() {
-        Answer answer = new Answer(CONTENT, postId, managerUserId);
-        answerRepository.save(answer);
-        String changContent = "change contents";
-        AnswerRequest changeRequest = new AnswerRequest(changContent);
-
-        answerService.updateAnswer(managerUserId, postId, changeRequest);
-
-        Answer updatedAnswer = answerRepository.findByPostId(postId).orElseThrow(() -> new CustomException(""));
-        assertThat(answer.getId()).isEqualTo(updatedAnswer.getId());
-        assertThat(updatedAnswer.getContent()).isEqualTo(changContent);
-    }
-
-    @Test
-    void updateAnswerByOtherManager() {
-        Answer answer = new Answer(CONTENT, postId, managerUserId);
-        answerRepository.save(answer);
-        String changContent = "change contents";
-        AnswerRequest changeRequest = new AnswerRequest(changContent);
-
-        User otherManager = userRepository.save(new User("otherManager@email.com", "pw", UserRole.MANAGER));
-
-        answerService.updateAnswer(otherManager.getId(), postId, changeRequest);
-
-        Answer updatedAnswer = answerRepository.findByPostId(postId).orElseThrow(() -> new CustomException(""));
-        assertThat(answer.getId()).isEqualTo(updatedAnswer.getId());
-        assertThat(updatedAnswer.getContent()).isEqualTo(changContent);
-    }
-
-    @Test
-    void updateAnswerByOwnerButNormalUser() {
-        Answer answer = new Answer(CONTENT, postId, managerUserId);
-        answerRepository.save(answer);
-        String changContent = "change contents";
-        AnswerRequest changeRequest = new AnswerRequest(changContent);
-
-        User user = userRepository.findById(managerUserId).orElseThrow(() -> new CustomException(""));
-        user.setUserRole(UserRole.USER);
-        userRepository.save(user);
-
-        assertThatThrownBy(
-                () -> answerService.updateAnswer(user.getId(), postId, changeRequest)
-        ).isInstanceOf(CustomException.class);
-    }
 
 
     @Test
@@ -204,7 +137,7 @@ class AnswerServiceTest {
         AnswerRequest changeRequest = new AnswerRequest(changContent);
 
         assertThatThrownBy(
-                () -> answerService.updateAnswer(managerUserId, fakePostId, changeRequest)
+                () -> answerService.updateAnswer(fakePostId, changeRequest)
         ).isInstanceOf(CustomException.class);
     }
 
@@ -214,56 +147,30 @@ class AnswerServiceTest {
         AnswerRequest changeRequest = new AnswerRequest(changContent);
 
         assertThatThrownBy(
-                () -> answerService.updateAnswer(managerUserId, postId, changeRequest)
+                () -> answerService.updateAnswer(postId, changeRequest)
         ).isInstanceOf(CustomException.class);
     }
 
     @Test
-    void deleteAnswerByOwnerManager() {
+    void deleteAnswer() {
         Answer answer = new Answer(CONTENT, postId, managerUserId);
         answerRepository.save(answer);
 
-        answerService.deleteAnswer(managerUserId, postId);
+        answerService.deleteAnswer(postId);
 
         assertFalse(answerRepository.existsById(answer.getId()));
     }
-
     @Test
-    void deleteAnswerByAdmin() {
+    void deleteAnswerFromNonExistentPost() {
+        Long fakePostId = Long.MAX_VALUE;
         Answer answer = new Answer(CONTENT, postId, managerUserId);
         answerRepository.save(answer);
-
-        answerService.deleteAnswer(adminUserId, postId);
-
-        assertFalse(answerRepository.existsById(answer.getId()));
-    }
-
-    @Test
-    void deleteAnswerByManager() {
-        Answer answer = new Answer(CONTENT, postId, managerUserId);
-        answerRepository.save(answer);
-
-        User otherManager = userRepository.save(
-                new User("otherManager@email.com", "pswd", UserRole.MANAGER)
-        );
-        answerService.deleteAnswer(otherManager.getId(), postId);
-
-        assertFalse(answerRepository.existsById(answer.getId()));
-    }
-
-    @Test
-    void deleteAnswerByOwnerButNormalUser() {
-        Answer answer = new Answer(CONTENT, postId, managerUserId);
-        answerRepository.save(answer);
-
-        User user = userRepository.findById(managerUserId).orElseThrow(() -> new CustomException(""));
-        user.setUserRole(UserRole.USER);
-        userRepository.save(user);
 
         assertThatThrownBy(
-                () -> answerService.deleteAnswer(user.getId(), postId)
+                () -> answerService.deleteAnswer(fakePostId)
         ).isInstanceOf(CustomException.class);
     }
+
 
     @AfterEach
     void tearDown() {

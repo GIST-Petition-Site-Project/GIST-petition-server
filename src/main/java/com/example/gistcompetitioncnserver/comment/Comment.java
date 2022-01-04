@@ -32,10 +32,6 @@ public class Comment extends BaseEntity {
         this.userId = userId;
     }
 
-    public void validate(CommentValidator commentValidator) {
-        commentValidator.validate(this);
-    }
-
     public void updateContent(String changedContent) {
         this.content = changedContent;
     }
