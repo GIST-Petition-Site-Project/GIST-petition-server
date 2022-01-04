@@ -57,6 +57,19 @@ public class PostController {
         return ResponseEntity.ok().body(postService.getPostsByCategory(categoryName));
     }
 
+    @PutMapping("/posts/{postId}")
+    public ResponseEntity<Void> updatePost(@PathVariable Long postId, @Validated @RequestBody PostRequest changeRequest) {
+        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
+        if (!sessionUser.getEnabled()) {
+            throw new CustomException("이메일 인증이 필요합니다!");
+        }
+        if (sessionUser.getUserRole() != UserRole.MANAGER && sessionUser.getUserRole() != UserRole.ADMIN) {
+            throw new CustomException("글 수정 권한이 없습니다.");
+        }
+        postService.updatePostDescription(postId, changeRequest.getDescription());
+        return ResponseEntity.noContent().build();
+    }
+
     @DeleteMapping("/posts/{postId}")
     public ResponseEntity<Void> deletePost(@PathVariable Long postId) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");

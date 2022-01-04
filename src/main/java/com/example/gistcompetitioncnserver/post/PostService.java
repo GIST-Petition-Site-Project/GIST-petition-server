@@ -57,13 +57,14 @@ public class PostService {
     }
 
     @Transactional
-    public void updatePostDescription(Long updaterId, Long postId, String description) {
+    public void updatePostDescription(Long postId, String description) {
         Post post = findPostById(postId);
         post.setDescription(description);
     }
 
     @Transactional
     public void deletePost(Long postId) {
+        Post post = findPostById(postId);
         commentRepository.deleteByPostId(postId);
         postRepository.deleteById(postId);
     }
