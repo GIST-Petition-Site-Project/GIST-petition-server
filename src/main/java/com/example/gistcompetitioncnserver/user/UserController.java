@@ -7,6 +7,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.net.URI;
 import java.util.List;
 
@@ -16,6 +17,7 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private final HttpSession httpSession;
     private final ApplicationEventPublisher eventPublisher;
 
     @PostMapping("/users")
@@ -25,18 +27,31 @@ public class UserController {
         return ResponseEntity.created(URI.create("/users/" + userId)).build();
     }
 
+    @PostMapping("/login")
+    public ResponseEntity<Void> login(@Validated @RequestBody SignInRequest request) {
+        userService.signIn(request);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout() {
+        httpSession.invalidate();
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/users")
-    public List<User> retrieveAllUsers() {
-        return userService.findAllUsers();
+    public ResponseEntity<List<User>> retrieveAllUsers() {
+        return ResponseEntity.ok().body(userService.findAllUsers());
     }
 
     @GetMapping("/users/{userId}")
-    public User retrieveUser(@PathVariable Long userId) {
-        return userService.findUserById(userId);
+    public ResponseEntity<User> retrieveUser(@PathVariable Long userId) {
+        return ResponseEntity.ok().body(userService.findUserById(userId));
     }
 
     @DeleteMapping("/users/{userId}")
-    public void deleteUser(@PathVariable Long userId) {
+    public ResponseEntity<Void> deleteUser(@PathVariable Long userId) {
         userService.deleteUser(userId);
+        return ResponseEntity.noContent().build();
     }
 }

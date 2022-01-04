@@ -5,16 +5,19 @@ import com.example.gistcompetitioncnserver.exception.ErrorCase;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpSession;
 import java.util.List;
 
 @Service
 public class UserService {
     private final UserRepository userRepository;
     private final Encryptor encryptor;
+    private final HttpSession httpSession;
 
-    public UserService(UserRepository userRepository, Encryptor encryptor) {
+    public UserService(UserRepository userRepository, Encryptor encryptor, HttpSession httpSession) {
         this.userRepository = userRepository;
         this.encryptor = encryptor;
+        this.httpSession = httpSession;
     }
 
     @Transactional
@@ -27,9 +30,21 @@ public class UserService {
             throw new CustomException("유효하지 않은 이메일 형태입니다");
         }
 
-        User user = new User(username, encryptor.hashPassword(request.getPassword()), UserRole.USER);
-        userRepository.save(user);
-        return user.getId();
+        User user = new User(
+                username,
+                encryptor.hashPassword(request.getPassword()),
+                UserRole.USER);
+        return userRepository.save(user).getId();
+    }
+
+    @Transactional(readOnly = true)
+    public void signIn(SignInRequest request) {
+        User user = userRepository.findByUsername(request.getUsername())
+                .orElseThrow(() -> new CustomException("존재하지 않는 회원 입니다."));
+        if (!encryptor.isMatch(request.getPassword(), user.getPassword())) {
+            throw new CustomException("비밀번호를 다시 확인해주세요");
+        }
+        httpSession.setAttribute("user", new SessionUser(user));
     }
 
     @Transactional(readOnly = true)

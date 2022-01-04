@@ -1,25 +1,31 @@
 package com.example.gistcompetitioncnserver.post;
 
+import com.example.gistcompetitioncnserver.exception.CustomException;
+import com.example.gistcompetitioncnserver.user.SessionUser;
+import com.example.gistcompetitioncnserver.user.UserRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpSession;
 import java.net.URI;
 import java.util.List;
-
-import static com.example.gistcompetitioncnserver.DataLoader.ADMIN;
-
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1")
 public class PostController {
     private final PostService postService;
+    private final HttpSession httpSession;
 
     @PostMapping("/posts")
     public ResponseEntity<Void> createPost(@Validated @RequestBody PostRequest postRequest) {
-        return ResponseEntity.created(URI.create("/posts/" + postService.createPost(postRequest, ADMIN.getId()))).build();
+        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
+        if (!sessionUser.getEnabled()) {
+            throw new CustomException("이메일 인증이 필요합니다!");
+        }
+        return ResponseEntity.created(URI.create("/posts/" + postService.createPost(postRequest, sessionUser.getId()))).build();
     }
 
     @GetMapping("/posts")
@@ -34,7 +40,11 @@ public class PostController {
 
     @GetMapping("/posts/me")
     public ResponseEntity<List<Post>> retrievePostsByUserId() {
-        return ResponseEntity.ok().body(postService.retrievePostsByUserId(ADMIN.getId()));
+        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
+        if (!sessionUser.getEnabled()) {
+            throw new CustomException("이메일 인증이 필요합니다!");
+        }
+        return ResponseEntity.ok().body(postService.retrievePostsByUserId(sessionUser.getId()));
     }
 
     @GetMapping("/posts/count")
@@ -47,15 +57,39 @@ public class PostController {
         return ResponseEntity.ok().body(postService.getPostsByCategory(categoryName));
     }
 
+    @PutMapping("/posts/{postId}")
+    public ResponseEntity<Void> updatePost(@PathVariable Long postId, @Validated @RequestBody PostRequest changeRequest) {
+        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
+        if (!sessionUser.getEnabled()) {
+            throw new CustomException("이메일 인증이 필요합니다!");
+        }
+        if (sessionUser.getUserRole() != UserRole.MANAGER && sessionUser.getUserRole() != UserRole.ADMIN) {
+            throw new CustomException("글 수정 권한이 없습니다.");
+        }
+        postService.updatePostDescription(postId, changeRequest.getDescription());
+        return ResponseEntity.noContent().build();
+    }
+
     @DeleteMapping("/posts/{postId}")
     public ResponseEntity<Void> deletePost(@PathVariable Long postId) {
-        postService.deletePost(ADMIN.getId(), postId);
+        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
+        if (!sessionUser.getEnabled()) {
+            throw new CustomException("이메일 인증이 필요합니다!");
+        }
+        if (sessionUser.getUserRole() != UserRole.MANAGER && sessionUser.getUserRole() != UserRole.ADMIN) {
+            throw new CustomException("삭제 권한이 없습니다.");
+        }
+        postService.deletePost(postId);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/posts/{postId}/agreements")
     public ResponseEntity<Boolean> agreePost(@PathVariable Long postId) {
-        return ResponseEntity.ok().body(postService.agree(postId, ADMIN.getId()));
+        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
+        if (!sessionUser.getEnabled()) {
+            throw new CustomException("이메일 인증이 필요합니다!");
+        }
+        return ResponseEntity.ok().body(postService.agree(postId, sessionUser.getId()));
     }
 
     @GetMapping("/posts/{postId}/agreements")
@@ -65,6 +99,10 @@ public class PostController {
 
     @GetMapping("/posts/{postId}/agreements/me")
     public ResponseEntity<Boolean> getStateOfAgreement(@PathVariable Long postId) {
-        return ResponseEntity.ok().body(postService.getStateOfAgreement(postId, ADMIN.getId()));
+        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
+        if (!sessionUser.getEnabled()) {
+            throw new CustomException("이메일 인증이 필요합니다!");
+        }
+        return ResponseEntity.ok().body(postService.getStateOfAgreement(postId, sessionUser.getId()));
     }
 }

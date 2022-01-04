@@ -11,7 +11,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,9 +18,6 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
 
 @SpringBootTest
 class CommentServiceTest {
@@ -35,125 +31,137 @@ class CommentServiceTest {
     private PostRepository postRepository;
     @Autowired
     private UserRepository userRepository;
-    @MockBean
-    private CommentValidator commentValidator;
 
-    private Long userId;
-    private Long postId;
+    private Long USER_ID;
+    private Long MANAGER_ID;
+    private Long ADMIN_ID;
+    private Long POST_OWNER_ID;
+    private Long POST_ID;
 
     @BeforeEach
     void setUp() {
-        userId = userRepository.save(new User("email@email.com", "password", UserRole.USER)).getId();
-        postId = postRepository.save(new Post("title", "description", "category", userId)).getId();
+        USER_ID = userRepository.save(new User("user@email.com", "password", UserRole.USER)).getId();
+        MANAGER_ID = userRepository.save(new User("manager@email.com", "password", UserRole.MANAGER)).getId();
+        ADMIN_ID = userRepository.save(new User("admin@admin.com", "password", UserRole.ADMIN)).getId();
+        POST_OWNER_ID = userRepository.save(new User("postOwner@email.com", "password", UserRole.USER)).getId();
+        POST_ID = postRepository.save(new Post("title", "description", "category", POST_OWNER_ID)).getId();
     }
 
     @Test
     void createComment() {
-        doNothing().when(commentValidator).validate(any());
         CommentRequest commentRequest = new CommentRequest(CONTENT);
 
-        Long commentId = commentService.createComment(postId, commentRequest, userId);
+        Long commentId = commentService.createComment(POST_ID, commentRequest, USER_ID);
 
-        Comment comment =
-                commentRepository.findById(commentId).orElseThrow(IllegalArgumentException::new);
+        Comment comment = commentRepository.findById(commentId).orElseThrow(IllegalArgumentException::new);
         assertThat(comment.getId()).isEqualTo(commentId);
-        assertThat(comment.getPostId()).isEqualTo(postId);
-        assertThat(comment.getUserId()).isEqualTo(userId);
+        assertThat(comment.getPostId()).isEqualTo(POST_ID);
+        assertThat(comment.getUserId()).isEqualTo(USER_ID);
         assertThat(comment.getContent()).isEqualTo(CONTENT);
     }
 
     @Test
-    void createNotValidatedComment() {
-        doThrow(new CustomException("error")).when(commentValidator).validate(any());
+    void createFailedIfPostNotExistent() {
         CommentRequest commentRequest = new CommentRequest(CONTENT);
 
+        Long fakePostId = Long.MAX_VALUE;
         assertThatThrownBy(
-                () -> commentService.createComment(Long.MAX_VALUE, commentRequest, Long.MAX_VALUE)
+                () -> commentService.createComment(fakePostId, commentRequest, USER_ID)
         ).isInstanceOf(CustomException.class);
     }
 
     @Test
     void getCommentsByPostId() {
         List<Comment> comments = new ArrayList<>();
-        comments.add(new Comment(CONTENT, postId, userId));
-        comments.add(new Comment(CONTENT, postId, userId));
-        comments.add(new Comment(CONTENT, postId, userId));
+        comments.add(new Comment(CONTENT, POST_ID, USER_ID));
+        comments.add(new Comment(CONTENT, POST_ID, USER_ID));
+        comments.add(new Comment(CONTENT, POST_ID, USER_ID));
         List<Comment> savedComments = commentRepository.saveAll(comments);
 
-        List<Comment> commentsByPostId = commentService.getCommentsByPostId(postId);
+        List<Comment> commentsByPostId = commentService.getCommentsByPostId(POST_ID);
 
         assertThat(commentsByPostId).hasSize(savedComments.size());
     }
 
     @Test
-    void getCommentsOfNotExistingPost() {
-        Long notExistingPostId = Long.MAX_VALUE;
+    void getFailedIfPostNotExistent() {
+        Long fakePostId = Long.MAX_VALUE;
         assertThatThrownBy(
-                () -> commentService.getCommentsByPostId(notExistingPostId)
+                () -> commentService.getCommentsByPostId(fakePostId)
         ).isInstanceOf(CustomException.class);
     }
 
     @Test
-    void updateCommentByOwner() {
+    void updateCommentByOwnerUser() {
         String contentToChange = "changed Content";
-        Long savedId = commentRepository.save(new Comment(CONTENT, postId, userId)).getId();
-        User manager = userRepository.save(new User("manager@manager.com", "password", UserRole.MANAGER));
+        Long savedCommentId = commentRepository.save(new Comment(CONTENT, POST_ID, USER_ID)).getId();
 
-        commentService.updateComment(manager.getId(), savedId, new CommentRequest(contentToChange));
+        commentService.updateComment(MANAGER_ID, UserRole.MANAGER, savedCommentId, new CommentRequest(contentToChange));
 
-        Comment comment = commentRepository.findById(savedId).orElseThrow(IllegalArgumentException::new);
+        Comment comment = commentRepository.findById(savedCommentId).orElseThrow(IllegalArgumentException::new);
         assertThat(comment.getContent()).isEqualTo(contentToChange);
     }
 
     @Test
-    void updateCommentByManager() {
-        String contentToChange = "changed Content";
-        Long savedId = commentRepository.save(new Comment(CONTENT, postId, userId)).getId();
-
-        commentService.updateComment(userId, savedId, new CommentRequest(contentToChange));
-
-        Comment comment = commentRepository.findById(savedId).orElseThrow(IllegalArgumentException::new);
-        assertThat(comment.getContent()).isEqualTo(contentToChange);
-    }
-
-    @Test
-    void updateCommentByOther() {
+    void updateCommentByOtherUser() {
         User other = userRepository.save(new User("other@other.com", "password", UserRole.USER));
-        CommentRequest updateRequest = new CommentRequest("changed Content");
-        Long savedId = commentRepository.save(new Comment(CONTENT, postId, userId)).getId();
+        String contentToChange = "changed Content";
+        CommentRequest updateRequest = new CommentRequest(contentToChange);
+        Long savedCommentId = commentRepository.save(new Comment(CONTENT, POST_ID, USER_ID)).getId();
+
         assertThatThrownBy(
-                () -> commentService.updateComment(other.getId(), savedId, updateRequest)
+                () -> commentService.updateComment(other.getId(), UserRole.USER, savedCommentId, updateRequest)
         ).isInstanceOf(CustomException.class);
     }
+    @Test
+    void updateCommentByOtherManger() {
+        String contentToChange = "changed Content";
+        Long savedId = commentRepository.save(new Comment(CONTENT, POST_ID, USER_ID)).getId();
+
+        CommentRequest commentChangeRequest = new CommentRequest(contentToChange);
+        commentService.updateComment(MANAGER_ID, UserRole.MANAGER, savedId, commentChangeRequest);
+
+        Comment comment = commentRepository.findById(savedId).orElseThrow(IllegalArgumentException::new);
+        assertThat(comment.getContent()).isEqualTo(contentToChange);
+    }
+
 
     @Test
-    void deleteByOwner() {
-        Comment saved = commentRepository.save(new Comment(CONTENT, postId, userId));
+    void deleteByOwnerUser() {
+        Comment saved = commentRepository.save(new Comment(CONTENT, POST_ID, USER_ID));
 
-        commentService.deleteComment(userId, saved.getId());
+        commentService.deleteComment(USER_ID, UserRole.USER, saved.getId());
 
         assertFalse(commentRepository.existsById(saved.getId()));
     }
 
+    @Test
+    void deleteByOtherUser() {
+        User other = userRepository.save(new User("other@gist.ac.kr", "password", UserRole.USER));
+        Long savedContentId = commentRepository.save(new Comment(CONTENT, POST_ID, USER_ID)).getId();
+
+        assertThatThrownBy(
+                () -> commentService.deleteComment(other.getId(), UserRole.USER, savedContentId)
+        ).isInstanceOf(CustomException.class);
+    }
+    @Test
+    void deleteByOtherManager() {
+        Comment saved = commentRepository.save(new Comment(CONTENT, POST_ID, USER_ID));
+
+        commentService.deleteComment(MANAGER_ID, UserRole.MANAGER, saved.getId());
+
+        assertFalse(commentRepository.existsById(saved.getId()));
+    }
     @Test
     void deleteByAdmin() {
-        User admin = userRepository.save(new User("admin@admin.com", "password", UserRole.ADMIN));
-        Comment saved = commentRepository.save(new Comment(CONTENT, postId, userId));
+        Comment saved = commentRepository.save(new Comment(CONTENT, POST_ID, USER_ID));
 
-        commentService.deleteComment(admin.getId(), saved.getId());
+        commentService.deleteComment(ADMIN_ID, UserRole.ADMIN, saved.getId());
 
         assertFalse(commentRepository.existsById(saved.getId()));
     }
 
-    @Test
-    void deleteByOther() {
-        User other = userRepository.save(new User("other@other.com", "password", UserRole.USER));
-        Comment saved = commentRepository.save(new Comment(CONTENT, postId, userId));
 
-        assertThatThrownBy(
-                () -> commentService.deleteComment(other.getId(), saved.getId())
-        ).isInstanceOf(CustomException.class);
-    }
 
     @AfterEach
     void tearDown() {

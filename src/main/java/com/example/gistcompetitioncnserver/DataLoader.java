@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class DataLoader implements CommandLineRunner {
-    public final static User ADMIN = new User(1L, "admin@gist.ac.kr", "test1234!", UserRole.ADMIN, true);
+    private final User ADMIN = new User(1L, "admin@gist.ac.kr", "test1234!", UserRole.ADMIN, true);
 
     private final UserRepository userRepository;
 
