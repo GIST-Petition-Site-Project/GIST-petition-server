@@ -8,6 +8,8 @@ import java.time.LocalDateTime;
 
 @Entity
 public class VerificationToken {
+    private static final int EXPIRE_MINUTE = 15;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -18,8 +20,8 @@ public class VerificationToken {
     protected VerificationToken() {
     }
 
-    public VerificationToken(String token, Long userId, int expiryTimeInMinutes) {
-        this(null, token, userId, LocalDateTime.now().plusMinutes(expiryTimeInMinutes));
+    public VerificationToken(String token, Long userId) {
+        this(null, token, userId, LocalDateTime.now().plusMinutes(EXPIRE_MINUTE));
     }
 
     public VerificationToken(String token, Long userId, LocalDateTime expiryTime) {

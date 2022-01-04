@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 public class VerificationService {
@@ -20,9 +21,10 @@ public class VerificationService {
     }
 
     @Transactional
-    public void createToken(Long userId, String token) {
-        userRepository.findById(userId).orElseThrow(() -> new CustomException("존재하지 않는 사용자입니다."));
-        verificationTokenRepository.save(new VerificationToken(token, userId, 20));
+    public String createToken(User user) {
+        String token = UUID.randomUUID().toString();
+        verificationTokenRepository.save(new VerificationToken(token, user.getId()));
+        return token;
     }
 
     @Transactional
@@ -39,6 +41,5 @@ public class VerificationService {
             throw new CustomException("이미 인증된 사용자입니다.");
         }
         user.setEnabled();
-
     }
 }
