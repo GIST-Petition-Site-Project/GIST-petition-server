@@ -14,14 +14,12 @@ public class AnswerService {
 
     private final AnswerRepository answerRepository;
     private final PostRepository postRepository;
-    private final UserRepository userRepository;
 
     public AnswerService(AnswerRepository answerRepository,
                          PostRepository postRepository,
                          UserRepository userRepository) {
         this.answerRepository = answerRepository;
         this.postRepository = postRepository;
-        this.userRepository = userRepository;
     }
 
     @Transactional
@@ -60,15 +58,10 @@ public class AnswerService {
         answerRepository.deleteByPostId(postId);
     }
 
-
     private void checkExistenceByPostId(Long postId) {
         if (!postRepository.existsById(postId)) {
             throw new CustomException("존재하지 않는 post입니다");
         }
-    }
-
-    private User findUserById(Long userId) {
-        return userRepository.findById(userId).orElseThrow(() -> new CustomException("존재하지 않는 user입니다"));
     }
 
     private Answer findAnswerByPostId(Long postId) {
