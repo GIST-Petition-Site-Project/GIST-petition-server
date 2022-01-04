@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class FakeEmailSender implements EmailSender {
     @Override
-    public void send(String to, String email) {
-        System.out.println("Send to: " + to + " email: " + email);
+    public void send(String to, String subject, String content) {
+        System.out.println("Send to: " + to + "subject: " + subject + " email: " + content);
     }
 }

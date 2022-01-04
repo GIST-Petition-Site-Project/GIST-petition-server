@@ -1,5 +1,6 @@
 package com.example.gistcompetitioncnserver.emailsender;
 
+import com.example.gistcompetitioncnserver.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,21 +26,20 @@ public class EmailSenderImpl implements EmailSender {
 
     @Override
     @Async
-    public void send(String to, String content) {
+    public void send(String to, String subject, String content) {
         try {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper helper =
                     new MimeMessageHelper(mimeMessage, "utf-8");
+            helper.setSubject(subject);
             helper.setText(content, true);
-            helper.setTo(to); // email that we will send
-            helper.setSubject("[청원 게시판] 회원가입 이메일 인증");
+            helper.setTo(to);
             helper.setFrom(new InternetAddress("choieungi@gm.gist.ac.kr", "GIST"));
-            //                helper.setFrom("choieungi@gm.gist.ac.kr", "GIST"); // email sender that show client
             mailSender.send(mimeMessage);
 
         } catch (MessagingException | UnsupportedEncodingException e) {
             LOGGER.error("이메일을 보내는데 실패했습니다.", e);
-            throw new IllegalStateException("이메일을 보내는데 실패했습니다.");
+            throw new CustomException("이메일을 보내는데 실패했습니다.");
         }
     }
 }

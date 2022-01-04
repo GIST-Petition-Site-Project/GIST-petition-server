@@ -1,10 +1,12 @@
 package com.example.gistcompetitioncnserver.user;
 
 import lombok.AllArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.util.List;
 
@@ -14,10 +16,13 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @PostMapping("/users")
-    public ResponseEntity<Void> register(@Validated @RequestBody SignUpRequest request) {
-        return ResponseEntity.created(URI.create("/users/" + userService.signUp(request))).build();
+    public ResponseEntity<Void> register(@Validated @RequestBody SignUpRequest signUpRequest, HttpServletRequest request) {
+        Long userId = userService.signUp(signUpRequest);
+        eventPublisher.publishEvent(new OnRegistrationCompleteEvent(userId, request.getRequestURL().toString()));
+        return ResponseEntity.created(URI.create("/users/" + userId)).build();
     }
 
     @GetMapping("/users")

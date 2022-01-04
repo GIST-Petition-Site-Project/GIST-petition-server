@@ -1,9 +1,22 @@
 package com.example.gistcompetitioncnserver.user;
 
-import lombok.Data;
-
-@Data
 public class SignUpRequest {
-    private final String username;
-    private final String password;
+    private String username;
+    private String password;
+
+    public SignUpRequest(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
+
+    public SignUpRequest() {
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
 }

@@ -27,11 +27,9 @@ public class UserService {
             throw new CustomException("유효하지 않은 이메일 형태입니다");
         }
 
-        User user = new User(
-                username,
-                encryptor.hashPassword(request.getPassword()),
-                UserRole.USER);
-        return userRepository.save(user).getId();
+        User user = new User(username, encryptor.hashPassword(request.getPassword()), UserRole.USER);
+        userRepository.save(user);
+        return user.getId();
     }
 
     @Transactional(readOnly = true)
