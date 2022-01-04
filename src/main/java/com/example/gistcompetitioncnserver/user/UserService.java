@@ -11,12 +11,12 @@ import java.util.List;
 @Service
 public class UserService {
     private final UserRepository userRepository;
-    private final BcryptEncoder encoder;
+    private final Encryptor encryptor;
     private final HttpSession httpSession;
 
-    public UserService(UserRepository userRepository, BcryptEncoder encoder, HttpSession httpSession) {
+    public UserService(UserRepository userRepository, Encryptor encryptor, HttpSession httpSession) {
         this.userRepository = userRepository;
-        this.encoder = encoder;
+        this.encryptor = encryptor;
         this.httpSession = httpSession;
     }
 
@@ -32,7 +32,7 @@ public class UserService {
 
         User user = new User(
                 username,
-                encoder.hashPassword(request.getPassword()),
+                encryptor.hashPassword(request.getPassword()),
                 UserRole.USER);
         return userRepository.save(user).getId();
     }
@@ -41,7 +41,7 @@ public class UserService {
     public void signIn(SignInRequest request) {
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new CustomException("존재하지 않는 회원 입니다."));
-        if (!encoder.isMatch(request.getPassword(), user.getPassword())) {
+        if (!encryptor.isMatch(request.getPassword(), user.getPassword())) {
             throw new CustomException("비밀번호를 다시 확인해주세요");
         }
         httpSession.setAttribute("user", new SessionUser(user));
