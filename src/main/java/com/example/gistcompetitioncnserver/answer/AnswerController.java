@@ -26,7 +26,7 @@ public class AnswerController {
         if (!sessionUser.getEnabled()) {
             throw new CustomException("이메일 인증이 필요합니다!");
         }
-        if (sessionUser.getUserRole() != UserRole.MANAGER && sessionUser.getUserRole() != UserRole.ADMIN) {
+        if (!sessionUser.hasManagerAuthority()) {
             throw new CustomException("답변 권한이 없습니다.");
         }
         Long answerId = answerService.createAnswer(postId, answerRequest, sessionUser.getId());
@@ -50,7 +50,7 @@ public class AnswerController {
         if (!sessionUser.getEnabled()) {
             throw new CustomException("이메일 인증이 필요합니다!");
         }
-        if (sessionUser.getUserRole() != UserRole.MANAGER && sessionUser.getUserRole() != UserRole.ADMIN) {
+        if (!sessionUser.hasManagerAuthority()) {
             throw new CustomException("답변 수정 권한이 없습니다.");
         }
         answerService.updateAnswer(postId, changeRequest);
@@ -63,7 +63,7 @@ public class AnswerController {
         if (!sessionUser.getEnabled()) {
             throw new CustomException("이메일 인증이 필요합니다!");
         }
-        if (sessionUser.getUserRole() != UserRole.MANAGER && sessionUser.getUserRole() != UserRole.ADMIN) {
+        if (!sessionUser.hasManagerAuthority()) {
             throw new CustomException("답변 삭제 권한이 없습니다.");
         }
         answerService.deleteAnswer(postId);
