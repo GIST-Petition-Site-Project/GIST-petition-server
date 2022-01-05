@@ -23,6 +23,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 class CommentServiceTest {
 
     private static final String CONTENT = "test contents";
+    public static final CommentRequest COMMENT_REQUEST = new CommentRequest(CONTENT);
+    public static final CommentRequest UPDATE_REQUEST = new CommentRequest("changed Content");
     @Autowired
     private CommentService commentService;
     @Autowired
@@ -45,24 +47,20 @@ class CommentServiceTest {
 
     @Test
     void createComment() {
-        CommentRequest commentRequest = new CommentRequest(CONTENT);
-
-        Long commentId = commentService.createComment(post.getId(), commentRequest, postOwner.getId());
+        Long commentId = commentService.createComment(post.getId(), COMMENT_REQUEST, postOwner.getId());
 
         Comment comment = commentRepository.findById(commentId).orElseThrow(IllegalArgumentException::new);
         assertThat(comment.getId()).isEqualTo(commentId);
         assertThat(comment.getPostId()).isEqualTo(post.getId());
         assertThat(comment.getUserId()).isEqualTo(postOwner.getId());
-        assertThat(comment.getContent()).isEqualTo(CONTENT);
+        assertThat(comment.getContent()).isEqualTo(COMMENT_REQUEST.getContent());
     }
 
     @Test
     void createFailedIfPostNotExistent() {
-        CommentRequest commentRequest = new CommentRequest(CONTENT);
-
         Long notExistingPostId = Long.MAX_VALUE;
         assertThatThrownBy(
-                () -> commentService.createComment(notExistingPostId, commentRequest, postOwner.getId())
+                () -> commentService.createComment(notExistingPostId, COMMENT_REQUEST, postOwner.getId())
         ).isInstanceOf(CustomException.class);
     }
 
@@ -89,34 +87,30 @@ class CommentServiceTest {
 
     @Test
     void updateComment() {
-        String contentToChange = "changed Content";
         Long savedCommentId = commentRepository.save(new Comment(CONTENT, post.getId(), postOwner.getId())).getId();
 
-        commentService.updateComment(savedCommentId, new CommentRequest(contentToChange));
+        commentService.updateComment(savedCommentId, UPDATE_REQUEST);
 
         Comment comment = commentRepository.findById(savedCommentId).orElseThrow(IllegalArgumentException::new);
-        assertThat(comment.getContent()).isEqualTo(contentToChange);
+        assertThat(comment.getContent()).isEqualTo(UPDATE_REQUEST.getContent());
     }
 
     @Test
     void updateCommentByOwner() {
-        String contentToChange = "changed Content";
         Long savedCommentId = commentRepository.save(new Comment(CONTENT, post.getId(), postOwner.getId())).getId();
 
-        commentService.updateCommentByOwner(postOwner.getId(), savedCommentId, new CommentRequest(contentToChange));
+        commentService.updateCommentByOwner(postOwner.getId(), savedCommentId, UPDATE_REQUEST);
 
         Comment comment = commentRepository.findById(savedCommentId).orElseThrow(IllegalArgumentException::new);
-        assertThat(comment.getContent()).isEqualTo(contentToChange);
+        assertThat(comment.getContent()).isEqualTo(UPDATE_REQUEST.getContent());
     }
 
     @Test
     void updateCommentByOtherUser() {
-        String contentToChange = "changed Content";
-        CommentRequest updateRequest = new CommentRequest(contentToChange);
         Long savedCommentId = commentRepository.save(new Comment(CONTENT, post.getId(), postOwner.getId())).getId();
 
         assertThatThrownBy(
-                () -> commentService.updateCommentByOwner(otherUser.getId(), savedCommentId, updateRequest)
+                () -> commentService.updateCommentByOwner(otherUser.getId(), savedCommentId, UPDATE_REQUEST)
         ).isInstanceOf(CustomException.class);
     }
 
