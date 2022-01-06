@@ -99,8 +99,34 @@ class UserServiceTest {
         assertThat(httpSession.getAttribute("user")).isNull();
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {"manager", "Manager", "MANAGER"})
+    void updateUserRoleToManager(String inputUserRole) {
+        SignUpRequest signUpRequest = new SignUpRequest(GIST_EMAIL, PASSWORD);
+        Long userId = userService.signUp(signUpRequest);
+
+        UpdateUserRoleRequest userRoleRequest = new UpdateUserRoleRequest(inputUserRole);
+        userService.updateUserRole(userId, userRoleRequest);
+
+        User user = userRepository.findById(userId).orElseThrow(IllegalArgumentException::new);
+        assertThat(user.getUserRole()).isEqualTo(UserRole.MANAGER);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"admin", "Admin", "ADMIN"})
+    void updateUserRoleToAdmin(String inputUserRole) {
+        SignUpRequest signUpRequest = new SignUpRequest(GIST_EMAIL, PASSWORD);
+        Long userId = userService.signUp(signUpRequest);
+
+        UpdateUserRoleRequest userRoleRequest = new UpdateUserRoleRequest(inputUserRole);
+        userService.updateUserRole(userId, userRoleRequest);
+
+        User user = userRepository.findById(userId).orElseThrow(IllegalArgumentException::new);
+        assertThat(user.getUserRole()).isEqualTo(UserRole.ADMIN);
+    }
+
     @Test
-    void updateUserPassowrd() {
+    void updateUserPassword() {
         SignUpRequest signUpRequest = new SignUpRequest(GIST_EMAIL, PASSWORD);
         Long userId = userService.signUp(signUpRequest);
 

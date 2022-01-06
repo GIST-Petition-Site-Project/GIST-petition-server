@@ -65,6 +65,12 @@ public class UserService {
     }
 
     @Transactional
+    public void updateUserRole(Long userId, UpdateUserRoleRequest userRoleRequest) {
+        User user = findUserById(userId);
+        user.setUserRole(UserRole.ignoringCaseValueOf(userRoleRequest.getUserRole()));
+    }
+
+    @Transactional
     public void updatePassword(Long userId, UpdatePasswordRequest passwordRequest) {
         User user = findUserById(userId);
         if (!encryptor.isMatch(passwordRequest.getOriginPassword(), user.getPassword())) {
