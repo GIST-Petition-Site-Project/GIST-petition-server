@@ -24,6 +24,19 @@ spring:
   config:
     activate:
       on-profile: dev
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://dev-api.gist-petition.com:3306/dev_petitiondb?serverTimezone=Asia/Seoul
+    username: ${USER_NAME}
+    password: ${PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    properties:
+      hibernate:
+        format_sql: true
 swagger:
   host: dev-api.gist-petition.com
   protocol: http
