@@ -32,14 +32,6 @@ public class User {
         this.enabled = enabled;
     }
 
-    public boolean isAdmin() {
-        return this.userRole == UserRole.ADMIN;
-    }
-
-    public boolean isManager() {
-        return this.userRole == UserRole.MANAGER;
-    }
-
     public Long getId() {
         return id;
     }

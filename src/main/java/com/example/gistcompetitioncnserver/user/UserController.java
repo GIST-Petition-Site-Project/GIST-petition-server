@@ -1,5 +1,6 @@
 package com.example.gistcompetitioncnserver.user;
 
+import com.example.gistcompetitioncnserver.exception.CustomException;
 import lombok.AllArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
@@ -40,17 +41,35 @@ public class UserController {
     }
 
     @GetMapping("/users")
-    public ResponseEntity<List<User>> retrieveAllUsers() {
+    public ResponseEntity<List<User>> retrieveAllUsers()     {
+        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
+        if (!sessionUser.getEnabled()) {
+            throw new CustomException("이메일 인증이 필요합니다!");
+        }
+        if (!sessionUser.isAdmin()) {
+            throw new CustomException("회원 정보 조회 권한이 없습니다.");
+        }
         return ResponseEntity.ok().body(userService.findAllUsers());
     }
 
     @GetMapping("/users/{userId}")
     public ResponseEntity<User> retrieveUser(@PathVariable Long userId) {
+        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
+        if (!sessionUser.getEnabled()) {
+            throw new CustomException("이메일 인증이 필요합니다!");
+        }
+        if (!sessionUser.isAdmin()) {
+            throw new CustomException("회원 정보 조회 권한이 없습니다.");
+        }
         return ResponseEntity.ok().body(userService.findUserById(userId));
     }
 
     @DeleteMapping("/users/{userId}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long userId) {
+        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
+        if (!sessionUser.getEnabled()) {
+            throw new CustomException("이메일 인증이 필요합니다!");
+        }
         userService.deleteUser(userId);
         return ResponseEntity.noContent().build();
     }
