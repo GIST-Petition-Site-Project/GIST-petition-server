@@ -41,7 +41,7 @@ public class UserController {
     }
 
     @GetMapping("/users")
-    public ResponseEntity<List<User>> retrieveAllUsers()     {
+    public ResponseEntity<List<User>> retrieveAllUsers() {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
         if (!sessionUser.getEnabled()) {
             throw new CustomException("이메일 인증이 필요합니다!");
@@ -71,6 +71,16 @@ public class UserController {
             throw new CustomException("이메일 인증이 필요합니다!");
         }
         return ResponseEntity.ok().body(userService.findUserById(sessionUser.getId()));
+    }
+
+    @PutMapping("/users/me/password")
+    public ResponseEntity<Void> updatePasswordOfMine(@Validated @RequestBody UpdatePasswordRequest passwordRequest) {
+        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
+        if (!sessionUser.getEnabled()) {
+            throw new CustomException("이메일 인증이 필요합니다!");
+        }
+        userService.updatePassword(sessionUser.getId(), passwordRequest);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/users/{userId}")

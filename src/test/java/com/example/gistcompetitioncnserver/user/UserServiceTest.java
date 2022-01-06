@@ -28,7 +28,7 @@ class UserServiceTest {
     @Autowired
     private VerificationTokenRepository verificationTokenRepository;
     @Autowired
-    private BcryptEncoder encoder;
+    private Encryptor encoder;
     @Autowired
     private HttpSession httpSession;
 
@@ -97,6 +97,30 @@ class UserServiceTest {
                 () -> userService.signIn(signInRequest)
         ).isInstanceOf(CustomException.class);
         assertThat(httpSession.getAttribute("user")).isNull();
+    }
+
+    @Test
+    void updateUserPassowrd() {
+        SignUpRequest signUpRequest = new SignUpRequest(GIST_EMAIL, PASSWORD);
+        Long userId = userService.signUp(signUpRequest);
+
+        UpdatePasswordRequest updatePasswordRequest = new UpdatePasswordRequest(PASSWORD, "newPassword");
+        userService.updatePassword(userId, updatePasswordRequest);
+
+        User user = userRepository.findById(userId).orElseThrow(IllegalArgumentException::new);
+        assertTrue(encoder.isMatch(updatePasswordRequest.getNewPassword(), user.getPassword()));
+    }
+
+    @Test
+    void updateFailIfInvalidOriginPassword() {
+        SignUpRequest signUpRequest = new SignUpRequest(GIST_EMAIL, PASSWORD);
+        Long userId = userService.signUp(signUpRequest);
+
+        UpdatePasswordRequest invalidRequest = new UpdatePasswordRequest("InvalidPassword", "newPassword");
+
+        assertThatThrownBy(
+                () -> userService.updatePassword(userId, invalidRequest)
+        ).isInstanceOf(CustomException.class);
     }
 
     @Test

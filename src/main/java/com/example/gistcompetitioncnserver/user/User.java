@@ -52,11 +52,15 @@ public class User {
         return enabled;
     }
 
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public void setUserRole(UserRole userRole) {
         this.userRole = userRole;
     }
 
-    public void setEnabled(){
+    public void setEnabled() {
         this.enabled = true;
     }
 }

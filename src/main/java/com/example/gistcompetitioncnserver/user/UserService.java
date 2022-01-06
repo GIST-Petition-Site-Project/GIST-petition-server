@@ -65,6 +65,15 @@ public class UserService {
     }
 
     @Transactional
+    public void updatePassword(Long userId, UpdatePasswordRequest passwordRequest) {
+        User user = findUserById(userId);
+        if (!encryptor.isMatch(passwordRequest.getOriginPassword(), user.getPassword())) {
+            throw new CustomException("기존 패쓰워드가 일치하지 않습니다.");
+        }
+        user.setPassword(encryptor.hashPassword(passwordRequest.getNewPassword()));
+    }
+
+    @Transactional
     public void deleteUser(Long userId) {
         if (!userRepository.existsById(userId)) {
             throw new CustomException("존재하지 않는 유저입니다");
