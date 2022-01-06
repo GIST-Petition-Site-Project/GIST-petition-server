@@ -166,6 +166,27 @@ class UserServiceTest {
         assertThatThrownBy(() -> userService.deleteUser(notExistedId)).isInstanceOf(CustomException.class);
     }
 
+
+    @Test
+    void deleteUserOfMine() {
+        SignUpRequest signUpRequest = new SignUpRequest(GIST_EMAIL, PASSWORD);
+        Long userId = userService.signUp(signUpRequest);
+
+        userService.deleteUserOfMine(userId, new DeleteUserRequest(signUpRequest.getPassword()));
+
+        assertFalse(userRepository.existsById(userId));
+    }
+
+    @Test
+    void deleteUserOfMineWithInvalidPassword() {
+        SignUpRequest signUpRequest = new SignUpRequest(GIST_EMAIL, PASSWORD);
+        Long userId = userService.signUp(signUpRequest);
+
+        assertThatThrownBy(
+                () -> userService.deleteUserOfMine(userId, new DeleteUserRequest("notPassword"))
+        ).isInstanceOf(CustomException.class);
+    }
+
     @AfterEach
     void tearDown() {
         verificationTokenRepository.deleteAllInBatch();

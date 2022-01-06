@@ -86,4 +86,13 @@ public class UserService {
         }
         userRepository.deleteById(userId);
     }
+
+    @Transactional
+    public void deleteUserOfMine(Long userId, DeleteUserRequest deleteUserRequest) {
+        User user = findUserById(userId);
+        if (!encryptor.isMatch(deleteUserRequest.getPassword(), user.getPassword())) {
+            throw new CustomException("기존 패쓰워드가 일치하지 않습니다.");
+        }
+        userRepository.deleteById(userId);
+    }
 }

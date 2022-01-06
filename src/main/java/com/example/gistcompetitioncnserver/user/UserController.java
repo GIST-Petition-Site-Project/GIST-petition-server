@@ -111,12 +111,12 @@ public class UserController {
     }
 
     @DeleteMapping("/users/me")
-    public ResponseEntity<Void> deleteUserOfMine() {
+    public ResponseEntity<Void> deleteUserOfMine(@Validated @RequestBody DeleteUserRequest deleteUserRequest) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
         if (!sessionUser.getEnabled()) {
             throw new CustomException("이메일 인증이 필요합니다!");
         }
-        userService.deleteUser(sessionUser.getId());
+        userService.deleteUserOfMine(sessionUser.getId(), deleteUserRequest);
         return ResponseEntity.noContent().build();
     }
 }
