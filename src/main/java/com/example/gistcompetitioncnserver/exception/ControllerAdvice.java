@@ -1,5 +1,6 @@
 package com.example.gistcompetitioncnserver.exception;
 
+import com.example.gistcompetitioncnserver.exception.post.PostException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -11,6 +12,11 @@ public class ControllerAdvice {
     public ResponseEntity<ErrorMessage> handle(CustomException ex) {
         return ResponseEntity.badRequest()
                 .body(new ErrorMessage(400, ex.getMessage()));
+    }
+
+    @ExceptionHandler(PostException.class)
+    public ResponseEntity<String> handle(PostException ex) {
+        return ResponseEntity.status(ex.getHttpStatus()).body(ex.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
