@@ -64,6 +64,15 @@ public class UserController {
         return ResponseEntity.ok().body(userService.findUserById(userId));
     }
 
+    @GetMapping("/users/me")
+    public ResponseEntity<User> retrieveUserOfMine() {
+        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
+        if (!sessionUser.getEnabled()) {
+            throw new CustomException("이메일 인증이 필요합니다!");
+        }
+        return ResponseEntity.ok().body(userService.findUserById(sessionUser.getId()));
+    }
+
     @DeleteMapping("/users/{userId}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long userId) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
