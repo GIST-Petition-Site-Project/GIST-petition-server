@@ -79,7 +79,20 @@ public class UserController {
         if (!sessionUser.getEnabled()) {
             throw new CustomException("이메일 인증이 필요합니다!");
         }
+        if (!sessionUser.isAdmin()) {
+            throw new CustomException("삭제할 권한이 없습니다.");
+        }
         userService.deleteUser(userId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/users/me")
+    public ResponseEntity<Void> deleteUserOfMine() {
+        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
+        if (!sessionUser.getEnabled()) {
+            throw new CustomException("이메일 인증이 필요합니다!");
+        }
+        userService.deleteUser(sessionUser.getId());
         return ResponseEntity.noContent().build();
     }
 }
