@@ -34,25 +34,27 @@ class CommentServiceTest {
     @Autowired
     private UserRepository userRepository;
 
-    private User postOwner;
-    private User otherUser;
     private Post post;
+    private User commenter;
+    private User otherUser;
 
     @BeforeEach
     void setUp() {
-        postOwner = userRepository.save(new User("user@gist.ac.kr", "password", UserRole.USER));
-        otherUser = userRepository.save(new User("other@gist.ac.kr", "password", UserRole.USER));
+        User postOwner = userRepository.save(new User("user@gist.ac.kr", "password", UserRole.USER));
         post = postRepository.save(new Post("title", "description", "category", postOwner.getId()));
+
+        commenter = userRepository.save(new User("commenter@gist.ac.kr", "password", UserRole.USER));
+        otherUser = userRepository.save(new User("other@gist.ac.kr", "password", UserRole.USER));
     }
 
     @Test
     void createComment() {
-        Long commentId = commentService.createComment(post.getId(), COMMENT_REQUEST, postOwner.getId());
+        Long commentId = commentService.createComment(post.getId(), COMMENT_REQUEST, commenter.getId());
 
         Comment comment = commentRepository.findById(commentId).orElseThrow(IllegalArgumentException::new);
         assertThat(comment.getId()).isEqualTo(commentId);
         assertThat(comment.getPostId()).isEqualTo(post.getId());
-        assertThat(comment.getUserId()).isEqualTo(postOwner.getId());
+        assertThat(comment.getUserId()).isEqualTo(commenter.getId());
         assertThat(comment.getContent()).isEqualTo(COMMENT_REQUEST.getContent());
     }
 
@@ -60,16 +62,16 @@ class CommentServiceTest {
     void createFailedIfPostNotExistent() {
         Long notExistingPostId = Long.MAX_VALUE;
         assertThatThrownBy(
-                () -> commentService.createComment(notExistingPostId, COMMENT_REQUEST, postOwner.getId())
+                () -> commentService.createComment(notExistingPostId, COMMENT_REQUEST, commenter.getId())
         ).isInstanceOf(CustomException.class);
     }
 
     @Test
     void getCommentsByPostId() {
         List<Comment> comments = new ArrayList<>();
-        comments.add(new Comment(CONTENT, post.getId(), postOwner.getId()));
-        comments.add(new Comment(CONTENT, post.getId(), postOwner.getId()));
-        comments.add(new Comment(CONTENT, post.getId(), postOwner.getId()));
+        comments.add(new Comment(CONTENT, post.getId(), commenter.getId()));
+        comments.add(new Comment(CONTENT, post.getId(), commenter.getId()));
+        comments.add(new Comment(CONTENT, post.getId(), commenter.getId()));
         List<Comment> savedComments = commentRepository.saveAll(comments);
 
         List<Comment> commentsByPostId = commentService.getCommentsByPostId(post.getId());
@@ -87,7 +89,7 @@ class CommentServiceTest {
 
     @Test
     void updateComment() {
-        Long savedCommentId = commentRepository.save(new Comment(CONTENT, post.getId(), postOwner.getId())).getId();
+        Long savedCommentId = commentRepository.save(new Comment(CONTENT, post.getId(), commenter.getId())).getId();
 
         commentService.updateComment(savedCommentId, UPDATE_REQUEST);
 
@@ -97,9 +99,9 @@ class CommentServiceTest {
 
     @Test
     void updateCommentByOwner() {
-        Long savedCommentId = commentRepository.save(new Comment(CONTENT, post.getId(), postOwner.getId())).getId();
+        Long savedCommentId = commentRepository.save(new Comment(CONTENT, post.getId(), commenter.getId())).getId();
 
-        commentService.updateCommentByOwner(postOwner.getId(), savedCommentId, UPDATE_REQUEST);
+        commentService.updateCommentByOwner(commenter.getId(), savedCommentId, UPDATE_REQUEST);
 
         Comment comment = commentRepository.findById(savedCommentId).orElseThrow(IllegalArgumentException::new);
         assertThat(comment.getContent()).isEqualTo(UPDATE_REQUEST.getContent());
@@ -107,7 +109,7 @@ class CommentServiceTest {
 
     @Test
     void updateCommentByOtherUser() {
-        Long savedCommentId = commentRepository.save(new Comment(CONTENT, post.getId(), postOwner.getId())).getId();
+        Long savedCommentId = commentRepository.save(new Comment(CONTENT, post.getId(), commenter.getId())).getId();
 
         assertThatThrownBy(
                 () -> commentService.updateCommentByOwner(otherUser.getId(), savedCommentId, UPDATE_REQUEST)
@@ -116,7 +118,7 @@ class CommentServiceTest {
 
     @Test
     void deleteComment() {
-        Comment saved = commentRepository.save(new Comment(CONTENT, post.getId(), postOwner.getId()));
+        Comment saved = commentRepository.save(new Comment(CONTENT, post.getId(), commenter.getId()));
 
         commentService.deleteComment(saved.getId());
 
@@ -125,16 +127,16 @@ class CommentServiceTest {
 
     @Test
     void deleteCommentByOwnerUser() {
-        Comment saved = commentRepository.save(new Comment(CONTENT, post.getId(), postOwner.getId()));
+        Comment saved = commentRepository.save(new Comment(CONTENT, post.getId(), commenter.getId()));
 
-        commentService.deleteCommentByOwner(postOwner.getId(), saved.getId());
+        commentService.deleteCommentByOwner(commenter.getId(), saved.getId());
 
         assertFalse(commentRepository.existsById(saved.getId()));
     }
 
     @Test
     void deleteCommentByOtherUser() {
-        Long savedContentId = commentRepository.save(new Comment(CONTENT, post.getId(), postOwner.getId())).getId();
+        Long savedContentId = commentRepository.save(new Comment(CONTENT, post.getId(), commenter.getId())).getId();
 
         assertThatThrownBy(
                 () -> commentService.deleteCommentByOwner(otherUser.getId(), savedContentId)
