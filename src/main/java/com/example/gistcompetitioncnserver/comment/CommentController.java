@@ -45,6 +45,7 @@ public class CommentController {
         }
         if (sessionUser.hasManagerAuthority()) {
             commentService.updateComment(commentId, updateRequest);
+            return ResponseEntity.noContent().build();
         }
         commentService.updateCommentByOwner(sessionUser.getId(), commentId, updateRequest);
         return ResponseEntity.noContent().build();
@@ -59,6 +60,7 @@ public class CommentController {
         }
         if (sessionUser.hasManagerAuthority()) {
             commentService.deleteComment(commentId);
+            return ResponseEntity.noContent().build();
         }
         commentService.deleteCommentByOwner(sessionUser.getId(), commentId);
         return ResponseEntity.noContent().build();
