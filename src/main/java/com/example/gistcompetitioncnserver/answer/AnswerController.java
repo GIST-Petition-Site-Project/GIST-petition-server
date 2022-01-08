@@ -1,6 +1,7 @@
 package com.example.gistcompetitioncnserver.answer;
 
-import com.example.gistcompetitioncnserver.exception.CustomException;
+import com.example.gistcompetitioncnserver.exception.user.NotConfirmedEmailException;
+import com.example.gistcompetitioncnserver.exception.user.UnAuthorizedUserException;
 import com.example.gistcompetitioncnserver.user.SessionUser;
 import com.example.gistcompetitioncnserver.user.UserRole;
 import lombok.AllArgsConstructor;
@@ -24,10 +25,10 @@ public class AnswerController {
                                                @Validated @RequestBody AnswerRequest answerRequest) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
         if (!sessionUser.getEnabled()) {
-            throw new CustomException("이메일 인증이 필요합니다!");
+            throw new NotConfirmedEmailException();
         }
         if (sessionUser.getUserRole() != UserRole.MANAGER && sessionUser.getUserRole() != UserRole.ADMIN) {
-            throw new CustomException("답변 권한이 없습니다.");
+            throw new UnAuthorizedUserException();
         }
         Long answerId = answerService.createAnswer(postId, answerRequest, sessionUser.getId());
         return ResponseEntity.created(URI.create("/posts/" + postId + "/answer/" + answerId)).build();
@@ -48,10 +49,10 @@ public class AnswerController {
                                              @Validated @RequestBody AnswerRequest changeRequest) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
         if (!sessionUser.getEnabled()) {
-            throw new CustomException("이메일 인증이 필요합니다!");
+            throw new NotConfirmedEmailException();
         }
         if (sessionUser.getUserRole() != UserRole.MANAGER && sessionUser.getUserRole() != UserRole.ADMIN) {
-            throw new CustomException("답변 수정 권한이 없습니다.");
+            throw new UnAuthorizedUserException();
         }
         answerService.updateAnswer(postId, changeRequest);
         return ResponseEntity.ok().build();
@@ -61,10 +62,10 @@ public class AnswerController {
     public ResponseEntity<Object> deleteComment(@PathVariable Long postId) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
         if (!sessionUser.getEnabled()) {
-            throw new CustomException("이메일 인증이 필요합니다!");
+            throw new NotConfirmedEmailException();
         }
         if (sessionUser.getUserRole() != UserRole.MANAGER && sessionUser.getUserRole() != UserRole.ADMIN) {
-            throw new CustomException("답변 삭제 권한이 없습니다.");
+            throw new UnAuthorizedUserException();
         }
         answerService.deleteAnswer(postId);
         return ResponseEntity.noContent().build();

@@ -1,6 +1,8 @@
 package com.example.gistcompetitioncnserver.answer;
 
 import com.example.gistcompetitioncnserver.exception.CustomException;
+import com.example.gistcompetitioncnserver.exception.post.NoSuchPostException;
+import com.example.gistcompetitioncnserver.exception.post.UnAnsweredPostException;
 import com.example.gistcompetitioncnserver.post.Post;
 import com.example.gistcompetitioncnserver.post.PostRepository;
 import com.example.gistcompetitioncnserver.user.User;
@@ -41,6 +43,7 @@ class AnswerServiceTest {
         normalUserId = userRepository.save(new User("normal@email.com", "password", UserRole.USER)).getId();
         managerUserId = userRepository.save(new User("manager@email.com", "password", UserRole.MANAGER)).getId();
         adminUserId = userRepository.save(new User("admin@email.com", "password", UserRole.ADMIN)).getId();
+
         postId = postRepository.save(new Post("title", "description", "category", normalUserId)).getId();
     }
 
@@ -83,7 +86,7 @@ class AnswerServiceTest {
         Long fakePostId = Long.MAX_VALUE;
         assertThatThrownBy(
                 () -> answerService.createAnswer(fakePostId, answerRequest, managerUserId)
-        ).isInstanceOf(CustomException.class);
+        ).isInstanceOf(NoSuchPostException.class);
     }
 
     @Test
@@ -100,7 +103,7 @@ class AnswerServiceTest {
     void retrieveAnswerWithNoAnswer() {
         assertThatThrownBy(
                 () -> answerService.retrieveAnswerByPostId(postId)
-        ).isInstanceOf(CustomException.class);
+        ).isInstanceOf(UnAnsweredPostException.class);
     }
 
     @Test
@@ -111,7 +114,7 @@ class AnswerServiceTest {
         Long fakePostId = Long.MAX_VALUE;
         assertThatThrownBy(
                 () -> answerService.retrieveAnswerByPostId(fakePostId)
-        ).isInstanceOf(CustomException.class);
+        ).isInstanceOf(NoSuchPostException.class);
     }
 
     @Test
@@ -138,7 +141,7 @@ class AnswerServiceTest {
 
         assertThatThrownBy(
                 () -> answerService.updateAnswer(fakePostId, changeRequest)
-        ).isInstanceOf(CustomException.class);
+        ).isInstanceOf(NoSuchPostException.class);
     }
 
     @Test
@@ -148,7 +151,7 @@ class AnswerServiceTest {
 
         assertThatThrownBy(
                 () -> answerService.updateAnswer(postId, changeRequest)
-        ).isInstanceOf(CustomException.class);
+        ).isInstanceOf(UnAnsweredPostException.class);
     }
 
     @Test
@@ -168,7 +171,7 @@ class AnswerServiceTest {
 
         assertThatThrownBy(
                 () -> answerService.deleteAnswer(fakePostId)
-        ).isInstanceOf(CustomException.class);
+        ).isInstanceOf(NoSuchPostException.class);
     }
 
 
