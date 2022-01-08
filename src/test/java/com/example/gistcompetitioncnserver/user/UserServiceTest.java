@@ -1,6 +1,9 @@
 package com.example.gistcompetitioncnserver.user;
 
-import com.example.gistcompetitioncnserver.exception.CustomException;
+import com.example.gistcompetitioncnserver.exception.user.DuplicatedUserException;
+import com.example.gistcompetitioncnserver.exception.user.InvalidEmailFormException;
+import com.example.gistcompetitioncnserver.exception.user.NoSuchUserException;
+import com.example.gistcompetitioncnserver.exception.user.NotMatchedPasswordException;
 import com.example.gistcompetitioncnserver.verification.VerificationTokenRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -51,7 +54,7 @@ class UserServiceTest {
         SignUpRequest signUpRequest = new SignUpRequest(GIST_EMAIL, PASSWORD);
         userService.signUp(signUpRequest);
 
-        assertThatThrownBy(() -> userService.signUp(signUpRequest)).isInstanceOf(CustomException.class);
+        assertThatThrownBy(() -> userService.signUp(signUpRequest)).isInstanceOf(DuplicatedUserException.class);
     }
 
     @Test
@@ -59,7 +62,7 @@ class UserServiceTest {
         String notGistEmail = "email@email.com";
         SignUpRequest signUpRequest = new SignUpRequest(notGistEmail, PASSWORD);
 
-        assertThatThrownBy(() -> userService.signUp(signUpRequest)).isInstanceOf(CustomException.class);
+        assertThatThrownBy(() -> userService.signUp(signUpRequest)).isInstanceOf(InvalidEmailFormException.class);
     }
 
     @Test
@@ -83,7 +86,7 @@ class UserServiceTest {
 
         assertThatThrownBy(
                 () -> userService.signIn(signInRequest)
-        ).isInstanceOf(CustomException.class);
+        ).isInstanceOf(NoSuchUserException.class);
         assertThat(httpSession.getAttribute("user")).isNull();
     }
 
@@ -95,7 +98,7 @@ class UserServiceTest {
 
         assertThatThrownBy(
                 () -> userService.signIn(signInRequest)
-        ).isInstanceOf(CustomException.class);
+        ).isInstanceOf(NotMatchedPasswordException.class);
         assertThat(httpSession.getAttribute("user")).isNull();
     }
 
@@ -113,7 +116,7 @@ class UserServiceTest {
     void deleteUserIfNotExisted() {
         Long notExistedId = Long.MAX_VALUE;
 
-        assertThatThrownBy(() -> userService.deleteUser(notExistedId)).isInstanceOf(CustomException.class);
+        assertThatThrownBy(() -> userService.deleteUser(notExistedId)).isInstanceOf(NoSuchUserException.class);
     }
 
     @AfterEach
