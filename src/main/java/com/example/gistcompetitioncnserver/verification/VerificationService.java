@@ -32,10 +32,10 @@ public class VerificationService {
     @Transactional
     public void confirm(String token) {
         VerificationToken verificationToken = verificationTokenRepository.findByToken(token)
-                .orElseThrow(() -> new CustomException("존재하지 않는 토큰입니다."));
+                .orElseThrow(() -> new CustomException("존재하지 않는 토큰입니다.", null));
 
         if (!verificationToken.isValidAt(LocalDateTime.now())) {
-            throw new CustomException("만료된 토큰입니다.");
+            throw new CustomException("만료된 토큰입니다.", null);
         }
 
         User user = userRepository.findById(verificationToken.getUserId()).orElseThrow(NoSuchUserException::new);

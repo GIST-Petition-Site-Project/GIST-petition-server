@@ -53,7 +53,7 @@ class AnswerServiceTest {
 
         Long savedAnswer = answerService.createAnswer(postId, answerRequest, adminUserId);
 
-        Answer answer = answerRepository.findById(savedAnswer).orElseThrow(() -> new CustomException("존재하지 않는 answer입니다.;"));
+        Answer answer = answerRepository.findById(savedAnswer).orElseThrow(() -> new CustomException("존재하지 않는 answer입니다.", null));
         assertThat(answer.getId()).isEqualTo(savedAnswer);
         assertThat(answer.getContent()).isEqualTo(CONTENT);
         assertThat(answer.getUserId()).isEqualTo(adminUserId);
@@ -69,7 +69,7 @@ class AnswerServiceTest {
 
         Long savedAnswer = answerService.createAnswer(postId, answerRequest, managerUserId);
 
-        Answer answer = answerRepository.findById(savedAnswer).orElseThrow(() -> new CustomException("존재하지 않는 answer입니다.;"));
+        Answer answer = answerRepository.findById(savedAnswer).orElseThrow(() -> new CustomException("존재하지 않는 answer입니다.", null));
         assertThat(answer.getId()).isEqualTo(savedAnswer);
         assertThat(answer.getContent()).isEqualTo(CONTENT);
         assertThat(answer.getUserId()).isEqualTo(managerUserId);
@@ -126,7 +126,7 @@ class AnswerServiceTest {
 
         answerService.updateAnswer(postId, changeRequest);
 
-        Answer updatedAnswer = answerRepository.findByPostId(postId).orElseThrow(() -> new CustomException(""));
+        Answer updatedAnswer = answerRepository.findByPostId(postId).orElseThrow(() -> new CustomException("", null));
         assertThat(answer.getId()).isEqualTo(updatedAnswer.getId());
         assertThat(updatedAnswer.getContent()).isEqualTo(changContent);
     }

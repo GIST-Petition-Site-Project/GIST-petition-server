@@ -39,7 +39,7 @@ public class EmailSenderImpl implements EmailSender {
 
         } catch (MessagingException | UnsupportedEncodingException e) {
             LOGGER.error("이메일을 보내는데 실패했습니다.", e);
-            throw new CustomException("이메일을 보내는데 실패했습니다.");
+            throw new CustomException("이메일을 보내는데 실패했습니다.", e);
         }
     }
 }
