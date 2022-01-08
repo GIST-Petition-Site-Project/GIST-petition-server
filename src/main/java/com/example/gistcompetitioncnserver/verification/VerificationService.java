@@ -13,10 +13,15 @@ import java.util.UUID;
 public class VerificationService {
 
     private final VerificationTokenRepository verificationTokenRepository;
+    private final VerificationTokenRepository2 verificationTokenRepository2;
+    private final TokenGenerator tokenGenerator;
     private final UserRepository userRepository;
 
-    public VerificationService(VerificationTokenRepository verificationTokenRepository, UserRepository userRepository) {
+
+    public VerificationService(VerificationTokenRepository verificationTokenRepository, VerificationTokenRepository2 verificationTokenRepository2, TokenGenerator tokenGenerator, UserRepository userRepository) {
         this.verificationTokenRepository = verificationTokenRepository;
+        this.verificationTokenRepository2 = verificationTokenRepository2;
+        this.tokenGenerator = tokenGenerator;
         this.userRepository = userRepository;
     }
 
@@ -41,5 +46,12 @@ public class VerificationService {
             throw new CustomException("이미 인증된 사용자입니다.");
         }
         user.setEnabled();
+    }
+
+    @Transactional
+    public String createToken2(VerificationEmailRequest request) {
+        String token = tokenGenerator.createToken();
+        verificationTokenRepository2.save(new VerificationToken2(request.getEmail(), token));
+        return token;
     }
 }
