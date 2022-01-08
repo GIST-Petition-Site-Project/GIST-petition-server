@@ -1,5 +1,6 @@
 package com.example.gistcompetitioncnserver.post;
 
+import com.example.gistcompetitioncnserver.exception.post.NoSuchPostException;
 import com.example.gistcompetitioncnserver.exception.post.PostException;
 import com.example.gistcompetitioncnserver.user.User;
 import com.example.gistcompetitioncnserver.user.UserRepository;
@@ -73,7 +74,7 @@ public class PostServiceTest {
 
         LocalDateTime initialTime = post.getUpdatedAt();
 
-        assertThatThrownBy(() -> postService.updatePostDescription(Long.MAX_VALUE, "updated")).isInstanceOf(PostException.class);
+        assertThatThrownBy(() -> postService.updatePostDescription(Long.MAX_VALUE, "updated")).isInstanceOf(NoSuchPostException.class);
 
         Post updatedPost = postRepository.findById(postId).orElseThrow(IllegalArgumentException::new);
         LocalDateTime updatedTime = updatedPost.getUpdatedAt();
@@ -132,7 +133,7 @@ public class PostServiceTest {
         Post post = postRepository.save(new Post("title", "description", "category", user.getId()));
         assertThatThrownBy(
                 () -> postService.deletePost(Long.MAX_VALUE)
-        ).isInstanceOf(PostException.class);
+        ).isInstanceOf(NoSuchPostException.class);
     }
 
     @AfterEach

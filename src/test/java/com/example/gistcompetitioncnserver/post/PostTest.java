@@ -1,5 +1,6 @@
 package com.example.gistcompetitioncnserver.post;
 
+import com.example.gistcompetitioncnserver.exception.post.DuplicatedAgreementException;
 import com.example.gistcompetitioncnserver.exception.post.PostException;
 import com.example.gistcompetitioncnserver.user.User;
 import com.example.gistcompetitioncnserver.user.UserRole;
@@ -31,7 +32,7 @@ class PostTest {
         post.applyAgreement(user);
         assertThatThrownBy(
                 () -> post.applyAgreement(user)
-        ).isInstanceOf(PostException.class);
+        ).isInstanceOf(DuplicatedAgreementException.class);
     }
 
     @Test
