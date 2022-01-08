@@ -59,7 +59,7 @@ class AnswerServiceTest {
         assertThat(answer.getUserId()).isEqualTo(adminUserId);
         assertThat(answer.getPostId()).isEqualTo(postId);
 
-        Post post = postRepository.findById(postId).orElseThrow(() -> new CustomException("존재하지 않는 post입니다"));
+        Post post = postRepository.findById(postId).orElseThrow(NoSuchPostException::new);
         assertTrue(post.isAnswered());
     }
 
@@ -75,7 +75,7 @@ class AnswerServiceTest {
         assertThat(answer.getUserId()).isEqualTo(managerUserId);
         assertThat(answer.getPostId()).isEqualTo(postId);
 
-        Post post = postRepository.findById(postId).orElseThrow(() -> new CustomException("존재하지 않는 post입니다"));
+        Post post = postRepository.findById(postId).orElseThrow(NoSuchPostException::new);
         assertTrue(post.isAnswered());
     }
 
