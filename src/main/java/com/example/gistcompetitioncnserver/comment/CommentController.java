@@ -1,10 +1,8 @@
 package com.example.gistcompetitioncnserver.comment;
 
 
-import com.example.gistcompetitioncnserver.exception.CustomException;
+import com.example.gistcompetitioncnserver.exception.user.NotConfirmedEmailException;
 import com.example.gistcompetitioncnserver.user.SessionUser;
-import com.example.gistcompetitioncnserver.user.User;
-import com.example.gistcompetitioncnserver.user.UserRole;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -26,7 +24,7 @@ public class CommentController {
 
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
         if (!sessionUser.getEnabled()) {
-            throw new CustomException("이메일 인증이 필요합니다!");
+            throw new NotConfirmedEmailException();
         }
         Long commentId = commentService.createComment(postId, commentRequest, sessionUser.getId());
         return ResponseEntity.created(URI.create("/posts/" + postId + "/comments/" + commentId)).build();
@@ -43,9 +41,9 @@ public class CommentController {
                                                 @Validated @RequestBody CommentRequest updateRequest) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
         if (!sessionUser.getEnabled()) {
-            throw new CustomException("이메일 인증이 필요합니다!");
+            throw new NotConfirmedEmailException();
         }
-        commentService.updateComment(sessionUser.getId(),sessionUser.getUserRole(),commentId, updateRequest);
+        commentService.updateComment(sessionUser.getId(), sessionUser.getUserRole(), commentId, updateRequest);
         return ResponseEntity.noContent().build();
     }
 
@@ -54,9 +52,9 @@ public class CommentController {
                                                 @PathVariable Long commentId) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
         if (!sessionUser.getEnabled()) {
-            throw new CustomException("이메일 인증이 필요합니다!");
+            throw new NotConfirmedEmailException();
         }
-        commentService.deleteComment(sessionUser.getId(),sessionUser.getUserRole(),commentId);
+        commentService.deleteComment(sessionUser.getId(), sessionUser.getUserRole(), commentId);
         return ResponseEntity.noContent().build();
     }
 }

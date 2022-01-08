@@ -1,9 +1,9 @@
 package com.example.gistcompetitioncnserver.comment;
 
-import com.example.gistcompetitioncnserver.exception.CustomException;
+import com.example.gistcompetitioncnserver.exception.comment.NoSuchCommentException;
+import com.example.gistcompetitioncnserver.exception.post.NoSuchPostException;
+import com.example.gistcompetitioncnserver.exception.user.UnAuthorizedUserException;
 import com.example.gistcompetitioncnserver.post.PostRepository;
-import com.example.gistcompetitioncnserver.user.User;
-import com.example.gistcompetitioncnserver.user.UserRepository;
 import com.example.gistcompetitioncnserver.user.UserRole;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,7 +34,7 @@ public class CommentService {
     @Transactional(readOnly = true)
     public List<Comment> getCommentsByPostId(Long postId) {
         if (!postRepository.existsById(postId)) {
-            throw new CustomException("존재하지 않는 Post입니다");
+            throw new NoSuchPostException();
         }
         return commentRepository.findByPostId(postId);
     }
@@ -43,7 +43,7 @@ public class CommentService {
     public void updateComment(Long updaterId, UserRole userRole , Long commentId, CommentRequest changeRequest) {
         Comment comment = findCommentById(commentId);
         if (!comment.getUserId().equals(updaterId) && userRole != UserRole.ADMIN && userRole !=UserRole.MANAGER ) {
-            throw new CustomException("댓글 수정 권한이 없습니다");
+            throw new UnAuthorizedUserException();
         }
         comment.updateContent(changeRequest.getContent());
     }
@@ -52,18 +52,18 @@ public class CommentService {
     public void deleteComment(Long eraserId, UserRole userRole ,Long commentId) {
         Comment comment = findCommentById(commentId);
         if (!comment.getUserId().equals(eraserId) && userRole != UserRole.ADMIN && userRole !=UserRole.MANAGER ) {
-            throw new CustomException("댓글 삭제 권한이 없습니다");
+            throw new UnAuthorizedUserException();
         }
         commentRepository.deleteById(commentId);
     }
 
     private Comment findCommentById(Long commentId) {
         return commentRepository.findById(commentId)
-                .orElseThrow(() -> new CustomException("존재하지 않는 Comment 입니다"));
+                .orElseThrow(NoSuchCommentException::new);
     }
     private void checkExistenceByPostId(Long postId) {
         if (!postRepository.existsById(postId)) {
-            throw new CustomException("존재하지 않는 post입니다");
+            throw new NoSuchPostException();
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.example.gistcompetitioncnserver.comment;
 
-import com.example.gistcompetitioncnserver.exception.CustomException;
+import com.example.gistcompetitioncnserver.exception.post.NoSuchPostException;
+import com.example.gistcompetitioncnserver.exception.user.UnAuthorizedUserException;
 import com.example.gistcompetitioncnserver.post.Post;
 import com.example.gistcompetitioncnserver.post.PostRepository;
 import com.example.gistcompetitioncnserver.user.User;
@@ -67,7 +68,7 @@ class CommentServiceTest {
         Long fakePostId = Long.MAX_VALUE;
         assertThatThrownBy(
                 () -> commentService.createComment(fakePostId, commentRequest, USER_ID)
-        ).isInstanceOf(CustomException.class);
+        ).isInstanceOf(NoSuchPostException.class);
     }
 
     @Test
@@ -88,7 +89,7 @@ class CommentServiceTest {
         Long fakePostId = Long.MAX_VALUE;
         assertThatThrownBy(
                 () -> commentService.getCommentsByPostId(fakePostId)
-        ).isInstanceOf(CustomException.class);
+        ).isInstanceOf(NoSuchPostException.class);
     }
 
     @Test
@@ -111,7 +112,7 @@ class CommentServiceTest {
 
         assertThatThrownBy(
                 () -> commentService.updateComment(other.getId(), UserRole.USER, savedCommentId, updateRequest)
-        ).isInstanceOf(CustomException.class);
+        ).isInstanceOf(UnAuthorizedUserException.class);
     }
     @Test
     void updateCommentByOtherManger() {
@@ -142,7 +143,7 @@ class CommentServiceTest {
 
         assertThatThrownBy(
                 () -> commentService.deleteComment(other.getId(), UserRole.USER, savedContentId)
-        ).isInstanceOf(CustomException.class);
+        ).isInstanceOf(UnAuthorizedUserException.class);
     }
     @Test
     void deleteByOtherManager() {
