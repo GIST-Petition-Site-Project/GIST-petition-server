@@ -1,7 +1,6 @@
 package com.example.gistcompetitioncnserver.user;
 
 import com.example.gistcompetitioncnserver.exception.CustomException;
-import com.example.gistcompetitioncnserver.verification.VerificationTokenRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,8 +31,6 @@ class UserServiceTest {
     private UserService userService;
     @Autowired
     private UserRepository userRepository;
-    @Autowired
-    private VerificationTokenRepository verificationTokenRepository;
     @Autowired
     private Encryptor encoder;
     @Autowired
@@ -194,7 +191,6 @@ class UserServiceTest {
 
     @AfterEach
     void tearDown() {
-        verificationTokenRepository.deleteAllInBatch();
         userRepository.deleteAllInBatch();
     }
 }
