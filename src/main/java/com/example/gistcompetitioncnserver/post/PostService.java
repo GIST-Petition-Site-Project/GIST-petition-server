@@ -64,7 +64,7 @@ public class PostService {
 
     @Transactional
     public void deletePost(Long postId) {
-        if (postRepository.existsById(postId)) {
+        if (!postRepository.existsById(postId)) {
             throw new CustomException(ErrorCase.NO_SUCH_POST_ERROR);
         }
         commentRepository.deleteByPostId(postId);
