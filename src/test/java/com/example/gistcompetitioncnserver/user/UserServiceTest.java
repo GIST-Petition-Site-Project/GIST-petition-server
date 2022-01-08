@@ -31,7 +31,7 @@ class UserServiceTest {
     @Autowired
     private VerificationTokenRepository verificationTokenRepository;
     @Autowired
-    private BcryptEncoder encoder;
+    private Encryptor encoder;
     @Autowired
     private HttpSession httpSession;
 
@@ -102,6 +102,56 @@ class UserServiceTest {
         assertThat(httpSession.getAttribute("user")).isNull();
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {"manager", "Manager", "MANAGER"})
+    void updateUserRoleToManager(String inputUserRole) {
+        SignUpRequest signUpRequest = new SignUpRequest(GIST_EMAIL, PASSWORD);
+        Long userId = userService.signUp(signUpRequest);
+
+        UpdateUserRoleRequest userRoleRequest = new UpdateUserRoleRequest(inputUserRole);
+        userService.updateUserRole(userId, userRoleRequest);
+
+        User user = userRepository.findById(userId).orElseThrow(IllegalArgumentException::new);
+        assertThat(user.getUserRole()).isEqualTo(UserRole.MANAGER);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"admin", "Admin", "ADMIN"})
+    void updateUserRoleToAdmin(String inputUserRole) {
+        SignUpRequest signUpRequest = new SignUpRequest(GIST_EMAIL, PASSWORD);
+        Long userId = userService.signUp(signUpRequest);
+
+        UpdateUserRoleRequest userRoleRequest = new UpdateUserRoleRequest(inputUserRole);
+        userService.updateUserRole(userId, userRoleRequest);
+
+        User user = userRepository.findById(userId).orElseThrow(IllegalArgumentException::new);
+        assertThat(user.getUserRole()).isEqualTo(UserRole.ADMIN);
+    }
+
+    @Test
+    void updateUserPassword() {
+        SignUpRequest signUpRequest = new SignUpRequest(GIST_EMAIL, PASSWORD);
+        Long userId = userService.signUp(signUpRequest);
+
+        UpdatePasswordRequest updatePasswordRequest = new UpdatePasswordRequest(PASSWORD, "newPassword");
+        userService.updatePassword(userId, updatePasswordRequest);
+
+        User user = userRepository.findById(userId).orElseThrow(IllegalArgumentException::new);
+        assertTrue(encoder.isMatch(updatePasswordRequest.getNewPassword(), user.getPassword()));
+    }
+
+    @Test
+    void updateFailIfInvalidOriginPassword() {
+        SignUpRequest signUpRequest = new SignUpRequest(GIST_EMAIL, PASSWORD);
+        Long userId = userService.signUp(signUpRequest);
+
+        UpdatePasswordRequest invalidRequest = new UpdatePasswordRequest("InvalidPassword", "newPassword");
+
+        assertThatThrownBy(
+                () -> userService.updatePassword(userId, invalidRequest)
+        ).isInstanceOf(CustomException.class);
+    }
+
     @Test
     void deleteUser() {
         SignUpRequest signUpRequest = new SignUpRequest(GIST_EMAIL, PASSWORD);
@@ -117,6 +167,27 @@ class UserServiceTest {
         Long notExistedId = Long.MAX_VALUE;
 
         assertThatThrownBy(() -> userService.deleteUser(notExistedId)).isInstanceOf(NoSuchUserException.class);
+    }
+
+
+    @Test
+    void deleteUserOfMine() {
+        SignUpRequest signUpRequest = new SignUpRequest(GIST_EMAIL, PASSWORD);
+        Long userId = userService.signUp(signUpRequest);
+
+        userService.deleteUserOfMine(userId, new DeleteUserRequest(signUpRequest.getPassword()));
+
+        assertFalse(userRepository.existsById(userId));
+    }
+
+    @Test
+    void deleteUserOfMineWithInvalidPassword() {
+        SignUpRequest signUpRequest = new SignUpRequest(GIST_EMAIL, PASSWORD);
+        Long userId = userService.signUp(signUpRequest);
+
+        assertThatThrownBy(
+                () -> userService.deleteUserOfMine(userId, new DeleteUserRequest("notPassword"))
+        ).isInstanceOf(CustomException.class);
     }
 
     @AfterEach

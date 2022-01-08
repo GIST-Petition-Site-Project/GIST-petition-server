@@ -45,7 +45,7 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public Post retrievePost(Long postId) {
-        return findPostById(postId);
+        return postRepository.findById(postId).orElseThrow(() -> new CustomException(ErrorCase.NO_SUCH_POST_ERROR));
     }
 
     @Transactional(readOnly = true)
@@ -60,13 +60,15 @@ public class PostService {
 
     @Transactional
     public void updatePostDescription(Long postId, String description) {
-        Post post = findPostById(postId);
+        Post post = postRepository.findById(postId).orElseThrow(() -> new CustomException(ErrorCase.NO_SUCH_POST_ERROR));
         post.setDescription(description);
     }
 
     @Transactional
     public void deletePost(Long postId) {
-        Post post = findPostById(postId);
+        if (!postRepository.existsById(postId)) {
+            throw new CustomException(ErrorCase.NO_SUCH_POST_ERROR);
+        }
         commentRepository.deleteByPostId(postId);
         postRepository.deleteById(postId);
     }
@@ -74,20 +76,20 @@ public class PostService {
 
     @Transactional
     public Boolean agree(Long postId, Long userId) {
-        Post post = findPostById(postId);
+        Post post = postRepository.findById(postId).orElseThrow(() -> new CustomException(ErrorCase.NO_SUCH_POST_ERROR));
         User user = findUserById(userId);
         return post.applyAgreement(user);
     }
 
     @Transactional(readOnly = true)
     public int getNumberOfAgreements(Long id) {
-        Post post = findPostById(id);
+        Post post = postRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCase.NO_SUCH_POST_ERROR));
         return post.getAgreements().size();
     }
 
     @Transactional(readOnly = true)
     public Boolean getStateOfAgreement(Long postId, Long userId) {
-        Post post = findPostById(postId);
+        Post post = postRepository.findById(postId).orElseThrow(() -> new CustomException(ErrorCase.NO_SUCH_POST_ERROR));
         User user = findUserById(userId);
         return post.isAgreedBy(user);
     }
@@ -95,7 +97,6 @@ public class PostService {
     private User findUserById(Long userId) {
         return userRepository.findById(userId).orElseThrow(NoSuchUserException::new);
     }
-
     private Post findPostById(Long postId) {
         return postRepository.findById(postId).orElseThrow(NoSuchPostException::new);
     }

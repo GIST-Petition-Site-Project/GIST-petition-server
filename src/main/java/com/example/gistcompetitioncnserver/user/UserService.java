@@ -67,9 +67,33 @@ public class UserService {
     }
 
     @Transactional
+    public void updateUserRole(Long userId, UpdateUserRoleRequest userRoleRequest) {
+        User user = findUserById(userId);
+        user.setUserRole(UserRole.ignoringCaseValueOf(userRoleRequest.getUserRole()));
+    }
+
+    @Transactional
+    public void updatePassword(Long userId, UpdatePasswordRequest passwordRequest) {
+        User user = findUserById(userId);
+        if (!encryptor.isMatch(passwordRequest.getOriginPassword(), user.getPassword())) {
+            throw new CustomException("기존 패쓰워드가 일치하지 않습니다.");
+        }
+        user.setPassword(encryptor.hashPassword(passwordRequest.getNewPassword()));
+    }
+
+    @Transactional
     public void deleteUser(Long userId) {
         if (!userRepository.existsById(userId)) {
             throw new NoSuchUserException();
+        }
+        userRepository.deleteById(userId);
+    }
+
+    @Transactional
+    public void deleteUserOfMine(Long userId, DeleteUserRequest deleteUserRequest) {
+        User user = findUserById(userId);
+        if (!encryptor.isMatch(deleteUserRequest.getPassword(), user.getPassword())) {
+            throw new CustomException("기존 패쓰워드가 일치하지 않습니다.");
         }
         userRepository.deleteById(userId);
     }

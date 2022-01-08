@@ -20,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
-@ActiveProfiles(profiles = "test")
 public class PostServiceTest {
     private static final PostRequest POST_REQUEST_DTO = new PostRequest("title", "description", "category");
     @Autowired
@@ -32,30 +31,28 @@ public class PostServiceTest {
     @Autowired
     private AgreementRepository agreementRepository;
 
-    private User user;
-    private User admin;
+    private User postOwner;
 
     @BeforeEach
     void setUp() {
-        user = userRepository.save(new User("email@email.com", "password", UserRole.USER));
-        admin = userRepository.save(new User("admin@admin.com", "password", UserRole.ADMIN));
+        postOwner = userRepository.save(new User("email@email.com", "password", UserRole.USER));
     }
 
     @Test
     void createPost() {
-        Long postId = postService.createPost(POST_REQUEST_DTO, user.getId());
+        Long postId = postService.createPost(POST_REQUEST_DTO, postOwner.getId());
         Post post = postRepository.findById(postId).orElseThrow(IllegalArgumentException::new);
 
         assertThat(post.getTitle()).isEqualTo(POST_REQUEST_DTO.getTitle());
         assertThat(post.getDescription()).isEqualTo(POST_REQUEST_DTO.getDescription());
         assertThat(post.getCategory()).isEqualTo(POST_REQUEST_DTO.getCategory());
-        assertThat(post.getUserId()).isEqualTo(user.getId());
+        assertThat(post.getUserId()).isEqualTo(postOwner.getId());
         assertThat(post.getCreatedAt()).isNotNull();
     }
 
     @Test
     void updatePost() {
-        Long postId = postService.createPost(POST_REQUEST_DTO, user.getId());
+        Long postId = postService.createPost(POST_REQUEST_DTO, postOwner.getId());
         Post post = postRepository.findById(postId).orElseThrow(IllegalArgumentException::new);
 
         LocalDateTime initialTime = post.getUpdatedAt();
@@ -69,7 +66,7 @@ public class PostServiceTest {
 
     @Test
     void updatePostByNonExistentPostId() {
-        Long postId = postService.createPost(POST_REQUEST_DTO, user.getId());
+        Long postId = postService.createPost(POST_REQUEST_DTO, postOwner.getId());
         Post post = postRepository.findById(postId).orElseThrow(IllegalArgumentException::new);
 
         LocalDateTime initialTime = post.getUpdatedAt();
@@ -83,26 +80,26 @@ public class PostServiceTest {
 
     @Test
     void agree() {
-        Long postId = postService.createPost(POST_REQUEST_DTO, user.getId());
+        Long postId = postService.createPost(POST_REQUEST_DTO, postOwner.getId());
 
         Post post = postRepository.findPostByWithEagerMode(postId);
         assertThat(post.getAgreements()).hasSize(0);
 
-        postService.agree(postId, user.getId());
+        postService.agree(postId, postOwner.getId());
         post = postRepository.findPostByWithEagerMode(postId);
         assertThat(post.getAgreements()).hasSize(1);
     }
 
     @Test
     void numberOfAgreements() {
-        Long postId = postService.createPost(POST_REQUEST_DTO, this.user.getId());
+        Long postId = postService.createPost(POST_REQUEST_DTO, postOwner.getId());
 
         User user = userRepository.save(new User("email@email.com", "password", UserRole.USER));
         User user3 = userRepository.save(new User("email3@email.com", "password", UserRole.USER));
 
         assertThat(postService.getNumberOfAgreements(postId)).isEqualTo(0);
 
-        postService.agree(postId, this.user.getId());
+        postService.agree(postId, postOwner.getId());
         postService.agree(postId, user.getId());
         postService.agree(postId, user3.getId());
 
@@ -111,26 +108,25 @@ public class PostServiceTest {
 
     @Test
     void getStateOfAgreement() {
-        Long postId = postService.createPost(POST_REQUEST_DTO, user.getId());
+        Long postId = postService.createPost(POST_REQUEST_DTO, postOwner.getId());
+        assertThat(postService.getStateOfAgreement(postId, postOwner.getId())).isFalse();
 
-        assertThat(postService.getStateOfAgreement(postId, user.getId())).isFalse();
-        postService.agree(postId, user.getId());
+        postService.agree(postId, postOwner.getId());
 
-        assertThat(postService.getStateOfAgreement(postId, user.getId())).isTrue();
-        Agreement agreement = agreementRepository.findByUserId(user.getId()).orElseThrow(IllegalArgumentException::new);
+        assertThat(postService.getStateOfAgreement(postId, postOwner.getId())).isTrue();
+        Agreement agreement = agreementRepository.findByUserId(postOwner.getId()).orElseThrow(IllegalArgumentException::new);
         assertThat(agreement.getCreatedAt()).isNotNull();
     }
 
     @Test
     void deletePost() {
-        Post post = postRepository.save(new Post("title", "description", "category", user.getId()));
+        Post post = postRepository.save(new Post("title", "description", "category", postOwner.getId()));
         postService.deletePost(post.getId());
         assertFalse(postRepository.existsById(post.getId()));
     }
 
     @Test
     void deletePostByNonExistentPostId() {
-        Post post = postRepository.save(new Post("title", "description", "category", user.getId()));
         assertThatThrownBy(
                 () -> postService.deletePost(Long.MAX_VALUE)
         ).isInstanceOf(NoSuchPostException.class);

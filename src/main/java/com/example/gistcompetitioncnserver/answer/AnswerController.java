@@ -27,8 +27,9 @@ public class AnswerController {
         if (!sessionUser.getEnabled()) {
             throw new NotConfirmedEmailException();
         }
-        if (sessionUser.getUserRole() != UserRole.MANAGER && sessionUser.getUserRole() != UserRole.ADMIN) {
+        if (!sessionUser.hasManagerAuthority()) {
             throw new UnAuthorizedUserException();
+
         }
         Long answerId = answerService.createAnswer(postId, answerRequest, sessionUser.getId());
         return ResponseEntity.created(URI.create("/posts/" + postId + "/answer/" + answerId)).build();
@@ -51,8 +52,9 @@ public class AnswerController {
         if (!sessionUser.getEnabled()) {
             throw new NotConfirmedEmailException();
         }
-        if (sessionUser.getUserRole() != UserRole.MANAGER && sessionUser.getUserRole() != UserRole.ADMIN) {
+        if (!sessionUser.hasManagerAuthority()) {
             throw new UnAuthorizedUserException();
+
         }
         answerService.updateAnswer(postId, changeRequest);
         return ResponseEntity.ok().build();
@@ -64,7 +66,7 @@ public class AnswerController {
         if (!sessionUser.getEnabled()) {
             throw new NotConfirmedEmailException();
         }
-        if (sessionUser.getUserRole() != UserRole.MANAGER && sessionUser.getUserRole() != UserRole.ADMIN) {
+        if (!sessionUser.hasManagerAuthority()) {
             throw new UnAuthorizedUserException();
         }
         answerService.deleteAnswer(postId);

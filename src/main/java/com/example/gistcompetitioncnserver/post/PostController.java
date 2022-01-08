@@ -64,7 +64,7 @@ public class PostController {
         if (!sessionUser.getEnabled()) {
             throw new NotConfirmedEmailException();
         }
-        if (sessionUser.getUserRole() != UserRole.MANAGER && sessionUser.getUserRole() != UserRole.ADMIN) {
+        if (!sessionUser.hasManagerAuthority()) {
             throw new UnAuthorizedUserException();
         }
         postService.updatePostDescription(postId, changeRequest.getDescription());
@@ -77,7 +77,7 @@ public class PostController {
         if (!sessionUser.getEnabled()) {
             throw new NotConfirmedEmailException();
         }
-        if (sessionUser.getUserRole() != UserRole.MANAGER && sessionUser.getUserRole() != UserRole.ADMIN) {
+        if (!sessionUser.hasManagerAuthority()) {
             throw new UnAuthorizedUserException();
         }
         postService.deletePost(postId);

@@ -43,7 +43,11 @@ public class CommentController {
         if (!sessionUser.getEnabled()) {
             throw new NotConfirmedEmailException();
         }
-        commentService.updateComment(sessionUser.getId(), sessionUser.getUserRole(), commentId, updateRequest);
+        if (sessionUser.hasManagerAuthority()) {
+            commentService.updateComment(commentId, updateRequest);
+            return ResponseEntity.noContent().build();
+        }
+        commentService.updateCommentByOwner(sessionUser.getId(), commentId, updateRequest);
         return ResponseEntity.noContent().build();
     }
 
@@ -54,7 +58,11 @@ public class CommentController {
         if (!sessionUser.getEnabled()) {
             throw new NotConfirmedEmailException();
         }
-        commentService.deleteComment(sessionUser.getId(), sessionUser.getUserRole(), commentId);
+        if (sessionUser.hasManagerAuthority()) {
+            commentService.deleteComment(commentId);
+            return ResponseEntity.noContent().build();
+        }
+        commentService.deleteCommentByOwner(sessionUser.getId(), commentId);
         return ResponseEntity.noContent().build();
     }
 }
