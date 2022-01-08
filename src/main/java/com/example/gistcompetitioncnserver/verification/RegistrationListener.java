@@ -1,7 +1,7 @@
 package com.example.gistcompetitioncnserver.verification;
 
 import com.example.gistcompetitioncnserver.emailsender.EmailSender;
-import com.example.gistcompetitioncnserver.exception.CustomException;
+import com.example.gistcompetitioncnserver.exception.user.NoSuchUserException;
 import com.example.gistcompetitioncnserver.user.OnRegistrationCompleteEvent;
 import com.example.gistcompetitioncnserver.user.User;
 import com.example.gistcompetitioncnserver.user.UserRepository;
@@ -31,7 +31,7 @@ public class RegistrationListener implements ApplicationListener<OnRegistrationC
     }
 
     private void confirmRegistration(OnRegistrationCompleteEvent event) {
-        User user = userRepository.findById(event.getUserId()).orElseThrow(() -> new CustomException("존재하지 않는 사용자입니다."));
+        User user = userRepository.findById(event.getUserId()).orElseThrow(NoSuchUserException::new);
 
         String token = verificationService.createToken(user);
 
