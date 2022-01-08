@@ -36,9 +36,9 @@ public class VerificationService {
             throw new CustomException("만료된 토큰입니다.");
         }
 
-        User user = userRepository.findById(verificationToken.getUserId()).orElseThrow(() -> new CustomException("존재하지 않는 사용자입니다."));
+        User user = userRepository.findById(verificationToken.getUserId()).orElseThrow(NoSuchUserException::new);
         if (user.isEnabled()) {
-            throw new CustomException("이미 인증된 사용자입니다.");
+            throw new DuplicatedUserException();
         }
         user.setEnabled();
     }
