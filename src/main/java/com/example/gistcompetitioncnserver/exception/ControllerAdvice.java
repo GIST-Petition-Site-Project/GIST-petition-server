@@ -14,9 +14,9 @@ public class ControllerAdvice {
                 .body(new ErrorMessage(400, ex.getMessage()));
     }
 
-    @ExceptionHandler(PostException.class)
-    public ResponseEntity<String> handle(PostException ex) {
-        return ResponseEntity.status(ex.getHttpStatus()).body(ex.getMessage());
+    @ExceptionHandler(ApplicationException.class)
+    public ResponseEntity<String> handle(ApplicationException ex) {
+        return ResponseEntity.status(ex.getHttpStatus( )).body(ex.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
