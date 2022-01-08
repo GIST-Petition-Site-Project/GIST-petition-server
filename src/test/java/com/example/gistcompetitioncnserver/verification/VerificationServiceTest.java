@@ -1,6 +1,7 @@
 package com.example.gistcompetitioncnserver.verification;
 
 import com.example.gistcompetitioncnserver.exception.CustomException;
+import com.example.gistcompetitioncnserver.exception.user.DuplicatedUserException;
 import com.example.gistcompetitioncnserver.user.User;
 import com.example.gistcompetitioncnserver.user.UserRepository;
 import com.example.gistcompetitioncnserver.user.UserRole;
@@ -56,7 +57,7 @@ class VerificationServiceTest {
     void confirmAlreadyConfirmedUser() {
         VerificationToken alreadyConfirmedToken = tokenRepository.save(new VerificationToken(TOKEN, enabledUser.getId(), LocalDateTime.now().plusMinutes(10)));
 
-        assertThatThrownBy(() -> tokenService.confirm(alreadyConfirmedToken.getToken())).isInstanceOf(CustomException.class);
+        assertThatThrownBy(() -> tokenService.confirm(alreadyConfirmedToken.getToken())).isInstanceOf(DuplicatedUserException.class);
     }
 
     @AfterEach
