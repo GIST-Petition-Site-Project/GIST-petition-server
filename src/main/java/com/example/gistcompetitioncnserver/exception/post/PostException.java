@@ -1,17 +1,10 @@
 package com.example.gistcompetitioncnserver.exception.post;
 
+import com.example.gistcompetitioncnserver.exception.ApplicationException;
 import org.springframework.http.HttpStatus;
 
-public class PostException extends RuntimeException {
-
-    private final HttpStatus httpStatus;
-
+public class PostException extends ApplicationException {
     public PostException(String message, HttpStatus httpStatus) {
-        super(message);
-        this.httpStatus = httpStatus;
-    }
-
-    public HttpStatus getHttpStatus() {
-        return httpStatus;
+        super(message, httpStatus);
     }
 }

@@ -2,11 +2,11 @@ package com.example.gistcompetitioncnserver.exception.post;
 
 import org.springframework.http.HttpStatus;
 
-public class DuplicatedAgreementException extends PostException {
-    private static final String MESSAGE = "이미 동의하셨습니다.";
+public class NoSuchPostException extends PostException {
+    private static final String MESSAGE = "존재하지 않는 청원입니다.";
     private static final HttpStatus HTTP_STATUS = null;
 
-    public DuplicatedAgreementException() {
+    public NoSuchPostException() {
         super(MESSAGE, HTTP_STATUS);
     }
 }
