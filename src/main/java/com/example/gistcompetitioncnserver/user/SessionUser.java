@@ -16,6 +16,10 @@ public class SessionUser implements Serializable {
         this.enabled = user.isEnabled();
     }
 
+    public boolean isAdmin() {
+        return userRole == UserRole.ADMIN;
+    }
+  
     public boolean hasManagerAuthority() {
         return userRole == UserRole.MANAGER || userRole == UserRole.ADMIN;
     }

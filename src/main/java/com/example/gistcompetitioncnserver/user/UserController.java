@@ -1,5 +1,6 @@
 package com.example.gistcompetitioncnserver.user;
 
+import com.example.gistcompetitioncnserver.exception.CustomException;
 import lombok.AllArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
@@ -41,17 +42,81 @@ public class UserController {
 
     @GetMapping("/users")
     public ResponseEntity<List<User>> retrieveAllUsers() {
+        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
+        if (!sessionUser.getEnabled()) {
+            throw new CustomException("이메일 인증이 필요합니다!");
+        }
+        if (!sessionUser.isAdmin()) {
+            throw new CustomException("회원 정보 조회 권한이 없습니다.");
+        }
         return ResponseEntity.ok().body(userService.findAllUsers());
     }
 
     @GetMapping("/users/{userId}")
     public ResponseEntity<User> retrieveUser(@PathVariable Long userId) {
+        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
+        if (!sessionUser.getEnabled()) {
+            throw new CustomException("이메일 인증이 필요합니다!");
+        }
+        if (!sessionUser.isAdmin()) {
+            throw new CustomException("회원 정보 조회 권한이 없습니다.");
+        }
         return ResponseEntity.ok().body(userService.findUserById(userId));
+    }
+
+    @GetMapping("/users/me")
+    public ResponseEntity<User> retrieveUserOfMine() {
+        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
+        if (!sessionUser.getEnabled()) {
+            throw new CustomException("이메일 인증이 필요합니다!");
+        }
+        return ResponseEntity.ok().body(userService.findUserById(sessionUser.getId()));
+    }
+
+    @PutMapping("/users/{userId}/userRole")
+    public ResponseEntity<Void> updateUserRole(@PathVariable Long userId,
+                                               @Validated @RequestBody UpdateUserRoleRequest userRoleRequest) {
+        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
+        if (!sessionUser.getEnabled()) {
+            throw new CustomException("이메일 인증이 필요합니다!");
+        }
+        if (!sessionUser.isAdmin()) {
+            throw new CustomException("유저 권한을 수정할 권한이 없습니다.");
+        }
+        userService.updateUserRole(userId, userRoleRequest);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/users/me/password")
+    public ResponseEntity<Void> updatePasswordOfMine(@Validated @RequestBody UpdatePasswordRequest passwordRequest) {
+        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
+        if (!sessionUser.getEnabled()) {
+            throw new CustomException("이메일 인증이 필요합니다!");
+        }
+        userService.updatePassword(sessionUser.getId(), passwordRequest);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/users/{userId}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long userId) {
+        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
+        if (!sessionUser.getEnabled()) {
+            throw new CustomException("이메일 인증이 필요합니다!");
+        }
+        if (!sessionUser.isAdmin()) {
+            throw new CustomException("삭제할 권한이 없습니다.");
+        }
         userService.deleteUser(userId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/users/me")
+    public ResponseEntity<Void> deleteUserOfMine(@Validated @RequestBody DeleteUserRequest deleteUserRequest) {
+        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
+        if (!sessionUser.getEnabled()) {
+            throw new CustomException("이메일 인증이 필요합니다!");
+        }
+        userService.deleteUserOfMine(sessionUser.getId(), deleteUserRequest);
         return ResponseEntity.noContent().build();
     }
 }
