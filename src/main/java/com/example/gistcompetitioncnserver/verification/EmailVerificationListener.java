@@ -33,6 +33,6 @@ public class EmailVerificationListener implements ApplicationListener<EmailVerif
     private String generateMailBody(String token) {
         Context context = new Context();
         context.setVariable("token", token);
-        return springTemplateEngine.process("email-verification2.html", context);
+        return springTemplateEngine.process("email-verification.html", context);
     }
 }
