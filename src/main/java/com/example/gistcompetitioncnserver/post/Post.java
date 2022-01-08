@@ -18,6 +18,7 @@ public class Post extends BaseEntity {
     @GeneratedValue
     private Long id;
     private String title;
+    @Lob
     private String description;
     private String category;
     private boolean answered;
