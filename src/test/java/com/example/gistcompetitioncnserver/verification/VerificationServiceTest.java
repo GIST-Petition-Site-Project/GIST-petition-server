@@ -13,7 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDateTime;
 
-import static com.example.gistcompetitioncnserver.verification.VerificationInfo.EXPIRE_MINUTE;
+import static com.example.gistcompetitioncnserver.verification.VerificationInfo.CONFIRM_EXPIRE_MINUTE;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -119,7 +119,7 @@ class VerificationServiceTest {
 
     @Test
     void confirmVerificationCodeWhenExpired() {
-        LocalDateTime expiredCreatedTime = LocalDateTime.now().minusMinutes(EXPIRE_MINUTE + 1);
+        LocalDateTime expiredCreatedTime = LocalDateTime.now().minusMinutes(CONFIRM_EXPIRE_MINUTE + 1);
         verificationInfoRepository.save(new VerificationInfo(null, GIST_EMAIL, VERIFICATION_CODE, expiredCreatedTime, null));
 
         UsernameConfirmationRequest expiredInfoRequest = new UsernameConfirmationRequest(GIST_EMAIL, VERIFICATION_CODE);

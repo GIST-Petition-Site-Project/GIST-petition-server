@@ -1,5 +1,6 @@
 package com.example.gistcompetitioncnserver.verification;
 
+import com.example.gistcompetitioncnserver.exception.CustomException;
 import lombok.Getter;
 
 import javax.persistence.Entity;
@@ -12,7 +13,8 @@ import java.util.Objects;
 @Entity
 @Getter
 public class VerificationInfo {
-    public static final int EXPIRE_MINUTE = 15;
+    public static final int CONFIRM_EXPIRE_MINUTE = 15;
+    public static final int SIGN_UP_EXPIRE_MINUTE = 60;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,14 +40,22 @@ public class VerificationInfo {
     }
 
     public boolean isValidToConfirm(LocalDateTime time) {
-        return time.isAfter(createdAt) && time.isBefore(createdAt.plusMinutes(EXPIRE_MINUTE));
+        return time.isAfter(createdAt) && time.isBefore(createdAt.plusMinutes(CONFIRM_EXPIRE_MINUTE));
     }
 
     public boolean isConfirmed() {
         return Objects.nonNull(confirmedAt);
     }
 
+    public boolean isValidToSignUp(LocalDateTime time) {
+        if(!isConfirmed()){
+            throw new CustomException("인증 되지 않은 코드입니다.");
+        }
+        return time.isAfter(confirmedAt) && time.isBefore(confirmedAt.plusMinutes(SIGN_UP_EXPIRE_MINUTE));
+    }
+
     public void confirm() {
         confirmedAt = LocalDateTime.now();
     }
+
 }
