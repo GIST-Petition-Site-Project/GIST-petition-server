@@ -73,7 +73,7 @@ public class VerificationService {
         VerificationInfo info = verificationInfoRepository.findByUsernameAndVerificationCode(username, verificationCode)
                 .orElseThrow(() -> new CustomException("존재하지 않는 인증 정보입니다."));
 
-        if (info.isExpiredAt(LocalDateTime.now())) {
+        if (!info.isValidToConfirm(LocalDateTime.now())) {
             throw new CustomException("만료된 인증 코드입니다.");
         }
 
