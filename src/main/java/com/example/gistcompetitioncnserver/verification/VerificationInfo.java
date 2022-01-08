@@ -1,5 +1,7 @@
 package com.example.gistcompetitioncnserver.verification;
 
+import lombok.Getter;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -7,29 +9,30 @@ import javax.persistence.Id;
 import java.time.LocalDateTime;
 
 @Entity
-public class VerificationToken2 {
+@Getter
+public class VerificationInfo {
     private static final int EXPIRE_MINUTE = 15;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String email;
-    private String token;
+    private String username;
+    private String verificationCode;
     private Boolean confirmed;
     private LocalDateTime createdAt;
     private LocalDateTime confirmedAt;
 
-    public VerificationToken2() {
+    public VerificationInfo() {
     }
 
-    public VerificationToken2(String email, String token) {
-        this(null, email, token, false, LocalDateTime.now(), null);
+    public VerificationInfo(String username, String verificationCode) {
+        this(null, username, verificationCode, false, LocalDateTime.now(), null);
     }
 
-    private VerificationToken2(Long id, String email, String token, Boolean confirmed, LocalDateTime createdAt, LocalDateTime confirmedAt) {
+    private VerificationInfo(Long id, String username, String verificationCode, Boolean confirmed, LocalDateTime createdAt, LocalDateTime confirmedAt) {
         this.id = id;
-        this.email = email;
-        this.token = token;
+        this.username = username;
+        this.verificationCode = verificationCode;
         this.confirmed = confirmed;
         this.createdAt = createdAt;
         this.confirmedAt = confirmedAt;

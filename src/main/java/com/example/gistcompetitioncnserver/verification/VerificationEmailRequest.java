@@ -1,16 +1,16 @@
 package com.example.gistcompetitioncnserver.verification;
 
 public class VerificationEmailRequest {
-    private String email;
+    private String username;
 
     public VerificationEmailRequest() {
     }
 
-    public VerificationEmailRequest(String email) {
-        this.email = email;
+    public VerificationEmailRequest(String username) {
+        this.username = username;
     }
 
-    public String getEmail() {
-        return email;
+    public String getUsername() {
+        return username;
     }
 }

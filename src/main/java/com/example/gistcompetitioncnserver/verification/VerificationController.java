@@ -1,7 +1,6 @@
 package com.example.gistcompetitioncnserver.verification;
 
 import lombok.AllArgsConstructor;
-import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,8 +21,8 @@ public class VerificationController {
 
     @PostMapping("/verification-email")
     public ResponseEntity<Void> createVerificationToken(@RequestBody VerificationEmailRequest request){
-        String token = verificationService.createToken2(request);
-        publisher.publishEvent(new EmailVerificationEvent(request.getEmail(), token));
+        String token = verificationService.createVerificationInfo(request);
+        publisher.publishEvent(new EmailVerificationEvent(request.getUsername(), token));
         return ResponseEntity.noContent().build();
     }
 

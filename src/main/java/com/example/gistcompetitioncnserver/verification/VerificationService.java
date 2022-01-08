@@ -1,6 +1,8 @@
 package com.example.gistcompetitioncnserver.verification;
 
 import com.example.gistcompetitioncnserver.exception.CustomException;
+import com.example.gistcompetitioncnserver.user.EmailDomain;
+import com.example.gistcompetitioncnserver.user.EmailParser;
 import com.example.gistcompetitioncnserver.user.User;
 import com.example.gistcompetitioncnserver.user.UserRepository;
 import org.springframework.stereotype.Service;
@@ -13,15 +15,15 @@ import java.util.UUID;
 public class VerificationService {
 
     private final VerificationTokenRepository verificationTokenRepository;
-    private final VerificationTokenRepository2 verificationTokenRepository2;
-    private final TokenGenerator tokenGenerator;
+    private final VerificationInfoRepository verificationInfoRepository;
+    private final VerificationCodeGenerator verificationCodeGenerator;
     private final UserRepository userRepository;
 
 
-    public VerificationService(VerificationTokenRepository verificationTokenRepository, VerificationTokenRepository2 verificationTokenRepository2, TokenGenerator tokenGenerator, UserRepository userRepository) {
+    public VerificationService(VerificationTokenRepository verificationTokenRepository, VerificationInfoRepository verificationInfoRepository, VerificationCodeGenerator verificationCodeGenerator, UserRepository userRepository) {
         this.verificationTokenRepository = verificationTokenRepository;
-        this.verificationTokenRepository2 = verificationTokenRepository2;
-        this.tokenGenerator = tokenGenerator;
+        this.verificationInfoRepository = verificationInfoRepository;
+        this.verificationCodeGenerator = verificationCodeGenerator;
         this.userRepository = userRepository;
     }
 
@@ -49,9 +51,17 @@ public class VerificationService {
     }
 
     @Transactional
-    public String createToken2(VerificationEmailRequest request) {
-        String token = tokenGenerator.createToken();
-        verificationTokenRepository2.save(new VerificationToken2(request.getEmail(), token));
+    public String createVerificationInfo(VerificationEmailRequest request) {
+        String username = request.getUsername();
+        if (userRepository.existsByUsername(username)) {
+            throw new CustomException("이미 존재하는 회원입니다");
+        }
+        if (!EmailDomain.has(EmailParser.parseDomainFrom(username))) {
+            throw new CustomException("유효하지 않은 이메일 형태입니다");
+        }
+
+        String token = verificationCodeGenerator.generate();
+        verificationInfoRepository.save(new VerificationInfo(username, token));
         return token;
     }
 }

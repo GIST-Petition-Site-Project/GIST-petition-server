@@ -3,9 +3,9 @@ package com.example.gistcompetitioncnserver.verification;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TokenGeneratorImpl implements TokenGenerator {
+public class VerificationCodeGeneratorImpl implements VerificationCodeGenerator {
     @Override
-    public String createToken() {
+    public String generate() {
         return "AAAAAA";
     }
 }
