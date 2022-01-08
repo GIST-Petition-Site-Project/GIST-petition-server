@@ -4,6 +4,8 @@ package com.example.gistcompetitioncnserver.post;
 import com.example.gistcompetitioncnserver.comment.CommentRepository;
 import com.example.gistcompetitioncnserver.exception.CustomException;
 import com.example.gistcompetitioncnserver.exception.ErrorCase;
+import com.example.gistcompetitioncnserver.exception.post.NoSuchPostException;
+import com.example.gistcompetitioncnserver.exception.user.NoSuchUserException;
 import com.example.gistcompetitioncnserver.user.User;
 import com.example.gistcompetitioncnserver.user.UserRepository;
 import lombok.AllArgsConstructor;
@@ -91,10 +93,10 @@ public class PostService {
     }
 
     private User findUserById(Long userId) {
-        return userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCase.NO_SUCH_USER_ERROR));
+        return userRepository.findById(userId).orElseThrow(NoSuchUserException::new);
     }
 
     private Post findPostById(Long postId) {
-        return postRepository.findById(postId).orElseThrow(() -> new CustomException(ErrorCase.NO_SUCH_POST_ERROR));
+        return postRepository.findById(postId).orElseThrow(NoSuchPostException::new);
     }
 }
