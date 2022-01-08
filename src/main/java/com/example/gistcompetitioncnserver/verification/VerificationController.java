@@ -19,11 +19,16 @@ public class VerificationController {
         return ResponseEntity.ok().body("인증되었습니다.");
     }
 
-    @PostMapping("/verification-email")
-    public ResponseEntity<Void> createVerificationToken(@RequestBody VerificationEmailRequest request){
+    @PostMapping("/username/verifications")
+    public ResponseEntity<Void> createVerificationCode(@RequestBody VerificationEmailRequest request){
         String token = verificationService.createVerificationInfo(request);
         publisher.publishEvent(new EmailVerificationEvent(request.getUsername(), token));
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/username/confirm")
+    public ResponseEntity<Void> confirmVerificationCode(@RequestBody UsernameConfirmationRequest request){
+        verificationService.confirmUsername(request);
+        return ResponseEntity.noContent().build();
+    }
 }

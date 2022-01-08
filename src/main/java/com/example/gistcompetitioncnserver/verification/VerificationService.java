@@ -64,4 +64,22 @@ public class VerificationService {
         verificationInfoRepository.save(new VerificationInfo(username, token));
         return token;
     }
+
+    @Transactional
+    public void confirmUsername(UsernameConfirmationRequest request) {
+        String username = request.getUsername();
+        String verificationCode = request.getVerificationCode();
+
+        VerificationInfo info = verificationInfoRepository.findByUsernameAndVerificationCode(username, verificationCode)
+                .orElseThrow(() -> new CustomException("존재하지 않는 인증 정보입니다."));
+
+        if (info.isExpiredAt(LocalDateTime.now())) {
+            throw new CustomException("만료된 인증 코드입니다.");
+        }
+
+        if (info.isConfirmed()) {
+            throw new CustomException("이미 인증된 정보입니다.");
+        }
+        info.confirm();
+    }
 }

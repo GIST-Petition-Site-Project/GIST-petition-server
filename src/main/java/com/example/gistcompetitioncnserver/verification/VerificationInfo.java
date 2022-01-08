@@ -37,4 +37,17 @@ public class VerificationInfo {
         this.createdAt = createdAt;
         this.confirmedAt = confirmedAt;
     }
+
+    public boolean isExpiredAt(LocalDateTime time) {
+        return time.isAfter(createdAt) && time.isBefore(createdAt.plusMinutes(EXPIRE_MINUTE));
+    }
+
+    public boolean isConfirmed() {
+        return confirmed;
+    }
+
+    public void confirm() {
+        confirmed = true;
+        confirmedAt = LocalDateTime.now();
+    }
 }

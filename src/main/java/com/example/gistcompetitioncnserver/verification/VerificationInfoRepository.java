@@ -8,4 +8,6 @@ import java.util.Optional;
 @Repository
 public interface VerificationInfoRepository extends JpaRepository<VerificationInfo, Long> {
     Optional<VerificationInfo> findByVerificationCode(String verificationCode);
+
+    Optional<VerificationInfo> findByUsernameAndVerificationCode(String username, String verificationCode);
 }
