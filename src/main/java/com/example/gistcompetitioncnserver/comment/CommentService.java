@@ -2,9 +2,6 @@ package com.example.gistcompetitioncnserver.comment;
 
 import com.example.gistcompetitioncnserver.exception.CustomException;
 import com.example.gistcompetitioncnserver.post.PostRepository;
-import com.example.gistcompetitioncnserver.user.User;
-import com.example.gistcompetitioncnserver.user.UserRepository;
-import com.example.gistcompetitioncnserver.user.UserRole;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,9 +12,9 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
+
     public CommentService(CommentRepository commentRepository,
-                          PostRepository postRepository
-                          ) {
+                          PostRepository postRepository) {
         this.commentRepository = commentRepository;
         this.postRepository = postRepository;
     }
@@ -30,7 +27,6 @@ public class CommentService {
     }
 
 
-
     @Transactional(readOnly = true)
     public List<Comment> getCommentsByPostId(Long postId) {
         if (!postRepository.existsById(postId)) {
@@ -40,18 +36,30 @@ public class CommentService {
     }
 
     @Transactional
-    public void updateComment(Long updaterId, UserRole userRole , Long commentId, CommentRequest changeRequest) {
+    public void updateComment(Long commentId, CommentRequest updateRequest) {
         Comment comment = findCommentById(commentId);
-        if (!comment.getUserId().equals(updaterId) && userRole != UserRole.ADMIN && userRole !=UserRole.MANAGER ) {
-            throw new CustomException("댓글 수정 권한이 없습니다");
-        }
-        comment.updateContent(changeRequest.getContent());
+        comment.updateContent(updateRequest.getContent());
     }
 
     @Transactional
-    public void deleteComment(Long eraserId, UserRole userRole ,Long commentId) {
+    public void updateCommentByOwner(Long updaterId, Long commentId, CommentRequest updateRequest) {
         Comment comment = findCommentById(commentId);
-        if (!comment.getUserId().equals(eraserId) && userRole != UserRole.ADMIN && userRole !=UserRole.MANAGER ) {
+        if (!comment.getUserId().equals(updaterId)) {
+            throw new CustomException("댓글 수정 권한이 없습니다");
+        }
+        comment.updateContent(updateRequest.getContent());
+    }
+
+    @Transactional
+    public void deleteComment(Long commentId) {
+        Comment comment = findCommentById(commentId);
+        commentRepository.deleteById(comment.getId());
+    }
+
+    @Transactional
+    public void deleteCommentByOwner(Long eraserId, Long commentId) {
+        Comment comment = findCommentById(commentId);
+        if (!comment.getUserId().equals(eraserId)) {
             throw new CustomException("댓글 삭제 권한이 없습니다");
         }
         commentRepository.deleteById(commentId);
@@ -61,6 +69,7 @@ public class CommentService {
         return commentRepository.findById(commentId)
                 .orElseThrow(() -> new CustomException("존재하지 않는 Comment 입니다"));
     }
+
     private void checkExistenceByPostId(Long postId) {
         if (!postRepository.existsById(postId)) {
             throw new CustomException("존재하지 않는 post입니다");

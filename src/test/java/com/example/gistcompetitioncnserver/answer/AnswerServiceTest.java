@@ -20,7 +20,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @SpringBootTest
 class AnswerServiceTest {
 
-    private static final String CONTENT = "test contents";
+    public static final String ANSWER_CONTENT = "test contents";
+    public static final AnswerRequest ANSWER_REQUEST = new AnswerRequest("test contents");
+    public static final AnswerRequest UPDATE_REQUEST = new AnswerRequest("change contents");
 
     @Autowired
     private AnswerService answerService;
@@ -31,151 +33,122 @@ class AnswerServiceTest {
     @Autowired
     private AnswerRepository answerRepository;
 
-    private Long normalUserId;
-    private Long managerUserId;
-    private Long adminUserId;
-    private Long postId;
+    private User manager;
+    private Post savedPost;
 
     @BeforeEach
     void setup() {
-        normalUserId = userRepository.save(new User("normal@email.com", "password", UserRole.USER)).getId();
-        managerUserId = userRepository.save(new User("manager@email.com", "password", UserRole.MANAGER)).getId();
-        adminUserId = userRepository.save(new User("admin@email.com", "password", UserRole.ADMIN)).getId();
-        postId = postRepository.save(new Post("title", "description", "category", normalUserId)).getId();
-    }
-
-    @Test
-    void createAnswerByAdmin() {
-        AnswerRequest answerRequest = new AnswerRequest(CONTENT);
-
-        Long savedAnswer = answerService.createAnswer(postId, answerRequest, adminUserId);
-
-        Answer answer = answerRepository.findById(savedAnswer).orElseThrow(() -> new CustomException("존재하지 않는 answer입니다.;"));
-        assertThat(answer.getId()).isEqualTo(savedAnswer);
-        assertThat(answer.getContent()).isEqualTo(CONTENT);
-        assertThat(answer.getUserId()).isEqualTo(adminUserId);
-        assertThat(answer.getPostId()).isEqualTo(postId);
-
-        Post post = postRepository.findById(postId).orElseThrow(() -> new CustomException("존재하지 않는 post입니다"));
-        assertTrue(post.isAnswered());
+        User user = userRepository.save(new User("normal@email.com", "password", UserRole.USER));
+        manager = userRepository.save(new User("manager@email.com", "password", UserRole.MANAGER));
+        savedPost = postRepository.save(new Post("title", "description", "category", user.getId()));
     }
 
     @Test
     void createAnswerByManager() {
-        AnswerRequest answerRequest = new AnswerRequest(CONTENT);
-
-        Long savedAnswer = answerService.createAnswer(postId, answerRequest, managerUserId);
+        Long savedAnswer = answerService.createAnswer(savedPost.getId(), ANSWER_REQUEST, manager.getId());
 
         Answer answer = answerRepository.findById(savedAnswer).orElseThrow(() -> new CustomException("존재하지 않는 answer입니다.;"));
         assertThat(answer.getId()).isEqualTo(savedAnswer);
-        assertThat(answer.getContent()).isEqualTo(CONTENT);
-        assertThat(answer.getUserId()).isEqualTo(managerUserId);
-        assertThat(answer.getPostId()).isEqualTo(postId);
+        assertThat(answer.getContent()).isEqualTo(ANSWER_REQUEST.getContent());
+        assertThat(answer.getUserId()).isEqualTo(manager.getId());
+        assertThat(answer.getPostId()).isEqualTo(savedPost.getId());
 
-        Post post = postRepository.findById(postId).orElseThrow(() -> new CustomException("존재하지 않는 post입니다"));
-        assertTrue(post.isAnswered());
+        Post answeredPost = postRepository.findById(savedPost.getId()).orElseThrow(() -> new CustomException("존재하지 않는 post입니다"));
+        assertTrue(answeredPost.isAnswered());
     }
 
     @Test
-    void createAnswerToNonExistentPost() {
-        AnswerRequest answerRequest = new AnswerRequest(CONTENT);
-
+    void createAnswerToNonExistingPost() {
         Long fakePostId = Long.MAX_VALUE;
         assertThatThrownBy(
-                () -> answerService.createAnswer(fakePostId, answerRequest, managerUserId)
+                () -> answerService.createAnswer(fakePostId, ANSWER_REQUEST, manager.getId())
         ).isInstanceOf(CustomException.class);
     }
 
     @Test
-    void retrieveAnswerByALL() {
-        Answer answer = new Answer(CONTENT, postId, managerUserId);
-        answerRepository.save(answer);
+    void retrieveAnswer() {
+        Answer saved = answerRepository.save(new Answer(ANSWER_CONTENT, savedPost.getId(), manager.getId()));
 
-        Answer retrievedAnswer = answerService.retrieveAnswerByPostId(postId);
+        Answer retrievedAnswer = answerService.retrieveAnswerByPostId(savedPost.getId());
 
-        assertThat(answer.getId()).isEqualTo(retrievedAnswer.getId());
+        assertThat(saved.getId()).isEqualTo(retrievedAnswer.getId());
     }
 
     @Test
-    void retrieveAnswerWithNoAnswer() {
+    void retrieveAnswerFromNotExistingPost() {
         assertThatThrownBy(
-                () -> answerService.retrieveAnswerByPostId(postId)
+                () -> answerService.retrieveAnswerByPostId(savedPost.getId())
         ).isInstanceOf(CustomException.class);
     }
 
     @Test
     void retrieveAnswerFromNonExistentPost() {
-        Answer answer = new Answer(CONTENT, postId, managerUserId);
-        answerRepository.save(answer);
+        Long notExistingPostId = Long.MAX_VALUE;
 
-        Long fakePostId = Long.MAX_VALUE;
         assertThatThrownBy(
-                () -> answerService.retrieveAnswerByPostId(fakePostId)
+                () -> answerService.retrieveAnswerByPostId(notExistingPostId)
         ).isInstanceOf(CustomException.class);
     }
 
     @Test
     void updateAnswer() {
-        Answer answer = new Answer(CONTENT, postId, managerUserId);
-        answerRepository.save(answer);
-        String changContent = "change contents";
-        AnswerRequest changeRequest = new AnswerRequest(changContent);
+        Answer answer = answerRepository.save(new Answer(ANSWER_CONTENT, savedPost.getId(), manager.getId()));
 
-        answerService.updateAnswer(postId, changeRequest);
+        answerService.updateAnswer(savedPost.getId(), UPDATE_REQUEST);
 
-        Answer updatedAnswer = answerRepository.findByPostId(postId).orElseThrow(() -> new CustomException(""));
+        Answer updatedAnswer = answerRepository.findByPostId(savedPost.getId()).orElseThrow(() -> new CustomException(""));
+
         assertThat(answer.getId()).isEqualTo(updatedAnswer.getId());
-        assertThat(updatedAnswer.getContent()).isEqualTo(changContent);
+        assertThat(updatedAnswer.getContent()).isEqualTo(UPDATE_REQUEST.getContent());
     }
 
-
-
     @Test
-    void updateAnswerFromNonExistentPost() {
-        Long fakePostId = Long.MAX_VALUE;
-        String changContent = "change contents";
-        AnswerRequest changeRequest = new AnswerRequest(changContent);
+    void updateAnswerFromNonExistingPost() {
+        Long notExistingPostId = Long.MAX_VALUE;
 
         assertThatThrownBy(
-                () -> answerService.updateAnswer(fakePostId, changeRequest)
+                () -> answerService.updateAnswer(notExistingPostId, UPDATE_REQUEST)
         ).isInstanceOf(CustomException.class);
     }
 
     @Test
-    void updateNonExistentAnswer() {
-        String changContent = "change contents";
-        AnswerRequest changeRequest = new AnswerRequest(changContent);
-
+    void updateAnswerFromNotAnsweredPost() {
         assertThatThrownBy(
-                () -> answerService.updateAnswer(postId, changeRequest)
+                () -> answerService.updateAnswer(savedPost.getId(), UPDATE_REQUEST)
         ).isInstanceOf(CustomException.class);
     }
 
     @Test
     void deleteAnswer() {
-        Answer answer = new Answer(CONTENT, postId, managerUserId);
-        answerRepository.save(answer);
+        Answer answer = answerRepository.save(new Answer(ANSWER_CONTENT, savedPost.getId(), manager.getId()));
 
-        answerService.deleteAnswer(postId);
+        answerService.deleteAnswer(savedPost.getId());
 
+        Post post = postRepository.findById(savedPost.getId()).orElseThrow(IllegalArgumentException::new);
+        assertFalse(post.isAnswered());
         assertFalse(answerRepository.existsById(answer.getId()));
     }
+
     @Test
-    void deleteAnswerFromNonExistentPost() {
-        Long fakePostId = Long.MAX_VALUE;
-        Answer answer = new Answer(CONTENT, postId, managerUserId);
-        answerRepository.save(answer);
+    void deleteAnswerFromNonExistingPost() {
+        Long notExistingPostId = Long.MAX_VALUE;
 
         assertThatThrownBy(
-                () -> answerService.deleteAnswer(fakePostId)
+                () -> answerService.deleteAnswer(notExistingPostId)
         ).isInstanceOf(CustomException.class);
     }
 
+    @Test
+    void deleteAnswerFromNotAnsweredPost() {
+        assertThatThrownBy(
+                () -> answerService.deleteAnswer(savedPost.getId())
+        ).isInstanceOf(CustomException.class);
+    }
 
     @AfterEach
     void tearDown() {
         userRepository.deleteAllInBatch();
-        postRepository.deleteAllInBatch();
         answerRepository.deleteAllInBatch();
+        postRepository.deleteAllInBatch();
     }
 }
