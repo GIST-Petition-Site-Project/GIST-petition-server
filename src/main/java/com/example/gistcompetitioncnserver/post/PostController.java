@@ -1,6 +1,6 @@
 package com.example.gistcompetitioncnserver.post;
 
-import com.example.gistcompetitioncnserver.exception.user.UnAuthenticatedUserException;
+import com.example.gistcompetitioncnserver.exception.user.NotConfirmedEmailException;
 import com.example.gistcompetitioncnserver.exception.user.UnAuthorizedUserException;
 import com.example.gistcompetitioncnserver.user.SessionUser;
 import com.example.gistcompetitioncnserver.user.UserRole;
@@ -24,7 +24,7 @@ public class PostController {
     public ResponseEntity<Void> createPost(@Validated @RequestBody PostRequest postRequest) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
         if (!sessionUser.getEnabled()) {
-            throw new UnAuthenticatedUserException();
+            throw new NotConfirmedEmailException();
         }
         return ResponseEntity.created(URI.create("/posts/" + postService.createPost(postRequest, sessionUser.getId()))).build();
     }
@@ -43,7 +43,7 @@ public class PostController {
     public ResponseEntity<List<Post>> retrievePostsByUserId() {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
         if (!sessionUser.getEnabled()) {
-            throw new UnAuthenticatedUserException();
+            throw new NotConfirmedEmailException();
         }
         return ResponseEntity.ok().body(postService.retrievePostsByUserId(sessionUser.getId()));
     }
@@ -62,7 +62,7 @@ public class PostController {
     public ResponseEntity<Void> updatePost(@PathVariable Long postId, @Validated @RequestBody PostRequest changeRequest) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
         if (!sessionUser.getEnabled()) {
-            throw new UnAuthenticatedUserException();
+            throw new NotConfirmedEmailException();
         }
         if (sessionUser.getUserRole() != UserRole.MANAGER && sessionUser.getUserRole() != UserRole.ADMIN) {
             throw new UnAuthorizedUserException();
@@ -75,7 +75,7 @@ public class PostController {
     public ResponseEntity<Void> deletePost(@PathVariable Long postId) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
         if (!sessionUser.getEnabled()) {
-            throw new UnAuthenticatedUserException();
+            throw new NotConfirmedEmailException();
         }
         if (sessionUser.getUserRole() != UserRole.MANAGER && sessionUser.getUserRole() != UserRole.ADMIN) {
             throw new UnAuthorizedUserException();
@@ -88,7 +88,7 @@ public class PostController {
     public ResponseEntity<Boolean> agreePost(@PathVariable Long postId) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
         if (!sessionUser.getEnabled()) {
-            throw new UnAuthenticatedUserException();
+            throw new NotConfirmedEmailException();
         }
         return ResponseEntity.ok().body(postService.agree(postId, sessionUser.getId()));
     }
@@ -102,7 +102,7 @@ public class PostController {
     public ResponseEntity<Boolean> getStateOfAgreement(@PathVariable Long postId) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
         if (!sessionUser.getEnabled()) {
-            throw new UnAuthenticatedUserException();
+            throw new NotConfirmedEmailException();
         }
         return ResponseEntity.ok().body(postService.getStateOfAgreement(postId, sessionUser.getId()));
     }
