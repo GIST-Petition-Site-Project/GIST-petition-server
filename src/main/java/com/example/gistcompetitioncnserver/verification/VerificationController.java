@@ -13,12 +13,6 @@ public class VerificationController {
     private final VerificationService verificationService;
     private final ApplicationEventPublisher publisher;
 
-    @GetMapping("/users/confirm")
-    public ResponseEntity<String> confirmEmail(@RequestParam String token) {
-        verificationService.confirm(token);
-        return ResponseEntity.ok().body("인증되었습니다.");
-    }
-
     @PostMapping("/username/verifications")
     public ResponseEntity<Void> createVerificationCode(@RequestBody VerificationEmailRequest request){
         String token = verificationService.createVerificationInfo(request);
