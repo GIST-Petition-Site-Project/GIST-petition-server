@@ -48,9 +48,6 @@ public class VerificationInfo {
     }
 
     public boolean isValidToSignUp(LocalDateTime time) {
-        if(!isConfirmed()){
-            throw new CustomException("인증 되지 않은 코드입니다.");
-        }
         return time.isAfter(confirmedAt) && time.isBefore(confirmedAt.plusMinutes(SIGN_UP_EXPIRE_MINUTE));
     }
 
