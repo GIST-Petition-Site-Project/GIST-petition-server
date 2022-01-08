@@ -63,7 +63,7 @@ public class PostController {
         if (!sessionUser.getEnabled()) {
             throw new CustomException("이메일 인증이 필요합니다!");
         }
-        if (sessionUser.getUserRole() != UserRole.MANAGER && sessionUser.getUserRole() != UserRole.ADMIN) {
+        if (!sessionUser.hasManagerAuthority()) {
             throw new CustomException("글 수정 권한이 없습니다.");
         }
         postService.updatePostDescription(postId, changeRequest.getDescription());
@@ -76,7 +76,7 @@ public class PostController {
         if (!sessionUser.getEnabled()) {
             throw new CustomException("이메일 인증이 필요합니다!");
         }
-        if (sessionUser.getUserRole() != UserRole.MANAGER && sessionUser.getUserRole() != UserRole.ADMIN) {
+        if (!sessionUser.hasManagerAuthority()) {
             throw new CustomException("삭제 권한이 없습니다.");
         }
         postService.deletePost(postId);

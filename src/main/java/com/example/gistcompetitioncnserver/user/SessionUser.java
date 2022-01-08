@@ -19,4 +19,8 @@ public class SessionUser implements Serializable {
     public boolean isAdmin() {
         return userRole == UserRole.ADMIN;
     }
+  
+    public boolean hasManagerAuthority() {
+        return userRole == UserRole.MANAGER || userRole == UserRole.ADMIN;
+    }
 }

@@ -3,8 +3,6 @@ package com.example.gistcompetitioncnserver.comment;
 
 import com.example.gistcompetitioncnserver.exception.CustomException;
 import com.example.gistcompetitioncnserver.user.SessionUser;
-import com.example.gistcompetitioncnserver.user.User;
-import com.example.gistcompetitioncnserver.user.UserRole;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -45,7 +43,11 @@ public class CommentController {
         if (!sessionUser.getEnabled()) {
             throw new CustomException("이메일 인증이 필요합니다!");
         }
-        commentService.updateComment(sessionUser.getId(),sessionUser.getUserRole(),commentId, updateRequest);
+        if (sessionUser.hasManagerAuthority()) {
+            commentService.updateComment(commentId, updateRequest);
+            return ResponseEntity.noContent().build();
+        }
+        commentService.updateCommentByOwner(sessionUser.getId(), commentId, updateRequest);
         return ResponseEntity.noContent().build();
     }
 
@@ -56,7 +58,11 @@ public class CommentController {
         if (!sessionUser.getEnabled()) {
             throw new CustomException("이메일 인증이 필요합니다!");
         }
-        commentService.deleteComment(sessionUser.getId(),sessionUser.getUserRole(),commentId);
+        if (sessionUser.hasManagerAuthority()) {
+            commentService.deleteComment(commentId);
+            return ResponseEntity.noContent().build();
+        }
+        commentService.deleteCommentByOwner(sessionUser.getId(), commentId);
         return ResponseEntity.noContent().build();
     }
 }
