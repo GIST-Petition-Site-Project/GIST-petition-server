@@ -1,6 +1,8 @@
 package com.example.gistcompetitioncnserver.user;
 
 import com.example.gistcompetitioncnserver.exception.CustomException;
+import com.example.gistcompetitioncnserver.exception.user.NotConfirmedEmailException;
+import com.example.gistcompetitioncnserver.exception.user.UnAuthorizedUserException;
 import lombok.AllArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
@@ -44,10 +46,10 @@ public class UserController {
     public ResponseEntity<List<User>> retrieveAllUsers() {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
         if (!sessionUser.getEnabled()) {
-            throw new CustomException("이메일 인증이 필요합니다!");
+            throw new NotConfirmedEmailException();
         }
         if (!sessionUser.isAdmin()) {
-            throw new CustomException("회원 정보 조회 권한이 없습니다.");
+            throw new UnAuthorizedUserException();
         }
         return ResponseEntity.ok().body(userService.findAllUsers());
     }
@@ -56,10 +58,10 @@ public class UserController {
     public ResponseEntity<User> retrieveUser(@PathVariable Long userId) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
         if (!sessionUser.getEnabled()) {
-            throw new CustomException("이메일 인증이 필요합니다!");
+            throw new NotConfirmedEmailException();
         }
         if (!sessionUser.isAdmin()) {
-            throw new CustomException("회원 정보 조회 권한이 없습니다.");
+            throw new UnAuthorizedUserException();
         }
         return ResponseEntity.ok().body(userService.findUserById(userId));
     }
@@ -68,7 +70,7 @@ public class UserController {
     public ResponseEntity<User> retrieveUserOfMine() {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
         if (!sessionUser.getEnabled()) {
-            throw new CustomException("이메일 인증이 필요합니다!");
+            throw new NotConfirmedEmailException();
         }
         return ResponseEntity.ok().body(userService.findUserById(sessionUser.getId()));
     }
@@ -78,10 +80,10 @@ public class UserController {
                                                @Validated @RequestBody UpdateUserRoleRequest userRoleRequest) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
         if (!sessionUser.getEnabled()) {
-            throw new CustomException("이메일 인증이 필요합니다!");
+            throw new NotConfirmedEmailException();
         }
         if (!sessionUser.isAdmin()) {
-            throw new CustomException("유저 권한을 수정할 권한이 없습니다.");
+            throw new UnAuthorizedUserException();
         }
         userService.updateUserRole(userId, userRoleRequest);
         return ResponseEntity.noContent().build();
@@ -91,7 +93,7 @@ public class UserController {
     public ResponseEntity<Void> updatePasswordOfMine(@Validated @RequestBody UpdatePasswordRequest passwordRequest) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
         if (!sessionUser.getEnabled()) {
-            throw new CustomException("이메일 인증이 필요합니다!");
+            throw new NotConfirmedEmailException();
         }
         userService.updatePassword(sessionUser.getId(), passwordRequest);
         return ResponseEntity.noContent().build();
@@ -101,10 +103,10 @@ public class UserController {
     public ResponseEntity<Void> deleteUser(@PathVariable Long userId) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
         if (!sessionUser.getEnabled()) {
-            throw new CustomException("이메일 인증이 필요합니다!");
+            throw new NotConfirmedEmailException();
         }
         if (!sessionUser.isAdmin()) {
-            throw new CustomException("삭제할 권한이 없습니다.");
+            throw new UnAuthorizedUserException();
         }
         userService.deleteUser(userId);
         return ResponseEntity.noContent().build();
@@ -114,7 +116,7 @@ public class UserController {
     public ResponseEntity<Void> deleteUserOfMine(@Validated @RequestBody DeleteUserRequest deleteUserRequest) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
         if (!sessionUser.getEnabled()) {
-            throw new CustomException("이메일 인증이 필요합니다!");
+            throw new NotConfirmedEmailException();
         }
         userService.deleteUserOfMine(sessionUser.getId(), deleteUserRequest);
         return ResponseEntity.noContent().build();

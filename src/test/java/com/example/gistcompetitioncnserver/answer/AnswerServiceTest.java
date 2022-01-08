@@ -40,27 +40,9 @@ class AnswerServiceTest {
 
     @BeforeEach
     void setup() {
-        normalUserId = userRepository.save(new User("normal@email.com", "password", UserRole.USER)).getId();
-        managerUserId = userRepository.save(new User("manager@email.com", "password", UserRole.MANAGER)).getId();
-        adminUserId = userRepository.save(new User("admin@email.com", "password", UserRole.ADMIN)).getId();
-
-        postId = postRepository.save(new Post("title", "description", "category", normalUserId)).getId();
-    }
-
-    @Test
-    void createAnswerByAdmin() {
-        AnswerRequest answerRequest = new AnswerRequest(CONTENT);
-
-        Long savedAnswer = answerService.createAnswer(postId, answerRequest, adminUserId);
-
-        Answer answer = answerRepository.findById(savedAnswer).orElseThrow(() -> new CustomException("존재하지 않는 answer입니다.", null));
-        assertThat(answer.getId()).isEqualTo(savedAnswer);
-        assertThat(answer.getContent()).isEqualTo(CONTENT);
-        assertThat(answer.getUserId()).isEqualTo(adminUserId);
-        assertThat(answer.getPostId()).isEqualTo(postId);
-
-        Post post = postRepository.findById(postId).orElseThrow(NoSuchPostException::new);
-        assertTrue(post.isAnswered());
+        User user = userRepository.save(new User("normal@email.com", "password", UserRole.USER));
+        manager = userRepository.save(new User("manager@email.com", "password", UserRole.MANAGER));
+        savedPost = postRepository.save(new Post("title", "description", "category", user.getId()));
     }
 
     @Test
@@ -161,7 +143,7 @@ class AnswerServiceTest {
     void deleteAnswerFromNotAnsweredPost() {
         assertThatThrownBy(
                 () -> answerService.deleteAnswer(savedPost.getId())
-        ).isInstanceOf(CustomException.class);
+        ).isInstanceOf(UnAnsweredPostException.class);
     }
 
     @AfterEach

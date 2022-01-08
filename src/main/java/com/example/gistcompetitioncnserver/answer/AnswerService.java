@@ -60,7 +60,7 @@ public class AnswerService {
     }
 
     private Post findPostBy(Long postId) {
-        return postRepository.findById(postId).orElseThrow(() -> new CustomException("존재하지 않는 post입니다"));
+        return postRepository.findById(postId).orElseThrow(NoSuchPostException::new);
     }
 
     private void checkExistenceOfPost(Long postId) {
@@ -71,7 +71,7 @@ public class AnswerService {
 
     private void checkExistenceOfAnswerOf(Long postId) {
         if (!answerRepository.existsByPostId(postId)) {
-            throw new CustomException("해당 post에는 답변이 존재하지 않습니다.");
+            throw new UnAnsweredPostException();
         }
     }
 

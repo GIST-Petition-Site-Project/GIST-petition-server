@@ -76,7 +76,7 @@ public class UserService {
     public void updatePassword(Long userId, UpdatePasswordRequest passwordRequest) {
         User user = findUserById(userId);
         if (!encryptor.isMatch(passwordRequest.getOriginPassword(), user.getPassword())) {
-            throw new CustomException("기존 패쓰워드가 일치하지 않습니다.");
+            throw new NotMatchedPasswordException();
         }
         user.setPassword(encryptor.hashPassword(passwordRequest.getNewPassword()));
     }
@@ -93,7 +93,7 @@ public class UserService {
     public void deleteUserOfMine(Long userId, DeleteUserRequest deleteUserRequest) {
         User user = findUserById(userId);
         if (!encryptor.isMatch(deleteUserRequest.getPassword(), user.getPassword())) {
-            throw new CustomException("기존 패쓰워드가 일치하지 않습니다.");
+            throw new NotMatchedPasswordException();
         }
         userRepository.deleteById(userId);
     }

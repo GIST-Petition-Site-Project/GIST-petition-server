@@ -149,7 +149,7 @@ class UserServiceTest {
 
         assertThatThrownBy(
                 () -> userService.updatePassword(userId, invalidRequest)
-        ).isInstanceOf(CustomException.class);
+        ).isInstanceOf(NotMatchedPasswordException.class);
     }
 
     @Test
@@ -187,7 +187,7 @@ class UserServiceTest {
 
         assertThatThrownBy(
                 () -> userService.deleteUserOfMine(userId, new DeleteUserRequest("notPassword"))
-        ).isInstanceOf(CustomException.class);
+        ).isInstanceOf(NotMatchedPasswordException.class);
     }
 
     @AfterEach

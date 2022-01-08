@@ -141,7 +141,7 @@ class CommentServiceTest {
 
         assertThatThrownBy(
                 () -> commentService.deleteCommentByOwner(otherUser.getId(), savedContentId)
-        ).isInstanceOf(CustomException.class);
+        ).isInstanceOf(UnAuthorizedUserException.class);
     }
 
     @AfterEach
