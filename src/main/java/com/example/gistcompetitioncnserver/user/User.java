@@ -32,14 +32,6 @@ public class User {
         this.enabled = enabled;
     }
 
-    public boolean isAdmin() {
-        return this.userRole == UserRole.ADMIN;
-    }
-
-    public boolean isManager() {
-        return this.userRole == UserRole.MANAGER;
-    }
-
     public Long getId() {
         return id;
     }
@@ -60,11 +52,15 @@ public class User {
         return enabled;
     }
 
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public void setUserRole(UserRole userRole) {
         this.userRole = userRole;
     }
 
-    public void setEnabled(){
+    public void setEnabled() {
         this.enabled = true;
     }
 }

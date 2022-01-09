@@ -10,11 +10,11 @@ public class AnswerRequest {
     protected AnswerRequest() {
     }
 
-    public String getContent() {
-        return content;
-    }
-
     public AnswerRequest(String content) {
         this.content = content;
+    }
+
+    public String getContent() {
+        return content;
     }
 }

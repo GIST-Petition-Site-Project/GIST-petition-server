@@ -9,5 +9,7 @@ import java.util.Optional;
 public interface AnswerRepository extends JpaRepository<Answer, Long> {
     Optional<Answer> findByPostId(Long postId);
 
+    boolean existsByPostId(Long postId);
+
     void deleteByPostId(Long postId);
 }
