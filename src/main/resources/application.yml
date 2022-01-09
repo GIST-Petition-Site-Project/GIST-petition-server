@@ -18,6 +18,3 @@ spring:
 logging:
   level:
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-swagger:
-  host: dev-api.gist-petition.com
-  protocol: http
