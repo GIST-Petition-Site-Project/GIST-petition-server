@@ -11,25 +11,23 @@ public class User {
     private String password;
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
-    private Boolean enabled;
 
     protected User() {
     }
 
     public User(String username, String password, UserRole userRole) {
-        this(null, username, password, userRole, false);
+        this(null, username, password, userRole);
     }
 
     public User(String username, String password, UserRole userRole, Boolean enabled) {
-        this(null, username, password, userRole, enabled);
+        this(null, username, password, userRole);
     }
 
-    public User(Long id, String username, String password, UserRole userRole, Boolean enabled) {
+    public User(Long id, String username, String password, UserRole userRole) {
         this.id = id;
         this.username = username;
         this.password = password;
         this.userRole = userRole;
-        this.enabled = enabled;
     }
 
     public Long getId() {
@@ -48,10 +46,6 @@ public class User {
         return userRole;
     }
 
-    public Boolean isEnabled() {
-        return enabled;
-    }
-
     public void setPassword(String password) {
         this.password = password;
     }
@@ -60,7 +54,4 @@ public class User {
         this.userRole = userRole;
     }
 
-    public void setEnabled() {
-        this.enabled = true;
-    }
 }

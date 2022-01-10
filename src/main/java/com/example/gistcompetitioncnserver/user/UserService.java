@@ -15,16 +15,20 @@ public class UserService {
     private final UserRepository userRepository;
     private final Encryptor encryptor;
     private final HttpSession httpSession;
+    private final SignUpValidator signUpValidator;
 
-    public UserService(UserRepository userRepository, Encryptor encryptor, HttpSession httpSession) {
+    public UserService(UserRepository userRepository, Encryptor encryptor, HttpSession httpSession, SignUpValidator signUpValidator) {
         this.userRepository = userRepository;
         this.encryptor = encryptor;
         this.httpSession = httpSession;
+        this.signUpValidator = signUpValidator;
     }
 
     @Transactional
     public Long signUp(SignUpRequest request) {
         String username = request.getUsername();
+        String verificationCode = request.getVerificationCode();
+
         if (userRepository.existsByUsername(username)) {
             throw new DuplicatedUserException();
         }
@@ -32,10 +36,9 @@ public class UserService {
             throw new InvalidEmailFormException();
         }
 
-        User user = new User(
-                username,
-                encryptor.hashPassword(request.getPassword()),
-                UserRole.USER);
+        signUpValidator.checkIsVerified(username, verificationCode);
+
+        User user = new User(username, encryptor.hashPassword(request.getPassword()), UserRole.USER);
         return userRepository.save(user).getId();
     }
 

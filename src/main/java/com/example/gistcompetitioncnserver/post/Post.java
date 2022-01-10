@@ -1,8 +1,6 @@
 package com.example.gistcompetitioncnserver.post;
 
 import com.example.gistcompetitioncnserver.common.BaseEntity;
-import com.example.gistcompetitioncnserver.exception.CustomException;
-import com.example.gistcompetitioncnserver.exception.ErrorCase;
 import com.example.gistcompetitioncnserver.exception.post.DuplicatedAgreementException;
 import com.example.gistcompetitioncnserver.user.User;
 import lombok.Getter;
@@ -16,9 +14,10 @@ import java.util.List;
 public class Post extends BaseEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String title;
+    @Lob
     private String description;
     private String category;
     private boolean answered;
