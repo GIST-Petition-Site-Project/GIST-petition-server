@@ -2,19 +2,23 @@ package com.example.gistcompetitioncnserver.user;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 public class SignUpRequest {
     @Email
     private String username;
     @NotBlank
     private String password;
-
-    public SignUpRequest(String username, String password) {
-        this.username = username;
-        this.password = password;
-    }
+    @NotNull
+    private String verificationCode;
 
     public SignUpRequest() {
+    }
+
+    public SignUpRequest(String username, String password, String verificationCode) {
+        this.username = username;
+        this.password = password;
+        this.verificationCode = verificationCode;
     }
 
     public String getUsername() {
@@ -23,5 +27,9 @@ public class SignUpRequest {
 
     public String getPassword() {
         return password;
+    }
+
+    public String getVerificationCode() {
+        return verificationCode;
     }
 }
