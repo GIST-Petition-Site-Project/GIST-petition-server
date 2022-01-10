@@ -1,5 +1,6 @@
 package com.example.gistcompetitioncnserver.answer;
 
+import com.example.gistcompetitioncnserver.exception.user.NoSessionException;
 import com.example.gistcompetitioncnserver.exception.user.UnAuthorizedUserException;
 import com.example.gistcompetitioncnserver.user.SessionUser;
 import lombok.AllArgsConstructor;
@@ -22,6 +23,9 @@ public class AnswerController {
     public ResponseEntity<Object> createAnswer(@PathVariable Long postId,
                                                @Validated @RequestBody AnswerRequest answerRequest) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
+        if (sessionUser == null) {
+            throw new NoSessionException();
+        }
         if (!sessionUser.hasManagerAuthority()) {
             throw new UnAuthorizedUserException();
 
@@ -44,6 +48,9 @@ public class AnswerController {
     public ResponseEntity<Void> updateAnswer(@PathVariable Long postId,
                                              @Validated @RequestBody AnswerRequest changeRequest) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
+        if (sessionUser == null) {
+            throw new NoSessionException();
+        }
         if (!sessionUser.hasManagerAuthority()) {
             throw new UnAuthorizedUserException();
 
@@ -55,6 +62,9 @@ public class AnswerController {
     @DeleteMapping("/posts/{postId}/answer")
     public ResponseEntity<Object> deleteComment(@PathVariable Long postId) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
+        if (sessionUser == null) {
+            throw new NoSessionException();
+        }
         if (!sessionUser.hasManagerAuthority()) {
             throw new UnAuthorizedUserException();
         }

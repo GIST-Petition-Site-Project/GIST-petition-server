@@ -15,7 +15,7 @@ import java.util.UUID;
 public class FileUploadService {
     private final UploadService uploadService;
 
-    // Multipart를 통해 전송된 파일을 업로드 하는 메소드
+    // Multipart 를 통해 전송된 파일을 업로드 하는 메소드
     public String uploadImage(MultipartFile file) {
         String fileName = createFileName(file.getOriginalFilename());
         ObjectMetadata objectMetadata = new ObjectMetadata();
