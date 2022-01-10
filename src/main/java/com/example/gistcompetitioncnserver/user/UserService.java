@@ -2,10 +2,13 @@ package com.example.gistcompetitioncnserver.user;
 
 import com.example.gistcompetitioncnserver.exception.CustomException;
 import com.example.gistcompetitioncnserver.exception.ErrorCase;
+import com.example.gistcompetitioncnserver.verification.VerificationInfo;
+import com.example.gistcompetitioncnserver.verification.VerificationInfoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpSession;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -13,16 +16,20 @@ public class UserService {
     private final UserRepository userRepository;
     private final Encryptor encryptor;
     private final HttpSession httpSession;
+    private final SignUpValidator signUpValidator;
 
-    public UserService(UserRepository userRepository, Encryptor encryptor, HttpSession httpSession) {
+    public UserService(UserRepository userRepository, Encryptor encryptor, HttpSession httpSession, SignUpValidator signUpValidator) {
         this.userRepository = userRepository;
         this.encryptor = encryptor;
         this.httpSession = httpSession;
+        this.signUpValidator = signUpValidator;
     }
 
     @Transactional
     public Long signUp(SignUpRequest request) {
         String username = request.getUsername();
+        String verificationCode = request.getVerificationCode();
+
         if (userRepository.existsByUsername(username)) {
             throw new CustomException("이미 존재하는 회원입니다");
         }
@@ -30,10 +37,9 @@ public class UserService {
             throw new CustomException("유효하지 않은 이메일 형태입니다");
         }
 
-        User user = new User(
-                username,
-                encryptor.hashPassword(request.getPassword()),
-                UserRole.USER);
+        signUpValidator.checkIsVerified(username,verificationCode);
+
+        User user = new User(username, encryptor.hashPassword(request.getPassword()), UserRole.USER);
         return userRepository.save(user).getId();
     }
 

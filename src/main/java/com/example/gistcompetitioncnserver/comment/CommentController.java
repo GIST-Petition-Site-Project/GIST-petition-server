@@ -23,9 +23,6 @@ public class CommentController {
                                               @RequestBody CommentRequest commentRequest) {
 
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
-        if (!sessionUser.getEnabled()) {
-            throw new CustomException("이메일 인증이 필요합니다!");
-        }
         Long commentId = commentService.createComment(postId, commentRequest, sessionUser.getId());
         return ResponseEntity.created(URI.create("/posts/" + postId + "/comments/" + commentId)).build();
     }
@@ -40,9 +37,6 @@ public class CommentController {
                                                 @PathVariable Long commentId,
                                                 @Validated @RequestBody CommentRequest updateRequest) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
-        if (!sessionUser.getEnabled()) {
-            throw new CustomException("이메일 인증이 필요합니다!");
-        }
         if (sessionUser.hasManagerAuthority()) {
             commentService.updateComment(commentId, updateRequest);
             return ResponseEntity.noContent().build();
@@ -55,9 +49,6 @@ public class CommentController {
     public ResponseEntity<Object> deleteComment(@PathVariable Long postId,
                                                 @PathVariable Long commentId) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
-        if (!sessionUser.getEnabled()) {
-            throw new CustomException("이메일 인증이 필요합니다!");
-        }
         if (sessionUser.hasManagerAuthority()) {
             commentService.deleteComment(commentId);
             return ResponseEntity.noContent().build();

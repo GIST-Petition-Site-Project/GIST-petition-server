@@ -4,6 +4,7 @@ import com.example.gistcompetitioncnserver.exception.CustomException;
 import com.example.gistcompetitioncnserver.user.User;
 import com.example.gistcompetitioncnserver.user.UserRepository;
 import com.example.gistcompetitioncnserver.user.UserRole;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,56 +13,95 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDateTime;
 
+import static com.example.gistcompetitioncnserver.verification.VerificationInfo.CONFIRM_EXPIRE_MINUTE;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 class VerificationServiceTest {
 
-    public static final String TOKEN = "token";
+    private static final String GIST_EMAIL = "tester@gist.ac.kr";
+    private static final String PASSWORD = "password!";
+    private static final String VERIFICATION_CODE = "AAAAAA";
+
     @Autowired
-    private VerificationService tokenService;
+    private VerificationService verificationService;
     @Autowired
-    private VerificationTokenRepository tokenRepository;
+    private VerificationInfoRepository verificationInfoRepository;
     @Autowired
     private UserRepository userRepository;
-    private User enabledUser;
-    private User unEnabledUser;
 
-    @BeforeEach
-    void setUp() {
-        enabledUser = userRepository.save(new User("enabled@gist.ac.kr", "password", UserRole.USER, true));
-        unEnabledUser = userRepository.save(new User("unenable@gist.ac.kr", "password", UserRole.USER, false));
+    @Test
+    void createVerificationCode() {
+        String verificationCode = verificationService.createVerificationInfo(new VerificationEmailRequest(GIST_EMAIL));
+        VerificationInfo verificationInfo = verificationInfoRepository.findByVerificationCode(verificationCode).orElseThrow(IllegalArgumentException::new);
+
+        assertThat(verificationInfo.getVerificationCode()).isEqualTo(verificationCode);
+        assertThat(verificationInfo.getUsername()).isEqualTo(GIST_EMAIL);
+        assertThat(verificationInfo.getCreatedAt()).isNotNull();
+        assertThat(verificationInfo.getConfirmedAt()).isNull();
     }
 
     @Test
-    void confirm() {
-        VerificationToken validToken = tokenRepository.save(new VerificationToken(TOKEN, unEnabledUser.getId(), LocalDateTime.now().plusMinutes(10)));
-
-        tokenService.confirm(validToken.getToken());
-
-        User user = userRepository.findById(unEnabledUser.getId()).orElseThrow(IllegalArgumentException::new);
-        assertTrue(user.isEnabled());
+    void createVerificationCodeFailedIfAlreadyExisted() {
+        userRepository.save(new User(GIST_EMAIL, PASSWORD, UserRole.USER, true));
+        Assertions.assertThatThrownBy(
+                () -> verificationService.createVerificationInfo(new VerificationEmailRequest(GIST_EMAIL))
+        ).isInstanceOf(CustomException.class);
     }
 
     @Test
-    void confirmFailedIfExpired() {
-        LocalDateTime pastTime = LocalDateTime.now().minusMinutes(10);
-        VerificationToken expiredToken = tokenRepository.save(new VerificationToken(TOKEN, unEnabledUser.getId(), pastTime));
-
-        assertThatThrownBy(() -> tokenService.confirm(expiredToken.getToken())).isInstanceOf(CustomException.class);
+    void createVerificationCodeFailedIfNotValidEmailForm() {
+        String notGistEmail = "notGistEmail@gmail.com";
+        Assertions.assertThatThrownBy(
+                () -> verificationService.createVerificationInfo(new VerificationEmailRequest(notGistEmail))
+        ).isInstanceOf(CustomException.class);
     }
 
     @Test
-    void confirmAlreadyConfirmedUser() {
-        VerificationToken alreadyConfirmedToken = tokenRepository.save(new VerificationToken(TOKEN, enabledUser.getId(), LocalDateTime.now().plusMinutes(10)));
+    void confirmVerificationCode() {
+        verificationInfoRepository.save(new VerificationInfo(null, GIST_EMAIL, VERIFICATION_CODE, LocalDateTime.now(), null));
 
-        assertThatThrownBy(() -> tokenService.confirm(alreadyConfirmedToken.getToken())).isInstanceOf(CustomException.class);
+        verificationService.confirmUsername(new UsernameConfirmationRequest(GIST_EMAIL, VERIFICATION_CODE));
+
+        VerificationInfo verificationInfo = verificationInfoRepository.findByVerificationCode(VERIFICATION_CODE).orElseThrow(IllegalArgumentException::new);
+        assertThat(verificationInfo.getConfirmedAt()).isNotNull();
+    }
+
+    @Test
+    void confirmVerificationCodeNotExisting() {
+        verificationInfoRepository.save(new VerificationInfo(null, GIST_EMAIL, VERIFICATION_CODE, LocalDateTime.now(), null));
+
+        String incorrectVerificationCode = VERIFICATION_CODE + "A";
+        UsernameConfirmationRequest requestWithIncorrectCode = new UsernameConfirmationRequest(GIST_EMAIL, incorrectVerificationCode);
+        Assertions.assertThatThrownBy(
+                () -> verificationService.confirmUsername(requestWithIncorrectCode)
+        ).isInstanceOf(CustomException.class);
+    }
+
+    @Test
+    void confirmVerificationCodeWhenExpired() {
+        LocalDateTime expiredCreatedTime = LocalDateTime.now().minusMinutes(CONFIRM_EXPIRE_MINUTE + 1);
+        verificationInfoRepository.save(new VerificationInfo(null, GIST_EMAIL, VERIFICATION_CODE, expiredCreatedTime, null));
+
+        UsernameConfirmationRequest expiredInfoRequest = new UsernameConfirmationRequest(GIST_EMAIL, VERIFICATION_CODE);
+        Assertions.assertThatThrownBy(
+                () -> verificationService.confirmUsername(expiredInfoRequest)
+        ).isInstanceOf(CustomException.class);
+    }
+
+    @Test
+    void confirmVerificationAlreadyConfirmedVerification() {
+        verificationInfoRepository.save(new VerificationInfo(null, GIST_EMAIL, VERIFICATION_CODE, LocalDateTime.now().minusMinutes(1), LocalDateTime.now()));
+        Assertions.assertThatThrownBy(
+                () -> verificationService.confirmUsername(new UsernameConfirmationRequest(GIST_EMAIL, VERIFICATION_CODE))
+        ).isInstanceOf(CustomException.class);
     }
 
     @AfterEach
     void tearDown() {
-        tokenRepository.deleteAllInBatch();
+        verificationInfoRepository.deleteAllInBatch();
         userRepository.deleteAllInBatch();
     }
 }

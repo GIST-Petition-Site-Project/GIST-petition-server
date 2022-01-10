@@ -23,9 +23,6 @@ public class AnswerController {
     public ResponseEntity<Object> createAnswer(@PathVariable Long postId,
                                                @Validated @RequestBody AnswerRequest answerRequest) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
-        if (!sessionUser.getEnabled()) {
-            throw new CustomException("이메일 인증이 필요합니다!");
-        }
         if (!sessionUser.hasManagerAuthority()) {
             throw new CustomException("답변 권한이 없습니다.");
         }
@@ -47,9 +44,6 @@ public class AnswerController {
     public ResponseEntity<Void> updateAnswer(@PathVariable Long postId,
                                              @Validated @RequestBody AnswerRequest changeRequest) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
-        if (!sessionUser.getEnabled()) {
-            throw new CustomException("이메일 인증이 필요합니다!");
-        }
         if (!sessionUser.hasManagerAuthority()) {
             throw new CustomException("답변 수정 권한이 없습니다.");
         }
@@ -60,9 +54,6 @@ public class AnswerController {
     @DeleteMapping("/posts/{postId}/answer")
     public ResponseEntity<Object> deleteComment(@PathVariable Long postId) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
-        if (!sessionUser.getEnabled()) {
-            throw new CustomException("이메일 인증이 필요합니다!");
-        }
         if (!sessionUser.hasManagerAuthority()) {
             throw new CustomException("답변 삭제 권한이 없습니다.");
         }

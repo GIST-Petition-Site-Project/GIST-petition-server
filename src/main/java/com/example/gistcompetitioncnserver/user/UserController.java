@@ -2,12 +2,10 @@ package com.example.gistcompetitioncnserver.user;
 
 import com.example.gistcompetitioncnserver.exception.CustomException;
 import lombok.AllArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.net.URI;
 import java.util.List;
@@ -19,12 +17,10 @@ public class UserController {
 
     private final UserService userService;
     private final HttpSession httpSession;
-    private final ApplicationEventPublisher eventPublisher;
 
     @PostMapping("/users")
-    public ResponseEntity<Void> register(@Validated @RequestBody SignUpRequest signUpRequest, HttpServletRequest request) {
+    public ResponseEntity<Void> register(@Validated @RequestBody SignUpRequest signUpRequest) {
         Long userId = userService.signUp(signUpRequest);
-        eventPublisher.publishEvent(new OnRegistrationCompleteEvent(userId, request.getRequestURL().toString()));
         return ResponseEntity.created(URI.create("/users/" + userId)).build();
     }
 
@@ -43,9 +39,6 @@ public class UserController {
     @GetMapping("/users")
     public ResponseEntity<List<User>> retrieveAllUsers() {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
-        if (!sessionUser.getEnabled()) {
-            throw new CustomException("이메일 인증이 필요합니다!");
-        }
         if (!sessionUser.isAdmin()) {
             throw new CustomException("회원 정보 조회 권한이 없습니다.");
         }
@@ -55,9 +48,6 @@ public class UserController {
     @GetMapping("/users/{userId}")
     public ResponseEntity<User> retrieveUser(@PathVariable Long userId) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
-        if (!sessionUser.getEnabled()) {
-            throw new CustomException("이메일 인증이 필요합니다!");
-        }
         if (!sessionUser.isAdmin()) {
             throw new CustomException("회원 정보 조회 권한이 없습니다.");
         }
@@ -67,9 +57,6 @@ public class UserController {
     @GetMapping("/users/me")
     public ResponseEntity<User> retrieveUserOfMine() {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
-        if (!sessionUser.getEnabled()) {
-            throw new CustomException("이메일 인증이 필요합니다!");
-        }
         return ResponseEntity.ok().body(userService.findUserById(sessionUser.getId()));
     }
 
@@ -77,9 +64,6 @@ public class UserController {
     public ResponseEntity<Void> updateUserRole(@PathVariable Long userId,
                                                @Validated @RequestBody UpdateUserRoleRequest userRoleRequest) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
-        if (!sessionUser.getEnabled()) {
-            throw new CustomException("이메일 인증이 필요합니다!");
-        }
         if (!sessionUser.isAdmin()) {
             throw new CustomException("유저 권한을 수정할 권한이 없습니다.");
         }
@@ -90,9 +74,6 @@ public class UserController {
     @PutMapping("/users/me/password")
     public ResponseEntity<Void> updatePasswordOfMine(@Validated @RequestBody UpdatePasswordRequest passwordRequest) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
-        if (!sessionUser.getEnabled()) {
-            throw new CustomException("이메일 인증이 필요합니다!");
-        }
         userService.updatePassword(sessionUser.getId(), passwordRequest);
         return ResponseEntity.noContent().build();
     }
@@ -100,9 +81,6 @@ public class UserController {
     @DeleteMapping("/users/{userId}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long userId) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
-        if (!sessionUser.getEnabled()) {
-            throw new CustomException("이메일 인증이 필요합니다!");
-        }
         if (!sessionUser.isAdmin()) {
             throw new CustomException("삭제할 권한이 없습니다.");
         }
@@ -113,9 +91,6 @@ public class UserController {
     @DeleteMapping("/users/me")
     public ResponseEntity<Void> deleteUserOfMine(@Validated @RequestBody DeleteUserRequest deleteUserRequest) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
-        if (!sessionUser.getEnabled()) {
-            throw new CustomException("이메일 인증이 필요합니다!");
-        }
         userService.deleteUserOfMine(sessionUser.getId(), deleteUserRequest);
         return ResponseEntity.noContent().build();
     }
