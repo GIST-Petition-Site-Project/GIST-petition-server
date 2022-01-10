@@ -15,8 +15,8 @@ public class VerificationController {
 
     @PostMapping("/username/verifications")
     public ResponseEntity<Void> createVerificationCode(@RequestBody VerificationEmailRequest request){
-        String token = verificationService.createVerificationInfo(request);
-        publisher.publishEvent(new EmailVerificationEvent(request.getUsername(), token));
+        String verificationCode = verificationService.createVerificationInfo(request);
+        publisher.publishEvent(new EmailVerificationEvent(request.getUsername(), verificationCode));
         return ResponseEntity.noContent().build();
     }
 

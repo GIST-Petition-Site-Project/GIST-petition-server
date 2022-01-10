@@ -1,6 +1,9 @@
 package com.example.gistcompetitioncnserver.verification;
 
+import javax.validation.constraints.Email;
+
 public class VerificationEmailRequest {
+    @Email
     private String username;
 
     public VerificationEmailRequest() {

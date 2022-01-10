@@ -3,17 +3,15 @@ package com.example.gistcompetitioncnserver.verification;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
-import java.time.Clock;
-
 @Getter
 public class EmailVerificationEvent extends ApplicationEvent {
-    private final String email;
-    private final String token;
+    private final String username;
+    private final String verificationCode;
 
-    public EmailVerificationEvent(String email, String token) {
-        super(email);
-        this.email = email;
-        this.token = token;
+    public EmailVerificationEvent(String username, String verificationCode) {
+        super(username);
+        this.username = username;
+        this.verificationCode = verificationCode;
     }
 
 }

@@ -23,16 +23,16 @@ public class EmailVerificationListener implements ApplicationListener<EmailVerif
     }
 
     private void confirmRegistration(EmailVerificationEvent event) {
-        String mailTo = event.getEmail();
+        String mailTo = event.getUsername();
         String subject = "[지스트 청원] 회원 가입 인증 메일";
-        String body = generateMailBody(event.getToken());
+        String body = generateMailBody(event.getVerificationCode());
 
         mailSender.send(mailTo, subject, body);
     }
 
-    private String generateMailBody(String token) {
+    private String generateMailBody(String verificationCode) {
         Context context = new Context();
-        context.setVariable("token", token);
+        context.setVariable("verificationCode", verificationCode);
         return springTemplateEngine.process("email-verification.html", context);
     }
 }
