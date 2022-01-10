@@ -1,7 +1,6 @@
 package com.example.gistcompetitioncnserver.comment;
 
 
-import com.example.gistcompetitioncnserver.exception.CustomException;
 import com.example.gistcompetitioncnserver.user.SessionUser;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;

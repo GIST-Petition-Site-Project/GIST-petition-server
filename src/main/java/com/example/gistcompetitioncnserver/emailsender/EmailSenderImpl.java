@@ -1,6 +1,6 @@
 package com.example.gistcompetitioncnserver.emailsender;
 
-import com.example.gistcompetitioncnserver.exception.CustomException;
+import com.example.gistcompetitioncnserver.exception.WrappedException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +39,7 @@ public class EmailSenderImpl implements EmailSender {
 
         } catch (MessagingException | UnsupportedEncodingException e) {
             LOGGER.error("이메일을 보내는데 실패했습니다.", e);
-            throw new CustomException("이메일을 보내는데 실패했습니다.", e);
+            throw new WrappedException("이메일을 보내는데 실패했습니다.", e);
         }
     }
 }

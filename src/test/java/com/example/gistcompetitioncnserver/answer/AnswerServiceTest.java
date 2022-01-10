@@ -1,6 +1,6 @@
 package com.example.gistcompetitioncnserver.answer;
 
-import com.example.gistcompetitioncnserver.exception.CustomException;
+import com.example.gistcompetitioncnserver.exception.WrappedException;
 import com.example.gistcompetitioncnserver.exception.post.NoSuchPostException;
 import com.example.gistcompetitioncnserver.exception.post.UnAnsweredPostException;
 import com.example.gistcompetitioncnserver.post.Post;
@@ -49,7 +49,7 @@ class AnswerServiceTest {
     void createAnswerByManager() {
         Long savedAnswer = answerService.createAnswer(savedPost.getId(), ANSWER_REQUEST, manager.getId());
 
-        Answer answer = answerRepository.findById(savedAnswer).orElseThrow(() -> new CustomException("존재하지 않는 answer입니다.", null));
+        Answer answer = answerRepository.findById(savedAnswer).orElseThrow(() -> new WrappedException("존재하지 않는 answer입니다.", null));
         assertThat(answer.getId()).isEqualTo(savedAnswer);
         assertThat(answer.getContent()).isEqualTo(ANSWER_REQUEST.getContent());
         assertThat(answer.getUserId()).isEqualTo(manager.getId());
@@ -97,7 +97,7 @@ class AnswerServiceTest {
         Answer answer = answerRepository.save(new Answer(ANSWER_CONTENT, savedPost.getId(), manager.getId()));
         answerService.updateAnswer(savedPost.getId(), UPDATE_REQUEST);
 
-        Answer updatedAnswer = answerRepository.findByPostId(savedPost.getId()).orElseThrow(() -> new CustomException("",null));
+        Answer updatedAnswer = answerRepository.findByPostId(savedPost.getId()).orElseThrow(() -> new WrappedException("", null));
 
         assertThat(answer.getId()).isEqualTo(updatedAnswer.getId());
         assertThat(updatedAnswer.getContent()).isEqualTo(UPDATE_REQUEST.getContent());

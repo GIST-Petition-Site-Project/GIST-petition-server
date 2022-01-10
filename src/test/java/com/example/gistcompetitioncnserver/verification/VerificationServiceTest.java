@@ -1,6 +1,6 @@
 package com.example.gistcompetitioncnserver.verification;
 
-import com.example.gistcompetitioncnserver.exception.CustomException;
+import com.example.gistcompetitioncnserver.exception.WrappedException;
 import com.example.gistcompetitioncnserver.exception.user.DuplicatedUserException;
 import com.example.gistcompetitioncnserver.exception.user.InvalidEmailFormException;
 import com.example.gistcompetitioncnserver.user.User;
@@ -76,7 +76,7 @@ class VerificationServiceTest {
         UsernameConfirmationRequest requestWithIncorrectCode = new UsernameConfirmationRequest(GIST_EMAIL, incorrectVerificationCode);
         assertThatThrownBy(
                 () -> verificationService.confirmUsername(requestWithIncorrectCode)
-        ).isInstanceOf(CustomException.class);
+        ).isInstanceOf(WrappedException.class);
     }
 
     @Test
@@ -87,7 +87,7 @@ class VerificationServiceTest {
         UsernameConfirmationRequest expiredInfoRequest = new UsernameConfirmationRequest(GIST_EMAIL, VERIFICATION_CODE);
         assertThatThrownBy(
                 () -> verificationService.confirmUsername(expiredInfoRequest)
-        ).isInstanceOf(CustomException.class);
+        ).isInstanceOf(WrappedException.class);
     }
 
     @Test
@@ -95,7 +95,7 @@ class VerificationServiceTest {
         verificationInfoRepository.save(new VerificationInfo(null, GIST_EMAIL, VERIFICATION_CODE, LocalDateTime.now().minusMinutes(1), LocalDateTime.now()));
         assertThatThrownBy(
                 () -> verificationService.confirmUsername(new UsernameConfirmationRequest(GIST_EMAIL, VERIFICATION_CODE))
-        ).isInstanceOf(CustomException.class);
+        ).isInstanceOf(WrappedException.class);
     }
 
     @AfterEach
