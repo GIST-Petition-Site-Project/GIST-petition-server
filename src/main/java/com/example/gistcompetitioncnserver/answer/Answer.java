@@ -3,10 +3,7 @@ package com.example.gistcompetitioncnserver.answer;
 import com.example.gistcompetitioncnserver.common.BaseEntity;
 import lombok.Getter;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 @Getter
@@ -14,6 +11,7 @@ public class Answer extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Lob
     private String content;
     private Long postId;
     private Long userId;
