@@ -1,8 +1,10 @@
 package com.example.gistcompetitioncnserver.verification;
 
-import com.example.gistcompetitioncnserver.exception.WrappedException;
 import com.example.gistcompetitioncnserver.exception.user.DuplicatedUserException;
 import com.example.gistcompetitioncnserver.exception.user.InvalidEmailFormException;
+import com.example.gistcompetitioncnserver.exception.verification.DuplicatedVerificationException;
+import com.example.gistcompetitioncnserver.exception.verification.ExpiredVerificationCodeException;
+import com.example.gistcompetitioncnserver.exception.verification.NoSuchVerificationInfoException;
 import com.example.gistcompetitioncnserver.user.User;
 import com.example.gistcompetitioncnserver.user.UserRepository;
 import com.example.gistcompetitioncnserver.user.UserRole;
@@ -76,7 +78,7 @@ class VerificationServiceTest {
         UsernameConfirmationRequest requestWithIncorrectCode = new UsernameConfirmationRequest(GIST_EMAIL, incorrectVerificationCode);
         assertThatThrownBy(
                 () -> verificationService.confirmUsername(requestWithIncorrectCode)
-        ).isInstanceOf(WrappedException.class);
+        ).isInstanceOf(NoSuchVerificationInfoException.class);
     }
 
     @Test
@@ -87,7 +89,7 @@ class VerificationServiceTest {
         UsernameConfirmationRequest expiredInfoRequest = new UsernameConfirmationRequest(GIST_EMAIL, VERIFICATION_CODE);
         assertThatThrownBy(
                 () -> verificationService.confirmUsername(expiredInfoRequest)
-        ).isInstanceOf(WrappedException.class);
+        ).isInstanceOf(ExpiredVerificationCodeException.class);
     }
 
     @Test
@@ -95,7 +97,7 @@ class VerificationServiceTest {
         verificationInfoRepository.save(new VerificationInfo(null, GIST_EMAIL, VERIFICATION_CODE, LocalDateTime.now().minusMinutes(1), LocalDateTime.now()));
         assertThatThrownBy(
                 () -> verificationService.confirmUsername(new UsernameConfirmationRequest(GIST_EMAIL, VERIFICATION_CODE))
-        ).isInstanceOf(WrappedException.class);
+        ).isInstanceOf(DuplicatedVerificationException.class);
     }
 
     @AfterEach

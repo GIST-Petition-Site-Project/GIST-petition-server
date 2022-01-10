@@ -1,6 +1,8 @@
 package com.example.gistcompetitioncnserver.verification;
 
-import com.example.gistcompetitioncnserver.exception.WrappedException;
+import com.example.gistcompetitioncnserver.exception.verification.InvalidVerificationInfoException;
+import com.example.gistcompetitioncnserver.exception.verification.NoSuchVerificationCodeException;
+import com.example.gistcompetitioncnserver.exception.verification.NotConfirmedVerificationCodeException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +39,7 @@ class SignUpValidatorImplTest {
         String notExistingInfo = "NONONO";
         assertThatThrownBy(
                 () -> signUpValidator.checkIsVerified(GIST_EMAIL, notExistingInfo)
-        ).isInstanceOf(WrappedException.class);
+        ).isInstanceOf(NoSuchVerificationCodeException.class);
     }
 
     @Test
@@ -47,7 +49,7 @@ class SignUpValidatorImplTest {
 
         assertThatThrownBy(
                 () -> signUpValidator.checkIsVerified(GIST_EMAIL, VERIFICATION_CODE)
-        ).isInstanceOf(WrappedException.class);
+        ).isInstanceOf(NotConfirmedVerificationCodeException.class);
     }
 
 
@@ -58,7 +60,7 @@ class SignUpValidatorImplTest {
 
         assertThatThrownBy(
                 () -> signUpValidator.checkIsVerified(GIST_EMAIL, VERIFICATION_CODE)
-        ).isInstanceOf(WrappedException.class);
+        ).isInstanceOf(InvalidVerificationInfoException.class);
     }
 
     @AfterEach

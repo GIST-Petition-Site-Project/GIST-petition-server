@@ -1,8 +1,10 @@
 package com.example.gistcompetitioncnserver.verification;
 
-import com.example.gistcompetitioncnserver.exception.WrappedException;
 import com.example.gistcompetitioncnserver.exception.user.DuplicatedUserException;
 import com.example.gistcompetitioncnserver.exception.user.InvalidEmailFormException;
+import com.example.gistcompetitioncnserver.exception.verification.DuplicatedVerificationException;
+import com.example.gistcompetitioncnserver.exception.verification.ExpiredVerificationCodeException;
+import com.example.gistcompetitioncnserver.exception.verification.NoSuchVerificationInfoException;
 import com.example.gistcompetitioncnserver.user.EmailDomain;
 import com.example.gistcompetitioncnserver.user.EmailParser;
 import com.example.gistcompetitioncnserver.user.UserRepository;
@@ -46,14 +48,14 @@ public class VerificationService {
         String verificationCode = request.getVerificationCode();
 
         VerificationInfo info = verificationInfoRepository.findByUsernameAndVerificationCode(username, verificationCode)
-                .orElseThrow(() -> new WrappedException("존재하지 않는 인증 정보입니다.", null));
+                .orElseThrow(NoSuchVerificationInfoException::new);
 
         if (!info.isValidToConfirm(LocalDateTime.now())) {
-            throw new WrappedException("만료된 인증 코드입니다.", null);
+            throw new ExpiredVerificationCodeException();
         }
 
         if (info.isConfirmed()) {
-            throw new WrappedException("이미 인증된 정보입니다.", null);
+            throw new DuplicatedVerificationException();
         }
         info.confirm();
     }
