@@ -2,8 +2,8 @@ package com.example.gistcompetitioncnserver.post;
 
 
 import com.example.gistcompetitioncnserver.comment.CommentRepository;
-import com.example.gistcompetitioncnserver.exception.post.NoSuchPostException;
-import com.example.gistcompetitioncnserver.exception.user.NoSuchUserException;
+import com.example.gistcompetitioncnserver.exception.CustomException;
+import com.example.gistcompetitioncnserver.exception.ErrorCase;
 import com.example.gistcompetitioncnserver.user.User;
 import com.example.gistcompetitioncnserver.user.UserRepository;
 import lombok.AllArgsConstructor;
@@ -43,7 +43,7 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public Post retrievePost(Long postId) {
-        return postRepository.findById(postId).orElseThrow(NoSuchPostException::new);
+        return postRepository.findById(postId).orElseThrow(() -> new CustomException(ErrorCase.NO_SUCH_POST_ERROR));
     }
 
     @Transactional(readOnly = true)
@@ -58,14 +58,14 @@ public class PostService {
 
     @Transactional
     public void updatePostDescription(Long postId, String description) {
-        Post post = postRepository.findById(postId).orElseThrow(NoSuchPostException::new);
+        Post post = postRepository.findById(postId).orElseThrow(() -> new CustomException(ErrorCase.NO_SUCH_POST_ERROR));
         post.setDescription(description);
     }
 
     @Transactional
     public void deletePost(Long postId) {
         if (!postRepository.existsById(postId)) {
-            throw new NoSuchPostException();
+            throw new CustomException(ErrorCase.NO_SUCH_POST_ERROR);
         }
         commentRepository.deleteByPostId(postId);
         postRepository.deleteById(postId);
@@ -74,29 +74,25 @@ public class PostService {
 
     @Transactional
     public Boolean agree(Long postId, Long userId) {
-        Post post = postRepository.findById(postId).orElseThrow(NoSuchPostException::new);
+        Post post = postRepository.findById(postId).orElseThrow(() -> new CustomException(ErrorCase.NO_SUCH_POST_ERROR));
         User user = findUserById(userId);
         return post.applyAgreement(user);
     }
 
     @Transactional(readOnly = true)
     public int getNumberOfAgreements(Long id) {
-        Post post = postRepository.findById(id).orElseThrow(NoSuchPostException::new);
+        Post post = postRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCase.NO_SUCH_POST_ERROR));
         return post.getAgreements().size();
     }
 
     @Transactional(readOnly = true)
     public Boolean getStateOfAgreement(Long postId, Long userId) {
-        Post post = postRepository.findById(postId).orElseThrow(NoSuchPostException::new);
+        Post post = postRepository.findById(postId).orElseThrow(() -> new CustomException(ErrorCase.NO_SUCH_POST_ERROR));
         User user = findUserById(userId);
         return post.isAgreedBy(user);
     }
 
     private User findUserById(Long userId) {
-        return userRepository.findById(userId).orElseThrow(NoSuchUserException::new);
-    }
-
-    private Post findPostById(Long postId) {
-        return postRepository.findById(postId).orElseThrow(NoSuchPostException::new);
+        return userRepository.findById(userId).orElseThrow(() -> new CustomException(ErrorCase.NO_SUCH_USER_ERROR));
     }
 }

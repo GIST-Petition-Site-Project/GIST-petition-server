@@ -1,8 +1,6 @@
 package com.example.gistcompetitioncnserver.answer;
 
-import com.example.gistcompetitioncnserver.exception.WrappedException;
-import com.example.gistcompetitioncnserver.exception.post.NoSuchPostException;
-import com.example.gistcompetitioncnserver.exception.post.UnAnsweredPostException;
+import com.example.gistcompetitioncnserver.exception.CustomException;
 import com.example.gistcompetitioncnserver.post.Post;
 import com.example.gistcompetitioncnserver.post.PostRepository;
 import com.example.gistcompetitioncnserver.user.User;
@@ -49,14 +47,14 @@ class AnswerServiceTest {
     void createAnswerByManager() {
         Long savedAnswer = answerService.createAnswer(savedPost.getId(), ANSWER_REQUEST, manager.getId());
 
-        Answer answer = answerRepository.findById(savedAnswer).orElseThrow(() -> new WrappedException("존재하지 않는 answer입니다.", null));
+        Answer answer = answerRepository.findById(savedAnswer).orElseThrow(() -> new CustomException("존재하지 않는 answer입니다.;"));
         assertThat(answer.getId()).isEqualTo(savedAnswer);
         assertThat(answer.getContent()).isEqualTo(ANSWER_REQUEST.getContent());
         assertThat(answer.getUserId()).isEqualTo(manager.getId());
         assertThat(answer.getPostId()).isEqualTo(savedPost.getId());
 
-        Post post = postRepository.findById(savedPost.getId()).orElseThrow(NoSuchPostException::new);
-        assertTrue(post.isAnswered());
+        Post answeredPost = postRepository.findById(savedPost.getId()).orElseThrow(() -> new CustomException("존재하지 않는 post입니다"));
+        assertTrue(answeredPost.isAnswered());
     }
 
     @Test
@@ -64,7 +62,7 @@ class AnswerServiceTest {
         Long fakePostId = Long.MAX_VALUE;
         assertThatThrownBy(
                 () -> answerService.createAnswer(fakePostId, ANSWER_REQUEST, manager.getId())
-        ).isInstanceOf(NoSuchPostException.class);
+        ).isInstanceOf(CustomException.class);
     }
 
     @Test
@@ -80,7 +78,7 @@ class AnswerServiceTest {
     void retrieveAnswerFromNotExistingPost() {
         assertThatThrownBy(
                 () -> answerService.retrieveAnswerByPostId(savedPost.getId())
-        ).isInstanceOf(UnAnsweredPostException.class);
+        ).isInstanceOf(CustomException.class);
     }
 
     @Test
@@ -89,15 +87,16 @@ class AnswerServiceTest {
 
         assertThatThrownBy(
                 () -> answerService.retrieveAnswerByPostId(notExistingPostId)
-        ).isInstanceOf(NoSuchPostException.class);
+        ).isInstanceOf(CustomException.class);
     }
 
     @Test
     void updateAnswer() {
         Answer answer = answerRepository.save(new Answer(ANSWER_CONTENT, savedPost.getId(), manager.getId()));
+
         answerService.updateAnswer(savedPost.getId(), UPDATE_REQUEST);
 
-        Answer updatedAnswer = answerRepository.findByPostId(savedPost.getId()).orElseThrow(() -> new WrappedException("", null));
+        Answer updatedAnswer = answerRepository.findByPostId(savedPost.getId()).orElseThrow(() -> new CustomException(""));
 
         assertThat(answer.getId()).isEqualTo(updatedAnswer.getId());
         assertThat(updatedAnswer.getContent()).isEqualTo(UPDATE_REQUEST.getContent());
@@ -109,14 +108,14 @@ class AnswerServiceTest {
 
         assertThatThrownBy(
                 () -> answerService.updateAnswer(notExistingPostId, UPDATE_REQUEST)
-        ).isInstanceOf(NoSuchPostException.class);
+        ).isInstanceOf(CustomException.class);
     }
 
     @Test
     void updateAnswerFromNotAnsweredPost() {
         assertThatThrownBy(
                 () -> answerService.updateAnswer(savedPost.getId(), UPDATE_REQUEST)
-        ).isInstanceOf(UnAnsweredPostException.class);
+        ).isInstanceOf(CustomException.class);
     }
 
     @Test
@@ -136,14 +135,14 @@ class AnswerServiceTest {
 
         assertThatThrownBy(
                 () -> answerService.deleteAnswer(notExistingPostId)
-        ).isInstanceOf(NoSuchPostException.class);
+        ).isInstanceOf(CustomException.class);
     }
 
     @Test
     void deleteAnswerFromNotAnsweredPost() {
         assertThatThrownBy(
                 () -> answerService.deleteAnswer(savedPost.getId())
-        ).isInstanceOf(UnAnsweredPostException.class);
+        ).isInstanceOf(CustomException.class);
     }
 
     @AfterEach

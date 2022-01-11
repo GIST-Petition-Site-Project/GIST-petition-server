@@ -1,8 +1,8 @@
 package com.example.gistcompetitioncnserver.answer;
 
-import com.example.gistcompetitioncnserver.exception.user.NoSessionException;
-import com.example.gistcompetitioncnserver.exception.user.UnAuthorizedUserException;
+import com.example.gistcompetitioncnserver.exception.CustomException;
 import com.example.gistcompetitioncnserver.user.SessionUser;
+import com.example.gistcompetitioncnserver.user.UserRole;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -23,12 +23,8 @@ public class AnswerController {
     public ResponseEntity<Object> createAnswer(@PathVariable Long postId,
                                                @Validated @RequestBody AnswerRequest answerRequest) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
-        if (sessionUser == null) {
-            throw new NoSessionException();
-        }
         if (!sessionUser.hasManagerAuthority()) {
-            throw new UnAuthorizedUserException();
-
+            throw new CustomException("답변 권한이 없습니다.");
         }
         Long answerId = answerService.createAnswer(postId, answerRequest, sessionUser.getId());
         return ResponseEntity.created(URI.create("/posts/" + postId + "/answer/" + answerId)).build();
@@ -48,12 +44,8 @@ public class AnswerController {
     public ResponseEntity<Void> updateAnswer(@PathVariable Long postId,
                                              @Validated @RequestBody AnswerRequest changeRequest) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
-        if (sessionUser == null) {
-            throw new NoSessionException();
-        }
         if (!sessionUser.hasManagerAuthority()) {
-            throw new UnAuthorizedUserException();
-
+            throw new CustomException("답변 수정 권한이 없습니다.");
         }
         answerService.updateAnswer(postId, changeRequest);
         return ResponseEntity.ok().build();
@@ -62,11 +54,8 @@ public class AnswerController {
     @DeleteMapping("/posts/{postId}/answer")
     public ResponseEntity<Object> deleteComment(@PathVariable Long postId) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
-        if (sessionUser == null) {
-            throw new NoSessionException();
-        }
         if (!sessionUser.hasManagerAuthority()) {
-            throw new UnAuthorizedUserException();
+            throw new CustomException("답변 삭제 권한이 없습니다.");
         }
         answerService.deleteAnswer(postId);
         return ResponseEntity.noContent().build();

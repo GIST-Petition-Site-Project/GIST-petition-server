@@ -1,9 +1,6 @@
 package com.example.gistcompetitioncnserver.user;
 
-import com.example.gistcompetitioncnserver.exception.user.DuplicatedUserException;
-import com.example.gistcompetitioncnserver.exception.user.InvalidEmailFormException;
-import com.example.gistcompetitioncnserver.exception.user.NoSuchUserException;
-import com.example.gistcompetitioncnserver.exception.user.NotMatchedPasswordException;
+import com.example.gistcompetitioncnserver.exception.CustomException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -63,7 +60,7 @@ class UserServiceTest {
     void signUpFailedIfAlreadyExisted() {
         userService.signUp(DEFAULT_SIGN_UP_REQUEST);
 
-        assertThatThrownBy(() -> userService.signUp(DEFAULT_SIGN_UP_REQUEST)).isInstanceOf(DuplicatedUserException.class);
+        assertThatThrownBy(() -> userService.signUp(DEFAULT_SIGN_UP_REQUEST)).isInstanceOf(CustomException.class);
     }
 
     @Test
@@ -71,7 +68,7 @@ class UserServiceTest {
         String notGistEmail = "email@email.com";
         SignUpRequest signUpRequest = new SignUpRequest(notGistEmail, PASSWORD, VERIFICATION_CODE);
 
-        assertThatThrownBy(() -> userService.signUp(signUpRequest)).isInstanceOf(InvalidEmailFormException.class);
+        assertThatThrownBy(() -> userService.signUp(signUpRequest)).isInstanceOf(CustomException.class);
     }
 
     @Test
@@ -95,7 +92,7 @@ class UserServiceTest {
 
         assertThatThrownBy(
                 () -> userService.signIn(signInRequest)
-        ).isInstanceOf(NoSuchUserException.class);
+        ).isInstanceOf(CustomException.class);
         assertThat(httpSession.getAttribute("user")).isNull();
     }
 
@@ -107,7 +104,7 @@ class UserServiceTest {
 
         assertThatThrownBy(
                 () -> userService.signIn(signInRequest)
-        ).isInstanceOf(NotMatchedPasswordException.class);
+        ).isInstanceOf(CustomException.class);
         assertThat(httpSession.getAttribute("user")).isNull();
     }
 
@@ -154,7 +151,7 @@ class UserServiceTest {
 
         assertThatThrownBy(
                 () -> userService.updatePassword(userId, invalidRequest)
-        ).isInstanceOf(NotMatchedPasswordException.class);
+        ).isInstanceOf(CustomException.class);
     }
 
     @Test
@@ -170,7 +167,7 @@ class UserServiceTest {
     void deleteUserIfNotExisted() {
         Long notExistedId = Long.MAX_VALUE;
 
-        assertThatThrownBy(() -> userService.deleteUser(notExistedId)).isInstanceOf(NoSuchUserException.class);
+        assertThatThrownBy(() -> userService.deleteUser(notExistedId)).isInstanceOf(CustomException.class);
     }
 
 
@@ -189,7 +186,7 @@ class UserServiceTest {
 
         assertThatThrownBy(
                 () -> userService.deleteUserOfMine(userId, new DeleteUserRequest("notPassword"))
-        ).isInstanceOf(NotMatchedPasswordException.class);
+        ).isInstanceOf(CustomException.class);
     }
 
     @AfterEach

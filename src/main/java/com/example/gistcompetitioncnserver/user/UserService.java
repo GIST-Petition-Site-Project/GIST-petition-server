@@ -1,13 +1,14 @@
 package com.example.gistcompetitioncnserver.user;
 
-import com.example.gistcompetitioncnserver.exception.user.DuplicatedUserException;
-import com.example.gistcompetitioncnserver.exception.user.InvalidEmailFormException;
-import com.example.gistcompetitioncnserver.exception.user.NoSuchUserException;
-import com.example.gistcompetitioncnserver.exception.user.NotMatchedPasswordException;
+import com.example.gistcompetitioncnserver.exception.CustomException;
+import com.example.gistcompetitioncnserver.exception.ErrorCase;
+import com.example.gistcompetitioncnserver.verification.VerificationInfo;
+import com.example.gistcompetitioncnserver.verification.VerificationInfoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpSession;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -30,13 +31,13 @@ public class UserService {
         String verificationCode = request.getVerificationCode();
 
         if (userRepository.existsByUsername(username)) {
-            throw new DuplicatedUserException();
+            throw new CustomException("이미 존재하는 회원입니다");
         }
         if (!EmailDomain.has(EmailParser.parseDomainFrom(username))) {
-            throw new InvalidEmailFormException();
+            throw new CustomException("유효하지 않은 이메일 형태입니다");
         }
 
-        signUpValidator.checkIsVerified(username, verificationCode);
+        signUpValidator.checkIsVerified(username,verificationCode);
 
         User user = new User(username, encryptor.hashPassword(request.getPassword()), UserRole.USER);
         return userRepository.save(user).getId();
@@ -45,9 +46,9 @@ public class UserService {
     @Transactional(readOnly = true)
     public void signIn(SignInRequest request) {
         User user = userRepository.findByUsername(request.getUsername())
-                .orElseThrow(NoSuchUserException::new);
+                .orElseThrow(() -> new CustomException("존재하지 않는 회원 입니다."));
         if (!encryptor.isMatch(request.getPassword(), user.getPassword())) {
-            throw new NotMatchedPasswordException();
+            throw new CustomException("비밀번호를 다시 확인해주세요");
         }
         httpSession.setAttribute("user", new SessionUser(user));
     }
@@ -55,13 +56,13 @@ public class UserService {
     @Transactional(readOnly = true)
     public User findUserById(Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(NoSuchUserException::new);
+                .orElseThrow(() -> new CustomException(ErrorCase.NO_SUCH_USER_ERROR));
     }
 
     @Transactional(readOnly = true)
     public User findUserByEmail(String email) {
         return userRepository.findByUsername(email)
-                .orElseThrow(NoSuchUserException::new);
+                .orElseThrow(() -> new CustomException(ErrorCase.NO_SUCH_USER_ERROR));
     }
 
     @Transactional(readOnly = true)
@@ -79,7 +80,7 @@ public class UserService {
     public void updatePassword(Long userId, UpdatePasswordRequest passwordRequest) {
         User user = findUserById(userId);
         if (!encryptor.isMatch(passwordRequest.getOriginPassword(), user.getPassword())) {
-            throw new NotMatchedPasswordException();
+            throw new CustomException("기존 패쓰워드가 일치하지 않습니다.");
         }
         user.setPassword(encryptor.hashPassword(passwordRequest.getNewPassword()));
     }
@@ -87,7 +88,7 @@ public class UserService {
     @Transactional
     public void deleteUser(Long userId) {
         if (!userRepository.existsById(userId)) {
-            throw new NoSuchUserException();
+            throw new CustomException("존재하지 않는 유저입니다");
         }
         userRepository.deleteById(userId);
     }
@@ -96,7 +97,7 @@ public class UserService {
     public void deleteUserOfMine(Long userId, DeleteUserRequest deleteUserRequest) {
         User user = findUserById(userId);
         if (!encryptor.isMatch(deleteUserRequest.getPassword(), user.getPassword())) {
-            throw new NotMatchedPasswordException();
+            throw new CustomException("기존 패쓰워드가 일치하지 않습니다.");
         }
         userRepository.deleteById(userId);
     }

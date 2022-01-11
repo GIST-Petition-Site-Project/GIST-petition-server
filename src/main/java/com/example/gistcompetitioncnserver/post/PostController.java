@@ -1,8 +1,8 @@
 package com.example.gistcompetitioncnserver.post;
 
-import com.example.gistcompetitioncnserver.exception.user.NoSessionException;
-import com.example.gistcompetitioncnserver.exception.user.UnAuthorizedUserException;
+import com.example.gistcompetitioncnserver.exception.CustomException;
 import com.example.gistcompetitioncnserver.user.SessionUser;
+import com.example.gistcompetitioncnserver.user.UserRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -22,9 +22,6 @@ public class PostController {
     @PostMapping("/posts")
     public ResponseEntity<Void> createPost(@Validated @RequestBody PostRequest postRequest) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
-        if (sessionUser == null) {
-            throw new NoSessionException();
-        }
         return ResponseEntity.created(URI.create("/posts/" + postService.createPost(postRequest, sessionUser.getId()))).build();
     }
 
@@ -41,9 +38,6 @@ public class PostController {
     @GetMapping("/posts/me")
     public ResponseEntity<List<Post>> retrievePostsByUserId() {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
-        if (sessionUser == null) {
-            throw new NoSessionException();
-        }
         return ResponseEntity.ok().body(postService.retrievePostsByUserId(sessionUser.getId()));
     }
 
@@ -60,11 +54,8 @@ public class PostController {
     @PutMapping("/posts/{postId}")
     public ResponseEntity<Void> updatePost(@PathVariable Long postId, @Validated @RequestBody PostRequest changeRequest) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
-        if (sessionUser == null) {
-            throw new NoSessionException();
-        }
         if (!sessionUser.hasManagerAuthority()) {
-            throw new UnAuthorizedUserException();
+            throw new CustomException("글 수정 권한이 없습니다.");
         }
         postService.updatePostDescription(postId, changeRequest.getDescription());
         return ResponseEntity.noContent().build();
@@ -73,11 +64,8 @@ public class PostController {
     @DeleteMapping("/posts/{postId}")
     public ResponseEntity<Void> deletePost(@PathVariable Long postId) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
-        if (sessionUser == null) {
-            throw new NoSessionException();
-        }
         if (!sessionUser.hasManagerAuthority()) {
-            throw new UnAuthorizedUserException();
+            throw new CustomException("삭제 권한이 없습니다.");
         }
         postService.deletePost(postId);
         return ResponseEntity.noContent().build();
@@ -86,9 +74,6 @@ public class PostController {
     @PostMapping("/posts/{postId}/agreements")
     public ResponseEntity<Boolean> agreePost(@PathVariable Long postId) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
-        if (sessionUser == null) {
-            throw new NoSessionException();
-        }
         return ResponseEntity.ok().body(postService.agree(postId, sessionUser.getId()));
     }
 
@@ -100,9 +85,6 @@ public class PostController {
     @GetMapping("/posts/{postId}/agreements/me")
     public ResponseEntity<Boolean> getStateOfAgreement(@PathVariable Long postId) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
-        if (sessionUser == null) {
-            throw new NoSessionException();
-        }
         return ResponseEntity.ok().body(postService.getStateOfAgreement(postId, sessionUser.getId()));
     }
 }
