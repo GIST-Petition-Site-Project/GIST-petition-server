@@ -1,7 +1,7 @@
 package com.example.gistcompetitioncnserver.comment;
 
 
-import com.example.gistcompetitioncnserver.exception.user.NoSessionException;
+import com.example.gistcompetitioncnserver.exception.user.UnAuthenticatedException;
 import com.example.gistcompetitioncnserver.user.SessionUser;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +24,7 @@ public class CommentController {
 
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
         if (sessionUser == null) {
-            throw new NoSessionException();
+            throw new UnAuthenticatedException();
         }
         Long commentId = commentService.createComment(postId, commentRequest, sessionUser.getId());
         return ResponseEntity.created(URI.create("/posts/" + postId + "/comments/" + commentId)).build();
@@ -41,7 +41,7 @@ public class CommentController {
                                                 @Validated @RequestBody CommentRequest updateRequest) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
         if (sessionUser == null) {
-            throw new NoSessionException();
+            throw new UnAuthenticatedException();
         }
         if (sessionUser.hasManagerAuthority()) {
             commentService.updateComment(commentId, updateRequest);
@@ -56,7 +56,7 @@ public class CommentController {
                                                 @PathVariable Long commentId) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
         if (sessionUser == null) {
-            throw new NoSessionException();
+            throw new UnAuthenticatedException();
         }
         if (sessionUser.hasManagerAuthority()) {
             commentService.deleteComment(commentId);

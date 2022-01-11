@@ -1,6 +1,6 @@
 package com.example.gistcompetitioncnserver.user;
 
-import com.example.gistcompetitioncnserver.exception.user.NoSessionException;
+import com.example.gistcompetitioncnserver.exception.user.UnAuthenticatedException;
 import com.example.gistcompetitioncnserver.exception.user.UnAuthorizedUserException;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -41,7 +41,7 @@ public class UserController {
     public ResponseEntity<List<User>> retrieveAllUsers() {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
         if (sessionUser == null) {
-            throw new NoSessionException();
+            throw new UnAuthenticatedException();
         }
         if (!sessionUser.isAdmin()) {
             throw new UnAuthorizedUserException();
@@ -53,7 +53,7 @@ public class UserController {
     public ResponseEntity<User> retrieveUser(@PathVariable Long userId) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
         if (sessionUser == null) {
-            throw new NoSessionException();
+            throw new UnAuthenticatedException();
         }
         if (!sessionUser.isAdmin()) {
             throw new UnAuthorizedUserException();
@@ -65,7 +65,7 @@ public class UserController {
     public ResponseEntity<User> retrieveUserOfMine() {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
         if (sessionUser == null) {
-            throw new NoSessionException();
+            throw new UnAuthenticatedException();
         }
         return ResponseEntity.ok().body(userService.findUserById(sessionUser.getId()));
     }
@@ -75,7 +75,7 @@ public class UserController {
                                                @Validated @RequestBody UpdateUserRoleRequest userRoleRequest) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
         if (sessionUser == null) {
-            throw new NoSessionException();
+            throw new UnAuthenticatedException();
         }
         if (!sessionUser.isAdmin()) {
             throw new UnAuthorizedUserException();
@@ -88,7 +88,7 @@ public class UserController {
     public ResponseEntity<Void> updatePasswordOfMine(@Validated @RequestBody UpdatePasswordRequest passwordRequest) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
         if (sessionUser == null) {
-            throw new NoSessionException();
+            throw new UnAuthenticatedException();
         }
         userService.updatePassword(sessionUser.getId(), passwordRequest);
         return ResponseEntity.noContent().build();
@@ -98,7 +98,7 @@ public class UserController {
     public ResponseEntity<Void> deleteUser(@PathVariable Long userId) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
         if (sessionUser == null) {
-            throw new NoSessionException();
+            throw new UnAuthenticatedException();
         }
         if (!sessionUser.isAdmin()) {
             throw new UnAuthorizedUserException();
@@ -111,7 +111,7 @@ public class UserController {
     public ResponseEntity<Void> deleteUserOfMine(@Validated @RequestBody DeleteUserRequest deleteUserRequest) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
         if (sessionUser == null) {
-            throw new NoSessionException();
+            throw new UnAuthenticatedException();
         }
         userService.deleteUserOfMine(sessionUser.getId(), deleteUserRequest);
         return ResponseEntity.noContent().build();
