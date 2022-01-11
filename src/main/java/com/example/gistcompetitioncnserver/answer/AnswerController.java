@@ -28,7 +28,6 @@ public class AnswerController {
         }
         if (!sessionUser.hasManagerAuthority()) {
             throw new UnAuthorizedUserException();
-
         }
         Long answerId = answerService.createAnswer(postId, answerRequest, sessionUser.getId());
         return ResponseEntity.created(URI.create("/posts/" + postId + "/answer/" + answerId)).build();
@@ -53,7 +52,6 @@ public class AnswerController {
         }
         if (!sessionUser.hasManagerAuthority()) {
             throw new UnAuthorizedUserException();
-
         }
         answerService.updateAnswer(postId, changeRequest);
         return ResponseEntity.ok().build();

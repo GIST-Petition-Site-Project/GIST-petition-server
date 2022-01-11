@@ -4,8 +4,6 @@ import com.example.gistcompetitioncnserver.exception.comment.NoSuchCommentExcept
 import com.example.gistcompetitioncnserver.exception.post.NoSuchPostException;
 import com.example.gistcompetitioncnserver.exception.user.UnAuthorizedUserException;
 import com.example.gistcompetitioncnserver.post.PostRepository;
-import com.example.gistcompetitioncnserver.user.UserRole;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -65,7 +63,6 @@ public class CommentService {
         Comment comment = findCommentById(commentId);
         if (!comment.getUserId().equals(eraserId)) {
             throw new UnAuthorizedUserException();
-
         }
         commentRepository.deleteById(commentId);
     }

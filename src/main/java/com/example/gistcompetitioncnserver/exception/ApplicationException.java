@@ -2,7 +2,7 @@ package com.example.gistcompetitioncnserver.exception;
 
 import org.springframework.http.HttpStatus;
 
-public class ApplicationException extends RuntimeException{
+public class ApplicationException extends RuntimeException {
     private final HttpStatus httpStatus;
 
     public ApplicationException(String message, HttpStatus httpStatus) {

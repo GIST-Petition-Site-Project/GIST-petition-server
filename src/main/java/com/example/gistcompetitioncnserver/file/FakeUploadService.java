@@ -2,9 +2,10 @@ package com.example.gistcompetitioncnserver.file;
 
 
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import java.io.InputStream;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
+
+import java.io.InputStream;
 
 @Component
 @Profile("!prod")
