@@ -11,7 +11,7 @@ import javax.servlet.http.HttpSession;
 @Service
 @AllArgsConstructor
 public class SessionLoginService implements LoginService {
-    public static final String USER = "user";
+    public static final String SESSION_KEY = "user";
     private final HttpSession httpSession;
     private final UserRepository userRepository;
     private final Encryptor encryptor;
@@ -24,7 +24,7 @@ public class SessionLoginService implements LoginService {
         if (!encryptor.isMatch(request.getPassword(), user.getPassword())) {
             throw new NotMatchedPasswordException();
         }
-        httpSession.setAttribute(USER, new SessionUser(user));
+        httpSession.setAttribute(SESSION_KEY, new SessionUser(user));
     }
 
     @Override
@@ -34,6 +34,6 @@ public class SessionLoginService implements LoginService {
 
     @Override
     public LoginUser getLoginUser() {
-        return (SessionUser) httpSession.getAttribute(USER);
+        return (SessionUser) httpSession.getAttribute(SESSION_KEY);
     }
 }

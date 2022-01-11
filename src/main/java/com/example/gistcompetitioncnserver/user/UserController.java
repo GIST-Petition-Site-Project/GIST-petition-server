@@ -3,14 +3,11 @@ package com.example.gistcompetitioncnserver.user;
 import com.example.gistcompetitioncnserver.config.annotation.AdminPermissionRequired;
 import com.example.gistcompetitioncnserver.config.annotation.LoginRequired;
 import com.example.gistcompetitioncnserver.config.annotation.LoginUser;
-import com.example.gistcompetitioncnserver.exception.user.UnAuthenticatedException;
-import com.example.gistcompetitioncnserver.exception.user.UnAuthorizedUserException;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpSession;
 import java.net.URI;
 import java.util.List;
 
@@ -20,7 +17,7 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
-    private final HttpSession httpSession;
+    private final LoginService loginService;
 
     @PostMapping("/users")
     public ResponseEntity<Void> register(@Validated @RequestBody SignUpRequest signUpRequest) {
@@ -30,13 +27,13 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<Void> login(@Validated @RequestBody SignInRequest request) {
-        userService.signIn(request);
+        loginService.login(request);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/logout")
     public ResponseEntity<Void> logout() {
-        httpSession.invalidate();
+        loginService.logout();
         return ResponseEntity.noContent().build();
     }
 

@@ -6,4 +6,6 @@ public interface LoginUser {
     boolean isAdmin();
 
     boolean hasManagerAuthority();
+
+    UserRole getUserRole();
 }

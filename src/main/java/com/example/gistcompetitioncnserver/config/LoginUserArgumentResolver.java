@@ -1,8 +1,8 @@
 package com.example.gistcompetitioncnserver.config;
 
 import com.example.gistcompetitioncnserver.config.annotation.LoginUser;
-import com.example.gistcompetitioncnserver.user.SessionUser;
-import com.example.gistcompetitioncnserver.user.UserService;
+import com.example.gistcompetitioncnserver.user.LoginService;
+import lombok.AllArgsConstructor;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -11,23 +11,20 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 @Component
+@AllArgsConstructor
 public class LoginUserArgumentResolver implements HandlerMethodArgumentResolver {
-    private final UserService userService;
-
-    public LoginUserArgumentResolver(UserService userService) {
-        this.userService = userService;
-    }
+    private final LoginService userService;
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
         if (parameter.getParameterAnnotation(LoginUser.class) == null) {
             return false;
         }
-        return parameter.getParameterType().equals(SessionUser.class);
+        return parameter.getParameterType().equals(LoginUser.class);
     }
 
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
-        return userService.getSessionUser();
+        return userService.getLoginUser();
     }
 }

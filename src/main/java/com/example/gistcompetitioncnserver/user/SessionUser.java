@@ -1,10 +1,7 @@
 package com.example.gistcompetitioncnserver.user;
 
-import lombok.Data;
-
 import java.io.Serializable;
 
-@Data
 public class SessionUser implements LoginUser, Serializable {
     private final Long id;
     private final UserRole userRole;
@@ -20,5 +17,15 @@ public class SessionUser implements LoginUser, Serializable {
 
     public boolean hasManagerAuthority() {
         return userRole == UserRole.MANAGER || userRole == UserRole.ADMIN;
+    }
+
+    @Override
+    public Long getId() {
+        return id;
+    }
+
+    @Override
+    public UserRole getUserRole() {
+        return userRole;
     }
 }
