@@ -18,3 +18,11 @@ spring:
 logging:
   level:
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+server:
+  servlet:
+    session:
+      cookie:
+        domain: gist-petition.com
+        http-only: true
+        path: /
+
