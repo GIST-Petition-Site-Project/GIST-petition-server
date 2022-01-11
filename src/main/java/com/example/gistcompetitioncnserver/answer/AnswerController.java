@@ -1,14 +1,14 @@
 package com.example.gistcompetitioncnserver.answer;
 
-import com.example.gistcompetitioncnserver.exception.user.UnAuthenticatedException;
 import com.example.gistcompetitioncnserver.exception.user.UnAuthorizedUserException;
+import com.example.gistcompetitioncnserver.user.LoginRequired;
+import com.example.gistcompetitioncnserver.user.LoginUser;
 import com.example.gistcompetitioncnserver.user.SessionUser;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpSession;
 import java.net.URI;
 
 @RestController
@@ -17,15 +17,12 @@ import java.net.URI;
 public class AnswerController {
 
     private final AnswerService answerService;
-    private final HttpSession httpSession;
 
+    @LoginRequired
     @PostMapping("/posts/{postId}/answer")
     public ResponseEntity<Object> createAnswer(@PathVariable Long postId,
-                                               @Validated @RequestBody AnswerRequest answerRequest) {
-        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
-        if (sessionUser == null) {
-            throw new UnAuthenticatedException();
-        }
+                                               @Validated @RequestBody AnswerRequest answerRequest,
+                                               @LoginUser SessionUser sessionUser) {
         if (!sessionUser.hasManagerAuthority()) {
             throw new UnAuthorizedUserException();
         }
@@ -43,13 +40,11 @@ public class AnswerController {
         return ResponseEntity.ok().body(answerService.getNumberOfAnswers());
     }
 
+    @LoginRequired
     @PutMapping("/posts/{postId}/answer")
     public ResponseEntity<Void> updateAnswer(@PathVariable Long postId,
-                                             @Validated @RequestBody AnswerRequest changeRequest) {
-        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
-        if (sessionUser == null) {
-            throw new UnAuthenticatedException();
-        }
+                                             @Validated @RequestBody AnswerRequest changeRequest,
+                                             @LoginUser SessionUser sessionUser) {
         if (!sessionUser.hasManagerAuthority()) {
             throw new UnAuthorizedUserException();
         }
@@ -57,12 +52,10 @@ public class AnswerController {
         return ResponseEntity.ok().build();
     }
 
+    @LoginRequired
     @DeleteMapping("/posts/{postId}/answer")
-    public ResponseEntity<Object> deleteComment(@PathVariable Long postId) {
-        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
-        if (sessionUser == null) {
-            throw new UnAuthenticatedException();
-        }
+    public ResponseEntity<Object> deleteComment(@PathVariable Long postId,
+                                                @LoginUser SessionUser sessionUser) {
         if (!sessionUser.hasManagerAuthority()) {
             throw new UnAuthorizedUserException();
         }
