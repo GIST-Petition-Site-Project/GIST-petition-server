@@ -13,6 +13,7 @@ public class WebConfig implements WebMvcConfigurer {
                         "http://127.0.0.1:3000",
                         "http://petition-bucket.s3-website.ap-northeast-2.amazonaws.com")
                 .allowedMethods("*")
-                .allowedHeaders("*");
+                .allowedHeaders("*")
+                .allowCredentials(true);
     }
 }
