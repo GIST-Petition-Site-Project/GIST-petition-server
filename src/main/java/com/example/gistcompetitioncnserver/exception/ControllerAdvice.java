@@ -9,16 +9,17 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class ControllerAdvice {
 
     @ExceptionHandler(ApplicationException.class)
-    public ResponseEntity<String> handle(ApplicationException ex) {
+    public ResponseEntity<ErrorResponse> handle(ApplicationException ex) {
         if (ex instanceof WrappedException) {
-            return ResponseEntity.status(ex.getHttpStatus()).body(ex.getCause().getMessage());
+            return ResponseEntity.status(ex.getHttpStatus()).body(new ErrorResponse(ex.getCause().getMessage()));
         }
-        return ResponseEntity.status(ex.getHttpStatus()).body(ex.getMessage());
+        return ResponseEntity.status(ex.getHttpStatus()).body(new ErrorResponse(ex.getMessage()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<String> validException(MethodArgumentNotValidException ex) {
+    public ResponseEntity<ErrorResponse> validException(MethodArgumentNotValidException ex) {
         String message = ex.getBindingResult().getAllErrors().get(0).getDefaultMessage();
-        return ResponseEntity.badRequest().body(message);
+        return ResponseEntity.badRequest().body(new ErrorResponse(message));
     }
+
 }
