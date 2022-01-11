@@ -48,8 +48,8 @@ public class PostController {
     }
 
     @GetMapping("/posts/count")
-    public ResponseEntity<Long> getPageNumber() {
-        return ResponseEntity.ok().body(postService.getPageNumber());
+    public ResponseEntity<Long> getPostCount() {
+        return ResponseEntity.ok().body(postService.getPostCount());
     }
 
     @GetMapping("/posts/category")
