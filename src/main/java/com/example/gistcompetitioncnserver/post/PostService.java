@@ -47,7 +47,7 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public Long getPageNumber() {
+    public Long getPostCount() {
         return postRepository.count();
     }
 
