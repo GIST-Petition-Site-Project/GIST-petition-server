@@ -1,8 +1,8 @@
 package com.example.gistcompetitioncnserver.comment;
 
 
-import com.example.gistcompetitioncnserver.user.LoginRequired;
-import com.example.gistcompetitioncnserver.user.LoginUser;
+import com.example.gistcompetitioncnserver.config.annotation.LoginRequired;
+import com.example.gistcompetitioncnserver.config.annotation.LoginUser;
 import com.example.gistcompetitioncnserver.user.SessionUser;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;

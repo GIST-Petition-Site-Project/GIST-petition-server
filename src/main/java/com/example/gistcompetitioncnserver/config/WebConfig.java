@@ -1,7 +1,5 @@
 package com.example.gistcompetitioncnserver.config;
 
-import com.example.gistcompetitioncnserver.user.LoginInterceptor;
-import com.example.gistcompetitioncnserver.user.LoginUserArgumentResolver;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;

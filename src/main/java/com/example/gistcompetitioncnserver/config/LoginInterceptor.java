@@ -1,7 +1,10 @@
-package com.example.gistcompetitioncnserver.user;
+package com.example.gistcompetitioncnserver.config;
 
 
+import com.example.gistcompetitioncnserver.config.annotation.LoginRequired;
 import com.example.gistcompetitioncnserver.exception.user.UnAuthenticatedException;
+import com.example.gistcompetitioncnserver.user.SessionUser;
+import com.example.gistcompetitioncnserver.user.UserService;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
