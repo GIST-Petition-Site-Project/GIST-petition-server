@@ -2,7 +2,7 @@ package com.example.gistcompetitioncnserver.post;
 
 import com.example.gistcompetitioncnserver.config.annotation.LoginRequired;
 import com.example.gistcompetitioncnserver.config.annotation.LoginUser;
-import com.example.gistcompetitioncnserver.exception.user.UnAuthorizedUserException;
+import com.example.gistcompetitioncnserver.config.annotation.ManagerPermissionRequired;
 import com.example.gistcompetitioncnserver.user.SessionUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -51,25 +51,19 @@ public class PostController {
         return ResponseEntity.ok().body(postService.getPostsByCategory(categoryName));
     }
 
-    @LoginRequired
+    @ManagerPermissionRequired
     @PutMapping("/posts/{postId}")
     public ResponseEntity<Void> updatePost(@PathVariable Long postId,
                                            @Validated @RequestBody PostRequest changeRequest,
                                            @LoginUser SessionUser sessionUser) {
-        if (!sessionUser.hasManagerAuthority()) {
-            throw new UnAuthorizedUserException();
-        }
         postService.updatePostDescription(postId, changeRequest.getDescription());
         return ResponseEntity.noContent().build();
     }
 
-    @LoginRequired
+    @ManagerPermissionRequired
     @DeleteMapping("/posts/{postId}")
     public ResponseEntity<Void> deletePost(@PathVariable Long postId,
                                            @LoginUser SessionUser sessionUser) {
-        if (!sessionUser.hasManagerAuthority()) {
-            throw new UnAuthorizedUserException();
-        }
         postService.deletePost(postId);
         return ResponseEntity.noContent().build();
     }

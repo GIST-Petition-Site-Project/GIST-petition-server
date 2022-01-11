@@ -1,8 +1,7 @@
 package com.example.gistcompetitioncnserver.answer;
 
-import com.example.gistcompetitioncnserver.config.annotation.LoginRequired;
 import com.example.gistcompetitioncnserver.config.annotation.LoginUser;
-import com.example.gistcompetitioncnserver.exception.user.UnAuthorizedUserException;
+import com.example.gistcompetitioncnserver.config.annotation.ManagerPermissionRequired;
 import com.example.gistcompetitioncnserver.user.SessionUser;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,14 +17,11 @@ public class AnswerController {
 
     private final AnswerService answerService;
 
-    @LoginRequired
+    @ManagerPermissionRequired
     @PostMapping("/posts/{postId}/answer")
     public ResponseEntity<Object> createAnswer(@PathVariable Long postId,
                                                @Validated @RequestBody AnswerRequest answerRequest,
                                                @LoginUser SessionUser sessionUser) {
-        if (!sessionUser.hasManagerAuthority()) {
-            throw new UnAuthorizedUserException();
-        }
         Long answerId = answerService.createAnswer(postId, answerRequest, sessionUser.getId());
         return ResponseEntity.created(URI.create("/posts/" + postId + "/answer/" + answerId)).build();
     }
@@ -40,25 +36,17 @@ public class AnswerController {
         return ResponseEntity.ok().body(answerService.getNumberOfAnswers());
     }
 
-    @LoginRequired
+    @ManagerPermissionRequired
     @PutMapping("/posts/{postId}/answer")
     public ResponseEntity<Void> updateAnswer(@PathVariable Long postId,
-                                             @Validated @RequestBody AnswerRequest changeRequest,
-                                             @LoginUser SessionUser sessionUser) {
-        if (!sessionUser.hasManagerAuthority()) {
-            throw new UnAuthorizedUserException();
-        }
+                                             @Validated @RequestBody AnswerRequest changeRequest) {
         answerService.updateAnswer(postId, changeRequest);
         return ResponseEntity.ok().build();
     }
 
-    @LoginRequired
+    @ManagerPermissionRequired
     @DeleteMapping("/posts/{postId}/answer")
-    public ResponseEntity<Object> deleteComment(@PathVariable Long postId,
-                                                @LoginUser SessionUser sessionUser) {
-        if (!sessionUser.hasManagerAuthority()) {
-            throw new UnAuthorizedUserException();
-        }
+    public ResponseEntity<Object> deleteComment(@PathVariable Long postId) {
         answerService.deleteAnswer(postId);
         return ResponseEntity.noContent().build();
     }
