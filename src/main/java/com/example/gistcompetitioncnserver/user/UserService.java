@@ -52,6 +52,10 @@ public class UserService {
         httpSession.setAttribute("user", new SessionUser(user));
     }
 
+    public SessionUser getSessionUser() {
+        return (SessionUser) httpSession.getAttribute("user");
+    }
+
     @Transactional(readOnly = true)
     public User findUserById(Long userId) {
         return userRepository.findById(userId)

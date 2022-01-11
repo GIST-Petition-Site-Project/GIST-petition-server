@@ -58,7 +58,8 @@ public class PostController {
     }
 
     @PutMapping("/posts/{postId}")
-    public ResponseEntity<Void> updatePost(@PathVariable Long postId, @Validated @RequestBody PostRequest changeRequest) {
+    public ResponseEntity<Void> updatePost(@PathVariable Long postId,
+                                           @Validated @RequestBody PostRequest changeRequest) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
         if (sessionUser == null) {
             throw new UnAuthenticatedException();
