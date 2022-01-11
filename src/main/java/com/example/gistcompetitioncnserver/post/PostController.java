@@ -1,6 +1,6 @@
 package com.example.gistcompetitioncnserver.post;
 
-import com.example.gistcompetitioncnserver.exception.user.NoSessionException;
+import com.example.gistcompetitioncnserver.exception.user.UnAuthenticatedException;
 import com.example.gistcompetitioncnserver.exception.user.UnAuthorizedUserException;
 import com.example.gistcompetitioncnserver.user.SessionUser;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ public class PostController {
     public ResponseEntity<Void> createPost(@Validated @RequestBody PostRequest postRequest) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
         if (sessionUser == null) {
-            throw new NoSessionException();
+            throw new UnAuthenticatedException();
         }
         return ResponseEntity.created(URI.create("/posts/" + postService.createPost(postRequest, sessionUser.getId()))).build();
     }
@@ -42,7 +42,7 @@ public class PostController {
     public ResponseEntity<List<Post>> retrievePostsByUserId() {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
         if (sessionUser == null) {
-            throw new NoSessionException();
+            throw new UnAuthenticatedException();
         }
         return ResponseEntity.ok().body(postService.retrievePostsByUserId(sessionUser.getId()));
     }
@@ -61,7 +61,7 @@ public class PostController {
     public ResponseEntity<Void> updatePost(@PathVariable Long postId, @Validated @RequestBody PostRequest changeRequest) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
         if (sessionUser == null) {
-            throw new NoSessionException();
+            throw new UnAuthenticatedException();
         }
         if (!sessionUser.hasManagerAuthority()) {
             throw new UnAuthorizedUserException();
@@ -74,7 +74,7 @@ public class PostController {
     public ResponseEntity<Void> deletePost(@PathVariable Long postId) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
         if (sessionUser == null) {
-            throw new NoSessionException();
+            throw new UnAuthenticatedException();
         }
         if (!sessionUser.hasManagerAuthority()) {
             throw new UnAuthorizedUserException();
@@ -87,7 +87,7 @@ public class PostController {
     public ResponseEntity<Boolean> agreePost(@PathVariable Long postId) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
         if (sessionUser == null) {
-            throw new NoSessionException();
+            throw new UnAuthenticatedException();
         }
         return ResponseEntity.ok().body(postService.agree(postId, sessionUser.getId()));
     }
@@ -101,7 +101,7 @@ public class PostController {
     public ResponseEntity<Boolean> getStateOfAgreement(@PathVariable Long postId) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
         if (sessionUser == null) {
-            throw new NoSessionException();
+            throw new UnAuthenticatedException();
         }
         return ResponseEntity.ok().body(postService.getStateOfAgreement(postId, sessionUser.getId()));
     }
