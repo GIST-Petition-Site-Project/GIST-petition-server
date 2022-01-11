@@ -1,12 +1,12 @@
 package com.example.gistcompetitioncnserver.post;
 
 
-import com.example.gistcompetitioncnserver.comment.CommentRepository;
 import com.example.gistcompetitioncnserver.exception.post.NoSuchPostException;
 import com.example.gistcompetitioncnserver.exception.user.NoSuchUserException;
 import com.example.gistcompetitioncnserver.user.User;
 import com.example.gistcompetitioncnserver.user.UserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,8 +18,8 @@ import java.util.List;
 public class PostService {
 
     private final PostRepository postRepository;
-    private final CommentRepository commentRepository;
     private final UserRepository userRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public Long createPost(PostRequest postRequest, Long userId) {
@@ -43,7 +43,7 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public Post retrievePost(Long postId) {
-        return postRepository.findById(postId).orElseThrow(NoSuchPostException::new);
+        return findPostById(postId);
     }
 
     @Transactional(readOnly = true)
@@ -58,7 +58,7 @@ public class PostService {
 
     @Transactional
     public void updatePostDescription(Long postId, String description) {
-        Post post = postRepository.findById(postId).orElseThrow(NoSuchPostException::new);
+        Post post = findPostById(postId);
         post.setDescription(description);
     }
 
@@ -67,27 +67,26 @@ public class PostService {
         if (!postRepository.existsById(postId)) {
             throw new NoSuchPostException();
         }
-        commentRepository.deleteByPostId(postId);
         postRepository.deleteById(postId);
+        eventPublisher.publishEvent(new PostDeleteEvent(postId));
     }
-
 
     @Transactional
     public Boolean agree(Long postId, Long userId) {
-        Post post = postRepository.findById(postId).orElseThrow(NoSuchPostException::new);
+        Post post = findPostById(postId);
         User user = findUserById(userId);
         return post.applyAgreement(user);
     }
 
     @Transactional(readOnly = true)
-    public int getNumberOfAgreements(Long id) {
-        Post post = postRepository.findById(id).orElseThrow(NoSuchPostException::new);
+    public int getNumberOfAgreements(Long postId) {
+        Post post = findPostById(postId);
         return post.getAgreements().size();
     }
 
     @Transactional(readOnly = true)
     public Boolean getStateOfAgreement(Long postId, Long userId) {
-        Post post = postRepository.findById(postId).orElseThrow(NoSuchPostException::new);
+        Post post = findPostById(postId);
         User user = findUserById(userId);
         return post.isAgreedBy(user);
     }
