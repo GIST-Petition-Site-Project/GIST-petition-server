@@ -1,8 +1,9 @@
 package com.example.gistcompetitioncnserver.config;
 
 
-import com.example.gistcompetitioncnserver.config.annotation.LoginRequired;
+import com.example.gistcompetitioncnserver.config.annotation.AdminPermissionRequired;
 import com.example.gistcompetitioncnserver.exception.user.UnAuthenticatedException;
+import com.example.gistcompetitioncnserver.exception.user.UnAuthorizedUserException;
 import com.example.gistcompetitioncnserver.user.SessionUser;
 import com.example.gistcompetitioncnserver.user.UserService;
 import org.springframework.stereotype.Component;
@@ -14,19 +15,22 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Objects;
 
 @Component
-public class LoginInterceptor implements HandlerInterceptor {
+public class AdminPermissionInterceptor implements HandlerInterceptor {
     private final UserService userService;
 
-    public LoginInterceptor(UserService userService) {
+    public AdminPermissionInterceptor(UserService userService) {
         this.userService = userService;
     }
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-        if (handler instanceof HandlerMethod && ((HandlerMethod) handler).hasMethodAnnotation(LoginRequired.class)) {
+        if (handler instanceof HandlerMethod && ((HandlerMethod) handler).hasMethodAnnotation(AdminPermissionRequired.class)) {
             SessionUser sessionUser = userService.getSessionUser();
             if (Objects.isNull(sessionUser)) {
                 throw new UnAuthenticatedException();
+            }
+            if (!sessionUser.isAdmin()) {
+                throw new UnAuthorizedUserException();
             }
             return true;
         }

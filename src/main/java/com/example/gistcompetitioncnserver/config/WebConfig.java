@@ -13,6 +13,8 @@ import java.util.List;
 @AllArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
     private final LoginInterceptor loginInterceptor;
+    private final ManagerPermissionInterceptor managerPermissionInterceptor;
+    private final AdminPermissionInterceptor adminPermissionInterceptor;
     private final LoginUserArgumentResolver loginUserArgumentResolver;
 
     @Override
@@ -29,6 +31,8 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(loginInterceptor);
+        registry.addInterceptor(managerPermissionInterceptor);
+        registry.addInterceptor(adminPermissionInterceptor);
     }
 
     @Override
