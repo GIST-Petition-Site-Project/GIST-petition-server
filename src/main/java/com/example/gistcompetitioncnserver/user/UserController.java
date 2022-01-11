@@ -1,5 +1,8 @@
 package com.example.gistcompetitioncnserver.user;
 
+import com.example.gistcompetitioncnserver.config.annotation.AdminPermissionRequired;
+import com.example.gistcompetitioncnserver.config.annotation.LoginRequired;
+import com.example.gistcompetitioncnserver.config.annotation.LoginUser;
 import com.example.gistcompetitioncnserver.exception.user.UnAuthenticatedException;
 import com.example.gistcompetitioncnserver.exception.user.UnAuthorizedUserException;
 import lombok.AllArgsConstructor;
@@ -37,82 +40,51 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
+    @AdminPermissionRequired
     @GetMapping("/users")
     public ResponseEntity<List<User>> retrieveAllUsers() {
-        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
-        if (sessionUser == null) {
-            throw new UnAuthenticatedException();
-        }
-        if (!sessionUser.isAdmin()) {
-            throw new UnAuthorizedUserException();
-        }
         return ResponseEntity.ok().body(userService.findAllUsers());
     }
 
+    @AdminPermissionRequired
     @GetMapping("/users/{userId}")
     public ResponseEntity<User> retrieveUser(@PathVariable Long userId) {
-        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
-        if (sessionUser == null) {
-            throw new UnAuthenticatedException();
-        }
-        if (!sessionUser.isAdmin()) {
-            throw new UnAuthorizedUserException();
-        }
         return ResponseEntity.ok().body(userService.findUserById(userId));
     }
 
+    @LoginRequired
     @GetMapping("/users/me")
-    public ResponseEntity<User> retrieveUserOfMine() {
-        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
-        if (sessionUser == null) {
-            throw new UnAuthenticatedException();
-        }
+    public ResponseEntity<User> retrieveUserOfMine(@LoginUser SessionUser sessionUser) {
         return ResponseEntity.ok().body(userService.findUserById(sessionUser.getId()));
     }
 
+    @AdminPermissionRequired
     @PutMapping("/users/{userId}/userRole")
     public ResponseEntity<Void> updateUserRole(@PathVariable Long userId,
                                                @Validated @RequestBody UpdateUserRoleRequest userRoleRequest) {
-        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
-        if (sessionUser == null) {
-            throw new UnAuthenticatedException();
-        }
-        if (!sessionUser.isAdmin()) {
-            throw new UnAuthorizedUserException();
-        }
         userService.updateUserRole(userId, userRoleRequest);
         return ResponseEntity.noContent().build();
     }
 
+    @LoginRequired
     @PutMapping("/users/me/password")
-    public ResponseEntity<Void> updatePasswordOfMine(@Validated @RequestBody UpdatePasswordRequest passwordRequest) {
-        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
-        if (sessionUser == null) {
-            throw new UnAuthenticatedException();
-        }
+    public ResponseEntity<Void> updatePasswordOfMine(@Validated @RequestBody UpdatePasswordRequest passwordRequest,
+                                                     @LoginUser SessionUser sessionUser) {
         userService.updatePassword(sessionUser.getId(), passwordRequest);
         return ResponseEntity.noContent().build();
     }
 
+    @AdminPermissionRequired
     @DeleteMapping("/users/{userId}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long userId) {
-        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
-        if (sessionUser == null) {
-            throw new UnAuthenticatedException();
-        }
-        if (!sessionUser.isAdmin()) {
-            throw new UnAuthorizedUserException();
-        }
         userService.deleteUser(userId);
         return ResponseEntity.noContent().build();
     }
 
+    @LoginRequired
     @DeleteMapping("/users/me")
-    public ResponseEntity<Void> deleteUserOfMine(@Validated @RequestBody DeleteUserRequest deleteUserRequest) {
-        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
-        if (sessionUser == null) {
-            throw new UnAuthenticatedException();
-        }
+    public ResponseEntity<Void> deleteUserOfMine(@Validated @RequestBody DeleteUserRequest deleteUserRequest,
+                                                 @LoginUser SessionUser sessionUser) {
         userService.deleteUserOfMine(sessionUser.getId(), deleteUserRequest);
         return ResponseEntity.noContent().build();
     }
