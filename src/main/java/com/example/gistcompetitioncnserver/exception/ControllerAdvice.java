@@ -10,10 +10,12 @@ public class ControllerAdvice {
 
     @ExceptionHandler(ApplicationException.class)
     public ResponseEntity<ErrorResponse> handle(ApplicationException ex) {
-        if (ex instanceof WrappedException) {
-            return ResponseEntity.status(ex.getHttpStatus()).body(new ErrorResponse(ex.getCause().getMessage()));
-        }
         return ResponseEntity.status(ex.getHttpStatus()).body(new ErrorResponse(ex.getMessage()));
+    }
+
+    @ExceptionHandler(WrappedException.class)
+    public ResponseEntity<ErrorResponse> handle(WrappedException ex) {
+        return ResponseEntity.status(ex.getHttpStatus()).body(new ErrorResponse(ex.getCause().getMessage()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -21,5 +23,4 @@ public class ControllerAdvice {
         String message = ex.getBindingResult().getAllErrors().get(0).getDefaultMessage();
         return ResponseEntity.badRequest().body(new ErrorResponse(message));
     }
-
 }
