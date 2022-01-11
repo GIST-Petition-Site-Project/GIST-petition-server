@@ -1,9 +1,10 @@
 package com.example.gistcompetitioncnserver.answer;
 
-import com.example.gistcompetitioncnserver.exception.CustomException;
+import com.example.gistcompetitioncnserver.exception.post.DuplicatedAnswerException;
+import com.example.gistcompetitioncnserver.exception.post.NoSuchPostException;
+import com.example.gistcompetitioncnserver.exception.post.UnAnsweredPostException;
 import com.example.gistcompetitioncnserver.post.Post;
 import com.example.gistcompetitioncnserver.post.PostRepository;
-import com.example.gistcompetitioncnserver.user.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,7 +24,7 @@ public class AnswerService {
     public Long createAnswer(Long postId, AnswerRequest answerRequest, Long userId) {
         Post post = findPostBy(postId);
         if (post.isAnswered()) {
-            throw new CustomException("이미 답변이 된 post입니다.");
+            throw new DuplicatedAnswerException();
         }
         Answer answer = new Answer(answerRequest.getContent(), postId, userId);
         post.setAnswered(true);
@@ -57,23 +58,22 @@ public class AnswerService {
     }
 
     private Post findPostBy(Long postId) {
-        return postRepository.findById(postId).orElseThrow(() -> new CustomException("존재하지 않는 post입니다"));
+        return postRepository.findById(postId).orElseThrow(NoSuchPostException::new);
     }
 
     private void checkExistenceOfPost(Long postId) {
         if (!postRepository.existsById(postId)) {
-            throw new CustomException("존재하지 않는 post입니다");
+            throw new NoSuchPostException();
         }
     }
 
     private void checkExistenceOfAnswerOf(Long postId) {
         if (!answerRepository.existsByPostId(postId)) {
-            throw new CustomException("해당 post에는 답변이 존재하지 않습니다.");
+            throw new UnAnsweredPostException();
         }
     }
 
     private Answer findAnswerByPostId(Long postId) {
-        return answerRepository.findByPostId(postId)
-                .orElseThrow(() -> new CustomException("해당 post에는 답변이 존재하지 않습니다."));
+        return answerRepository.findByPostId(postId).orElseThrow(UnAnsweredPostException::new);
     }
 }

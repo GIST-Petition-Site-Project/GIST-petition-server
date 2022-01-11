@@ -1,7 +1,7 @@
 package com.example.gistcompetitioncnserver.comment;
 
 
-import com.example.gistcompetitioncnserver.exception.CustomException;
+import com.example.gistcompetitioncnserver.exception.user.NoSessionException;
 import com.example.gistcompetitioncnserver.user.SessionUser;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +23,9 @@ public class CommentController {
                                               @RequestBody CommentRequest commentRequest) {
 
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
+        if (sessionUser == null) {
+            throw new NoSessionException();
+        }
         Long commentId = commentService.createComment(postId, commentRequest, sessionUser.getId());
         return ResponseEntity.created(URI.create("/posts/" + postId + "/comments/" + commentId)).build();
     }
@@ -37,6 +40,9 @@ public class CommentController {
                                                 @PathVariable Long commentId,
                                                 @Validated @RequestBody CommentRequest updateRequest) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
+        if (sessionUser == null) {
+            throw new NoSessionException();
+        }
         if (sessionUser.hasManagerAuthority()) {
             commentService.updateComment(commentId, updateRequest);
             return ResponseEntity.noContent().build();
@@ -49,6 +55,9 @@ public class CommentController {
     public ResponseEntity<Object> deleteComment(@PathVariable Long postId,
                                                 @PathVariable Long commentId) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
+        if (sessionUser == null) {
+            throw new NoSessionException();
+        }
         if (sessionUser.hasManagerAuthority()) {
             commentService.deleteComment(commentId);
             return ResponseEntity.noContent().build();

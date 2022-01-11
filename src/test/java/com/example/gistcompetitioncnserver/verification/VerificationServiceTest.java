@@ -1,12 +1,14 @@
 package com.example.gistcompetitioncnserver.verification;
 
-import com.example.gistcompetitioncnserver.exception.CustomException;
+import com.example.gistcompetitioncnserver.exception.user.DuplicatedUserException;
+import com.example.gistcompetitioncnserver.exception.user.InvalidEmailFormException;
+import com.example.gistcompetitioncnserver.exception.verification.DuplicatedVerificationException;
+import com.example.gistcompetitioncnserver.exception.verification.ExpiredVerificationCodeException;
+import com.example.gistcompetitioncnserver.exception.verification.NoSuchVerificationInfoException;
 import com.example.gistcompetitioncnserver.user.User;
 import com.example.gistcompetitioncnserver.user.UserRepository;
 import com.example.gistcompetitioncnserver.user.UserRole;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,9 +16,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.time.LocalDateTime;
 
 import static com.example.gistcompetitioncnserver.verification.VerificationInfo.CONFIRM_EXPIRE_MINUTE;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 class VerificationServiceTest {
@@ -46,17 +47,17 @@ class VerificationServiceTest {
     @Test
     void createVerificationCodeFailedIfAlreadyExisted() {
         userRepository.save(new User(GIST_EMAIL, PASSWORD, UserRole.USER, true));
-        Assertions.assertThatThrownBy(
+        assertThatThrownBy(
                 () -> verificationService.createVerificationInfo(new VerificationEmailRequest(GIST_EMAIL))
-        ).isInstanceOf(CustomException.class);
+        ).isInstanceOf(DuplicatedUserException.class);
     }
 
     @Test
     void createVerificationCodeFailedIfNotValidEmailForm() {
         String notGistEmail = "notGistEmail@gmail.com";
-        Assertions.assertThatThrownBy(
+        assertThatThrownBy(
                 () -> verificationService.createVerificationInfo(new VerificationEmailRequest(notGistEmail))
-        ).isInstanceOf(CustomException.class);
+        ).isInstanceOf(InvalidEmailFormException.class);
     }
 
     @Test
@@ -75,9 +76,9 @@ class VerificationServiceTest {
 
         String incorrectVerificationCode = VERIFICATION_CODE + "A";
         UsernameConfirmationRequest requestWithIncorrectCode = new UsernameConfirmationRequest(GIST_EMAIL, incorrectVerificationCode);
-        Assertions.assertThatThrownBy(
+        assertThatThrownBy(
                 () -> verificationService.confirmUsername(requestWithIncorrectCode)
-        ).isInstanceOf(CustomException.class);
+        ).isInstanceOf(NoSuchVerificationInfoException.class);
     }
 
     @Test
@@ -86,17 +87,17 @@ class VerificationServiceTest {
         verificationInfoRepository.save(new VerificationInfo(null, GIST_EMAIL, VERIFICATION_CODE, expiredCreatedTime, null));
 
         UsernameConfirmationRequest expiredInfoRequest = new UsernameConfirmationRequest(GIST_EMAIL, VERIFICATION_CODE);
-        Assertions.assertThatThrownBy(
+        assertThatThrownBy(
                 () -> verificationService.confirmUsername(expiredInfoRequest)
-        ).isInstanceOf(CustomException.class);
+        ).isInstanceOf(ExpiredVerificationCodeException.class);
     }
 
     @Test
     void confirmVerificationAlreadyConfirmedVerification() {
         verificationInfoRepository.save(new VerificationInfo(null, GIST_EMAIL, VERIFICATION_CODE, LocalDateTime.now().minusMinutes(1), LocalDateTime.now()));
-        Assertions.assertThatThrownBy(
+        assertThatThrownBy(
                 () -> verificationService.confirmUsername(new UsernameConfirmationRequest(GIST_EMAIL, VERIFICATION_CODE))
-        ).isInstanceOf(CustomException.class);
+        ).isInstanceOf(DuplicatedVerificationException.class);
     }
 
     @AfterEach

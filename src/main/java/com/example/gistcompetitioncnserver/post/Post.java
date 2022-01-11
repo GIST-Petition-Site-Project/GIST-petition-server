@@ -1,8 +1,7 @@
 package com.example.gistcompetitioncnserver.post;
 
 import com.example.gistcompetitioncnserver.common.BaseEntity;
-import com.example.gistcompetitioncnserver.exception.CustomException;
-import com.example.gistcompetitioncnserver.exception.ErrorCase;
+import com.example.gistcompetitioncnserver.exception.post.DuplicatedAgreementException;
 import com.example.gistcompetitioncnserver.user.User;
 import lombok.Getter;
 
@@ -48,7 +47,7 @@ public class Post extends BaseEntity {
     public boolean applyAgreement(User user) {
         for (Agreement agreement : agreements) {
             if (agreement.isAgreedBy(user.getId())) {
-                throw new CustomException(ErrorCase.INVALID_AGREEMENT);
+                throw new DuplicatedAgreementException();
             }
         }
         this.agreements.add(new Agreement(user.getId()));

@@ -1,6 +1,10 @@
 package com.example.gistcompetitioncnserver.verification;
 
-import com.example.gistcompetitioncnserver.exception.CustomException;
+import com.example.gistcompetitioncnserver.exception.user.DuplicatedUserException;
+import com.example.gistcompetitioncnserver.exception.user.InvalidEmailFormException;
+import com.example.gistcompetitioncnserver.exception.verification.DuplicatedVerificationException;
+import com.example.gistcompetitioncnserver.exception.verification.ExpiredVerificationCodeException;
+import com.example.gistcompetitioncnserver.exception.verification.NoSuchVerificationInfoException;
 import com.example.gistcompetitioncnserver.user.EmailDomain;
 import com.example.gistcompetitioncnserver.user.EmailParser;
 import com.example.gistcompetitioncnserver.user.UserRepository;
@@ -27,10 +31,10 @@ public class VerificationService {
     public String createVerificationInfo(VerificationEmailRequest request) {
         String username = request.getUsername();
         if (userRepository.existsByUsername(username)) {
-            throw new CustomException("이미 존재하는 회원입니다");
+            throw new DuplicatedUserException();
         }
         if (!EmailDomain.has(EmailParser.parseDomainFrom(username))) {
-            throw new CustomException("유효하지 않은 이메일 형태입니다");
+            throw new InvalidEmailFormException();
         }
 
         String token = verificationCodeGenerator.generate();
@@ -44,14 +48,14 @@ public class VerificationService {
         String verificationCode = request.getVerificationCode();
 
         VerificationInfo info = verificationInfoRepository.findByUsernameAndVerificationCode(username, verificationCode)
-                .orElseThrow(() -> new CustomException("존재하지 않는 인증 정보입니다."));
+                .orElseThrow(NoSuchVerificationInfoException::new);
 
         if (!info.isValidToConfirm(LocalDateTime.now())) {
-            throw new CustomException("만료된 인증 코드입니다.");
+            throw new ExpiredVerificationCodeException();
         }
 
         if (info.isConfirmed()) {
-            throw new CustomException("이미 인증된 정보입니다.");
+            throw new DuplicatedVerificationException();
         }
         info.confirm();
     }

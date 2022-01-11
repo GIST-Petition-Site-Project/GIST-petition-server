@@ -1,6 +1,7 @@
 package com.example.gistcompetitioncnserver.user;
 
-import com.example.gistcompetitioncnserver.exception.CustomException;
+import com.example.gistcompetitioncnserver.exception.user.NoSessionException;
+import com.example.gistcompetitioncnserver.exception.user.UnAuthorizedUserException;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -39,8 +40,11 @@ public class UserController {
     @GetMapping("/users")
     public ResponseEntity<List<User>> retrieveAllUsers() {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
+        if (sessionUser == null) {
+            throw new NoSessionException();
+        }
         if (!sessionUser.isAdmin()) {
-            throw new CustomException("회원 정보 조회 권한이 없습니다.");
+            throw new UnAuthorizedUserException();
         }
         return ResponseEntity.ok().body(userService.findAllUsers());
     }
@@ -48,8 +52,11 @@ public class UserController {
     @GetMapping("/users/{userId}")
     public ResponseEntity<User> retrieveUser(@PathVariable Long userId) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
+        if (sessionUser == null) {
+            throw new NoSessionException();
+        }
         if (!sessionUser.isAdmin()) {
-            throw new CustomException("회원 정보 조회 권한이 없습니다.");
+            throw new UnAuthorizedUserException();
         }
         return ResponseEntity.ok().body(userService.findUserById(userId));
     }
@@ -57,6 +64,9 @@ public class UserController {
     @GetMapping("/users/me")
     public ResponseEntity<User> retrieveUserOfMine() {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
+        if (sessionUser == null) {
+            throw new NoSessionException();
+        }
         return ResponseEntity.ok().body(userService.findUserById(sessionUser.getId()));
     }
 
@@ -64,8 +74,11 @@ public class UserController {
     public ResponseEntity<Void> updateUserRole(@PathVariable Long userId,
                                                @Validated @RequestBody UpdateUserRoleRequest userRoleRequest) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
+        if (sessionUser == null) {
+            throw new NoSessionException();
+        }
         if (!sessionUser.isAdmin()) {
-            throw new CustomException("유저 권한을 수정할 권한이 없습니다.");
+            throw new UnAuthorizedUserException();
         }
         userService.updateUserRole(userId, userRoleRequest);
         return ResponseEntity.noContent().build();
@@ -74,6 +87,9 @@ public class UserController {
     @PutMapping("/users/me/password")
     public ResponseEntity<Void> updatePasswordOfMine(@Validated @RequestBody UpdatePasswordRequest passwordRequest) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
+        if (sessionUser == null) {
+            throw new NoSessionException();
+        }
         userService.updatePassword(sessionUser.getId(), passwordRequest);
         return ResponseEntity.noContent().build();
     }
@@ -81,8 +97,11 @@ public class UserController {
     @DeleteMapping("/users/{userId}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long userId) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
+        if (sessionUser == null) {
+            throw new NoSessionException();
+        }
         if (!sessionUser.isAdmin()) {
-            throw new CustomException("삭제할 권한이 없습니다.");
+            throw new UnAuthorizedUserException();
         }
         userService.deleteUser(userId);
         return ResponseEntity.noContent().build();
@@ -91,6 +110,9 @@ public class UserController {
     @DeleteMapping("/users/me")
     public ResponseEntity<Void> deleteUserOfMine(@Validated @RequestBody DeleteUserRequest deleteUserRequest) {
         SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
+        if (sessionUser == null) {
+            throw new NoSessionException();
+        }
         userService.deleteUserOfMine(sessionUser.getId(), deleteUserRequest);
         return ResponseEntity.noContent().build();
     }
