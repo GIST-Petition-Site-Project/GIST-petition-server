@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static com.example.gistcompetitioncnserver.verification.VerificationInfo.CONFIRM_EXPIRE_MINUTE;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -57,6 +58,17 @@ class VerificationServiceTest extends ServiceTest {
         assertThatThrownBy(
                 () -> verificationService.createVerificationInfo(new VerificationEmailRequest(notGistEmail))
         ).isInstanceOf(InvalidEmailFormException.class);
+    }
+
+    @Test
+    void createVerificationCodeIfVerificationCodeExist() {
+        verificationInfoRepository.save(new VerificationInfo(GIST_EMAIL, "BBBBBB"));
+
+        String code = verificationService.createVerificationInfo(new VerificationEmailRequest(GIST_EMAIL));
+
+        List<VerificationInfo> infos = verificationInfoRepository.findByUsername(GIST_EMAIL);
+        assertThat(infos).hasSize(1);
+        assertThat(infos.get(0).getVerificationCode()).isEqualTo(code);
     }
 
     @Test
