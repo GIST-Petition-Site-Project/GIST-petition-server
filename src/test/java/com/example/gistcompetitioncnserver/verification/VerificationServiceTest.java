@@ -1,5 +1,6 @@
 package com.example.gistcompetitioncnserver.verification;
 
+import com.example.gistcompetitioncnserver.ServiceTest;
 import com.example.gistcompetitioncnserver.exception.user.DuplicatedUserException;
 import com.example.gistcompetitioncnserver.exception.user.InvalidEmailFormException;
 import com.example.gistcompetitioncnserver.exception.verification.DuplicatedVerificationException;
@@ -11,7 +12,6 @@ import com.example.gistcompetitioncnserver.user.UserRole;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDateTime;
 
@@ -19,8 +19,7 @@ import static com.example.gistcompetitioncnserver.verification.VerificationInfo.
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
-@SpringBootTest
-class VerificationServiceTest {
+class VerificationServiceTest extends ServiceTest {
 
     private static final String GIST_EMAIL = "tester@gist.ac.kr";
     private static final String PASSWORD = "password!";
