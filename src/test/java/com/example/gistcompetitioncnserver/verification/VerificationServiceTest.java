@@ -1,5 +1,6 @@
 package com.example.gistcompetitioncnserver.verification;
 
+import com.example.gistcompetitioncnserver.ServiceTest;
 import com.example.gistcompetitioncnserver.exception.user.DuplicatedUserException;
 import com.example.gistcompetitioncnserver.exception.user.InvalidEmailFormException;
 import com.example.gistcompetitioncnserver.exception.verification.DuplicatedVerificationException;
@@ -11,16 +12,15 @@ import com.example.gistcompetitioncnserver.user.UserRole;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static com.example.gistcompetitioncnserver.verification.VerificationInfo.CONFIRM_EXPIRE_MINUTE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
-@SpringBootTest
-class VerificationServiceTest {
+class VerificationServiceTest extends ServiceTest {
 
     private static final String GIST_EMAIL = "tester@gist.ac.kr";
     private static final String PASSWORD = "password!";
@@ -58,6 +58,17 @@ class VerificationServiceTest {
         assertThatThrownBy(
                 () -> verificationService.createVerificationInfo(new VerificationEmailRequest(notGistEmail))
         ).isInstanceOf(InvalidEmailFormException.class);
+    }
+
+    @Test
+    void createVerificationCodeIfVerificationCodeExist() {
+        verificationInfoRepository.save(new VerificationInfo(GIST_EMAIL, "BBBBBB"));
+
+        String code = verificationService.createVerificationInfo(new VerificationEmailRequest(GIST_EMAIL));
+
+        List<VerificationInfo> infos = verificationInfoRepository.findByUsername(GIST_EMAIL);
+        assertThat(infos).hasSize(1);
+        assertThat(infos.get(0).getVerificationCode()).isEqualTo(code);
     }
 
     @Test
