@@ -15,7 +15,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.io.UnsupportedEncodingException;
 
-@Profile("prod")
+@Profile({"prod","dev"})
 @Service
 @RequiredArgsConstructor
 public class EmailSenderImpl implements EmailSender {
