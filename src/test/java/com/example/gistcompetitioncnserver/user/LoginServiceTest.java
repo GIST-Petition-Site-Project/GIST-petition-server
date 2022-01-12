@@ -29,9 +29,9 @@ class LoginServiceTest {
 
         loginService.login(signInRequest);
 
-        LoginUser loginUser = loginService.getLoginUser();
-        assertThat(loginUser.getId()).isEqualTo(registeredUser.getId());
-        assertThat(loginUser.getUserRole()).isEqualTo(registeredUser.getUserRole());
+        SimpleUser simpleUser = loginService.getLoginUser();
+        assertThat(simpleUser.getId()).isEqualTo(registeredUser.getId());
+        assertThat(simpleUser.getUserRole()).isEqualTo(registeredUser.getUserRole());
     }
 
     @Test

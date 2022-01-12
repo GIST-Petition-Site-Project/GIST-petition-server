@@ -2,11 +2,11 @@ package com.example.gistcompetitioncnserver.user;
 
 import java.io.Serializable;
 
-public class SessionUser implements LoginUser, Serializable {
+public class SimpleUser implements Serializable {
     private final Long id;
     private final UserRole userRole;
 
-    public SessionUser(User user) {
+    public SimpleUser(User user) {
         this.id = user.getId();
         this.userRole = user.getUserRole();
     }
@@ -19,12 +19,10 @@ public class SessionUser implements LoginUser, Serializable {
         return userRole == UserRole.MANAGER || userRole == UserRole.ADMIN;
     }
 
-    @Override
     public Long getId() {
         return id;
     }
 
-    @Override
     public UserRole getUserRole() {
         return userRole;
     }

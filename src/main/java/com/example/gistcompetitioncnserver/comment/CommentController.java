@@ -3,7 +3,7 @@ package com.example.gistcompetitioncnserver.comment;
 
 import com.example.gistcompetitioncnserver.config.annotation.LoginRequired;
 import com.example.gistcompetitioncnserver.config.annotation.LoginUser;
-import com.example.gistcompetitioncnserver.user.SessionUser;
+import com.example.gistcompetitioncnserver.user.SimpleUser;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -21,8 +21,8 @@ public class CommentController {
     @PostMapping("/posts/{postId}/comments")
     public ResponseEntity<Void> createComment(@PathVariable Long postId,
                                               @RequestBody CommentRequest commentRequest,
-                                              @LoginUser SessionUser sessionUser) {
-        Long commentId = commentService.createComment(postId, commentRequest, sessionUser.getId());
+                                              @LoginUser SimpleUser simpleUser) {
+        Long commentId = commentService.createComment(postId, commentRequest, simpleUser.getId());
         return ResponseEntity.created(URI.create("/posts/" + postId + "/comments/" + commentId)).build();
     }
 
@@ -36,12 +36,12 @@ public class CommentController {
     public ResponseEntity<Object> updateComment(@PathVariable Long postId,
                                                 @PathVariable Long commentId,
                                                 @Validated @RequestBody CommentRequest updateRequest,
-                                                @LoginUser SessionUser sessionUser) {
-        if (sessionUser.hasManagerAuthority()) {
+                                                @LoginUser SimpleUser simpleUser) {
+        if (simpleUser.hasManagerAuthority()) {
             commentService.updateComment(commentId, updateRequest);
             return ResponseEntity.noContent().build();
         }
-        commentService.updateCommentByOwner(sessionUser.getId(), commentId, updateRequest);
+        commentService.updateCommentByOwner(simpleUser.getId(), commentId, updateRequest);
         return ResponseEntity.noContent().build();
     }
 
@@ -49,12 +49,12 @@ public class CommentController {
     @DeleteMapping("/posts/{postId}/comments/{commentId}")
     public ResponseEntity<Object> deleteComment(@PathVariable Long postId,
                                                 @PathVariable Long commentId,
-                                                @LoginUser SessionUser sessionUser) {
-        if (sessionUser.hasManagerAuthority()) {
+                                                @LoginUser SimpleUser simpleUser) {
+        if (simpleUser.hasManagerAuthority()) {
             commentService.deleteComment(commentId);
             return ResponseEntity.noContent().build();
         }
-        commentService.deleteCommentByOwner(sessionUser.getId(), commentId);
+        commentService.deleteCommentByOwner(simpleUser.getId(), commentId);
         return ResponseEntity.noContent().build();
     }
 }

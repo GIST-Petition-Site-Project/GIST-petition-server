@@ -5,5 +5,5 @@ public interface LoginService {
 
     void logout();
 
-    LoginUser getLoginUser();
+    SimpleUser getLoginUser();
 }

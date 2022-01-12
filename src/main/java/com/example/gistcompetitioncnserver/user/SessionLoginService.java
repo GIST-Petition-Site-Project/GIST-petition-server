@@ -24,7 +24,7 @@ public class SessionLoginService implements LoginService {
         if (!encryptor.isMatch(request.getPassword(), user.getPassword())) {
             throw new NotMatchedPasswordException();
         }
-        httpSession.setAttribute(SESSION_KEY, new SessionUser(user));
+        httpSession.setAttribute(SESSION_KEY, new SimpleUser(user));
     }
 
     @Override
@@ -33,7 +33,7 @@ public class SessionLoginService implements LoginService {
     }
 
     @Override
-    public LoginUser getLoginUser() {
-        return (SessionUser) httpSession.getAttribute(SESSION_KEY);
+    public SimpleUser getLoginUser() {
+        return (SimpleUser) httpSession.getAttribute(SESSION_KEY);
     }
 }

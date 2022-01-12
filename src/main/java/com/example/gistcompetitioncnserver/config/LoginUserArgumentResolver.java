@@ -2,6 +2,7 @@ package com.example.gistcompetitioncnserver.config;
 
 import com.example.gistcompetitioncnserver.config.annotation.LoginUser;
 import com.example.gistcompetitioncnserver.user.LoginService;
+import com.example.gistcompetitioncnserver.user.SimpleUser;
 import lombok.AllArgsConstructor;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
@@ -13,18 +14,16 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 @Component
 @AllArgsConstructor
 public class LoginUserArgumentResolver implements HandlerMethodArgumentResolver {
-    private final LoginService userService;
+    private final LoginService loginService;
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        if (parameter.getParameterAnnotation(LoginUser.class) == null) {
-            return false;
-        }
-        return parameter.getParameterType().equals(LoginUser.class);
+        return parameter.hasParameterAnnotation(LoginUser.class)
+                && parameter.getParameterType().equals(SimpleUser.class);
     }
 
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
-        return userService.getLoginUser();
+        return loginService.getLoginUser();
     }
 }

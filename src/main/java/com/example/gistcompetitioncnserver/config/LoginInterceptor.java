@@ -4,7 +4,7 @@ package com.example.gistcompetitioncnserver.config;
 import com.example.gistcompetitioncnserver.config.annotation.LoginRequired;
 import com.example.gistcompetitioncnserver.exception.user.UnAuthenticatedException;
 import com.example.gistcompetitioncnserver.user.LoginService;
-import com.example.gistcompetitioncnserver.user.LoginUser;
+import com.example.gistcompetitioncnserver.user.SimpleUser;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
@@ -22,8 +22,8 @@ public class LoginInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         if (handler instanceof HandlerMethod && ((HandlerMethod) handler).hasMethodAnnotation(LoginRequired.class)) {
-            LoginUser loginUser = loginService.getLoginUser();
-            if (Objects.isNull(loginUser)) {
+            SimpleUser simpleUser = loginService.getLoginUser();
+            if (Objects.isNull(simpleUser)) {
                 throw new UnAuthenticatedException();
             }
             return true;

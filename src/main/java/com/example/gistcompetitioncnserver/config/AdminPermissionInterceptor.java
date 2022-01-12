@@ -5,7 +5,7 @@ import com.example.gistcompetitioncnserver.config.annotation.AdminPermissionRequ
 import com.example.gistcompetitioncnserver.exception.user.UnAuthenticatedException;
 import com.example.gistcompetitioncnserver.exception.user.UnAuthorizedUserException;
 import com.example.gistcompetitioncnserver.user.LoginService;
-import com.example.gistcompetitioncnserver.user.LoginUser;
+import com.example.gistcompetitioncnserver.user.SimpleUser;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
@@ -23,11 +23,11 @@ public class AdminPermissionInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         if (handler instanceof HandlerMethod && ((HandlerMethod) handler).hasMethodAnnotation(AdminPermissionRequired.class)) {
-            LoginUser loginUser = loginService.getLoginUser();
-            if (Objects.isNull(loginUser)) {
+            SimpleUser simpleUser = loginService.getLoginUser();
+            if (Objects.isNull(simpleUser)) {
                 throw new UnAuthenticatedException();
             }
-            if (!loginUser.isAdmin()) {
+            if (!simpleUser.isAdmin()) {
                 throw new UnAuthorizedUserException();
             }
             return true;

@@ -2,7 +2,7 @@ package com.example.gistcompetitioncnserver.answer;
 
 import com.example.gistcompetitioncnserver.config.annotation.LoginUser;
 import com.example.gistcompetitioncnserver.config.annotation.ManagerPermissionRequired;
-import com.example.gistcompetitioncnserver.user.SessionUser;
+import com.example.gistcompetitioncnserver.user.SimpleUser;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -21,8 +21,8 @@ public class AnswerController {
     @PostMapping("/posts/{postId}/answer")
     public ResponseEntity<Object> createAnswer(@PathVariable Long postId,
                                                @Validated @RequestBody AnswerRequest answerRequest,
-                                               @LoginUser SessionUser sessionUser) {
-        Long answerId = answerService.createAnswer(postId, answerRequest, sessionUser.getId());
+                                               @LoginUser SimpleUser simpleUser) {
+        Long answerId = answerService.createAnswer(postId, answerRequest, simpleUser.getId());
         return ResponseEntity.created(URI.create("/posts/" + postId + "/answer/" + answerId)).build();
     }
 

@@ -51,8 +51,8 @@ public class UserController {
 
     @LoginRequired
     @GetMapping("/users/me")
-    public ResponseEntity<User> retrieveUserOfMine(@LoginUser SessionUser sessionUser) {
-        return ResponseEntity.ok().body(userService.findUserById(sessionUser.getId()));
+    public ResponseEntity<User> retrieveUserOfMine(@LoginUser SimpleUser simpleUser) {
+        return ResponseEntity.ok().body(userService.findUserById(simpleUser.getId()));
     }
 
     @AdminPermissionRequired
@@ -66,8 +66,8 @@ public class UserController {
     @LoginRequired
     @PutMapping("/users/me/password")
     public ResponseEntity<Void> updatePasswordOfMine(@Validated @RequestBody UpdatePasswordRequest passwordRequest,
-                                                     @LoginUser SessionUser sessionUser) {
-        userService.updatePassword(sessionUser.getId(), passwordRequest);
+                                                     @LoginUser SimpleUser simpleUser) {
+        userService.updatePassword(simpleUser.getId(), passwordRequest);
         return ResponseEntity.noContent().build();
     }
 
@@ -81,8 +81,8 @@ public class UserController {
     @LoginRequired
     @DeleteMapping("/users/me")
     public ResponseEntity<Void> deleteUserOfMine(@Validated @RequestBody DeleteUserRequest deleteUserRequest,
-                                                 @LoginUser SessionUser sessionUser) {
-        userService.deleteUserOfMine(sessionUser.getId(), deleteUserRequest);
+                                                 @LoginUser SimpleUser simpleUser) {
+        userService.deleteUserOfMine(simpleUser.getId(), deleteUserRequest);
         return ResponseEntity.noContent().build();
     }
 }

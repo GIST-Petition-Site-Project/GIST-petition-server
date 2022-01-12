@@ -3,7 +3,7 @@ package com.example.gistcompetitioncnserver.post;
 import com.example.gistcompetitioncnserver.config.annotation.LoginRequired;
 import com.example.gistcompetitioncnserver.config.annotation.LoginUser;
 import com.example.gistcompetitioncnserver.config.annotation.ManagerPermissionRequired;
-import com.example.gistcompetitioncnserver.user.SessionUser;
+import com.example.gistcompetitioncnserver.user.SimpleUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -21,8 +21,8 @@ public class PostController {
     @LoginRequired
     @PostMapping("/posts")
     public ResponseEntity<Void> createPost(@Validated @RequestBody PostRequest postRequest,
-                                           @LoginUser SessionUser sessionUser) {
-        return ResponseEntity.created(URI.create("/posts/" + postService.createPost(postRequest, sessionUser.getId()))).build();
+                                           @LoginUser SimpleUser simpleUser) {
+        return ResponseEntity.created(URI.create("/posts/" + postService.createPost(postRequest, simpleUser.getId()))).build();
     }
 
     @GetMapping("/posts")
@@ -37,8 +37,8 @@ public class PostController {
 
     @LoginRequired
     @GetMapping("/posts/me")
-    public ResponseEntity<List<Post>> retrievePostsByUserId(@LoginUser SessionUser sessionUser) {
-        return ResponseEntity.ok().body(postService.retrievePostsByUserId(sessionUser.getId()));
+    public ResponseEntity<List<Post>> retrievePostsByUserId(@LoginUser SimpleUser simpleUser) {
+        return ResponseEntity.ok().body(postService.retrievePostsByUserId(simpleUser.getId()));
     }
 
     @GetMapping("/posts/count")
@@ -55,7 +55,7 @@ public class PostController {
     @PutMapping("/posts/{postId}")
     public ResponseEntity<Void> updatePost(@PathVariable Long postId,
                                            @Validated @RequestBody PostRequest changeRequest,
-                                           @LoginUser SessionUser sessionUser) {
+                                           @LoginUser SimpleUser simpleUser) {
         postService.updatePostDescription(postId, changeRequest.getDescription());
         return ResponseEntity.noContent().build();
     }
@@ -63,7 +63,7 @@ public class PostController {
     @ManagerPermissionRequired
     @DeleteMapping("/posts/{postId}")
     public ResponseEntity<Void> deletePost(@PathVariable Long postId,
-                                           @LoginUser SessionUser sessionUser) {
+                                           @LoginUser SimpleUser simpleUser) {
         postService.deletePost(postId);
         return ResponseEntity.noContent().build();
     }
@@ -71,8 +71,8 @@ public class PostController {
     @LoginRequired
     @PostMapping("/posts/{postId}/agreements")
     public ResponseEntity<Boolean> agreePost(@PathVariable Long postId,
-                                             @LoginUser SessionUser sessionUser) {
-        return ResponseEntity.ok().body(postService.agree(postId, sessionUser.getId()));
+                                             @LoginUser SimpleUser simpleUser) {
+        return ResponseEntity.ok().body(postService.agree(postId, simpleUser.getId()));
     }
 
     @GetMapping("/posts/{postId}/agreements")
@@ -83,7 +83,7 @@ public class PostController {
     @LoginRequired
     @GetMapping("/posts/{postId}/agreements/me")
     public ResponseEntity<Boolean> getStateOfAgreement(@PathVariable Long postId,
-                                                       @LoginUser SessionUser sessionUser) {
-        return ResponseEntity.ok().body(postService.getStateOfAgreement(postId, sessionUser.getId()));
+                                                       @LoginUser SimpleUser simpleUser) {
+        return ResponseEntity.ok().body(postService.getStateOfAgreement(postId, simpleUser.getId()));
     }
 }
