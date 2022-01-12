@@ -30,8 +30,7 @@ public class AdminPermissionInterceptor implements HandlerInterceptor {
             if (!simpleUser.isAdmin()) {
                 throw new UnAuthorizedUserException();
             }
-            return true;
         }
-        return false;
+        return true;
     }
 }

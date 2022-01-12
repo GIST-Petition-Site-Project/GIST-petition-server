@@ -30,8 +30,7 @@ public class ManagerPermissionInterceptor implements HandlerInterceptor {
             if (!simpleUser.hasManagerAuthority()) {
                 throw new UnAuthorizedUserException();
             }
-            return true;
         }
-        return false;
+        return true;
     }
 }
