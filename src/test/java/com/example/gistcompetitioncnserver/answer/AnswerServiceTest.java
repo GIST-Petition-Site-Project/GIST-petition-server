@@ -1,5 +1,6 @@
 package com.example.gistcompetitioncnserver.answer;
 
+import com.example.gistcompetitioncnserver.ServiceTest;
 import com.example.gistcompetitioncnserver.exception.WrappedException;
 import com.example.gistcompetitioncnserver.exception.post.NoSuchPostException;
 import com.example.gistcompetitioncnserver.exception.post.UnAnsweredPostException;
@@ -12,15 +13,13 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SpringBootTest
-class AnswerServiceTest {
+class AnswerServiceTest extends ServiceTest {
 
     public static final String ANSWER_CONTENT = "test contents";
     public static final AnswerRequest ANSWER_REQUEST = new AnswerRequest("test contents");

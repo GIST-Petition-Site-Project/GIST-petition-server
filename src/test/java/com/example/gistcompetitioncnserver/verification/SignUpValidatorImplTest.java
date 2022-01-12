@@ -1,12 +1,12 @@
 package com.example.gistcompetitioncnserver.verification;
 
+import com.example.gistcompetitioncnserver.ServiceTest;
 import com.example.gistcompetitioncnserver.exception.verification.InvalidVerificationInfoException;
 import com.example.gistcompetitioncnserver.exception.verification.NoSuchVerificationCodeException;
 import com.example.gistcompetitioncnserver.exception.verification.NotConfirmedVerificationCodeException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDateTime;
 
@@ -14,8 +14,7 @@ import static com.example.gistcompetitioncnserver.verification.VerificationInfo.
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@SpringBootTest
-class SignUpValidatorImplTest {
+class SignUpValidatorImplTest extends ServiceTest {
     private static final String GIST_EMAIL = "tester@gist.ac.kr";
     private static final String VERIFICATION_CODE = "AAAAAA";
 
