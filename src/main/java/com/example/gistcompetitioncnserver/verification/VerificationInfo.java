@@ -53,5 +53,4 @@ public class VerificationInfo {
     public void confirm() {
         confirmedAt = LocalDateTime.now();
     }
-
 }
