@@ -10,4 +10,6 @@ public interface VerificationInfoRepository extends JpaRepository<VerificationIn
     Optional<VerificationInfo> findByVerificationCode(String verificationCode);
 
     Optional<VerificationInfo> findByUsernameAndVerificationCode(String username, String verificationCode);
+
+    void deleteByUsername(String username);
 }

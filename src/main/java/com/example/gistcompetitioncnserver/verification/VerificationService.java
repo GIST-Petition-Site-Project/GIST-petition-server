@@ -36,10 +36,11 @@ public class VerificationService {
         if (!EmailDomain.has(EmailParser.parseDomainFrom(username))) {
             throw new InvalidEmailFormException();
         }
+        verificationInfoRepository.deleteByUsername(username);
 
-        String token = verificationCodeGenerator.generate();
-        verificationInfoRepository.save(new VerificationInfo(username, token));
-        return token;
+        String code = verificationCodeGenerator.generate();
+        verificationInfoRepository.save(new VerificationInfo(username, code));
+        return code;
     }
 
     @Transactional
