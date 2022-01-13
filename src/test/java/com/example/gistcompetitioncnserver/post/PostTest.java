@@ -2,8 +2,8 @@ package com.example.gistcompetitioncnserver.post;
 
 import com.example.gistcompetitioncnserver.exception.post.DuplicatedAgreementException;
 import com.example.gistcompetitioncnserver.post.domain.Post;
-import com.example.gistcompetitioncnserver.user.User;
-import com.example.gistcompetitioncnserver.user.UserRole;
+import com.example.gistcompetitioncnserver.user.domain.User;
+import com.example.gistcompetitioncnserver.user.domain.UserRole;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

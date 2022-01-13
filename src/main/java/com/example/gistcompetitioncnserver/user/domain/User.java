@@ -1,6 +1,6 @@
-package com.example.gistcompetitioncnserver.user;
+package com.example.gistcompetitioncnserver.user.domain;
 
-import com.example.gistcompetitioncnserver.common.BaseEntity;
+import com.example.gistcompetitioncnserver.common.persistence.BaseEntity;
 
 import javax.persistence.*;
 

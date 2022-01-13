@@ -1,9 +1,9 @@
 package com.example.gistcompetitioncnserver;
 
-import com.example.gistcompetitioncnserver.user.BcryptEncoder;
-import com.example.gistcompetitioncnserver.user.User;
-import com.example.gistcompetitioncnserver.user.UserRepository;
-import com.example.gistcompetitioncnserver.user.UserRole;
+import com.example.gistcompetitioncnserver.common.password.BcryptEncoder;
+import com.example.gistcompetitioncnserver.user.domain.User;
+import com.example.gistcompetitioncnserver.user.domain.UserRepository;
+import com.example.gistcompetitioncnserver.user.domain.UserRole;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 

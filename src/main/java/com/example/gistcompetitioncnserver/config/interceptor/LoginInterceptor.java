@@ -3,8 +3,8 @@ package com.example.gistcompetitioncnserver.config.interceptor;
 
 import com.example.gistcompetitioncnserver.config.annotation.LoginRequired;
 import com.example.gistcompetitioncnserver.exception.user.UnAuthenticatedException;
-import com.example.gistcompetitioncnserver.user.LoginService;
-import com.example.gistcompetitioncnserver.user.SimpleUser;
+import com.example.gistcompetitioncnserver.user.application.LoginService;
+import com.example.gistcompetitioncnserver.user.domain.SimpleUser;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;

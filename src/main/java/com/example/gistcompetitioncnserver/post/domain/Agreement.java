@@ -1,6 +1,6 @@
 package com.example.gistcompetitioncnserver.post.domain;
 
-import com.example.gistcompetitioncnserver.common.UnmodifiableEntity;
+import com.example.gistcompetitioncnserver.common.persistence.UnmodifiableEntity;
 import lombok.Getter;
 
 import javax.persistence.Entity;

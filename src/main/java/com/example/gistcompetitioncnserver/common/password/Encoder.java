@@ -1,6 +1,6 @@
-package com.example.gistcompetitioncnserver.user;
+package com.example.gistcompetitioncnserver.common.password;
 
-public interface Encryptor {
+public interface Encoder {
     String hashPassword(String raw);
 
     boolean isMatch(String raw, String hashed);

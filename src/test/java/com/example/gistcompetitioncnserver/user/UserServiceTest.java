@@ -1,9 +1,19 @@
 package com.example.gistcompetitioncnserver.user;
 
+import com.example.gistcompetitioncnserver.common.password.Encoder;
 import com.example.gistcompetitioncnserver.exception.user.DuplicatedUserException;
 import com.example.gistcompetitioncnserver.exception.user.InvalidEmailFormException;
 import com.example.gistcompetitioncnserver.exception.user.NoSuchUserException;
 import com.example.gistcompetitioncnserver.exception.user.NotMatchedPasswordException;
+import com.example.gistcompetitioncnserver.user.application.SignUpValidator;
+import com.example.gistcompetitioncnserver.user.application.UserService;
+import com.example.gistcompetitioncnserver.user.domain.User;
+import com.example.gistcompetitioncnserver.user.domain.UserRepository;
+import com.example.gistcompetitioncnserver.user.domain.UserRole;
+import com.example.gistcompetitioncnserver.user.dto.request.DeleteUserRequest;
+import com.example.gistcompetitioncnserver.user.dto.request.SignUpRequest;
+import com.example.gistcompetitioncnserver.user.dto.request.UpdatePasswordRequest;
+import com.example.gistcompetitioncnserver.user.dto.request.UpdateUserRoleRequest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,7 +43,7 @@ class UserServiceTest {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private Encryptor encoder;
+    private Encoder encoder;
     @MockBean
     private SignUpValidator signUpValidator;
 

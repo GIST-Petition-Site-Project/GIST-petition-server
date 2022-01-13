@@ -6,9 +6,9 @@ import com.example.gistcompetitioncnserver.exception.user.InvalidEmailFormExcept
 import com.example.gistcompetitioncnserver.exception.verification.DuplicatedVerificationException;
 import com.example.gistcompetitioncnserver.exception.verification.ExpiredVerificationCodeException;
 import com.example.gistcompetitioncnserver.exception.verification.NoSuchVerificationInfoException;
-import com.example.gistcompetitioncnserver.user.User;
-import com.example.gistcompetitioncnserver.user.UserRepository;
-import com.example.gistcompetitioncnserver.user.UserRole;
+import com.example.gistcompetitioncnserver.user.domain.User;
+import com.example.gistcompetitioncnserver.user.domain.UserRepository;
+import com.example.gistcompetitioncnserver.user.domain.UserRole;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

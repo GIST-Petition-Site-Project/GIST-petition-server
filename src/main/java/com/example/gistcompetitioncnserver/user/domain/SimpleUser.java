@@ -1,4 +1,4 @@
-package com.example.gistcompetitioncnserver.user;
+package com.example.gistcompetitioncnserver.user.domain;
 
 import java.io.Serializable;
 

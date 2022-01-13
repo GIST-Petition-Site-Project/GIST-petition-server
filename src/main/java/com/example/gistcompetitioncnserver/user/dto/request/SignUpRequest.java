@@ -1,4 +1,4 @@
-package com.example.gistcompetitioncnserver.user;
+package com.example.gistcompetitioncnserver.user.dto.request;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;

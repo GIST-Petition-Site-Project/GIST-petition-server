@@ -1,6 +1,6 @@
 package com.example.gistcompetitioncnserver.comment.domain;
 
-import com.example.gistcompetitioncnserver.common.BaseEntity;
+import com.example.gistcompetitioncnserver.common.persistence.BaseEntity;
 import lombok.Getter;
 
 import javax.persistence.*;

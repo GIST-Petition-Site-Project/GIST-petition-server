@@ -1,5 +1,7 @@
-package com.example.gistcompetitioncnserver.user;
+package com.example.gistcompetitioncnserver.user.dto.response;
 
+import com.example.gistcompetitioncnserver.user.domain.User;
+import com.example.gistcompetitioncnserver.user.domain.UserRole;
 import lombok.Data;
 
 import java.util.List;

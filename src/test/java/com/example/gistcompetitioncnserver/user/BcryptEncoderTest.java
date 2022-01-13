@@ -1,5 +1,6 @@
 package com.example.gistcompetitioncnserver.user;
 
+import com.example.gistcompetitioncnserver.common.password.BcryptEncoder;
 import org.junit.jupiter.api.Test;
 import org.mindrot.jbcrypt.BCrypt;
 

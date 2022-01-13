@@ -5,7 +5,7 @@ import com.example.gistcompetitioncnserver.comment.application.CommentService;
 import com.example.gistcompetitioncnserver.comment.dto.CommentRequest;
 import com.example.gistcompetitioncnserver.config.annotation.LoginRequired;
 import com.example.gistcompetitioncnserver.config.annotation.LoginUser;
-import com.example.gistcompetitioncnserver.user.SimpleUser;
+import com.example.gistcompetitioncnserver.user.domain.SimpleUser;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;

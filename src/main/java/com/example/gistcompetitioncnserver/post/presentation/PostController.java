@@ -6,7 +6,7 @@ import com.example.gistcompetitioncnserver.config.annotation.ManagerPermissionRe
 import com.example.gistcompetitioncnserver.post.application.PostService;
 import com.example.gistcompetitioncnserver.post.domain.Post;
 import com.example.gistcompetitioncnserver.post.dto.PostRequest;
-import com.example.gistcompetitioncnserver.user.SimpleUser;
+import com.example.gistcompetitioncnserver.user.domain.SimpleUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;

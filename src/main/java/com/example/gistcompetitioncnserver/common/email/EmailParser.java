@@ -1,4 +1,4 @@
-package com.example.gistcompetitioncnserver.user;
+package com.example.gistcompetitioncnserver.common.email;
 
 import java.util.Arrays;
 

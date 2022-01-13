@@ -1,9 +1,19 @@
-package com.example.gistcompetitioncnserver.user;
+package com.example.gistcompetitioncnserver.user.application;
 
+import com.example.gistcompetitioncnserver.common.email.EmailDomain;
+import com.example.gistcompetitioncnserver.common.email.EmailParser;
+import com.example.gistcompetitioncnserver.common.password.Encoder;
 import com.example.gistcompetitioncnserver.exception.user.DuplicatedUserException;
 import com.example.gistcompetitioncnserver.exception.user.InvalidEmailFormException;
 import com.example.gistcompetitioncnserver.exception.user.NoSuchUserException;
 import com.example.gistcompetitioncnserver.exception.user.NotMatchedPasswordException;
+import com.example.gistcompetitioncnserver.user.domain.User;
+import com.example.gistcompetitioncnserver.user.domain.UserRepository;
+import com.example.gistcompetitioncnserver.user.domain.UserRole;
+import com.example.gistcompetitioncnserver.user.dto.request.DeleteUserRequest;
+import com.example.gistcompetitioncnserver.user.dto.request.SignUpRequest;
+import com.example.gistcompetitioncnserver.user.dto.request.UpdatePasswordRequest;
+import com.example.gistcompetitioncnserver.user.dto.request.UpdateUserRoleRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,12 +22,12 @@ import java.util.List;
 @Service
 public class UserService {
     private final UserRepository userRepository;
-    private final Encryptor encryptor;
+    private final Encoder encoder;
     private final SignUpValidator signUpValidator;
 
-    public UserService(UserRepository userRepository, Encryptor encryptor, SignUpValidator signUpValidator) {
+    public UserService(UserRepository userRepository, Encoder encoder, SignUpValidator signUpValidator) {
         this.userRepository = userRepository;
-        this.encryptor = encryptor;
+        this.encoder = encoder;
         this.signUpValidator = signUpValidator;
     }
 
@@ -35,7 +45,7 @@ public class UserService {
 
         signUpValidator.checkIsVerified(username, verificationCode);
 
-        User user = new User(username, encryptor.hashPassword(request.getPassword()), UserRole.USER);
+        User user = new User(username, encoder.hashPassword(request.getPassword()), UserRole.USER);
         return userRepository.save(user).getId();
     }
 
@@ -65,10 +75,10 @@ public class UserService {
     @Transactional
     public void updatePassword(Long userId, UpdatePasswordRequest passwordRequest) {
         User user = findUserById(userId);
-        if (!encryptor.isMatch(passwordRequest.getOriginPassword(), user.getPassword())) {
+        if (!encoder.isMatch(passwordRequest.getOriginPassword(), user.getPassword())) {
             throw new NotMatchedPasswordException();
         }
-        user.setPassword(encryptor.hashPassword(passwordRequest.getNewPassword()));
+        user.setPassword(encoder.hashPassword(passwordRequest.getNewPassword()));
     }
 
     @Transactional
@@ -82,7 +92,7 @@ public class UserService {
     @Transactional
     public void deleteUserOfMine(Long userId, DeleteUserRequest deleteUserRequest) {
         User user = findUserById(userId);
-        if (!encryptor.isMatch(deleteUserRequest.getPassword(), user.getPassword())) {
+        if (!encoder.isMatch(deleteUserRequest.getPassword(), user.getPassword())) {
             throw new NotMatchedPasswordException();
         }
         userRepository.deleteById(userId);

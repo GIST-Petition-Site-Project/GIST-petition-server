@@ -1,7 +1,14 @@
 package com.example.gistcompetitioncnserver.user;
 
+import com.example.gistcompetitioncnserver.common.password.Encoder;
 import com.example.gistcompetitioncnserver.exception.user.NoSuchUserException;
 import com.example.gistcompetitioncnserver.exception.user.NotMatchedPasswordException;
+import com.example.gistcompetitioncnserver.user.application.LoginService;
+import com.example.gistcompetitioncnserver.user.domain.SimpleUser;
+import com.example.gistcompetitioncnserver.user.domain.User;
+import com.example.gistcompetitioncnserver.user.domain.UserRepository;
+import com.example.gistcompetitioncnserver.user.domain.UserRole;
+import com.example.gistcompetitioncnserver.user.dto.request.SignInRequest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +27,7 @@ class LoginServiceTest {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private Encryptor encoder;
+    private Encoder encoder;
 
     @Test
     void signIn() {

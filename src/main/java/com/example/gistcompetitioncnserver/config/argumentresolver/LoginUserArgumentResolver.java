@@ -1,8 +1,8 @@
 package com.example.gistcompetitioncnserver.config.argumentresolver;
 
 import com.example.gistcompetitioncnserver.config.annotation.LoginUser;
-import com.example.gistcompetitioncnserver.user.LoginService;
-import com.example.gistcompetitioncnserver.user.SimpleUser;
+import com.example.gistcompetitioncnserver.user.application.LoginService;
+import com.example.gistcompetitioncnserver.user.domain.SimpleUser;
 import lombok.AllArgsConstructor;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;

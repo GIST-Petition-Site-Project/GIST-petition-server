@@ -1,4 +1,4 @@
-package com.example.gistcompetitioncnserver.common;
+package com.example.gistcompetitioncnserver.common.persistence;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;

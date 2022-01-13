@@ -1,8 +1,8 @@
 package com.example.gistcompetitioncnserver.post.domain;
 
-import com.example.gistcompetitioncnserver.common.BaseEntity;
+import com.example.gistcompetitioncnserver.common.persistence.BaseEntity;
 import com.example.gistcompetitioncnserver.exception.post.DuplicatedAgreementException;
-import com.example.gistcompetitioncnserver.user.User;
+import com.example.gistcompetitioncnserver.user.domain.User;
 import lombok.Getter;
 
 import javax.persistence.*;
