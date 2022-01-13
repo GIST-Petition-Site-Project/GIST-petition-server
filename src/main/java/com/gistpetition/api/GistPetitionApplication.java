@@ -6,9 +6,9 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @SpringBootApplication
 @EnableJpaAuditing
-public class GistCompetitionCnServerApplication {
+public class GistPetitionApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(GistCompetitionCnServerApplication.class, args);
+        SpringApplication.run(GistPetitionApplication.class, args);
     }
 }
