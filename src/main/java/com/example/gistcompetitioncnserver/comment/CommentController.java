@@ -1,14 +1,14 @@
 package com.example.gistcompetitioncnserver.comment;
 
 
-import com.example.gistcompetitioncnserver.exception.user.UnAuthenticatedException;
-import com.example.gistcompetitioncnserver.user.SessionUser;
+import com.example.gistcompetitioncnserver.config.annotation.LoginRequired;
+import com.example.gistcompetitioncnserver.config.annotation.LoginUser;
+import com.example.gistcompetitioncnserver.user.SimpleUser;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpSession;
 import java.net.URI;
 
 @AllArgsConstructor
@@ -16,17 +16,13 @@ import java.net.URI;
 @RequestMapping("/v1")
 public class CommentController {
     private final CommentService commentService;
-    private final HttpSession httpSession;
 
+    @LoginRequired
     @PostMapping("/posts/{postId}/comments")
     public ResponseEntity<Void> createComment(@PathVariable Long postId,
-                                              @RequestBody CommentRequest commentRequest) {
-
-        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
-        if (sessionUser == null) {
-            throw new UnAuthenticatedException();
-        }
-        Long commentId = commentService.createComment(postId, commentRequest, sessionUser.getId());
+                                              @RequestBody CommentRequest commentRequest,
+                                              @LoginUser SimpleUser simpleUser) {
+        Long commentId = commentService.createComment(postId, commentRequest, simpleUser.getId());
         return ResponseEntity.created(URI.create("/posts/" + postId + "/comments/" + commentId)).build();
     }
 
@@ -35,34 +31,30 @@ public class CommentController {
         return ResponseEntity.ok().body(commentService.getCommentsByPostId(postId));
     }
 
+    @LoginRequired
     @PutMapping("/posts/{postId}/comments/{commentId}")
     public ResponseEntity<Object> updateComment(@PathVariable Long postId,
                                                 @PathVariable Long commentId,
-                                                @Validated @RequestBody CommentRequest updateRequest) {
-        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
-        if (sessionUser == null) {
-            throw new UnAuthenticatedException();
-        }
-        if (sessionUser.hasManagerAuthority()) {
+                                                @Validated @RequestBody CommentRequest updateRequest,
+                                                @LoginUser SimpleUser simpleUser) {
+        if (simpleUser.hasManagerAuthority()) {
             commentService.updateComment(commentId, updateRequest);
             return ResponseEntity.noContent().build();
         }
-        commentService.updateCommentByOwner(sessionUser.getId(), commentId, updateRequest);
+        commentService.updateCommentByOwner(simpleUser.getId(), commentId, updateRequest);
         return ResponseEntity.noContent().build();
     }
 
+    @LoginRequired
     @DeleteMapping("/posts/{postId}/comments/{commentId}")
     public ResponseEntity<Object> deleteComment(@PathVariable Long postId,
-                                                @PathVariable Long commentId) {
-        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
-        if (sessionUser == null) {
-            throw new UnAuthenticatedException();
-        }
-        if (sessionUser.hasManagerAuthority()) {
+                                                @PathVariable Long commentId,
+                                                @LoginUser SimpleUser simpleUser) {
+        if (simpleUser.hasManagerAuthority()) {
             commentService.deleteComment(commentId);
             return ResponseEntity.noContent().build();
         }
-        commentService.deleteCommentByOwner(sessionUser.getId(), commentId);
+        commentService.deleteCommentByOwner(simpleUser.getId(), commentId);
         return ResponseEntity.noContent().build();
     }
 }

@@ -74,43 +74,6 @@ class UserServiceTest {
         assertThatThrownBy(() -> userService.signUp(signUpRequest)).isInstanceOf(InvalidEmailFormException.class);
     }
 
-    @Test
-    void signIn() {
-        User registeredUser = userRepository.save(new User(GIST_EMAIL, encoder.hashPassword(PASSWORD), UserRole.USER));
-        SignInRequest signInRequest = new SignInRequest(GIST_EMAIL, PASSWORD);
-
-        userService.signIn(signInRequest);
-
-        assertTrue(httpSession.isNew());
-        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
-        assertThat(sessionUser.getId()).isEqualTo(registeredUser.getId());
-        assertThat(sessionUser.getUserRole()).isEqualTo(registeredUser.getUserRole());
-    }
-
-    @Test
-    void signInFailedIfNotValidUsername() {
-        userRepository.save(new User(GIST_EMAIL, encoder.hashPassword(PASSWORD), UserRole.USER));
-        String fakeUsername = "wrong@gist.ac.kr";
-        SignInRequest signInRequest = new SignInRequest(fakeUsername, PASSWORD);
-
-        assertThatThrownBy(
-                () -> userService.signIn(signInRequest)
-        ).isInstanceOf(NoSuchUserException.class);
-        assertThat(httpSession.getAttribute("user")).isNull();
-    }
-
-    @Test
-    void signInFailedIfNotValidPassword() {
-        userRepository.save(new User(GIST_EMAIL, encoder.hashPassword(PASSWORD), UserRole.USER));
-        String fakePassword = "wrongpassword";
-        SignInRequest signInRequest = new SignInRequest(GIST_EMAIL, fakePassword);
-
-        assertThatThrownBy(
-                () -> userService.signIn(signInRequest)
-        ).isInstanceOf(NotMatchedPasswordException.class);
-        assertThat(httpSession.getAttribute("user")).isNull();
-    }
-
     @ParameterizedTest
     @ValueSource(strings = {"manager", "Manager", "MANAGER"})
     void updateUserRoleToManager(String inputUserRole) {

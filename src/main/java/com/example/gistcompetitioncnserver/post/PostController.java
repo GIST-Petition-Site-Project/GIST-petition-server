@@ -1,14 +1,14 @@
 package com.example.gistcompetitioncnserver.post;
 
-import com.example.gistcompetitioncnserver.exception.user.UnAuthenticatedException;
-import com.example.gistcompetitioncnserver.exception.user.UnAuthorizedUserException;
-import com.example.gistcompetitioncnserver.user.SessionUser;
+import com.example.gistcompetitioncnserver.config.annotation.LoginRequired;
+import com.example.gistcompetitioncnserver.config.annotation.LoginUser;
+import com.example.gistcompetitioncnserver.config.annotation.ManagerPermissionRequired;
+import com.example.gistcompetitioncnserver.user.SimpleUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpSession;
 import java.net.URI;
 import java.util.List;
 
@@ -17,15 +17,12 @@ import java.util.List;
 @RequestMapping("/v1")
 public class PostController {
     private final PostService postService;
-    private final HttpSession httpSession;
 
+    @LoginRequired
     @PostMapping("/posts")
-    public ResponseEntity<Void> createPost(@Validated @RequestBody PostRequest postRequest) {
-        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
-        if (sessionUser == null) {
-            throw new UnAuthenticatedException();
-        }
-        return ResponseEntity.created(URI.create("/posts/" + postService.createPost(postRequest, sessionUser.getId()))).build();
+    public ResponseEntity<Void> createPost(@Validated @RequestBody PostRequest postRequest,
+                                           @LoginUser SimpleUser simpleUser) {
+        return ResponseEntity.created(URI.create("/posts/" + postService.createPost(postRequest, simpleUser.getId()))).build();
     }
 
     @GetMapping("/posts")
@@ -38,13 +35,10 @@ public class PostController {
         return ResponseEntity.ok().body(postService.retrievePost(postId));
     }
 
+    @LoginRequired
     @GetMapping("/posts/me")
-    public ResponseEntity<List<Post>> retrievePostsByUserId() {
-        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
-        if (sessionUser == null) {
-            throw new UnAuthenticatedException();
-        }
-        return ResponseEntity.ok().body(postService.retrievePostsByUserId(sessionUser.getId()));
+    public ResponseEntity<List<Post>> retrievePostsByUserId(@LoginUser SimpleUser simpleUser) {
+        return ResponseEntity.ok().body(postService.retrievePostsByUserId(simpleUser.getId()));
     }
 
     @GetMapping("/posts/count")
@@ -57,39 +51,28 @@ public class PostController {
         return ResponseEntity.ok().body(postService.getPostsByCategory(categoryName));
     }
 
+    @ManagerPermissionRequired
     @PutMapping("/posts/{postId}")
-    public ResponseEntity<Void> updatePost(@PathVariable Long postId, @Validated @RequestBody PostRequest changeRequest) {
-        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
-        if (sessionUser == null) {
-            throw new UnAuthenticatedException();
-        }
-        if (!sessionUser.hasManagerAuthority()) {
-            throw new UnAuthorizedUserException();
-        }
+    public ResponseEntity<Void> updatePost(@PathVariable Long postId,
+                                           @Validated @RequestBody PostRequest changeRequest,
+                                           @LoginUser SimpleUser simpleUser) {
         postService.updatePostDescription(postId, changeRequest.getDescription());
         return ResponseEntity.noContent().build();
     }
 
+    @ManagerPermissionRequired
     @DeleteMapping("/posts/{postId}")
-    public ResponseEntity<Void> deletePost(@PathVariable Long postId) {
-        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
-        if (sessionUser == null) {
-            throw new UnAuthenticatedException();
-        }
-        if (!sessionUser.hasManagerAuthority()) {
-            throw new UnAuthorizedUserException();
-        }
+    public ResponseEntity<Void> deletePost(@PathVariable Long postId,
+                                           @LoginUser SimpleUser simpleUser) {
         postService.deletePost(postId);
         return ResponseEntity.noContent().build();
     }
 
+    @LoginRequired
     @PostMapping("/posts/{postId}/agreements")
-    public ResponseEntity<Boolean> agreePost(@PathVariable Long postId) {
-        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
-        if (sessionUser == null) {
-            throw new UnAuthenticatedException();
-        }
-        return ResponseEntity.ok().body(postService.agree(postId, sessionUser.getId()));
+    public ResponseEntity<Boolean> agreePost(@PathVariable Long postId,
+                                             @LoginUser SimpleUser simpleUser) {
+        return ResponseEntity.ok().body(postService.agree(postId, simpleUser.getId()));
     }
 
     @GetMapping("/posts/{postId}/agreements")
@@ -97,12 +80,10 @@ public class PostController {
         return ResponseEntity.ok().body(postService.getNumberOfAgreements(postId));
     }
 
+    @LoginRequired
     @GetMapping("/posts/{postId}/agreements/me")
-    public ResponseEntity<Boolean> getStateOfAgreement(@PathVariable Long postId) {
-        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
-        if (sessionUser == null) {
-            throw new UnAuthenticatedException();
-        }
-        return ResponseEntity.ok().body(postService.getStateOfAgreement(postId, sessionUser.getId()));
+    public ResponseEntity<Boolean> getStateOfAgreement(@PathVariable Long postId,
+                                                       @LoginUser SimpleUser simpleUser) {
+        return ResponseEntity.ok().body(postService.getStateOfAgreement(postId, simpleUser.getId()));
     }
 }

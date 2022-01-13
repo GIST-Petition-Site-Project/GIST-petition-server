@@ -1,14 +1,13 @@
 package com.example.gistcompetitioncnserver.answer;
 
-import com.example.gistcompetitioncnserver.exception.user.UnAuthenticatedException;
-import com.example.gistcompetitioncnserver.exception.user.UnAuthorizedUserException;
-import com.example.gistcompetitioncnserver.user.SessionUser;
+import com.example.gistcompetitioncnserver.config.annotation.LoginUser;
+import com.example.gistcompetitioncnserver.config.annotation.ManagerPermissionRequired;
+import com.example.gistcompetitioncnserver.user.SimpleUser;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpSession;
 import java.net.URI;
 
 @RestController
@@ -17,19 +16,13 @@ import java.net.URI;
 public class AnswerController {
 
     private final AnswerService answerService;
-    private final HttpSession httpSession;
 
+    @ManagerPermissionRequired
     @PostMapping("/posts/{postId}/answer")
     public ResponseEntity<Object> createAnswer(@PathVariable Long postId,
-                                               @Validated @RequestBody AnswerRequest answerRequest) {
-        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
-        if (sessionUser == null) {
-            throw new UnAuthenticatedException();
-        }
-        if (!sessionUser.hasManagerAuthority()) {
-            throw new UnAuthorizedUserException();
-        }
-        Long answerId = answerService.createAnswer(postId, answerRequest, sessionUser.getId());
+                                               @Validated @RequestBody AnswerRequest answerRequest,
+                                               @LoginUser SimpleUser simpleUser) {
+        Long answerId = answerService.createAnswer(postId, answerRequest, simpleUser.getId());
         return ResponseEntity.created(URI.create("/posts/" + postId + "/answer/" + answerId)).build();
     }
 
@@ -43,29 +36,17 @@ public class AnswerController {
         return ResponseEntity.ok().body(answerService.getNumberOfAnswers());
     }
 
+    @ManagerPermissionRequired
     @PutMapping("/posts/{postId}/answer")
     public ResponseEntity<Void> updateAnswer(@PathVariable Long postId,
                                              @Validated @RequestBody AnswerRequest changeRequest) {
-        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
-        if (sessionUser == null) {
-            throw new UnAuthenticatedException();
-        }
-        if (!sessionUser.hasManagerAuthority()) {
-            throw new UnAuthorizedUserException();
-        }
         answerService.updateAnswer(postId, changeRequest);
         return ResponseEntity.ok().build();
     }
 
+    @ManagerPermissionRequired
     @DeleteMapping("/posts/{postId}/answer")
     public ResponseEntity<Object> deleteComment(@PathVariable Long postId) {
-        SessionUser sessionUser = (SessionUser) httpSession.getAttribute("user");
-        if (sessionUser == null) {
-            throw new UnAuthenticatedException();
-        }
-        if (!sessionUser.hasManagerAuthority()) {
-            throw new UnAuthorizedUserException();
-        }
         answerService.deleteAnswer(postId);
         return ResponseEntity.noContent().build();
     }

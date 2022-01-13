@@ -7,20 +7,17 @@ import com.example.gistcompetitioncnserver.exception.user.NotMatchedPasswordExce
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.servlet.http.HttpSession;
 import java.util.List;
 
 @Service
 public class UserService {
     private final UserRepository userRepository;
     private final Encryptor encryptor;
-    private final HttpSession httpSession;
     private final SignUpValidator signUpValidator;
 
-    public UserService(UserRepository userRepository, Encryptor encryptor, HttpSession httpSession, SignUpValidator signUpValidator) {
+    public UserService(UserRepository userRepository, Encryptor encryptor, SignUpValidator signUpValidator) {
         this.userRepository = userRepository;
         this.encryptor = encryptor;
-        this.httpSession = httpSession;
         this.signUpValidator = signUpValidator;
     }
 
@@ -40,16 +37,6 @@ public class UserService {
 
         User user = new User(username, encryptor.hashPassword(request.getPassword()), UserRole.USER);
         return userRepository.save(user).getId();
-    }
-
-    @Transactional(readOnly = true)
-    public void signIn(SignInRequest request) {
-        User user = userRepository.findByUsername(request.getUsername())
-                .orElseThrow(NoSuchUserException::new);
-        if (!encryptor.isMatch(request.getPassword(), user.getPassword())) {
-            throw new NotMatchedPasswordException();
-        }
-        httpSession.setAttribute("user", new SessionUser(user));
     }
 
     @Transactional(readOnly = true)
