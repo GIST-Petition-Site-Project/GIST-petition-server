@@ -16,19 +16,6 @@ spring:
     host: smtp.gmail.com
     port: 587
 
-logging:
-  level:
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-
 swagger:
   host: dev-api.gist-petition.com
-  protocol: http
-
-server:
-  servlet:
-    session:
-      cookie:
-        http-only: true
-        path: /
-        secure: true
-        sameSite: None
+  protocol: https
