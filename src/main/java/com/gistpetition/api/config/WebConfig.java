@@ -5,6 +5,7 @@ import com.gistpetition.api.config.interceptor.AdminPermissionInterceptor;
 import com.gistpetition.api.config.interceptor.LoginInterceptor;
 import com.gistpetition.api.config.interceptor.ManagerPermissionInterceptor;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -16,6 +17,9 @@ import java.util.List;
 @Configuration
 @AllArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
+    @Value("${request.origins}")
+    String[] origins;
+
     private final LoginInterceptor loginInterceptor;
     private final ManagerPermissionInterceptor managerPermissionInterceptor;
     private final AdminPermissionInterceptor adminPermissionInterceptor;
@@ -24,9 +28,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("https://localhost:3000",
-                        "https://127.0.0.1:3000",
-                        "https://dev.gist-petition.com")
+                .allowedOrigins(origins)
                 .allowedMethods("*")
                 .allowedHeaders("*")
                 .allowCredentials(true);

@@ -26,3 +26,5 @@ server:
         path: /
         secure: true
         sameSite: None
+request:
+  origins: "*"
