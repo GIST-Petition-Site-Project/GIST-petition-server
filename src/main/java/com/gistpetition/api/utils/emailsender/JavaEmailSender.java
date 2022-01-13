@@ -1,4 +1,4 @@
-package com.gistpetition.api.emailsender;
+package com.gistpetition.api.utils.emailsender;
 
 import com.gistpetition.api.exception.WrappedException;
 import lombok.RequiredArgsConstructor;

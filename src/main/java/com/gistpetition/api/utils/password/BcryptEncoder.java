@@ -1,4 +1,4 @@
-package com.gistpetition.api.common.password;
+package com.gistpetition.api.utils.password;
 
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Component;

@@ -1,6 +1,6 @@
 package com.gistpetition.api.verification.application;
 
-import com.gistpetition.api.emailsender.EmailSender;
+import com.gistpetition.api.utils.emailsender.EmailSender;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.context.Context;

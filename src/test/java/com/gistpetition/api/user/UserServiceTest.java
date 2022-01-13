@@ -1,6 +1,5 @@
 package com.gistpetition.api.user;
 
-import com.gistpetition.api.common.password.Encoder;
 import com.gistpetition.api.exception.user.DuplicatedUserException;
 import com.gistpetition.api.exception.user.InvalidEmailFormException;
 import com.gistpetition.api.exception.user.NoSuchUserException;
@@ -14,6 +13,7 @@ import com.gistpetition.api.user.dto.request.DeleteUserRequest;
 import com.gistpetition.api.user.dto.request.SignUpRequest;
 import com.gistpetition.api.user.dto.request.UpdatePasswordRequest;
 import com.gistpetition.api.user.dto.request.UpdateUserRoleRequest;
+import com.gistpetition.api.utils.password.Encoder;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

@@ -1,6 +1,6 @@
 package com.gistpetition.api.user;
 
-import com.gistpetition.api.common.password.BcryptEncoder;
+import com.gistpetition.api.utils.password.BcryptEncoder;
 import org.junit.jupiter.api.Test;
 import org.mindrot.jbcrypt.BCrypt;
 

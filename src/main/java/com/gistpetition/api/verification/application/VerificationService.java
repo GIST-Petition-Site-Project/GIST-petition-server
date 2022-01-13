@@ -1,13 +1,13 @@
 package com.gistpetition.api.verification.application;
 
-import com.gistpetition.api.common.email.EmailDomain;
-import com.gistpetition.api.common.email.EmailParser;
 import com.gistpetition.api.exception.user.DuplicatedUserException;
 import com.gistpetition.api.exception.user.InvalidEmailFormException;
 import com.gistpetition.api.exception.verification.DuplicatedVerificationException;
 import com.gistpetition.api.exception.verification.ExpiredVerificationCodeException;
 import com.gistpetition.api.exception.verification.NoSuchVerificationInfoException;
 import com.gistpetition.api.user.domain.UserRepository;
+import com.gistpetition.api.utils.email.EmailDomain;
+import com.gistpetition.api.utils.email.EmailParser;
 import com.gistpetition.api.verification.domain.VerificationInfo;
 import com.gistpetition.api.verification.domain.VerificationInfoRepository;
 import com.gistpetition.api.verification.dto.UsernameConfirmationRequest;

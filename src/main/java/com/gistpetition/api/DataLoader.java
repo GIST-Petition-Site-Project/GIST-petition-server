@@ -1,9 +1,9 @@
 package com.gistpetition.api;
 
-import com.gistpetition.api.common.password.BcryptEncoder;
 import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRepository;
 import com.gistpetition.api.user.domain.UserRole;
+import com.gistpetition.api.utils.password.BcryptEncoder;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 

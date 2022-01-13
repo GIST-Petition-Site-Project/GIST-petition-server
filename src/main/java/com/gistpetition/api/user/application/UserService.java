@@ -1,8 +1,5 @@
 package com.gistpetition.api.user.application;
 
-import com.gistpetition.api.common.email.EmailDomain;
-import com.gistpetition.api.common.email.EmailParser;
-import com.gistpetition.api.common.password.Encoder;
 import com.gistpetition.api.exception.user.DuplicatedUserException;
 import com.gistpetition.api.exception.user.InvalidEmailFormException;
 import com.gistpetition.api.exception.user.NoSuchUserException;
@@ -14,6 +11,9 @@ import com.gistpetition.api.user.dto.request.DeleteUserRequest;
 import com.gistpetition.api.user.dto.request.SignUpRequest;
 import com.gistpetition.api.user.dto.request.UpdatePasswordRequest;
 import com.gistpetition.api.user.dto.request.UpdateUserRoleRequest;
+import com.gistpetition.api.utils.email.EmailDomain;
+import com.gistpetition.api.utils.email.EmailParser;
+import com.gistpetition.api.utils.password.Encoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

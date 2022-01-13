@@ -1,4 +1,4 @@
-package com.gistpetition.api.common.email;
+package com.gistpetition.api.utils.email;
 
 import java.util.Arrays;
 

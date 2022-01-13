@@ -1,4 +1,4 @@
-package com.gistpetition.api.common.password;
+package com.gistpetition.api.utils.password;
 
 public interface Encoder {
     String hashPassword(String raw);
