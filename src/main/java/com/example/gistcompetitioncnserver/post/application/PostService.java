@@ -1,8 +1,11 @@
-package com.example.gistcompetitioncnserver.post;
+package com.example.gistcompetitioncnserver.post.application;
 
 
 import com.example.gistcompetitioncnserver.exception.post.NoSuchPostException;
 import com.example.gistcompetitioncnserver.exception.user.NoSuchUserException;
+import com.example.gistcompetitioncnserver.post.domain.Post;
+import com.example.gistcompetitioncnserver.post.domain.PostRepository;
+import com.example.gistcompetitioncnserver.post.dto.PostRequest;
 import com.example.gistcompetitioncnserver.user.User;
 import com.example.gistcompetitioncnserver.user.UserRepository;
 import lombok.AllArgsConstructor;

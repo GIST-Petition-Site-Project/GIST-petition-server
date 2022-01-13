@@ -1,13 +1,13 @@
 package com.example.gistcompetitioncnserver.answer.application;
 
-import com.example.gistcompetitioncnserver.answer.dto.AnswerRequest;
 import com.example.gistcompetitioncnserver.answer.domain.Answer;
 import com.example.gistcompetitioncnserver.answer.domain.AnswerRepository;
+import com.example.gistcompetitioncnserver.answer.dto.AnswerRequest;
 import com.example.gistcompetitioncnserver.exception.post.DuplicatedAnswerException;
 import com.example.gistcompetitioncnserver.exception.post.NoSuchPostException;
 import com.example.gistcompetitioncnserver.exception.post.UnAnsweredPostException;
-import com.example.gistcompetitioncnserver.post.Post;
-import com.example.gistcompetitioncnserver.post.PostRepository;
+import com.example.gistcompetitioncnserver.post.domain.Post;
+import com.example.gistcompetitioncnserver.post.domain.PostRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

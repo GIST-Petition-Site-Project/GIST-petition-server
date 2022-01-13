@@ -1,4 +1,4 @@
-package com.example.gistcompetitioncnserver.post;
+package com.example.gistcompetitioncnserver.post.domain;
 
 import com.example.gistcompetitioncnserver.common.BaseEntity;
 import com.example.gistcompetitioncnserver.exception.post.DuplicatedAgreementException;

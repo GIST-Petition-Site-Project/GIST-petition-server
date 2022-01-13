@@ -1,4 +1,4 @@
-package com.example.gistcompetitioncnserver.post;
+package com.example.gistcompetitioncnserver.post.application;
 
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;

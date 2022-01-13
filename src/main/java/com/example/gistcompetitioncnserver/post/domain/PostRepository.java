@@ -1,4 +1,4 @@
-package com.example.gistcompetitioncnserver.post;
+package com.example.gistcompetitioncnserver.post.domain;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;

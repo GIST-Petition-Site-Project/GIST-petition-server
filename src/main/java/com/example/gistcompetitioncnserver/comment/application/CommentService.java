@@ -6,7 +6,7 @@ import com.example.gistcompetitioncnserver.comment.dto.CommentRequest;
 import com.example.gistcompetitioncnserver.exception.comment.NoSuchCommentException;
 import com.example.gistcompetitioncnserver.exception.post.NoSuchPostException;
 import com.example.gistcompetitioncnserver.exception.user.UnAuthorizedUserException;
-import com.example.gistcompetitioncnserver.post.PostRepository;
+import com.example.gistcompetitioncnserver.post.domain.PostRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

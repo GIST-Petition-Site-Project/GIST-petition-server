@@ -1,12 +1,14 @@
-package com.example.gistcompetitioncnserver.post;
+package com.example.gistcompetitioncnserver.post.domain;
 
 import com.example.gistcompetitioncnserver.common.UnmodifiableEntity;
+import lombok.Getter;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+@Getter
 @Entity
 public class Agreement extends UnmodifiableEntity {
 
@@ -29,9 +31,5 @@ public class Agreement extends UnmodifiableEntity {
 
     public boolean isAgreedBy(Long userId) {
         return this.userId.equals(userId);
-    }
-
-    public Long getUserId() {
-        return userId;
     }
 }

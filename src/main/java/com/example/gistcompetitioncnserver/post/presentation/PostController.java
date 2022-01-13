@@ -1,8 +1,11 @@
-package com.example.gistcompetitioncnserver.post;
+package com.example.gistcompetitioncnserver.post.presentation;
 
 import com.example.gistcompetitioncnserver.config.annotation.LoginRequired;
 import com.example.gistcompetitioncnserver.config.annotation.LoginUser;
 import com.example.gistcompetitioncnserver.config.annotation.ManagerPermissionRequired;
+import com.example.gistcompetitioncnserver.post.application.PostService;
+import com.example.gistcompetitioncnserver.post.domain.Post;
+import com.example.gistcompetitioncnserver.post.dto.PostRequest;
 import com.example.gistcompetitioncnserver.user.SimpleUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

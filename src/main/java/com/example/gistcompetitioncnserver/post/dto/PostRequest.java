@@ -1,4 +1,4 @@
-package com.example.gistcompetitioncnserver.post;
+package com.example.gistcompetitioncnserver.post.dto;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;

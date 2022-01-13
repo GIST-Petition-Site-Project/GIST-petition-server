@@ -2,6 +2,12 @@ package com.example.gistcompetitioncnserver.post;
 
 import com.example.gistcompetitioncnserver.ServiceTest;
 import com.example.gistcompetitioncnserver.exception.post.NoSuchPostException;
+import com.example.gistcompetitioncnserver.post.application.PostService;
+import com.example.gistcompetitioncnserver.post.domain.Agreement;
+import com.example.gistcompetitioncnserver.post.domain.AgreementRepository;
+import com.example.gistcompetitioncnserver.post.domain.Post;
+import com.example.gistcompetitioncnserver.post.domain.PostRepository;
+import com.example.gistcompetitioncnserver.post.dto.PostRequest;
 import com.example.gistcompetitioncnserver.user.User;
 import com.example.gistcompetitioncnserver.user.UserRepository;
 import com.example.gistcompetitioncnserver.user.UserRole;
