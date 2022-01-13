@@ -17,7 +17,7 @@ import java.util.List;
 @Configuration
 @AllArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
-    @Value("${request.origins}")
+    @Value("${request.origins:*}")
     String[] origins;
 
     private final LoginInterceptor loginInterceptor;
