@@ -1,13 +1,26 @@
 package com.example.gistcompetitioncnserver.user;
 
-import lombok.Data;
-
 import javax.validation.constraints.NotNull;
 
-@Data
 public class SignInRequest {
     @NotNull
-    private final String username;
+    private String username;
     @NotNull
-    private final String password;
+    private String password;
+
+    protected SignInRequest() {
+    }
+
+    public SignInRequest(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
 }

@@ -22,7 +22,7 @@ server:
   servlet:
     session:
       cookie:
-        domain: gist-petition.com
         http-only: true
         path: /
-
+        secure: true
+        sameSite: None
