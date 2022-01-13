@@ -35,16 +35,10 @@ spring:
     activate:
       on-profile: dev
     import: ./privates/application-dev-db.yml, ./privates/application-dev-mail.yml
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/dev_petitiondb?serverTimezone=Asia/Seoul
   jpa:
     database-platform: org.hibernate.dialect.MySQL8Dialect
     hibernate:
       ddl-auto: update
-  mail:
-    host: smtp.gmail.com
-    port: 587
 swagger:
   host: dev-api.gist-petition.com
   protocol: https
