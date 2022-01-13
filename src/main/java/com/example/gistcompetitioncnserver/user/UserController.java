@@ -39,20 +39,20 @@ public class UserController {
 
     @AdminPermissionRequired
     @GetMapping("/users")
-    public ResponseEntity<List<User>> retrieveAllUsers() {
-        return ResponseEntity.ok().body(userService.findAllUsers());
+    public ResponseEntity<List<UserResponse>> retrieveAllUsers() {
+        return ResponseEntity.ok().body(UserResponse.listOf(userService.findAllUsers()));
     }
 
     @AdminPermissionRequired
     @GetMapping("/users/{userId}")
-    public ResponseEntity<User> retrieveUser(@PathVariable Long userId) {
-        return ResponseEntity.ok().body(userService.findUserById(userId));
+    public ResponseEntity<UserResponse> retrieveUser(@PathVariable Long userId) {
+        return ResponseEntity.ok().body(UserResponse.of(userService.findUserById(userId)));
     }
 
     @LoginRequired
     @GetMapping("/users/me")
-    public ResponseEntity<User> retrieveUserOfMine(@LoginUser SimpleUser simpleUser) {
-        return ResponseEntity.ok().body(userService.findUserById(simpleUser.getId()));
+    public ResponseEntity<UserResponse> retrieveUserOfMine(@LoginUser SimpleUser simpleUser) {
+        return ResponseEntity.ok().body(UserResponse.of(userService.findUserById(simpleUser.getId())));
     }
 
     @AdminPermissionRequired

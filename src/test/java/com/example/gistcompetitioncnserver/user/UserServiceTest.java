@@ -13,8 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-import javax.servlet.http.HttpSession;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -36,8 +34,6 @@ class UserServiceTest {
     private UserRepository userRepository;
     @Autowired
     private Encryptor encoder;
-    @Autowired
-    private HttpSession httpSession;
     @MockBean
     private SignUpValidator signUpValidator;
 
