@@ -1,4 +1,4 @@
-package com.example.gistcompetitioncnserver.config;
+package com.example.gistcompetitioncnserver.config.interceptor;
 
 
 import com.example.gistcompetitioncnserver.config.annotation.LoginRequired;

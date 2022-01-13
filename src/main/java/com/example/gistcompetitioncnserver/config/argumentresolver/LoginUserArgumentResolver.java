@@ -1,4 +1,4 @@
-package com.example.gistcompetitioncnserver.config;
+package com.example.gistcompetitioncnserver.config.argumentresolver;
 
 import com.example.gistcompetitioncnserver.config.annotation.LoginUser;
 import com.example.gistcompetitioncnserver.user.LoginService;

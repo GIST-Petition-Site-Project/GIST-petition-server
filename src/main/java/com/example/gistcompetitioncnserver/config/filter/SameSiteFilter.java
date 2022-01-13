@@ -1,4 +1,4 @@
-package com.example.gistcompetitioncnserver.config;
+package com.example.gistcompetitioncnserver.config.filter;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
