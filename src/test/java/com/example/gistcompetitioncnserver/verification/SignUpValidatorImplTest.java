@@ -4,13 +4,16 @@ import com.example.gistcompetitioncnserver.ServiceTest;
 import com.example.gistcompetitioncnserver.exception.verification.InvalidVerificationInfoException;
 import com.example.gistcompetitioncnserver.exception.verification.NoSuchVerificationCodeException;
 import com.example.gistcompetitioncnserver.exception.verification.NotConfirmedVerificationCodeException;
+import com.example.gistcompetitioncnserver.verification.application.SignUpValidatorImpl;
+import com.example.gistcompetitioncnserver.verification.domain.VerificationInfo;
+import com.example.gistcompetitioncnserver.verification.domain.VerificationInfoRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
 
-import static com.example.gistcompetitioncnserver.verification.VerificationInfo.SIGN_UP_EXPIRE_MINUTE;
+import static com.example.gistcompetitioncnserver.verification.domain.VerificationInfo.SIGN_UP_EXPIRE_MINUTE;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 

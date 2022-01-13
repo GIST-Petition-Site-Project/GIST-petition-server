@@ -1,4 +1,4 @@
-package com.example.gistcompetitioncnserver.verification;
+package com.example.gistcompetitioncnserver.verification.application;
 
 import com.example.gistcompetitioncnserver.common.email.EmailDomain;
 import com.example.gistcompetitioncnserver.common.email.EmailParser;
@@ -8,6 +8,10 @@ import com.example.gistcompetitioncnserver.exception.verification.DuplicatedVeri
 import com.example.gistcompetitioncnserver.exception.verification.ExpiredVerificationCodeException;
 import com.example.gistcompetitioncnserver.exception.verification.NoSuchVerificationInfoException;
 import com.example.gistcompetitioncnserver.user.domain.UserRepository;
+import com.example.gistcompetitioncnserver.verification.domain.VerificationInfo;
+import com.example.gistcompetitioncnserver.verification.domain.VerificationInfoRepository;
+import com.example.gistcompetitioncnserver.verification.dto.UsernameConfirmationRequest;
+import com.example.gistcompetitioncnserver.verification.dto.VerificationEmailRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

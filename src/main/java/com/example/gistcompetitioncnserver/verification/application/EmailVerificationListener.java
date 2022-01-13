@@ -1,4 +1,4 @@
-package com.example.gistcompetitioncnserver.verification;
+package com.example.gistcompetitioncnserver.verification.application;
 
 import com.example.gistcompetitioncnserver.emailsender.EmailSender;
 import org.springframework.context.ApplicationListener;

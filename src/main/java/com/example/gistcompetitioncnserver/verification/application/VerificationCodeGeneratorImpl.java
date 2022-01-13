@@ -1,4 +1,4 @@
-package com.example.gistcompetitioncnserver.verification;
+package com.example.gistcompetitioncnserver.verification.application;
 
 import org.springframework.stereotype.Component;
 

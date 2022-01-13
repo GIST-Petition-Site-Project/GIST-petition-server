@@ -1,5 +1,9 @@
-package com.example.gistcompetitioncnserver.verification;
+package com.example.gistcompetitioncnserver.verification.presentation;
 
+import com.example.gistcompetitioncnserver.verification.application.EmailVerificationEvent;
+import com.example.gistcompetitioncnserver.verification.application.VerificationService;
+import com.example.gistcompetitioncnserver.verification.dto.UsernameConfirmationRequest;
+import com.example.gistcompetitioncnserver.verification.dto.VerificationEmailRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;

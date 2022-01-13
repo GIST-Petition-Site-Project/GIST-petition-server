@@ -1,9 +1,11 @@
-package com.example.gistcompetitioncnserver.verification;
+package com.example.gistcompetitioncnserver.verification.application;
 
 import com.example.gistcompetitioncnserver.exception.verification.InvalidVerificationInfoException;
 import com.example.gistcompetitioncnserver.exception.verification.NoSuchVerificationCodeException;
 import com.example.gistcompetitioncnserver.exception.verification.NotConfirmedVerificationCodeException;
 import com.example.gistcompetitioncnserver.user.application.SignUpValidator;
+import com.example.gistcompetitioncnserver.verification.domain.VerificationInfo;
+import com.example.gistcompetitioncnserver.verification.domain.VerificationInfoRepository;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;

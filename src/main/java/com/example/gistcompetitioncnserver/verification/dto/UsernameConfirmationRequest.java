@@ -1,4 +1,4 @@
-package com.example.gistcompetitioncnserver.verification;
+package com.example.gistcompetitioncnserver.verification.dto;
 
 public class UsernameConfirmationRequest {
     private String username;

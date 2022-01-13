@@ -9,6 +9,11 @@ import com.example.gistcompetitioncnserver.exception.verification.NoSuchVerifica
 import com.example.gistcompetitioncnserver.user.domain.User;
 import com.example.gistcompetitioncnserver.user.domain.UserRepository;
 import com.example.gistcompetitioncnserver.user.domain.UserRole;
+import com.example.gistcompetitioncnserver.verification.application.VerificationService;
+import com.example.gistcompetitioncnserver.verification.domain.VerificationInfo;
+import com.example.gistcompetitioncnserver.verification.domain.VerificationInfoRepository;
+import com.example.gistcompetitioncnserver.verification.dto.UsernameConfirmationRequest;
+import com.example.gistcompetitioncnserver.verification.dto.VerificationEmailRequest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.example.gistcompetitioncnserver.verification.VerificationInfo.CONFIRM_EXPIRE_MINUTE;
+import static com.example.gistcompetitioncnserver.verification.domain.VerificationInfo.CONFIRM_EXPIRE_MINUTE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
