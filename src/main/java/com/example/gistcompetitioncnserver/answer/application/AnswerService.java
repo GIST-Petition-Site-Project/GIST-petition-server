@@ -1,5 +1,8 @@
-package com.example.gistcompetitioncnserver.answer;
+package com.example.gistcompetitioncnserver.answer.application;
 
+import com.example.gistcompetitioncnserver.answer.dto.AnswerRequest;
+import com.example.gistcompetitioncnserver.answer.domain.Answer;
+import com.example.gistcompetitioncnserver.answer.domain.AnswerRepository;
 import com.example.gistcompetitioncnserver.exception.post.DuplicatedAnswerException;
 import com.example.gistcompetitioncnserver.exception.post.NoSuchPostException;
 import com.example.gistcompetitioncnserver.exception.post.UnAnsweredPostException;

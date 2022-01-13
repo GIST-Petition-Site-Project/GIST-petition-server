@@ -1,5 +1,6 @@
-package com.example.gistcompetitioncnserver.answer;
+package com.example.gistcompetitioncnserver.answer.domain;
 
+import com.example.gistcompetitioncnserver.answer.domain.Answer;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
