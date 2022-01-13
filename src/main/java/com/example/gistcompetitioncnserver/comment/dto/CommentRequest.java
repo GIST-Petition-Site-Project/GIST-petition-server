@@ -1,4 +1,4 @@
-package com.example.gistcompetitioncnserver.comment;
+package com.example.gistcompetitioncnserver.comment.dto;
 
 
 import javax.validation.constraints.NotBlank;

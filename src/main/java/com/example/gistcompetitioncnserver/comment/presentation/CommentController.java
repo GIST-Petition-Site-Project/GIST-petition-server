@@ -1,6 +1,8 @@
-package com.example.gistcompetitioncnserver.comment;
+package com.example.gistcompetitioncnserver.comment.presentation;
 
 
+import com.example.gistcompetitioncnserver.comment.application.CommentService;
+import com.example.gistcompetitioncnserver.comment.dto.CommentRequest;
 import com.example.gistcompetitioncnserver.config.annotation.LoginRequired;
 import com.example.gistcompetitioncnserver.config.annotation.LoginUser;
 import com.example.gistcompetitioncnserver.user.SimpleUser;

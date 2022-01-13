@@ -1,5 +1,6 @@
-package com.example.gistcompetitioncnserver.comment;
+package com.example.gistcompetitioncnserver.comment.application;
 
+import com.example.gistcompetitioncnserver.comment.domain.CommentRepository;
 import com.example.gistcompetitioncnserver.post.PostDeleteEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;

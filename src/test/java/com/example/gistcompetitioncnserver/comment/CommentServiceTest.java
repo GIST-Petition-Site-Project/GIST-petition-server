@@ -1,6 +1,10 @@
 package com.example.gistcompetitioncnserver.comment;
 
 import com.example.gistcompetitioncnserver.ServiceTest;
+import com.example.gistcompetitioncnserver.comment.application.CommentService;
+import com.example.gistcompetitioncnserver.comment.domain.Comment;
+import com.example.gistcompetitioncnserver.comment.domain.CommentRepository;
+import com.example.gistcompetitioncnserver.comment.dto.CommentRequest;
 import com.example.gistcompetitioncnserver.exception.post.NoSuchPostException;
 import com.example.gistcompetitioncnserver.exception.user.UnAuthorizedUserException;
 import com.example.gistcompetitioncnserver.post.Post;

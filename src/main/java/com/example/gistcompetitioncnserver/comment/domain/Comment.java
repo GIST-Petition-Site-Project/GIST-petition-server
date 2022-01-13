@@ -1,4 +1,4 @@
-package com.example.gistcompetitioncnserver.comment;
+package com.example.gistcompetitioncnserver.comment.domain;
 
 import com.example.gistcompetitioncnserver.common.BaseEntity;
 import lombok.Getter;

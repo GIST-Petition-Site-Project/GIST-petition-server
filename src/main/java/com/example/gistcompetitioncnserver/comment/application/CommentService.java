@@ -1,5 +1,8 @@
-package com.example.gistcompetitioncnserver.comment;
+package com.example.gistcompetitioncnserver.comment.application;
 
+import com.example.gistcompetitioncnserver.comment.domain.Comment;
+import com.example.gistcompetitioncnserver.comment.domain.CommentRepository;
+import com.example.gistcompetitioncnserver.comment.dto.CommentRequest;
 import com.example.gistcompetitioncnserver.exception.comment.NoSuchCommentException;
 import com.example.gistcompetitioncnserver.exception.post.NoSuchPostException;
 import com.example.gistcompetitioncnserver.exception.user.UnAuthorizedUserException;
