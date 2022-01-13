@@ -11,6 +11,9 @@ jobs:
     steps:
       - name: Checkout source code
         uses: actions/checkout@v2
+        with:
+          submodules: true
+          token: ${{secrets.SUBMODULE_ACCESS_KEY}}
 
       - name: Build App
         run: ./gradlew bootJar
