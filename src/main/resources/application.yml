@@ -1,6 +1,16 @@
 spring:
   profiles:
     active: local
+server.servlet.session.cookie:
+  http-only: true
+  path: /
+  secure: true
+  sameSite: None
+---
+spring:
+  config:
+    activate:
+      on-profile: local
   datasource:
     url: jdbc:h2:mem:testdb
     driverClassName: org.h2.Driver
@@ -18,11 +28,19 @@ spring:
 logging:
   level:
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-server:
-  servlet:
-    session:
-      cookie:
-        http-only: true
-        path: /
-        secure: true
-        sameSite: None
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+    import: ./privates/application-dev-db.yml, ./privates/application-dev-mail.yml
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: update
+swagger:
+  host: dev-api.gist-petition.com
+  protocol: https
+request:
+  origins: https://localhost:3000, https://dev.gist-petition.com
