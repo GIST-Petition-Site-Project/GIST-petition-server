@@ -1,0 +1,34 @@
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+    import: ./privates/application-dev-db.yml, ./privates/application-dev-mail.yml
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/dev_petitiondb?serverTimezone=Asia/Seoul
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+  mail:
+    host: smtp.gmail.com
+    port: 587
+
+logging:
+  level:
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+swagger:
+  host: dev-api.gist-petition.com
+  protocol: http
+
+server:
+  servlet:
+    session:
+      cookie:
+        http-only: true
+        path: /
+        secure: true
+        sameSite: None

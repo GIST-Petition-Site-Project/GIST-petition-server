@@ -40,3 +40,13 @@ dependencies {
 test {
     useJUnitPlatform()
 }
+
+processResources.dependsOn('copyPrivate')
+
+task copyPrivate(type: Copy) {
+    copy {
+        from './server-privates'
+        include "*.yml"
+        into 'src/main/resources/privates'
+    }
+}
