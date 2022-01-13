@@ -1,0 +1,3 @@
+[submodule "server-privates"]
+	path = server-privates
+	url = https://github.com/GIST-Petition-Site-Project/server-privates
