@@ -26,7 +26,7 @@ public class SwaggerConfig {
                 .host(host)
                 .protocols(Collections.singleton(protocol))
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.example.gistcompetitioncnserver"))
+                .apis(RequestHandlerSelectors.basePackage("com.gistpetition.api"))
                 .paths(PathSelectors.any())
                 .build();
     }
