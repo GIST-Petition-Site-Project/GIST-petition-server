@@ -6,16 +6,15 @@ import java.util.Random;
 
 @Component
 public class RandomVerificationCodeGenerator implements VerificationCodeGenerator {
+    private final Random random = new Random();
+    private static final int LENGTH = 6;
+    private static final int LEFTMOST = 'A';
+    private static final int RIGHTMOST = 'Z';
+
     @Override
     public String generate() {
-        int length = 6;
-        int leftMost = 'A';
-        int rightMost = 'Z';
-
-        Random random = new Random();
-
-        return random.ints(leftMost, rightMost + 1)
-                .limit(length)
+        return random.ints(LEFTMOST, RIGHTMOST + 1)
+                .limit(LENGTH)
                 .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
                 .toString();
     }
