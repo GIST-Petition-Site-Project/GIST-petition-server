@@ -7,8 +7,7 @@
         <encoder>
             <pattern>${LOG_PATTERN}</pattern>
         </encoder>
-        <rollingPolicy
-                class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>${LOG_PATH}/${BACKUP_PATH}/%d{yyyy-MM-dd}/${ERROR_LOG_FILE_NAME}-%d{yyyy-MM-dd}_%i.log
             </fileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy
