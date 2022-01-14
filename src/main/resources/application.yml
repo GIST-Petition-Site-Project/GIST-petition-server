@@ -34,5 +34,9 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+swagger:
+  host: dev-api.gist-petition.com
+  protocol: https
+
 request:
   origins: https://localhost:3000, https://dev.gist-petition.com
