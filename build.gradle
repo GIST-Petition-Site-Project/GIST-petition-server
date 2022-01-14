@@ -27,6 +27,8 @@ dependencies {
 
     implementation "io.springfox:springfox-boot-starter:3.0.0"
 
+    implementation "net.rakugakibox.spring.boot:logback-access-spring-boot-starter:2.7.1"
+
     runtimeOnly 'com.h2database:h2'
     runtimeOnly 'mysql:mysql-connector-java'
 
