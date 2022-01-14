@@ -19,7 +19,8 @@ public class Post extends BaseEntity {
     private String title;
     @Lob
     private String description;
-    private String category;
+    @Enumerated(EnumType.STRING)
+    private Category category;
     private boolean answered;
     private int accepted;
     private Long userId;
@@ -30,11 +31,11 @@ public class Post extends BaseEntity {
     protected Post() {
     }
 
-    public Post(String title, String description, String category, Long userId) {
+    public Post(String title, String description, Category category, Long userId) {
         this(null, title, description, category, false, 0, userId);
     }
 
-    private Post(Long id, String title, String description, String category, boolean answered, int accepted, Long userId) {
+    private Post(Long id, String title, String description, Category category, boolean answered, int accepted, Long userId) {
         this.id = id;
         this.title = title;
         this.description = description;
