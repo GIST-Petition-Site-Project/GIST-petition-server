@@ -43,7 +43,7 @@ public class PostController {
     }
 
     @GetMapping("/posts/{postId}")
-    public ResponseEntity<Post> retrievePost(@PathVariable Long postId) {
+    public ResponseEntity<PostResponse> retrievePost(@PathVariable Long postId) {
         return ResponseEntity.ok().body(postService.retrievePostById(postId));
     }
 

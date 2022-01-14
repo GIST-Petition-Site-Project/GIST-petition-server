@@ -48,15 +48,15 @@ public class PostService {
         return PostResponse.pageOf(postRepository.findByCategory(Category.getById(categoryId), pageable));
     }
 
-
+    //Todo 이건 어디에 쓰이는거죠? 응?
     @Transactional(readOnly = true)
     public List<Post> retrievePostsByUserId(Long user_id) {
         return postRepository.findByUserId(Sort.by(Sort.Direction.DESC, "id"), user_id);
     }
 
     @Transactional(readOnly = true)
-    public Post retrievePostById(Long postId) {
-        return findPostById(postId);
+    public PostResponse retrievePostById(Long postId) {
+        return PostResponse.of(findPostById(postId));
     }
 
     @Transactional(readOnly = true)

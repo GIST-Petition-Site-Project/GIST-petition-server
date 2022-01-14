@@ -8,6 +8,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class PostResponse {
     private final String title;
@@ -21,12 +22,12 @@ public class PostResponse {
     }
 
     public static Page<PostResponse> pageOf(Page<Post> page) {
-        List<PostResponse> postResponseList = new ArrayList<>();
-        for (Post post : page.getContent()) {
-            PostResponse pr = new PostResponse(post.getTitle(), post.getDescription(), post.getCategory().getName());
-            postResponseList.add(pr);
-        }
+        List<PostResponse> postResponseList = page.getContent().stream().map(PostResponse::of).collect(Collectors.toList());
         return new PageImpl<>(postResponseList, page.getPageable(), page.getTotalElements());
+    }
+
+    public static PostResponse of(Post post) {
+        return new PostResponse(post.getTitle(), post.getDescription(), post.getCategory().getName());
     }
 
     public String getTitle() {
