@@ -1,5 +1,7 @@
 package com.gistpetition.api.post.domain;
 
+import com.gistpetition.api.exception.post.NoSuchCategoryException;
+
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,6 +35,9 @@ public enum Category {
     }
 
     public static Category getById(Long id) {
+        if (id < 0L || values().length < id) {
+            throw new NoSuchCategoryException();
+        }
         return lookup.get(id);
     }
 
