@@ -20,14 +20,10 @@ spring:
     console:
       enabled: true
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
     show-sql: true
     properties:
       hibernate:
         format_sql: true
-logging:
-  level:
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
 
 ---
 spring:
@@ -39,8 +35,5 @@ spring:
     database-platform: org.hibernate.dialect.MySQL8Dialect
     hibernate:
       ddl-auto: update
-swagger:
-  host: dev-api.gist-petition.com
-  protocol: https
 request:
   origins: https://localhost:3000, https://dev.gist-petition.com
