@@ -6,8 +6,13 @@ import com.gistpetition.api.config.annotation.ManagerPermissionRequired;
 import com.gistpetition.api.post.application.PostService;
 import com.gistpetition.api.post.domain.Post;
 import com.gistpetition.api.post.dto.PostRequest;
+import com.gistpetition.api.post.dto.PostResponse;
 import com.gistpetition.api.user.domain.SimpleUser;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -29,13 +34,17 @@ public class PostController {
     }
 
     @GetMapping("/posts")
-    public ResponseEntity<List<Post>> retrieveAllPost() {
-        return ResponseEntity.ok().body(postService.retrieveAllPost());
+    public ResponseEntity<Page<PostResponse>> retrievePost(@RequestParam(defaultValue = "0") Long categoryId,
+                                                           @PageableDefault(sort="createdAt",direction = Sort.Direction.DESC) Pageable pageable) {
+        if (categoryId.equals(0L)) {
+            return ResponseEntity.ok().body(postService.retrievePost(pageable));
+        }
+        return ResponseEntity.ok().body(postService.retrievePostByCategoryId(categoryId, pageable));
     }
 
     @GetMapping("/posts/{postId}")
-    public ResponseEntity<Post> retrievePost(@PathVariable Long postId) {
-        return ResponseEntity.ok().body(postService.retrievePost(postId));
+    public ResponseEntity<PostResponse> retrievePost(@PathVariable Long postId) {
+        return ResponseEntity.ok().body(postService.retrievePostById(postId));
     }
 
     @LoginRequired
@@ -47,11 +56,6 @@ public class PostController {
     @GetMapping("/posts/count")
     public ResponseEntity<Long> getPostCount() {
         return ResponseEntity.ok().body(postService.getPostCount());
-    }
-
-    @GetMapping("/posts/category")
-    public ResponseEntity<List<Post>> getPostsByCategory(@RequestParam("categoryName") String categoryName) {
-        return ResponseEntity.ok().body(postService.getPostsByCategory(categoryName));
     }
 
     @ManagerPermissionRequired

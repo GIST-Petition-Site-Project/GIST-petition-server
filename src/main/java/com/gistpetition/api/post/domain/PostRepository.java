@@ -1,5 +1,7 @@
 package com.gistpetition.api.post.domain;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -12,9 +14,8 @@ import java.util.List;
 public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findByUserId(Sort sort, Long userId);
 
-    List<Post> findByCategory(Sort sort, String categoryName);
-
-    List<Post> findAll(Sort sort);
+    Page<Post> findByCategory(Category category, Pageable pageable);
+    Page<Post> findAll(Pageable pageable);
 
     @Query("SELECT p FROM Post AS p LEFT JOIN FETCH p.agreements WHERE p.id=:postId")
     Post findPostByWithEagerMode(@Param("postId") Long postId);

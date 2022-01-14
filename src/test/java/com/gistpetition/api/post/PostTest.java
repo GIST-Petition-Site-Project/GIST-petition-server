@@ -1,6 +1,7 @@
 package com.gistpetition.api.post;
 
 import com.gistpetition.api.exception.post.DuplicatedAgreementException;
+import com.gistpetition.api.post.domain.Category;
 import com.gistpetition.api.post.domain.Post;
 import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRole;
@@ -17,7 +18,7 @@ class PostTest {
     @BeforeEach
     void setUp() {
         user = new User(1L, "email@email.com", "password", UserRole.USER);
-        post = new Post("title", "description", "category", user.getId());
+        post = new Post("title", "description", Category.DORMITORY, user.getId());
     }
 
     @Test

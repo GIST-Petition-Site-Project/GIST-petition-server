@@ -7,6 +7,7 @@ import com.gistpetition.api.comment.domain.CommentRepository;
 import com.gistpetition.api.comment.dto.CommentRequest;
 import com.gistpetition.api.exception.post.NoSuchPostException;
 import com.gistpetition.api.exception.user.UnAuthorizedUserException;
+import com.gistpetition.api.post.domain.Category;
 import com.gistpetition.api.post.domain.Post;
 import com.gistpetition.api.post.domain.PostRepository;
 import com.gistpetition.api.user.domain.User;
@@ -45,7 +46,7 @@ class CommentServiceTest extends ServiceTest {
     @BeforeEach
     void setUp() {
         User postOwner = userRepository.save(new User("user@gist.ac.kr", "password", UserRole.USER));
-        post = postRepository.save(new Post("title", "description", "category", postOwner.getId()));
+        post = postRepository.save(new Post("title", "description", Category.DORMITORY, postOwner.getId()));
 
         commenter = userRepository.save(new User("commenter@gist.ac.kr", "password", UserRole.USER));
         otherUser = userRepository.save(new User("other@gist.ac.kr", "password", UserRole.USER));

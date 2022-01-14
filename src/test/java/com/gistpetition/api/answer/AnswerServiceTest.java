@@ -8,6 +8,7 @@ import com.gistpetition.api.answer.dto.AnswerRequest;
 import com.gistpetition.api.exception.WrappedException;
 import com.gistpetition.api.exception.post.NoSuchPostException;
 import com.gistpetition.api.exception.post.UnAnsweredPostException;
+import com.gistpetition.api.post.domain.Category;
 import com.gistpetition.api.post.domain.Post;
 import com.gistpetition.api.post.domain.PostRepository;
 import com.gistpetition.api.user.domain.User;
@@ -45,7 +46,7 @@ class AnswerServiceTest extends ServiceTest {
     void setup() {
         User user = userRepository.save(new User("normal@email.com", "password", UserRole.USER));
         manager = userRepository.save(new User("manager@email.com", "password", UserRole.MANAGER));
-        savedPost = postRepository.save(new Post("title", "description", "category", user.getId()));
+        savedPost = postRepository.save(new Post("title", "description", Category.DORMITORY, user.getId()));
     }
 
     @Test

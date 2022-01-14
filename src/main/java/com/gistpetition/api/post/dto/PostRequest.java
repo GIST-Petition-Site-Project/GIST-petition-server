@@ -9,15 +9,15 @@ public class PostRequest {
     @NotBlank
     private String description;
     @NotNull
-    private String category;
+    private Long categoryId;
 
     protected PostRequest() {
     }
 
-    public PostRequest(String title, String description, String category) {
+    public PostRequest(String title, String description, Long categoryId) {
         this.title = title;
         this.description = description;
-        this.category = category;
+        this.categoryId = categoryId;
     }
 
     public String getTitle() {
@@ -28,8 +28,8 @@ public class PostRequest {
         return description;
     }
 
-    public String getCategory() {
-        return category;
+    public Long getCategoryId() {
+        return categoryId;
     }
 
 }
