@@ -32,7 +32,6 @@ spring:
       on-profile: dev
     import: ./privates/application-dev-db.yml, ./privates/application-dev-mail.yml
   jpa:
-    database-platform: org.hibernate.dialect.MySQL8Dialect
     hibernate:
       ddl-auto: update
 request:
