@@ -47,6 +47,10 @@ public class PostService {
     public Page<PostResponse> retrievePostByCategoryId(Long categoryId, Pageable pageable) {
         return PostResponse.pageOf(postRepository.findByCategory(Category.getById(categoryId), pageable));
     }
+    @Transactional(readOnly = true)
+    public Page<PostResponse> retrievePostByKeyword(String keyword, Pageable pageable) {
+        return PostResponse.pageOf(postRepository.findByTitleContains(keyword, pageable));
+    }
 
     //Todo 이건 어디에 쓰이는거죠? 응?
     @Transactional(readOnly = true)
