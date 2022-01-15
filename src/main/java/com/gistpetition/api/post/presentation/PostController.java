@@ -42,6 +42,15 @@ public class PostController {
         return ResponseEntity.ok().body(postService.retrievePostByCategoryId(categoryId, pageable));
     }
 
+    @GetMapping("/posts/search")
+    public ResponseEntity<Page<PostResponse>> retrievePostByKeyword(@RequestParam(defaultValue = "") String keyword,
+                                                           @PageableDefault(sort="createdAt",direction = Sort.Direction.DESC) Pageable pageable) {
+        if (keyword.equals("")) {
+            return ResponseEntity.ok().body(postService.retrievePost(pageable));
+        }
+        return ResponseEntity.ok().body(postService.retrievePostByKeyword(keyword, pageable));
+    }
+
     @GetMapping("/posts/{postId}")
     public ResponseEntity<PostResponse> retrievePost(@PathVariable Long postId) {
         return ResponseEntity.ok().body(postService.retrievePostById(postId));

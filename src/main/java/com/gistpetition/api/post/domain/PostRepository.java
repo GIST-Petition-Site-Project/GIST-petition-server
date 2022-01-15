@@ -17,6 +17,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     Page<Post> findByCategory(Category category, Pageable pageable);
     Page<Post> findAll(Pageable pageable);
 
+    Page<Post> findByTitleContains(String keyword,Pageable pageable);
+
     @Query("SELECT p FROM Post AS p LEFT JOIN FETCH p.agreements WHERE p.id=:postId")
     Post findPostByWithEagerMode(@Param("postId") Long postId);
 }
