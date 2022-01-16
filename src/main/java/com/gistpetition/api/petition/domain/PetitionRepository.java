@@ -15,9 +15,10 @@ public interface PetitionRepository extends JpaRepository<Petition, Long> {
     List<Petition> findByUserId(Sort sort, Long userId);
 
     Page<Petition> findByCategory(Category category, Pageable pageable);
+
     Page<Petition> findAll(Pageable pageable);
 
-    Page<Petition> findByTitleContains(String keyword,Pageable pageable);
+    Page<Petition> findByTitleContains(String keyword, Pageable pageable);
 
     @Query("SELECT p FROM Petition AS p LEFT JOIN FETCH p.agreements WHERE p.id=:petitionId")
     Petition findPetitionByWithEagerMode(@Param("petitionId") Long petitionId);

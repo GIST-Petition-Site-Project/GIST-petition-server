@@ -28,14 +28,14 @@ public class PetitionController {
 
     @LoginRequired
     @PostMapping("/petitions")
-    public ResponseEntity<Void> createPost(@Validated @RequestBody PetitionRequest petitionRequest,
-                                           @LoginUser SimpleUser simpleUser) {
+    public ResponseEntity<Void> createPetition(@Validated @RequestBody PetitionRequest petitionRequest,
+                                               @LoginUser SimpleUser simpleUser) {
         return ResponseEntity.created(URI.create("/petitions/" + petitionService.createPetition(petitionRequest, simpleUser.getId()))).build();
     }
 
     @GetMapping("/petitions")
-    public ResponseEntity<Page<PetitionResponse>> retrievePost(@RequestParam(defaultValue = "0") Long categoryId,
-                                                               @PageableDefault(sort="createdAt",direction = Sort.Direction.DESC) Pageable pageable) {
+    public ResponseEntity<Page<PetitionResponse>> retrievePetition(@RequestParam(defaultValue = "0") Long categoryId,
+                                                                   @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         if (categoryId.equals(0L)) {
             return ResponseEntity.ok().body(petitionService.retrievePetition(pageable));
         }
@@ -43,8 +43,8 @@ public class PetitionController {
     }
 
     @GetMapping("/petitions/search")
-    public ResponseEntity<Page<PetitionResponse>> retrievePostByKeyword(@RequestParam(defaultValue = "") String keyword,
-                                                           @PageableDefault(sort="createdAt",direction = Sort.Direction.DESC) Pageable pageable) {
+    public ResponseEntity<Page<PetitionResponse>> retrievePetitionsByKeyword(@RequestParam(defaultValue = "") String keyword,
+                                                                             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         if (keyword.equals("")) {
             return ResponseEntity.ok().body(petitionService.retrievePetition(pageable));
         }
@@ -52,40 +52,40 @@ public class PetitionController {
     }
 
     @GetMapping("/petitions/{petitionId}")
-    public ResponseEntity<PetitionResponse> retrievePost(@PathVariable Long petitionId) {
+    public ResponseEntity<PetitionResponse> retrievePetition(@PathVariable Long petitionId) {
         return ResponseEntity.ok().body(petitionService.retrievePetitionById(petitionId));
     }
 
     @LoginRequired
     @GetMapping("/petitions/me")
-    public ResponseEntity<List<Petition>> retrievePostsByUserId(@LoginUser SimpleUser simpleUser) {
+    public ResponseEntity<List<Petition>> retrievePetitionsByUserId(@LoginUser SimpleUser simpleUser) {
         return ResponseEntity.ok().body(petitionService.retrievePetitionsByUserId(simpleUser.getId()));
     }
 
     @GetMapping("/petitions/count")
-    public ResponseEntity<Long> getPostCount() {
+    public ResponseEntity<Long> getPetitionCount() {
         return ResponseEntity.ok().body(petitionService.getPetitionCount());
     }
 
     @ManagerPermissionRequired
     @PutMapping("/petitions/{petitionId}")
-    public ResponseEntity<Void> updatePost(@PathVariable Long petitionId,
-                                           @Validated @RequestBody PetitionRequest changeRequest) {
+    public ResponseEntity<Void> updatePetition(@PathVariable Long petitionId,
+                                               @Validated @RequestBody PetitionRequest changeRequest) {
         petitionService.updatePetitionDescription(petitionId, changeRequest.getDescription());
         return ResponseEntity.noContent().build();
     }
 
     @ManagerPermissionRequired
     @DeleteMapping("/petitions/{petitionId}")
-    public ResponseEntity<Void> deletePost(@PathVariable Long petitionId) {
+    public ResponseEntity<Void> deletePetition(@PathVariable Long petitionId) {
         petitionService.deletePetition(petitionId);
         return ResponseEntity.noContent().build();
     }
 
     @LoginRequired
     @PostMapping("/petitions/{petitionId}/agreements")
-    public ResponseEntity<Boolean> agreePost(@PathVariable Long petitionId,
-                                             @LoginUser SimpleUser simpleUser) {
+    public ResponseEntity<Boolean> agreePetition(@PathVariable Long petitionId,
+                                                 @LoginUser SimpleUser simpleUser) {
         return ResponseEntity.ok().body(petitionService.agree(petitionId, simpleUser.getId()));
     }
 

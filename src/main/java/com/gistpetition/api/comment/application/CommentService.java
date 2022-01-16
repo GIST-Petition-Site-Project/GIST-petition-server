@@ -25,19 +25,19 @@ public class CommentService {
     }
 
     @Transactional
-    public Long createComment(Long postId, CommentRequest commentRequest, Long userId) {
-        checkExistenceByPostId(postId);
-        Comment comment = new Comment(commentRequest.getContent(), postId, userId);
+    public Long createComment(Long petitionId, CommentRequest commentRequest, Long userId) {
+        checkExistenceByPetitionId(petitionId);
+        Comment comment = new Comment(commentRequest.getContent(), petitionId, userId);
         return commentRepository.save(comment).getId();
     }
 
 
     @Transactional(readOnly = true)
-    public List<Comment> getCommentsByPostId(Long postId) {
-        if (!petitionRepository.existsById(postId)) {
+    public List<Comment> getCommentsByPetitionId(Long petitionId) {
+        if (!petitionRepository.existsById(petitionId)) {
             throw new NoSuchPetitionException();
         }
-        return commentRepository.findByPetitionId(postId);
+        return commentRepository.findByPetitionId(petitionId);
     }
 
     @Transactional
@@ -75,8 +75,8 @@ public class CommentService {
                 .orElseThrow(NoSuchCommentException::new);
     }
 
-    private void checkExistenceByPostId(Long postId) {
-        if (!petitionRepository.existsById(postId)) {
+    private void checkExistenceByPetitionId(Long petitionId) {
+        if (!petitionRepository.existsById(petitionId)) {
             throw new NoSuchPetitionException();
         }
     }

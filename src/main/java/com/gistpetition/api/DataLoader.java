@@ -1,7 +1,7 @@
 package com.gistpetition.api;
 
-import com.gistpetition.api.petition.domain.Petition;
 import com.gistpetition.api.petition.domain.Category;
+import com.gistpetition.api.petition.domain.Petition;
 import com.gistpetition.api.petition.domain.PetitionRepository;
 import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRepository;

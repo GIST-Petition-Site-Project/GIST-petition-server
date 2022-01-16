@@ -30,7 +30,7 @@ public class CommentController {
 
     @GetMapping("/petitions/{petitionId}/comments")
     public ResponseEntity<Object> getComments(@PathVariable Long petitionId) {
-        return ResponseEntity.ok().body(commentService.getCommentsByPostId(petitionId));
+        return ResponseEntity.ok().body(commentService.getCommentsByPetitionId(petitionId));
     }
 
     @LoginRequired

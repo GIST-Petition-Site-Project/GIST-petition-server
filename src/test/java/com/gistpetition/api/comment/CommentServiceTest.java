@@ -45,8 +45,8 @@ class CommentServiceTest extends ServiceTest {
 
     @BeforeEach
     void setUp() {
-        User postOwner = userRepository.save(new User("user@gist.ac.kr", "password", UserRole.USER));
-        petition = petitionRepository.save(new Petition("title", "description", Category.DORMITORY, postOwner.getId()));
+        User petitionOwner = userRepository.save(new User("user@gist.ac.kr", "password", UserRole.USER));
+        petition = petitionRepository.save(new Petition("title", "description", Category.DORMITORY, petitionOwner.getId()));
 
         commenter = userRepository.save(new User("commenter@gist.ac.kr", "password", UserRole.USER));
         otherUser = userRepository.save(new User("other@gist.ac.kr", "password", UserRole.USER));
@@ -64,31 +64,31 @@ class CommentServiceTest extends ServiceTest {
     }
 
     @Test
-    void createFailedIfPostNotExistent() {
-        Long notExistingPostId = Long.MAX_VALUE;
+    void createFailedIfPetitionNotExistent() {
+        Long notExistingPetitionId = Long.MAX_VALUE;
         assertThatThrownBy(
-                () -> commentService.createComment(notExistingPostId, COMMENT_REQUEST, commenter.getId())
+                () -> commentService.createComment(notExistingPetitionId, COMMENT_REQUEST, commenter.getId())
         ).isInstanceOf(NoSuchPetitionException.class);
     }
 
     @Test
-    void getCommentsByPostId() {
+    void getCommentsByPetitionId() {
         List<Comment> comments = new ArrayList<>();
         comments.add(new Comment(CONTENT, petition.getId(), commenter.getId()));
         comments.add(new Comment(CONTENT, petition.getId(), commenter.getId()));
         comments.add(new Comment(CONTENT, petition.getId(), commenter.getId()));
         List<Comment> savedComments = commentRepository.saveAll(comments);
 
-        List<Comment> commentsByPostId = commentService.getCommentsByPostId(petition.getId());
+        List<Comment> commentsByPetitionId = commentService.getCommentsByPetitionId(petition.getId());
 
-        assertThat(commentsByPostId).hasSize(savedComments.size());
+        assertThat(commentsByPetitionId).hasSize(savedComments.size());
     }
 
     @Test
-    void getFailedIfPostNotExistent() {
-        Long notExistingPostId = Long.MAX_VALUE;
+    void getFailedIfPetitionNotExistent() {
+        Long notExistingPetitionId = Long.MAX_VALUE;
         assertThatThrownBy(
-                () -> commentService.getCommentsByPostId(notExistingPostId)
+                () -> commentService.getCommentsByPetitionId(notExistingPetitionId)
         ).isInstanceOf(NoSuchPetitionException.class);
     }
 

@@ -64,10 +64,10 @@ class AnswerServiceTest extends ServiceTest {
     }
 
     @Test
-    void createAnswerToNonExistingPost() {
-        Long fakePostId = Long.MAX_VALUE;
+    void createAnswerToNonExistingPetition() {
+        Long fakePetitionId = Long.MAX_VALUE;
         assertThatThrownBy(
-                () -> answerService.createAnswer(fakePostId, ANSWER_REQUEST, manager.getId())
+                () -> answerService.createAnswer(fakePetitionId, ANSWER_REQUEST, manager.getId())
         ).isInstanceOf(NoSuchPetitionException.class);
     }
 
@@ -81,18 +81,18 @@ class AnswerServiceTest extends ServiceTest {
     }
 
     @Test
-    void retrieveAnswerFromNotExistingPost() {
+    void retrieveAnswerFromNotExistingPetition() {
         assertThatThrownBy(
                 () -> answerService.retrieveAnswerByPetitionId(savedPetition.getId())
         ).isInstanceOf(UnAnsweredPetitionException.class);
     }
 
     @Test
-    void retrieveAnswerFromNonExistentPost() {
-        Long notExistingPostId = Long.MAX_VALUE;
+    void retrieveAnswerFromNonExistentPetition() {
+        Long notExistingPetitionId = Long.MAX_VALUE;
 
         assertThatThrownBy(
-                () -> answerService.retrieveAnswerByPetitionId(notExistingPostId)
+                () -> answerService.retrieveAnswerByPetitionId(notExistingPetitionId)
         ).isInstanceOf(NoSuchPetitionException.class);
     }
 
@@ -108,16 +108,16 @@ class AnswerServiceTest extends ServiceTest {
     }
 
     @Test
-    void updateAnswerFromNonExistingPost() {
-        Long notExistingPostId = Long.MAX_VALUE;
+    void updateAnswerFromNonExistingPetition() {
+        Long notExistingPetitionId = Long.MAX_VALUE;
 
         assertThatThrownBy(
-                () -> answerService.updateAnswer(notExistingPostId, UPDATE_REQUEST)
+                () -> answerService.updateAnswer(notExistingPetitionId, UPDATE_REQUEST)
         ).isInstanceOf(NoSuchPetitionException.class);
     }
 
     @Test
-    void updateAnswerFromNotAnsweredPost() {
+    void updateAnswerFromNotAnsweredPetition() {
         assertThatThrownBy(
                 () -> answerService.updateAnswer(savedPetition.getId(), UPDATE_REQUEST)
         ).isInstanceOf(UnAnsweredPetitionException.class);
@@ -135,16 +135,16 @@ class AnswerServiceTest extends ServiceTest {
     }
 
     @Test
-    void deleteAnswerFromNonExistingPost() {
-        Long notExistingPostId = Long.MAX_VALUE;
+    void deleteAnswerFromNonExistingPetition() {
+        Long notExistingPetitionId = Long.MAX_VALUE;
 
         assertThatThrownBy(
-                () -> answerService.deleteAnswer(notExistingPostId)
+                () -> answerService.deleteAnswer(notExistingPetitionId)
         ).isInstanceOf(NoSuchPetitionException.class);
     }
 
     @Test
-    void deleteAnswerFromNotAnsweredPost() {
+    void deleteAnswerFromNotAnsweredPetition() {
         assertThatThrownBy(
                 () -> answerService.deleteAnswer(savedPetition.getId())
         ).isInstanceOf(UnAnsweredPetitionException.class);

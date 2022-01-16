@@ -21,17 +21,17 @@ public class AnswerController {
     private final AnswerService answerService;
 
     @ManagerPermissionRequired
-    @PostMapping("/posts/{postId}/answer")
-    public ResponseEntity<Object> createAnswer(@PathVariable Long postId,
+    @PostMapping("/petitions/{petitionId}/answer")
+    public ResponseEntity<Object> createAnswer(@PathVariable Long petitionId,
                                                @Validated @RequestBody AnswerRequest answerRequest,
                                                @LoginUser SimpleUser simpleUser) {
-        Long answerId = answerService.createAnswer(postId, answerRequest, simpleUser.getId());
-        return ResponseEntity.created(URI.create("/posts/" + postId + "/answer/" + answerId)).build();
+        Long answerId = answerService.createAnswer(petitionId, answerRequest, simpleUser.getId());
+        return ResponseEntity.created(URI.create("/petitions/" + petitionId + "/answer/" + answerId)).build();
     }
 
-    @GetMapping("/posts/{postId}/answer")
-    public ResponseEntity<Answer> retrieveAnswer(@PathVariable Long postId) {
-        return ResponseEntity.ok().body(answerService.retrieveAnswerByPetitionId(postId));
+    @GetMapping("/petitions/{petitionId}/answer")
+    public ResponseEntity<Answer> retrieveAnswer(@PathVariable Long petitionId) {
+        return ResponseEntity.ok().body(answerService.retrieveAnswerByPetitionId(petitionId));
     }
 
     @GetMapping("/answers/count")
@@ -40,17 +40,17 @@ public class AnswerController {
     }
 
     @ManagerPermissionRequired
-    @PutMapping("/posts/{postId}/answer")
-    public ResponseEntity<Void> updateAnswer(@PathVariable Long postId,
+    @PutMapping("/petitions/{petitionId}/answer")
+    public ResponseEntity<Void> updateAnswer(@PathVariable Long petitionId,
                                              @Validated @RequestBody AnswerRequest changeRequest) {
-        answerService.updateAnswer(postId, changeRequest);
+        answerService.updateAnswer(petitionId, changeRequest);
         return ResponseEntity.ok().build();
     }
 
     @ManagerPermissionRequired
-    @DeleteMapping("/posts/{postId}/answer")
-    public ResponseEntity<Object> deleteComment(@PathVariable Long postId) {
-        answerService.deleteAnswer(postId);
+    @DeleteMapping("/petitions/{petitionId}/answer")
+    public ResponseEntity<Object> deleteComment(@PathVariable Long petitionId) {
+        answerService.deleteAnswer(petitionId);
         return ResponseEntity.noContent().build();
     }
 }
