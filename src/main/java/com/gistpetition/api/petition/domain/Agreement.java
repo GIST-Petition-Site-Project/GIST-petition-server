@@ -1,4 +1,4 @@
-package com.gistpetition.api.post.domain;
+package com.gistpetition.api.petition.domain;
 
 import com.gistpetition.api.common.persistence.UnmodifiableEntity;
 import lombok.Getter;

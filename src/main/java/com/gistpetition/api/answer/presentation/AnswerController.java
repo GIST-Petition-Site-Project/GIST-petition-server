@@ -31,7 +31,7 @@ public class AnswerController {
 
     @GetMapping("/posts/{postId}/answer")
     public ResponseEntity<Answer> retrieveAnswer(@PathVariable Long postId) {
-        return ResponseEntity.ok().body(answerService.retrieveAnswerByPostId(postId));
+        return ResponseEntity.ok().body(answerService.retrieveAnswerByPetitionId(postId));
     }
 
     @GetMapping("/answers/count")

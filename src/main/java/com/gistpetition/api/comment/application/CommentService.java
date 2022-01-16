@@ -4,9 +4,9 @@ import com.gistpetition.api.comment.domain.Comment;
 import com.gistpetition.api.comment.domain.CommentRepository;
 import com.gistpetition.api.comment.dto.CommentRequest;
 import com.gistpetition.api.exception.comment.NoSuchCommentException;
-import com.gistpetition.api.exception.post.NoSuchPostException;
+import com.gistpetition.api.exception.petition.NoSuchPetitionException;
 import com.gistpetition.api.exception.user.UnAuthorizedUserException;
-import com.gistpetition.api.post.domain.PostRepository;
+import com.gistpetition.api.petition.domain.PetitionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,12 +16,12 @@ import java.util.List;
 public class CommentService {
 
     private final CommentRepository commentRepository;
-    private final PostRepository postRepository;
+    private final PetitionRepository petitionRepository;
 
     public CommentService(CommentRepository commentRepository,
-                          PostRepository postRepository) {
+                          PetitionRepository petitionRepository) {
         this.commentRepository = commentRepository;
-        this.postRepository = postRepository;
+        this.petitionRepository = petitionRepository;
     }
 
     @Transactional
@@ -34,10 +34,10 @@ public class CommentService {
 
     @Transactional(readOnly = true)
     public List<Comment> getCommentsByPostId(Long postId) {
-        if (!postRepository.existsById(postId)) {
-            throw new NoSuchPostException();
+        if (!petitionRepository.existsById(postId)) {
+            throw new NoSuchPetitionException();
         }
-        return commentRepository.findByPostId(postId);
+        return commentRepository.findByPetitionId(postId);
     }
 
     @Transactional
@@ -76,8 +76,8 @@ public class CommentService {
     }
 
     private void checkExistenceByPostId(Long postId) {
-        if (!postRepository.existsById(postId)) {
-            throw new NoSuchPostException();
+        if (!petitionRepository.existsById(postId)) {
+            throw new NoSuchPetitionException();
         }
     }
 }

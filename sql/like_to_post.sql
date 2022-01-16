@@ -5,5 +5,5 @@ create table like_to_post
         primary key,
     user_id    bigint       null,
     post_id    bigint       null,
-    foreign key (post_id) references post (post_id)
+    foreign key (post_id) references petition (post_id)
 );

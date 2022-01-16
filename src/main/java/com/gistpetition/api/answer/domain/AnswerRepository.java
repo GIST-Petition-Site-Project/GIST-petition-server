@@ -7,9 +7,9 @@ import java.util.Optional;
 
 @Repository
 public interface AnswerRepository extends JpaRepository<Answer, Long> {
-    Optional<Answer> findByPostId(Long postId);
+    Optional<Answer> findByPetitionId(Long petitionId);
 
-    boolean existsByPostId(Long postId);
+    boolean existsByPetitionId(Long petitionId);
 
-    void deleteByPostId(Long postId);
+    void deleteByPetitionId(Long petitionId);
 }
