@@ -4,9 +4,9 @@ import com.gistpetition.api.comment.domain.Comment;
 import com.gistpetition.api.comment.domain.CommentRepository;
 import com.gistpetition.api.comment.dto.CommentRequest;
 import com.gistpetition.api.exception.comment.NoSuchCommentException;
-import com.gistpetition.api.exception.post.NoSuchPostException;
+import com.gistpetition.api.exception.petition.NoSuchPetitionException;
 import com.gistpetition.api.exception.user.UnAuthorizedUserException;
-import com.gistpetition.api.post.domain.PostRepository;
+import com.gistpetition.api.petition.domain.PetitionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,28 +16,28 @@ import java.util.List;
 public class CommentService {
 
     private final CommentRepository commentRepository;
-    private final PostRepository postRepository;
+    private final PetitionRepository petitionRepository;
 
     public CommentService(CommentRepository commentRepository,
-                          PostRepository postRepository) {
+                          PetitionRepository petitionRepository) {
         this.commentRepository = commentRepository;
-        this.postRepository = postRepository;
+        this.petitionRepository = petitionRepository;
     }
 
     @Transactional
-    public Long createComment(Long postId, CommentRequest commentRequest, Long userId) {
-        checkExistenceByPostId(postId);
-        Comment comment = new Comment(commentRequest.getContent(), postId, userId);
+    public Long createComment(Long petitionId, CommentRequest commentRequest, Long userId) {
+        checkExistenceByPetitionId(petitionId);
+        Comment comment = new Comment(commentRequest.getContent(), petitionId, userId);
         return commentRepository.save(comment).getId();
     }
 
 
     @Transactional(readOnly = true)
-    public List<Comment> getCommentsByPostId(Long postId) {
-        if (!postRepository.existsById(postId)) {
-            throw new NoSuchPostException();
+    public List<Comment> getCommentsByPetitionId(Long petitionId) {
+        if (!petitionRepository.existsById(petitionId)) {
+            throw new NoSuchPetitionException();
         }
-        return commentRepository.findByPostId(postId);
+        return commentRepository.findByPetitionId(petitionId);
     }
 
     @Transactional
@@ -75,9 +75,9 @@ public class CommentService {
                 .orElseThrow(NoSuchCommentException::new);
     }
 
-    private void checkExistenceByPostId(Long postId) {
-        if (!postRepository.existsById(postId)) {
-            throw new NoSuchPostException();
+    private void checkExistenceByPetitionId(Long petitionId) {
+        if (!petitionRepository.existsById(petitionId)) {
+            throw new NoSuchPetitionException();
         }
     }
 }

@@ -3,11 +3,11 @@ package com.gistpetition.api.answer.application;
 import com.gistpetition.api.answer.domain.Answer;
 import com.gistpetition.api.answer.domain.AnswerRepository;
 import com.gistpetition.api.answer.dto.AnswerRequest;
-import com.gistpetition.api.exception.post.DuplicatedAnswerException;
-import com.gistpetition.api.exception.post.NoSuchPostException;
-import com.gistpetition.api.exception.post.UnAnsweredPostException;
-import com.gistpetition.api.post.domain.Post;
-import com.gistpetition.api.post.domain.PostRepository;
+import com.gistpetition.api.exception.petition.DuplicatedAnswerException;
+import com.gistpetition.api.exception.petition.NoSuchPetitionException;
+import com.gistpetition.api.exception.petition.UnAnsweredPetitionException;
+import com.gistpetition.api.petition.domain.Petition;
+import com.gistpetition.api.petition.domain.PetitionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,29 +15,29 @@ import org.springframework.transaction.annotation.Transactional;
 public class AnswerService {
 
     private final AnswerRepository answerRepository;
-    private final PostRepository postRepository;
+    private final PetitionRepository petitionRepository;
 
     public AnswerService(AnswerRepository answerRepository,
-                         PostRepository postRepository) {
+                         PetitionRepository petitionRepository) {
         this.answerRepository = answerRepository;
-        this.postRepository = postRepository;
+        this.petitionRepository = petitionRepository;
     }
 
     @Transactional
-    public Long createAnswer(Long postId, AnswerRequest answerRequest, Long userId) {
-        Post post = findPostBy(postId);
-        if (post.isAnswered()) {
+    public Long createAnswer(Long petitionId, AnswerRequest answerRequest, Long userId) {
+        Petition petition = findPetitionById(petitionId);
+        if (petition.isAnswered()) {
             throw new DuplicatedAnswerException();
         }
-        Answer answer = new Answer(answerRequest.getContent(), postId, userId);
-        post.setAnswered(true);
+        Answer answer = new Answer(answerRequest.getContent(), petitionId, userId);
+        petition.setAnswered(true);
         return answerRepository.save(answer).getId();
     }
 
     @Transactional(readOnly = true)
-    public Answer retrieveAnswerByPostId(Long postId) {
-        checkExistenceOfPost(postId);
-        return findAnswerByPostId(postId);
+    public Answer retrieveAnswerByPetitionId(Long petitionId) {
+        checkExistenceOfPetition(petitionId);
+        return findAnswerByPetitionId(petitionId);
     }
 
     @Transactional(readOnly = true)
@@ -46,37 +46,37 @@ public class AnswerService {
     }
 
     @Transactional
-    public void updateAnswer(Long postId, AnswerRequest changeRequest) {
-        checkExistenceOfPost(postId);
-        Answer answer = findAnswerByPostId(postId);
+    public void updateAnswer(Long petitionId, AnswerRequest changeRequest) {
+        checkExistenceOfPetition(petitionId);
+        Answer answer = findAnswerByPetitionId(petitionId);
         answer.updateContent(changeRequest.getContent());
     }
 
     @Transactional
-    public void deleteAnswer(Long postId) {
-        Post post = findPostBy(postId);
-        checkExistenceOfAnswerOf(postId);
-        answerRepository.deleteByPostId(postId);
-        post.setAnswered(false);
+    public void deleteAnswer(Long petitionId) {
+        Petition petition = findPetitionById(petitionId);
+        checkExistenceOfAnswerOf(petitionId);
+        answerRepository.deleteByPetitionId(petitionId);
+        petition.setAnswered(false);
     }
 
-    private Post findPostBy(Long postId) {
-        return postRepository.findById(postId).orElseThrow(NoSuchPostException::new);
+    private Petition findPetitionById(Long petitionId) {
+        return petitionRepository.findById(petitionId).orElseThrow(NoSuchPetitionException::new);
     }
 
-    private void checkExistenceOfPost(Long postId) {
-        if (!postRepository.existsById(postId)) {
-            throw new NoSuchPostException();
+    private void checkExistenceOfPetition(Long petitionId) {
+        if (!petitionRepository.existsById(petitionId)) {
+            throw new NoSuchPetitionException();
         }
     }
 
-    private void checkExistenceOfAnswerOf(Long postId) {
-        if (!answerRepository.existsByPostId(postId)) {
-            throw new UnAnsweredPostException();
+    private void checkExistenceOfAnswerOf(Long petitionId) {
+        if (!answerRepository.existsByPetitionId(petitionId)) {
+            throw new UnAnsweredPetitionException();
         }
     }
 
-    private Answer findAnswerByPostId(Long postId) {
-        return answerRepository.findByPostId(postId).orElseThrow(UnAnsweredPostException::new);
+    private Answer findAnswerByPetitionId(Long petitionId) {
+        return answerRepository.findByPetitionId(petitionId).orElseThrow(UnAnsweredPetitionException::new);
     }
 }

@@ -1,9 +1,9 @@
-package com.gistpetition.api.post.dto;
+package com.gistpetition.api.petition.dto;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-public class PostRequest {
+public class PetitionRequest {
     @NotBlank
     private String title;
     @NotBlank
@@ -11,10 +11,10 @@ public class PostRequest {
     @NotNull
     private Long categoryId;
 
-    protected PostRequest() {
+    protected PetitionRequest() {
     }
 
-    public PostRequest(String title, String description, Long categoryId) {
+    public PetitionRequest(String title, String description, Long categoryId) {
         this.title = title;
         this.description = description;
         this.categoryId = categoryId;

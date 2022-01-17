@@ -1,7 +1,7 @@
-package com.gistpetition.api.post.domain;
+package com.gistpetition.api.petition.domain;
 
 import com.gistpetition.api.common.persistence.BaseEntity;
-import com.gistpetition.api.exception.post.DuplicatedAgreementException;
+import com.gistpetition.api.exception.petition.DuplicatedAgreementException;
 import com.gistpetition.api.user.domain.User;
 import lombok.Getter;
 
@@ -11,7 +11,7 @@ import java.util.List;
 
 @Getter
 @Entity
-public class Post extends BaseEntity {
+public class Petition extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,17 +25,17 @@ public class Post extends BaseEntity {
     private int accepted;
     private Long userId;
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "post_id")
+    @JoinColumn(name = "petition_id")
     private final List<Agreement> agreements = new ArrayList<>();
 
-    protected Post() {
+    protected Petition() {
     }
 
-    public Post(String title, String description, Category category, Long userId) {
+    public Petition(String title, String description, Category category, Long userId) {
         this(null, title, description, category, false, 0, userId);
     }
 
-    private Post(Long id, String title, String description, Category category, boolean answered, int accepted, Long userId) {
+    private Petition(Long id, String title, String description, Category category, boolean answered, int accepted, Long userId) {
         this.id = id;
         this.title = title;
         this.description = description;

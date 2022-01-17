@@ -1,6 +1,6 @@
-package com.gistpetition.api.post.domain;
+package com.gistpetition.api.petition.domain;
 
-import com.gistpetition.api.exception.post.NoSuchCategoryException;
+import com.gistpetition.api.exception.petition.NoSuchCategoryException;
 
 import java.util.EnumSet;
 import java.util.HashMap;

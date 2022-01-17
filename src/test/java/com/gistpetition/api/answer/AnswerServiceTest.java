@@ -6,11 +6,11 @@ import com.gistpetition.api.answer.domain.Answer;
 import com.gistpetition.api.answer.domain.AnswerRepository;
 import com.gistpetition.api.answer.dto.AnswerRequest;
 import com.gistpetition.api.exception.WrappedException;
-import com.gistpetition.api.exception.post.NoSuchPostException;
-import com.gistpetition.api.exception.post.UnAnsweredPostException;
-import com.gistpetition.api.post.domain.Category;
-import com.gistpetition.api.post.domain.Post;
-import com.gistpetition.api.post.domain.PostRepository;
+import com.gistpetition.api.exception.petition.NoSuchPetitionException;
+import com.gistpetition.api.exception.petition.UnAnsweredPetitionException;
+import com.gistpetition.api.petition.domain.Category;
+import com.gistpetition.api.petition.domain.Petition;
+import com.gistpetition.api.petition.domain.PetitionRepository;
 import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRepository;
 import com.gistpetition.api.user.domain.UserRole;
@@ -35,125 +35,125 @@ class AnswerServiceTest extends ServiceTest {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private PostRepository postRepository;
+    private PetitionRepository petitionRepository;
     @Autowired
     private AnswerRepository answerRepository;
 
     private User manager;
-    private Post savedPost;
+    private Petition savedPetition;
 
     @BeforeEach
     void setup() {
         User user = userRepository.save(new User("normal@email.com", "password", UserRole.USER));
         manager = userRepository.save(new User("manager@email.com", "password", UserRole.MANAGER));
-        savedPost = postRepository.save(new Post("title", "description", Category.DORMITORY, user.getId()));
+        savedPetition = petitionRepository.save(new Petition("title", "description", Category.DORMITORY, user.getId()));
     }
 
     @Test
     void createAnswerByManager() {
-        Long savedAnswer = answerService.createAnswer(savedPost.getId(), ANSWER_REQUEST, manager.getId());
+        Long savedAnswer = answerService.createAnswer(savedPetition.getId(), ANSWER_REQUEST, manager.getId());
 
         Answer answer = answerRepository.findById(savedAnswer).orElseThrow(() -> new WrappedException("존재하지 않는 answer입니다.", null));
         assertThat(answer.getId()).isEqualTo(savedAnswer);
         assertThat(answer.getContent()).isEqualTo(ANSWER_REQUEST.getContent());
         assertThat(answer.getUserId()).isEqualTo(manager.getId());
-        assertThat(answer.getPostId()).isEqualTo(savedPost.getId());
+        assertThat(answer.getPetitionId()).isEqualTo(savedPetition.getId());
 
-        Post post = postRepository.findById(savedPost.getId()).orElseThrow(NoSuchPostException::new);
-        assertTrue(post.isAnswered());
+        Petition petition = petitionRepository.findById(savedPetition.getId()).orElseThrow(NoSuchPetitionException::new);
+        assertTrue(petition.isAnswered());
     }
 
     @Test
-    void createAnswerToNonExistingPost() {
-        Long fakePostId = Long.MAX_VALUE;
+    void createAnswerToNonExistingPetition() {
+        Long fakePetitionId = Long.MAX_VALUE;
         assertThatThrownBy(
-                () -> answerService.createAnswer(fakePostId, ANSWER_REQUEST, manager.getId())
-        ).isInstanceOf(NoSuchPostException.class);
+                () -> answerService.createAnswer(fakePetitionId, ANSWER_REQUEST, manager.getId())
+        ).isInstanceOf(NoSuchPetitionException.class);
     }
 
     @Test
     void retrieveAnswer() {
-        Answer saved = answerRepository.save(new Answer(ANSWER_CONTENT, savedPost.getId(), manager.getId()));
+        Answer saved = answerRepository.save(new Answer(ANSWER_CONTENT, savedPetition.getId(), manager.getId()));
 
-        Answer retrievedAnswer = answerService.retrieveAnswerByPostId(savedPost.getId());
+        Answer retrievedAnswer = answerService.retrieveAnswerByPetitionId(savedPetition.getId());
 
         assertThat(saved.getId()).isEqualTo(retrievedAnswer.getId());
     }
 
     @Test
-    void retrieveAnswerFromNotExistingPost() {
+    void retrieveAnswerFromNotExistingPetition() {
         assertThatThrownBy(
-                () -> answerService.retrieveAnswerByPostId(savedPost.getId())
-        ).isInstanceOf(UnAnsweredPostException.class);
+                () -> answerService.retrieveAnswerByPetitionId(savedPetition.getId())
+        ).isInstanceOf(UnAnsweredPetitionException.class);
     }
 
     @Test
-    void retrieveAnswerFromNonExistentPost() {
-        Long notExistingPostId = Long.MAX_VALUE;
+    void retrieveAnswerFromNonExistentPetition() {
+        Long notExistingPetitionId = Long.MAX_VALUE;
 
         assertThatThrownBy(
-                () -> answerService.retrieveAnswerByPostId(notExistingPostId)
-        ).isInstanceOf(NoSuchPostException.class);
+                () -> answerService.retrieveAnswerByPetitionId(notExistingPetitionId)
+        ).isInstanceOf(NoSuchPetitionException.class);
     }
 
     @Test
     void updateAnswer() {
-        Answer answer = answerRepository.save(new Answer(ANSWER_CONTENT, savedPost.getId(), manager.getId()));
-        answerService.updateAnswer(savedPost.getId(), UPDATE_REQUEST);
+        Answer answer = answerRepository.save(new Answer(ANSWER_CONTENT, savedPetition.getId(), manager.getId()));
+        answerService.updateAnswer(savedPetition.getId(), UPDATE_REQUEST);
 
-        Answer updatedAnswer = answerRepository.findByPostId(savedPost.getId()).orElseThrow(() -> new WrappedException("", null));
+        Answer updatedAnswer = answerRepository.findByPetitionId(savedPetition.getId()).orElseThrow(() -> new WrappedException("", null));
 
         assertThat(answer.getId()).isEqualTo(updatedAnswer.getId());
         assertThat(updatedAnswer.getContent()).isEqualTo(UPDATE_REQUEST.getContent());
     }
 
     @Test
-    void updateAnswerFromNonExistingPost() {
-        Long notExistingPostId = Long.MAX_VALUE;
+    void updateAnswerFromNonExistingPetition() {
+        Long notExistingPetitionId = Long.MAX_VALUE;
 
         assertThatThrownBy(
-                () -> answerService.updateAnswer(notExistingPostId, UPDATE_REQUEST)
-        ).isInstanceOf(NoSuchPostException.class);
+                () -> answerService.updateAnswer(notExistingPetitionId, UPDATE_REQUEST)
+        ).isInstanceOf(NoSuchPetitionException.class);
     }
 
     @Test
-    void updateAnswerFromNotAnsweredPost() {
+    void updateAnswerFromNotAnsweredPetition() {
         assertThatThrownBy(
-                () -> answerService.updateAnswer(savedPost.getId(), UPDATE_REQUEST)
-        ).isInstanceOf(UnAnsweredPostException.class);
+                () -> answerService.updateAnswer(savedPetition.getId(), UPDATE_REQUEST)
+        ).isInstanceOf(UnAnsweredPetitionException.class);
     }
 
     @Test
     void deleteAnswer() {
-        Answer answer = answerRepository.save(new Answer(ANSWER_CONTENT, savedPost.getId(), manager.getId()));
+        Answer answer = answerRepository.save(new Answer(ANSWER_CONTENT, savedPetition.getId(), manager.getId()));
 
-        answerService.deleteAnswer(savedPost.getId());
+        answerService.deleteAnswer(savedPetition.getId());
 
-        Post post = postRepository.findById(savedPost.getId()).orElseThrow(IllegalArgumentException::new);
-        assertFalse(post.isAnswered());
+        Petition petition = petitionRepository.findById(savedPetition.getId()).orElseThrow(IllegalArgumentException::new);
+        assertFalse(petition.isAnswered());
         assertFalse(answerRepository.existsById(answer.getId()));
     }
 
     @Test
-    void deleteAnswerFromNonExistingPost() {
-        Long notExistingPostId = Long.MAX_VALUE;
+    void deleteAnswerFromNonExistingPetition() {
+        Long notExistingPetitionId = Long.MAX_VALUE;
 
         assertThatThrownBy(
-                () -> answerService.deleteAnswer(notExistingPostId)
-        ).isInstanceOf(NoSuchPostException.class);
+                () -> answerService.deleteAnswer(notExistingPetitionId)
+        ).isInstanceOf(NoSuchPetitionException.class);
     }
 
     @Test
-    void deleteAnswerFromNotAnsweredPost() {
+    void deleteAnswerFromNotAnsweredPetition() {
         assertThatThrownBy(
-                () -> answerService.deleteAnswer(savedPost.getId())
-        ).isInstanceOf(UnAnsweredPostException.class);
+                () -> answerService.deleteAnswer(savedPetition.getId())
+        ).isInstanceOf(UnAnsweredPetitionException.class);
     }
 
     @AfterEach
     void tearDown() {
         userRepository.deleteAllInBatch();
         answerRepository.deleteAllInBatch();
-        postRepository.deleteAllInBatch();
+        petitionRepository.deleteAllInBatch();
     }
 }

@@ -20,22 +20,22 @@ public class CommentController {
     private final CommentService commentService;
 
     @LoginRequired
-    @PostMapping("/posts/{postId}/comments")
-    public ResponseEntity<Void> createComment(@PathVariable Long postId,
+    @PostMapping("/petitions/{petitionId}/comments")
+    public ResponseEntity<Void> createComment(@PathVariable Long petitionId,
                                               @RequestBody CommentRequest commentRequest,
                                               @LoginUser SimpleUser simpleUser) {
-        Long commentId = commentService.createComment(postId, commentRequest, simpleUser.getId());
-        return ResponseEntity.created(URI.create("/posts/" + postId + "/comments/" + commentId)).build();
+        Long commentId = commentService.createComment(petitionId, commentRequest, simpleUser.getId());
+        return ResponseEntity.created(URI.create("/petitions/" + petitionId + "/comments/" + commentId)).build();
     }
 
-    @GetMapping("/posts/{postId}/comments")
-    public ResponseEntity<Object> getComments(@PathVariable Long postId) {
-        return ResponseEntity.ok().body(commentService.getCommentsByPostId(postId));
+    @GetMapping("/petitions/{petitionId}/comments")
+    public ResponseEntity<Object> getComments(@PathVariable Long petitionId) {
+        return ResponseEntity.ok().body(commentService.getCommentsByPetitionId(petitionId));
     }
 
     @LoginRequired
-    @PutMapping("/posts/{postId}/comments/{commentId}")
-    public ResponseEntity<Object> updateComment(@PathVariable Long postId,
+    @PutMapping("/petitions/{petitionId}/comments/{commentId}")
+    public ResponseEntity<Object> updateComment(@PathVariable Long petitionId,
                                                 @PathVariable Long commentId,
                                                 @Validated @RequestBody CommentRequest updateRequest,
                                                 @LoginUser SimpleUser simpleUser) {
@@ -48,8 +48,8 @@ public class CommentController {
     }
 
     @LoginRequired
-    @DeleteMapping("/posts/{postId}/comments/{commentId}")
-    public ResponseEntity<Object> deleteComment(@PathVariable Long postId,
+    @DeleteMapping("/petitions/{petitionId}/comments/{commentId}")
+    public ResponseEntity<Object> deleteComment(@PathVariable Long petitionId,
                                                 @PathVariable Long commentId,
                                                 @LoginUser SimpleUser simpleUser) {
         if (simpleUser.hasManagerAuthority()) {

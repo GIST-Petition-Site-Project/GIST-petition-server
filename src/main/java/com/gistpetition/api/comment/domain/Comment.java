@@ -13,20 +13,20 @@ public class Comment extends BaseEntity {
     private Long id;
     @Lob
     private String content;
-    private Long postId;
+    private Long petitionId;
     private Long userId;
 
     protected Comment() {
     }
 
-    public Comment(String content, Long postId, Long userId) {
-        this(null, content, postId, userId);
+    public Comment(String content, Long petitionId, Long userId) {
+        this(null, content, petitionId, userId);
     }
 
-    public Comment(Long id, String content, Long postId, Long userId) {
+    public Comment(Long id, String content, Long petitionId, Long userId) {
         this.id = id;
         this.content = content;
-        this.postId = postId;
+        this.petitionId = petitionId;
         this.userId = userId;
     }
 
