@@ -35,7 +35,6 @@ public class UserService {
     public Long signUp(SignUpRequest request) {
         String username = request.getUsername();
         String verificationCode = request.getVerificationCode();
-
         if (userRepository.existsByUsername(username)) {
             throw new DuplicatedUserException();
         }
