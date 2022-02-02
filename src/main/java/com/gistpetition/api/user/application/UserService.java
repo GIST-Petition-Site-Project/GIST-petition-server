@@ -35,16 +35,7 @@ public class UserService {
     public Long signUp(SignUpRequest request) {
         String username = request.getUsername();
         String verificationCode = request.getVerificationCode();
-
-        if (userRepository.existsByUsername(username)) {
-            throw new DuplicatedUserException();
-        }
-        if (!EmailDomain.has(EmailParser.parseDomainFrom(username))) {
-            throw new InvalidEmailFormException();
-        }
-
         signUpValidator.checkIsVerified(username, verificationCode);
-
         User user = new User(username, encoder.hashPassword(request.getPassword()), UserRole.USER);
         return userRepository.save(user).getId();
     }

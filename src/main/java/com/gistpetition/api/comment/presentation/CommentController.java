@@ -5,6 +5,7 @@ import com.gistpetition.api.comment.application.CommentService;
 import com.gistpetition.api.comment.dto.CommentRequest;
 import com.gistpetition.api.config.annotation.LoginRequired;
 import com.gistpetition.api.config.annotation.LoginUser;
+import com.gistpetition.api.config.annotation.ManagerPermissionRequired;
 import com.gistpetition.api.user.domain.SimpleUser;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -39,11 +40,17 @@ public class CommentController {
                                                 @PathVariable Long commentId,
                                                 @Validated @RequestBody CommentRequest updateRequest,
                                                 @LoginUser SimpleUser simpleUser) {
-        if (simpleUser.hasManagerAuthority()) {
-            commentService.updateComment(commentId, updateRequest);
-            return ResponseEntity.noContent().build();
-        }
         commentService.updateCommentByOwner(simpleUser.getId(), commentId, updateRequest);
+        return ResponseEntity.noContent().build();
+    }
+
+    @ManagerPermissionRequired
+    @PutMapping("/petitions/{petitionId}/comments/{commentId}/manager")
+    public ResponseEntity<Object> updateCommentByManager(@PathVariable Long petitionId,
+                                                         @PathVariable Long commentId,
+                                                         @Validated @RequestBody CommentRequest updateRequest,
+                                                         @LoginUser SimpleUser simpleUser) {
+        commentService.updateComment(commentId, updateRequest);
         return ResponseEntity.noContent().build();
     }
 
@@ -52,11 +59,16 @@ public class CommentController {
     public ResponseEntity<Object> deleteComment(@PathVariable Long petitionId,
                                                 @PathVariable Long commentId,
                                                 @LoginUser SimpleUser simpleUser) {
-        if (simpleUser.hasManagerAuthority()) {
-            commentService.deleteComment(commentId);
-            return ResponseEntity.noContent().build();
-        }
         commentService.deleteCommentByOwner(simpleUser.getId(), commentId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @ManagerPermissionRequired
+    @DeleteMapping("/petitions/{petitionId}/comments/{commentId}/manager")
+    public ResponseEntity<Object> deleteCommentByManager(@PathVariable Long petitionId,
+                                                         @PathVariable Long commentId,
+                                                         @LoginUser SimpleUser simpleUser) {
+        commentService.deleteComment(commentId);
         return ResponseEntity.noContent().build();
     }
 }
