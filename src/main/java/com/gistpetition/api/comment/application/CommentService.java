@@ -34,9 +34,7 @@ public class CommentService {
 
     @Transactional(readOnly = true)
     public List<Comment> getCommentsByPetitionId(Long petitionId) {
-        if (!petitionRepository.existsById(petitionId)) {
-            throw new NoSuchPetitionException();
-        }
+        checkExistenceByPetitionId(petitionId);
         return commentRepository.findByPetitionId(petitionId);
     }
 
