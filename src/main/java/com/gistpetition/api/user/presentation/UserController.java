@@ -60,11 +60,18 @@ public class UserController {
         return ResponseEntity.ok().body(UserResponse.of(userService.findUserById(simpleUser.getId())));
     }
 
+
     @AdminPermissionRequired
     @PutMapping("/users/{userId}/userRole")
     public ResponseEntity<Void> updateUserRole(@PathVariable Long userId,
                                                @Validated @RequestBody UpdateUserRoleRequest userRoleRequest) {
         userService.updateUserRole(userId, userRoleRequest);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/users/reset-password")
+    public ResponseEntity<Void> updatePasswordByVerification(@Validated @RequestBody UpdatePasswordByVerificationRequest request) {
+        userService.updatePasswordByVerificationCode(request);
         return ResponseEntity.noContent().build();
     }
 

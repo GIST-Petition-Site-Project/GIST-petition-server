@@ -46,7 +46,7 @@ public class FindPasswordVerificationService {
         PasswordVerificationInfo info = passwordVerificationInfoRepository.findByUsernameAndVerificationCode(username, verificationCode)
                 .orElseThrow(NoSuchVerificationInfoException::new);
 
-        if (!info.isValidToApply(LocalDateTime.now())) {
+        if (!info.isValidToConfirm(LocalDateTime.now())) {
             throw new ExpiredVerificationCodeException();
         }
 

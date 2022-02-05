@@ -38,6 +38,10 @@ public class VerificationInfo {
         this.confirmedAt = confirmedAt;
     }
 
+    public boolean isValidToConfirm(LocalDateTime time) {
+        return time.isAfter(createdAt) && time.isBefore(createdAt.plusMinutes(CONFIRM_CODE_EXPIRE_MINUTE));
+    }
+
     public boolean isConfirmed() {
         return Objects.nonNull(confirmedAt);
     }
