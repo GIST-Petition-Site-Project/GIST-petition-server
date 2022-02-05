@@ -2,15 +2,12 @@ package com.gistpetition.api.verification.domain;
 
 import lombok.Getter;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-@Entity
 @Getter
+@MappedSuperclass
 public class VerificationInfo {
     public static final int CONFIRM_EXPIRE_MINUTE = 15;
     public static final int SIGN_UP_EXPIRE_MINUTE = 60;
@@ -46,7 +43,7 @@ public class VerificationInfo {
         return Objects.nonNull(confirmedAt);
     }
 
-    public boolean isValidToSignUp(LocalDateTime time) {
+    public boolean isValidToApply(LocalDateTime time) {
         return time.isAfter(confirmedAt) && time.isBefore(confirmedAt.plusMinutes(SIGN_UP_EXPIRE_MINUTE));
     }
 

@@ -24,7 +24,6 @@ public class VerificationService {
     private final VerificationCodeGenerator verificationCodeGenerator;
     private final UserRepository userRepository;
 
-
     public VerificationService(VerificationInfoRepository verificationInfoRepository, VerificationCodeGenerator verificationCodeGenerator, UserRepository userRepository) {
         this.verificationInfoRepository = verificationInfoRepository;
         this.verificationCodeGenerator = verificationCodeGenerator;
