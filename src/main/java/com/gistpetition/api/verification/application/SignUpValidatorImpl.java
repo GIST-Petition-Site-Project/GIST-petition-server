@@ -4,23 +4,23 @@ import com.gistpetition.api.exception.verification.InvalidVerificationInfoExcept
 import com.gistpetition.api.exception.verification.NoSuchVerificationCodeException;
 import com.gistpetition.api.exception.verification.NotConfirmedVerificationCodeException;
 import com.gistpetition.api.user.application.SignUpValidator;
+import com.gistpetition.api.verification.domain.SignUpVerificationInfoRepository;
 import com.gistpetition.api.verification.domain.VerificationInfo;
-import com.gistpetition.api.verification.domain.VerificationInfoRepository;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
 @Component
 public class SignUpValidatorImpl implements SignUpValidator {
-    private final VerificationInfoRepository verificationInfoRepository;
+    private final SignUpVerificationInfoRepository signUpVerificationInfoRepository;
 
-    public SignUpValidatorImpl(VerificationInfoRepository verificationInfoRepository) {
-        this.verificationInfoRepository = verificationInfoRepository;
+    public SignUpValidatorImpl(SignUpVerificationInfoRepository signUpVerificationInfoRepository) {
+        this.signUpVerificationInfoRepository = signUpVerificationInfoRepository;
     }
 
     @Override
     public void checkIsVerified(String username, String verificationCode) {
-        VerificationInfo verificationInfo = verificationInfoRepository.findByUsernameAndVerificationCode(username, verificationCode)
+        VerificationInfo verificationInfo = signUpVerificationInfoRepository.findByUsernameAndVerificationCode(username, verificationCode)
                 .orElseThrow(NoSuchVerificationCodeException::new);
 
         if (!verificationInfo.isConfirmed()) {

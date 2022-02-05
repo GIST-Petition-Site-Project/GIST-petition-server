@@ -9,9 +9,10 @@ import com.gistpetition.api.exception.verification.NoSuchVerificationInfoExcepti
 import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRepository;
 import com.gistpetition.api.user.domain.UserRole;
-import com.gistpetition.api.verification.application.VerificationService;
+import com.gistpetition.api.verification.application.SignUpVerificationService;
+import com.gistpetition.api.verification.domain.SignUpVerificationInfo;
+import com.gistpetition.api.verification.domain.SignUpVerificationInfoRepository;
 import com.gistpetition.api.verification.domain.VerificationInfo;
-import com.gistpetition.api.verification.domain.VerificationInfoRepository;
 import com.gistpetition.api.verification.dto.UsernameConfirmationRequest;
 import com.gistpetition.api.verification.dto.VerificationEmailRequest;
 import org.junit.jupiter.api.AfterEach;
@@ -24,23 +25,23 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
-class VerificationServiceTest extends ServiceTest {
+class SignUpVerificationServiceTest extends ServiceTest {
 
     private static final String GIST_EMAIL = "tester@gist.ac.kr";
     private static final String PASSWORD = "password!";
     private static final String VERIFICATION_CODE = "AAAAAA";
 
     @Autowired
-    private VerificationService verificationService;
+    private SignUpVerificationService signUpVerificationService;
     @Autowired
-    private VerificationInfoRepository verificationInfoRepository;
+    private SignUpVerificationInfoRepository signUpVerificationInfoRepository;
     @Autowired
     private UserRepository userRepository;
 
     @Test
     void createVerificationCode() {
-        String verificationCode = verificationService.createVerificationInfo(new VerificationEmailRequest(GIST_EMAIL));
-        VerificationInfo verificationInfo = verificationInfoRepository.findByVerificationCode(verificationCode).orElseThrow(IllegalArgumentException::new);
+        String verificationCode = signUpVerificationService.createVerificationInfo(new VerificationEmailRequest(GIST_EMAIL));
+        VerificationInfo verificationInfo = signUpVerificationInfoRepository.findByVerificationCode(verificationCode).orElseThrow(IllegalArgumentException::new);
 
         assertThat(verificationInfo.getVerificationCode()).isEqualTo(verificationCode);
         assertThat(verificationInfo.getUsername()).isEqualTo(GIST_EMAIL);
@@ -52,7 +53,7 @@ class VerificationServiceTest extends ServiceTest {
     void createVerificationCodeFailedIfAlreadyExisted() {
         userRepository.save(new User(GIST_EMAIL, PASSWORD, UserRole.USER, true));
         assertThatThrownBy(
-                () -> verificationService.createVerificationInfo(new VerificationEmailRequest(GIST_EMAIL))
+                () -> signUpVerificationService.createVerificationInfo(new VerificationEmailRequest(GIST_EMAIL))
         ).isInstanceOf(DuplicatedUserException.class);
     }
 
@@ -60,64 +61,64 @@ class VerificationServiceTest extends ServiceTest {
     void createVerificationCodeFailedIfNotValidEmailForm() {
         String notGistEmail = "notGistEmail@gmail.com";
         assertThatThrownBy(
-                () -> verificationService.createVerificationInfo(new VerificationEmailRequest(notGistEmail))
+                () -> signUpVerificationService.createVerificationInfo(new VerificationEmailRequest(notGistEmail))
         ).isInstanceOf(InvalidEmailFormException.class);
     }
 
     @Test
     void createVerificationCodeIfVerificationCodeExist() {
-        verificationInfoRepository.save(new VerificationInfo(GIST_EMAIL, "BBBBBB"));
+        signUpVerificationInfoRepository.save(new SignUpVerificationInfo(GIST_EMAIL, "BBBBBB"));
 
-        String code = verificationService.createVerificationInfo(new VerificationEmailRequest(GIST_EMAIL));
+        String code = signUpVerificationService.createVerificationInfo(new VerificationEmailRequest(GIST_EMAIL));
 
-        List<VerificationInfo> infos = verificationInfoRepository.findByUsername(GIST_EMAIL);
+        List<SignUpVerificationInfo> infos = signUpVerificationInfoRepository.findByUsername(GIST_EMAIL);
         assertThat(infos).hasSize(1);
         assertThat(infos.get(0).getVerificationCode()).isEqualTo(code);
     }
 
     @Test
     void confirmVerificationCode() {
-        verificationInfoRepository.save(new VerificationInfo(null, GIST_EMAIL, VERIFICATION_CODE, LocalDateTime.now(), null));
+        signUpVerificationInfoRepository.save(new SignUpVerificationInfo(null, GIST_EMAIL, VERIFICATION_CODE, LocalDateTime.now(), null));
 
-        verificationService.confirmUsername(new UsernameConfirmationRequest(GIST_EMAIL, VERIFICATION_CODE));
+        signUpVerificationService.confirmUsername(new UsernameConfirmationRequest(GIST_EMAIL, VERIFICATION_CODE));
 
-        VerificationInfo verificationInfo = verificationInfoRepository.findByVerificationCode(VERIFICATION_CODE).orElseThrow(IllegalArgumentException::new);
+        VerificationInfo verificationInfo = signUpVerificationInfoRepository.findByVerificationCode(VERIFICATION_CODE).orElseThrow(IllegalArgumentException::new);
         assertThat(verificationInfo.getConfirmedAt()).isNotNull();
     }
 
     @Test
     void confirmVerificationCodeNotExisting() {
-        verificationInfoRepository.save(new VerificationInfo(null, GIST_EMAIL, VERIFICATION_CODE, LocalDateTime.now(), null));
+        signUpVerificationInfoRepository.save(new SignUpVerificationInfo(null, GIST_EMAIL, VERIFICATION_CODE, LocalDateTime.now(), null));
 
         String incorrectVerificationCode = VERIFICATION_CODE + "A";
         UsernameConfirmationRequest requestWithIncorrectCode = new UsernameConfirmationRequest(GIST_EMAIL, incorrectVerificationCode);
         assertThatThrownBy(
-                () -> verificationService.confirmUsername(requestWithIncorrectCode)
+                () -> signUpVerificationService.confirmUsername(requestWithIncorrectCode)
         ).isInstanceOf(NoSuchVerificationInfoException.class);
     }
 
     @Test
     void confirmVerificationCodeWhenExpired() {
         LocalDateTime expiredCreatedTime = LocalDateTime.now().minusMinutes(VerificationInfo.CONFIRM_EXPIRE_MINUTE + 1);
-        verificationInfoRepository.save(new VerificationInfo(null, GIST_EMAIL, VERIFICATION_CODE, expiredCreatedTime, null));
+        signUpVerificationInfoRepository.save(new SignUpVerificationInfo(null, GIST_EMAIL, VERIFICATION_CODE, expiredCreatedTime, null));
 
         UsernameConfirmationRequest expiredInfoRequest = new UsernameConfirmationRequest(GIST_EMAIL, VERIFICATION_CODE);
         assertThatThrownBy(
-                () -> verificationService.confirmUsername(expiredInfoRequest)
+                () -> signUpVerificationService.confirmUsername(expiredInfoRequest)
         ).isInstanceOf(ExpiredVerificationCodeException.class);
     }
 
     @Test
     void confirmVerificationAlreadyConfirmedVerification() {
-        verificationInfoRepository.save(new VerificationInfo(null, GIST_EMAIL, VERIFICATION_CODE, LocalDateTime.now().minusMinutes(1), LocalDateTime.now()));
+        signUpVerificationInfoRepository.save(new SignUpVerificationInfo(null, GIST_EMAIL, VERIFICATION_CODE, LocalDateTime.now().minusMinutes(1), LocalDateTime.now()));
         assertThatThrownBy(
-                () -> verificationService.confirmUsername(new UsernameConfirmationRequest(GIST_EMAIL, VERIFICATION_CODE))
+                () -> signUpVerificationService.confirmUsername(new UsernameConfirmationRequest(GIST_EMAIL, VERIFICATION_CODE))
         ).isInstanceOf(DuplicatedVerificationException.class);
     }
 
     @AfterEach
     void tearDown() {
-        verificationInfoRepository.deleteAllInBatch();
+        signUpVerificationInfoRepository.deleteAllInBatch();
         userRepository.deleteAllInBatch();
     }
 }

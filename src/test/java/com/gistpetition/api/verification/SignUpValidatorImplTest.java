@@ -5,8 +5,8 @@ import com.gistpetition.api.exception.verification.InvalidVerificationInfoExcept
 import com.gistpetition.api.exception.verification.NoSuchVerificationCodeException;
 import com.gistpetition.api.exception.verification.NotConfirmedVerificationCodeException;
 import com.gistpetition.api.verification.application.SignUpValidatorImpl;
-import com.gistpetition.api.verification.domain.VerificationInfo;
-import com.gistpetition.api.verification.domain.VerificationInfoRepository;
+import com.gistpetition.api.verification.domain.SignUpVerificationInfo;
+import com.gistpetition.api.verification.domain.SignUpVerificationInfoRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,12 +24,12 @@ class SignUpValidatorImplTest extends ServiceTest {
     @Autowired
     SignUpValidatorImpl signUpValidator;
     @Autowired
-    VerificationInfoRepository verificationInfoRepository;
+    SignUpVerificationInfoRepository signUpVerificationInfoRepository;
 
     @Test
     void checkIsVerified() {
-        VerificationInfo confirmed = new VerificationInfo(null, GIST_EMAIL, VERIFICATION_CODE, LocalDateTime.now(), LocalDateTime.now());
-        verificationInfoRepository.save(confirmed);
+        SignUpVerificationInfo confirmed = new SignUpVerificationInfo(null, GIST_EMAIL, VERIFICATION_CODE, LocalDateTime.now(), LocalDateTime.now());
+        signUpVerificationInfoRepository.save(confirmed);
 
         assertThatCode(
                 () -> signUpValidator.checkIsVerified(GIST_EMAIL, VERIFICATION_CODE)
@@ -46,8 +46,8 @@ class SignUpValidatorImplTest extends ServiceTest {
 
     @Test
     void checkIsVerifiedIfNotConfirmed() {
-        VerificationInfo notConfirmed = new VerificationInfo(null, GIST_EMAIL, VERIFICATION_CODE, LocalDateTime.now(), null);
-        verificationInfoRepository.save(notConfirmed);
+        SignUpVerificationInfo notConfirmed = new SignUpVerificationInfo(null, GIST_EMAIL, VERIFICATION_CODE, LocalDateTime.now(), null);
+        signUpVerificationInfoRepository.save(notConfirmed);
 
         assertThatThrownBy(
                 () -> signUpValidator.checkIsVerified(GIST_EMAIL, VERIFICATION_CODE)
@@ -57,8 +57,8 @@ class SignUpValidatorImplTest extends ServiceTest {
 
     @Test
     void checkIsVerifiedIfSignUpTimeOut() {
-        VerificationInfo timeOutInfo = new VerificationInfo(null, GIST_EMAIL, VERIFICATION_CODE, LocalDateTime.MIN, LocalDateTime.now().minusMinutes(SIGN_UP_EXPIRE_MINUTE));
-        verificationInfoRepository.save(timeOutInfo);
+        SignUpVerificationInfo timeOutInfo = new SignUpVerificationInfo(null, GIST_EMAIL, VERIFICATION_CODE, LocalDateTime.MIN, LocalDateTime.now().minusMinutes(SIGN_UP_EXPIRE_MINUTE));
+        signUpVerificationInfoRepository.save(timeOutInfo);
 
         assertThatThrownBy(
                 () -> signUpValidator.checkIsVerified(GIST_EMAIL, VERIFICATION_CODE)
@@ -67,6 +67,6 @@ class SignUpValidatorImplTest extends ServiceTest {
 
     @AfterEach
     void tearDown() {
-        verificationInfoRepository.deleteAllInBatch();
+        signUpVerificationInfoRepository.deleteAllInBatch();
     }
 }

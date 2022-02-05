@@ -8,8 +8,9 @@ import com.gistpetition.api.exception.verification.NoSuchVerificationInfoExcepti
 import com.gistpetition.api.user.domain.UserRepository;
 import com.gistpetition.api.utils.email.EmailDomain;
 import com.gistpetition.api.utils.email.EmailParser;
+import com.gistpetition.api.verification.domain.SignUpVerificationInfo;
+import com.gistpetition.api.verification.domain.SignUpVerificationInfoRepository;
 import com.gistpetition.api.verification.domain.VerificationInfo;
-import com.gistpetition.api.verification.domain.VerificationInfoRepository;
 import com.gistpetition.api.verification.dto.UsernameConfirmationRequest;
 import com.gistpetition.api.verification.dto.VerificationEmailRequest;
 import org.springframework.stereotype.Service;
@@ -18,14 +19,14 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 
 @Service
-public class VerificationService {
+public class SignUpVerificationService {
 
-    private final VerificationInfoRepository verificationInfoRepository;
+    private final SignUpVerificationInfoRepository signUpVerificationInfoRepository;
     private final VerificationCodeGenerator verificationCodeGenerator;
     private final UserRepository userRepository;
 
-    public VerificationService(VerificationInfoRepository verificationInfoRepository, VerificationCodeGenerator verificationCodeGenerator, UserRepository userRepository) {
-        this.verificationInfoRepository = verificationInfoRepository;
+    public SignUpVerificationService(SignUpVerificationInfoRepository signUpVerificationInfoRepository, VerificationCodeGenerator verificationCodeGenerator, UserRepository userRepository) {
+        this.signUpVerificationInfoRepository = signUpVerificationInfoRepository;
         this.verificationCodeGenerator = verificationCodeGenerator;
         this.userRepository = userRepository;
     }
@@ -39,10 +40,10 @@ public class VerificationService {
         if (!EmailDomain.has(EmailParser.parseDomainFrom(username))) {
             throw new InvalidEmailFormException();
         }
-        verificationInfoRepository.deleteByUsername(username);
+        signUpVerificationInfoRepository.deleteByUsername(username);
 
         String code = verificationCodeGenerator.generate();
-        verificationInfoRepository.save(new VerificationInfo(username, code));
+        signUpVerificationInfoRepository.save(new SignUpVerificationInfo(username, code));
         return code;
     }
 
@@ -51,7 +52,7 @@ public class VerificationService {
         String username = request.getUsername();
         String verificationCode = request.getVerificationCode();
 
-        VerificationInfo info = verificationInfoRepository.findByUsernameAndVerificationCode(username, verificationCode)
+        VerificationInfo info = signUpVerificationInfoRepository.findByUsernameAndVerificationCode(username, verificationCode)
                 .orElseThrow(NoSuchVerificationInfoException::new);
 
         if (!info.isValidToConfirm(LocalDateTime.now())) {
