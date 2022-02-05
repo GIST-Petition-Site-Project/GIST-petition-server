@@ -9,7 +9,7 @@ import com.gistpetition.api.exception.verification.NoSuchVerificationInfoExcepti
 import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRepository;
 import com.gistpetition.api.user.domain.UserRole;
-import com.gistpetition.api.verification.application.SignUpVerificationService;
+import com.gistpetition.api.verification.application.signup.SignUpVerificationService;
 import com.gistpetition.api.verification.domain.SignUpVerificationInfo;
 import com.gistpetition.api.verification.domain.SignUpVerificationInfoRepository;
 import com.gistpetition.api.verification.domain.VerificationInfo;

@@ -1,4 +1,4 @@
-package com.gistpetition.api.verification.application;
+package com.gistpetition.api.verification.application.signup;
 
 import com.gistpetition.api.exception.user.DuplicatedUserException;
 import com.gistpetition.api.exception.user.InvalidEmailFormException;
@@ -8,6 +8,7 @@ import com.gistpetition.api.exception.verification.NoSuchVerificationInfoExcepti
 import com.gistpetition.api.user.domain.UserRepository;
 import com.gistpetition.api.utils.email.EmailDomain;
 import com.gistpetition.api.utils.email.EmailParser;
+import com.gistpetition.api.verification.application.VerificationCodeGenerator;
 import com.gistpetition.api.verification.domain.SignUpVerificationInfo;
 import com.gistpetition.api.verification.domain.SignUpVerificationInfoRepository;
 import com.gistpetition.api.verification.domain.VerificationInfo;

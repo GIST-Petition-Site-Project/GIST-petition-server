@@ -1,7 +1,7 @@
 package com.gistpetition.api.verification.presentation;
 
 import com.gistpetition.api.verification.application.EmailVerificationEvent;
-import com.gistpetition.api.verification.application.SignUpVerificationService;
+import com.gistpetition.api.verification.application.signup.SignUpVerificationService;
 import com.gistpetition.api.verification.application.VerficationType;
 import com.gistpetition.api.verification.dto.UsernameConfirmationRequest;
 import com.gistpetition.api.verification.dto.VerificationEmailRequest;

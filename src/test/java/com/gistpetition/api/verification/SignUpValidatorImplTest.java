@@ -4,7 +4,7 @@ import com.gistpetition.api.ServiceTest;
 import com.gistpetition.api.exception.verification.InvalidVerificationInfoException;
 import com.gistpetition.api.exception.verification.NoSuchVerificationCodeException;
 import com.gistpetition.api.exception.verification.NotConfirmedVerificationCodeException;
-import com.gistpetition.api.verification.application.SignUpValidatorImpl;
+import com.gistpetition.api.verification.application.signup.SignUpValidatorImpl;
 import com.gistpetition.api.verification.domain.SignUpVerificationInfo;
 import com.gistpetition.api.verification.domain.SignUpVerificationInfoRepository;
 import org.junit.jupiter.api.AfterEach;
