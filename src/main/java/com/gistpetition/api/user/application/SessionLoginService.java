@@ -22,7 +22,7 @@ public class SessionLoginService implements LoginService {
     private final Encoder encoder;
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public void login(SignInRequest request) {
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(NoSuchUserException::new);
