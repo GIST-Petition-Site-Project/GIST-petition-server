@@ -41,7 +41,7 @@ class SignUpVerificationServiceTest extends ServiceTest {
     @Test
     void createVerificationCode() {
         String verificationCode = signUpVerificationService.createVerificationInfo(new VerificationEmailRequest(GIST_EMAIL));
-        VerificationInfo verificationInfo = signUpVerificationInfoRepository.findByVerificationCode(verificationCode).orElseThrow(IllegalArgumentException::new);
+        SignUpVerificationInfo verificationInfo = signUpVerificationInfoRepository.findByVerificationCode(verificationCode).orElseThrow(IllegalArgumentException::new);
 
         assertThat(verificationInfo.getVerificationCode()).isEqualTo(verificationCode);
         assertThat(verificationInfo.getUsername()).isEqualTo(GIST_EMAIL);
@@ -82,7 +82,7 @@ class SignUpVerificationServiceTest extends ServiceTest {
 
         signUpVerificationService.confirmUsername(new UsernameConfirmationRequest(GIST_EMAIL, VERIFICATION_CODE));
 
-        VerificationInfo verificationInfo = signUpVerificationInfoRepository.findByVerificationCode(VERIFICATION_CODE).orElseThrow(IllegalArgumentException::new);
+        SignUpVerificationInfo verificationInfo = signUpVerificationInfoRepository.findByVerificationCode(VERIFICATION_CODE).orElseThrow(IllegalArgumentException::new);
         assertThat(verificationInfo.getConfirmedAt()).isNotNull();
     }
 

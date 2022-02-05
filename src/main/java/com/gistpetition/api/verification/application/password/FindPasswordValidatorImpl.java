@@ -3,8 +3,8 @@ package com.gistpetition.api.verification.application.password;
 import com.gistpetition.api.exception.verification.InvalidVerificationInfoException;
 import com.gistpetition.api.exception.verification.NoSuchVerificationCodeException;
 import com.gistpetition.api.exception.verification.NotConfirmedVerificationCodeException;
+import com.gistpetition.api.verification.domain.PasswordVerificationInfo;
 import com.gistpetition.api.verification.domain.PasswordVerificationInfoRepository;
-import com.gistpetition.api.verification.domain.VerificationInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -18,7 +18,7 @@ public class FindPasswordValidatorImpl implements FindPasswordValidator {
 
     @Override
     public void checkIsVerified(String username, String verificationCode) {
-        VerificationInfo verificationInfo = passwordVerificationInfoRepository.findByUsernameAndVerificationCode(username, verificationCode)
+        PasswordVerificationInfo verificationInfo = passwordVerificationInfoRepository.findByUsernameAndVerificationCode(username, verificationCode)
                 .orElseThrow(NoSuchVerificationCodeException::new);
 
         if (!verificationInfo.isConfirmed()) {
