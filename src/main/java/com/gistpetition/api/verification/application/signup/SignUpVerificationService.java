@@ -53,7 +53,7 @@ public class SignUpVerificationService {
         String username = request.getUsername();
         String verificationCode = request.getVerificationCode();
 
-        VerificationInfo info = signUpVerificationInfoRepository.findByUsernameAndVerificationCode(username, verificationCode)
+        SignUpVerificationInfo info = signUpVerificationInfoRepository.findByUsernameAndVerificationCode(username, verificationCode)
                 .orElseThrow(NoSuchVerificationInfoException::new);
 
         if (!info.isValidToConfirm(LocalDateTime.now())) {
