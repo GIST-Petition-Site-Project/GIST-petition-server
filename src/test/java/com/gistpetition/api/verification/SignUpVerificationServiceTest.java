@@ -99,7 +99,7 @@ class SignUpVerificationServiceTest extends ServiceTest {
 
     @Test
     void confirmVerificationCodeWhenExpired() {
-        LocalDateTime expiredCreatedTime = LocalDateTime.now().minusMinutes(VerificationInfo.CONFIRM_EXPIRE_MINUTE + 1);
+        LocalDateTime expiredCreatedTime = LocalDateTime.now().minusMinutes(VerificationInfo.CONFIRM_CODE_EXPIRE_MINUTE + 1);
         signUpVerificationInfoRepository.save(new SignUpVerificationInfo(null, GIST_EMAIL, VERIFICATION_CODE, expiredCreatedTime, null));
 
         UsernameConfirmationRequest expiredInfoRequest = new UsernameConfirmationRequest(GIST_EMAIL, VERIFICATION_CODE);

@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
 
-import static com.gistpetition.api.verification.domain.VerificationInfo.SIGN_UP_EXPIRE_MINUTE;
+import static com.gistpetition.api.verification.domain.VerificationInfo.APPLY_EXPIRE_MINUTE;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -57,7 +57,7 @@ class SignUpValidatorImplTest extends ServiceTest {
 
     @Test
     void checkIsVerifiedIfSignUpTimeOut() {
-        SignUpVerificationInfo timeOutInfo = new SignUpVerificationInfo(null, GIST_EMAIL, VERIFICATION_CODE, LocalDateTime.MIN, LocalDateTime.now().minusMinutes(SIGN_UP_EXPIRE_MINUTE));
+        SignUpVerificationInfo timeOutInfo = new SignUpVerificationInfo(null, GIST_EMAIL, VERIFICATION_CODE, LocalDateTime.MIN, LocalDateTime.now().minusMinutes(APPLY_EXPIRE_MINUTE));
         signUpVerificationInfoRepository.save(timeOutInfo);
 
         assertThatThrownBy(

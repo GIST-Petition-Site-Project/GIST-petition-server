@@ -1,13 +1,10 @@
 package com.gistpetition.api.verification.application.password;
 
-import com.gistpetition.api.exception.user.InvalidEmailFormException;
 import com.gistpetition.api.exception.user.NoSuchUserException;
 import com.gistpetition.api.exception.verification.DuplicatedVerificationException;
 import com.gistpetition.api.exception.verification.ExpiredVerificationCodeException;
 import com.gistpetition.api.exception.verification.NoSuchVerificationInfoException;
 import com.gistpetition.api.user.domain.UserRepository;
-import com.gistpetition.api.utils.email.EmailDomain;
-import com.gistpetition.api.utils.email.EmailParser;
 import com.gistpetition.api.verification.application.VerificationCodeGenerator;
 import com.gistpetition.api.verification.domain.PasswordVerificationInfo;
 import com.gistpetition.api.verification.domain.PasswordVerificationInfoRepository;
@@ -33,9 +30,6 @@ public class FindPasswordVerificationService {
         if (!userRepository.existsByUsername(username)) {
             throw new NoSuchUserException();
         }
-        if (!EmailDomain.has(EmailParser.parseDomainFrom(username))) {
-            throw new InvalidEmailFormException();
-        }
 
         passwordVerificationInfoRepository.deleteByUsername(username);
 
@@ -52,7 +46,7 @@ public class FindPasswordVerificationService {
         PasswordVerificationInfo info = passwordVerificationInfoRepository.findByUsernameAndVerificationCode(username, verificationCode)
                 .orElseThrow(NoSuchVerificationInfoException::new);
 
-        if (!info.isValidToConfirm(LocalDateTime.now())) {
+        if (!info.isValidToApply(LocalDateTime.now())) {
             throw new ExpiredVerificationCodeException();
         }
 
