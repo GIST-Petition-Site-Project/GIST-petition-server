@@ -25,7 +25,7 @@ public class FindPasswordValidatorImpl implements FindPasswordValidator {
             throw new NotConfirmedVerificationCodeException();
         }
 
-        if (!verificationInfo.isValidToApply(LocalDateTime.now())) {
+        if (!verificationInfo.isConfirmationValidAt(LocalDateTime.now())) {
             throw new InvalidVerificationInfoException();
         }
     }

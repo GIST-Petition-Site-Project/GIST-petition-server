@@ -26,7 +26,7 @@ public class SignUpValidatorImpl implements SignUpValidator {
             throw new NotConfirmedVerificationCodeException();
         }
 
-        if (!verificationInfo.isValidToApply(LocalDateTime.now())) {
+        if (!verificationInfo.isConfirmationValidAt(LocalDateTime.now())) {
             throw new InvalidVerificationInfoException();
         }
     }

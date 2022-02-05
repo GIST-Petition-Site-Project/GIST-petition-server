@@ -13,7 +13,7 @@ import java.util.Objects;
 @MappedSuperclass
 public class VerificationInfo {
     public static final int CONFIRM_CODE_EXPIRE_MINUTE = 15;
-    public static final int APPLY_EXPIRE_MINUTE = 60;
+    public static final int CONFIRMATION_EXPIRE_MINUTE = 60;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,8 +46,8 @@ public class VerificationInfo {
         return Objects.nonNull(confirmedAt);
     }
 
-    public boolean isValidToApply(LocalDateTime time) {
-        return time.isAfter(confirmedAt) && time.isBefore(confirmedAt.plusMinutes(APPLY_EXPIRE_MINUTE));
+    public boolean isConfirmationValidAt(LocalDateTime time) {
+        return time.isAfter(confirmedAt) && time.isBefore(confirmedAt.plusMinutes(CONFIRMATION_EXPIRE_MINUTE));
     }
 
     public void confirm() {

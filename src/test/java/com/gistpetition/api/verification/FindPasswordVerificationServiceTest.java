@@ -14,6 +14,7 @@ import com.gistpetition.api.verification.domain.PasswordVerificationInfoReposito
 import com.gistpetition.api.verification.dto.UsernameConfirmationRequest;
 import com.gistpetition.api.verification.dto.VerificationEmailRequest;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -37,9 +38,15 @@ class FindPasswordVerificationServiceTest extends ServiceTest {
     @Autowired
     private UserRepository userRepository;
 
+    private User user;
+
+    @BeforeEach
+    void setup() {
+        user = userRepository.save(USER);
+    }
+
     @Test
     void createFindPasswordVerificationCode() {
-        User user = userRepository.save(USER);
         String passwordVerificationCode = findPasswordVerificationService.createPasswordVerificationInfo(new VerificationEmailRequest(user.getUsername()));
         PasswordVerificationInfo passwordVerificationInfo = passwordVerificationInfoRepository.findByVerificationCode(passwordVerificationCode).orElseThrow(IllegalAccessError::new);
 
@@ -51,14 +58,14 @@ class FindPasswordVerificationServiceTest extends ServiceTest {
 
     @Test
     void createFindPasswordVerificationCodeFailedIfNotExisted() {
+        String notGistEmail = "not" + GIST_EMAIL;
         assertThatThrownBy(
-                () -> findPasswordVerificationService.createPasswordVerificationInfo(new VerificationEmailRequest(GIST_EMAIL))
+                () -> findPasswordVerificationService.createPasswordVerificationInfo(new VerificationEmailRequest(notGistEmail))
         ).isInstanceOf(NoSuchUserException.class);
     }
 
     @Test
     void createVerificationCodeIfVerificationCodeExist() {
-        User user = userRepository.save(USER);
         passwordVerificationInfoRepository.save(new PasswordVerificationInfo(user.getUsername(), "AAAAAA"));
         String verificationCode = findPasswordVerificationService.createPasswordVerificationInfo(new VerificationEmailRequest(user.getUsername()));
 
@@ -71,7 +78,6 @@ class FindPasswordVerificationServiceTest extends ServiceTest {
 
     @Test
     void confirmVerificationCode() {
-        User user = userRepository.save(USER);
         passwordVerificationInfoRepository.save(new PasswordVerificationInfo(user.getUsername(), VERIFICATION_CODE));
         findPasswordVerificationService.confirmUsername(new UsernameConfirmationRequest(user.getUsername(), VERIFICATION_CODE));
 
@@ -83,7 +89,6 @@ class FindPasswordVerificationServiceTest extends ServiceTest {
 
     @Test
     void confirmVerificationCodeNotExisting() {
-        User user = userRepository.save(USER);
         passwordVerificationInfoRepository.save(new PasswordVerificationInfo(user.getUsername(), VERIFICATION_CODE));
         String incorrectVerificationCode = VERIFICATION_CODE + "A";
         assertThatThrownBy(
@@ -93,7 +98,6 @@ class FindPasswordVerificationServiceTest extends ServiceTest {
 
     @Test
     void confirmVerificationCodeWhenExpired() {
-        User user = userRepository.save(USER);
         LocalDateTime expiredCreatedTime = LocalDateTime.now().minusMinutes(PasswordVerificationInfo.CONFIRM_CODE_EXPIRE_MINUTE + 1);
         passwordVerificationInfoRepository.save(new PasswordVerificationInfo(null, user.getUsername(), VERIFICATION_CODE, expiredCreatedTime, null));
         assertThatThrownBy(
@@ -103,7 +107,6 @@ class FindPasswordVerificationServiceTest extends ServiceTest {
 
     @Test
     void confirmVerificationAlreadyConfirmedVerification() {
-        User user = userRepository.save(USER);
         passwordVerificationInfoRepository.save(new PasswordVerificationInfo(null, user.getUsername(), VERIFICATION_CODE, LocalDateTime.now().minusMinutes(1), LocalDateTime.now()));
         assertThatThrownBy(
                 () -> findPasswordVerificationService.confirmUsername(new UsernameConfirmationRequest(GIST_EMAIL, VERIFICATION_CODE))
