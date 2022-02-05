@@ -2,6 +2,7 @@ package com.gistpetition.api.acceptableTest;
 
 import com.gistpetition.api.petition.domain.PetitionRepository;
 import com.gistpetition.api.user.domain.UserRepository;
+import com.gistpetition.api.user.dto.request.SignInRequest;
 import com.gistpetition.api.user.dto.request.SignUpRequest;
 import com.gistpetition.api.verification.domain.VerificationInfo;
 import com.gistpetition.api.verification.domain.VerificationInfoRepository;
@@ -76,12 +77,17 @@ public class UserAPITest {
     }
 
     @Test
-    void login() {
+    void loginAPIs() {
 
-    }
+        String username = "admin@gist.ac.kr";
+        String password = "test1234!";
 
-    @Test
-    void writePetition() {
-
+        SignInRequest signInRequest = new SignInRequest(username,password);
+        Response login = given().
+                contentType(ContentType.JSON).
+                body(signInRequest).
+                when().
+                post("/v1/login");
+        assertThat(login.getStatusCode()).isEqualTo(204);
     }
 }
