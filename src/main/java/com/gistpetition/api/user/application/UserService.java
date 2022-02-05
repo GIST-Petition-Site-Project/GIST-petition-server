@@ -14,6 +14,7 @@ import com.gistpetition.api.user.dto.request.UpdateUserRoleRequest;
 import com.gistpetition.api.utils.email.EmailDomain;
 import com.gistpetition.api.utils.email.EmailParser;
 import com.gistpetition.api.utils.password.Encoder;
+import com.gistpetition.api.verification.application.SignUpValidator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
