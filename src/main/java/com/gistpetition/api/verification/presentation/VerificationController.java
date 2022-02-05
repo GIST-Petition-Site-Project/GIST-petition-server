@@ -1,6 +1,7 @@
 package com.gistpetition.api.verification.presentation;
 
 import com.gistpetition.api.verification.application.EmailVerificationEvent;
+import com.gistpetition.api.verification.application.password.FindPasswordVerificationService;
 import com.gistpetition.api.verification.application.signup.SignUpVerificationService;
 import com.gistpetition.api.verification.application.VerficationType;
 import com.gistpetition.api.verification.dto.UsernameConfirmationRequest;
@@ -19,31 +20,32 @@ import org.springframework.web.bind.annotation.RestController;
 public class VerificationController {
 
     private final SignUpVerificationService signUpVerificationService;
+    private final FindPasswordVerificationService findPasswordVerificationService;
     private final ApplicationEventPublisher publisher;
 
-    @PostMapping("/sign_up/verifications")
+    @PostMapping("/sign-up/verifications")
     public ResponseEntity<Void> createSignUpVerificationCode(@RequestBody VerificationEmailRequest request) {
         String verificationCode = signUpVerificationService.createVerificationInfo(request);
         publisher.publishEvent(new EmailVerificationEvent(request.getUsername(), verificationCode, VerficationType.SignUp));
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/sign_up/confirm")
+    @PostMapping("/sign-up/confirm")
     public ResponseEntity<Void> confirmSignUpVerificationCode(@RequestBody UsernameConfirmationRequest request) {
         signUpVerificationService.confirmUsername(request);
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/find_password/verifications")
+    @PostMapping("/find-password/verifications")
     public ResponseEntity<Void> createFindPasswordVerificationCode(@RequestBody VerificationEmailRequest request) {
-        String verificationCode = signUpVerificationService.createVerificationInfo(request); //todo change service
+        String verificationCode = findPasswordVerificationService.createPasswordVerificationInfo(request);
         publisher.publishEvent(new EmailVerificationEvent(request.getUsername(), verificationCode, VerficationType.NewPassword));
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/find_password/confirm")
+    @PostMapping("/find-password/confirm")
     public ResponseEntity<Void> confirmFindPassowrdVerificationCode(@RequestBody UsernameConfirmationRequest request) {
-        signUpVerificationService.confirmUsername(request); //todo change service
+        findPasswordVerificationService.confirmUsername(request);
         return ResponseEntity.noContent().build();
     }
 
