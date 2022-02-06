@@ -15,29 +15,17 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
-@Profile("dev || prod")
+@Profile("!dev && !prod")
 @RequiredArgsConstructor
 @Component
-public class DataLoader implements CommandLineRunner {
+public class TestDataLoader implements CommandLineRunner {
     private final User ADMIN = new User(1L, "admin@gist.ac.kr", new BcryptEncoder().hashPassword("test1234!"), UserRole.ADMIN);
+    private final User MANAGER = new User(2L, "manager@gist.ac.kr", new BcryptEncoder().hashPassword("test1234!"), UserRole.MANAGER);
     private final UserRepository userRepository;
-    private final PetitionRepository petitionRepository;
 
     @Override
     public void run(String... args) {
         userRepository.save(ADMIN);
-
-        List<Petition> petitionsAboutDorm = new ArrayList<>();
-        for (int i = 0; i < 100; i++) {
-            petitionsAboutDorm.add(new Petition("dorm " + i, "description" + i, Category.DORMITORY, 1L));
-        }
-
-        List<Petition> petitionsAboutFacility = new ArrayList<>();
-        for (int i = 0; i < 100; i++) {
-            petitionsAboutFacility.add(new Petition("professor " + i, "description" + i, Category.FACILITY, 1L));
-        }
-
-        petitionRepository.saveAll(petitionsAboutDorm);
-        petitionRepository.saveAll(petitionsAboutFacility);
+        userRepository.save(MANAGER);
     }
 }
