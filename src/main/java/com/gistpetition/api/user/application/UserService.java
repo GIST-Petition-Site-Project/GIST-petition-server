@@ -7,29 +7,26 @@ import com.gistpetition.api.exception.user.NotMatchedPasswordException;
 import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRepository;
 import com.gistpetition.api.user.domain.UserRole;
-import com.gistpetition.api.user.dto.request.DeleteUserRequest;
-import com.gistpetition.api.user.dto.request.SignUpRequest;
-import com.gistpetition.api.user.dto.request.UpdatePasswordRequest;
-import com.gistpetition.api.user.dto.request.UpdateUserRoleRequest;
+import com.gistpetition.api.user.dto.request.*;
 import com.gistpetition.api.utils.email.EmailDomain;
 import com.gistpetition.api.utils.email.EmailParser;
 import com.gistpetition.api.utils.password.Encoder;
+import com.gistpetition.api.verification.application.password.FindPasswordValidator;
+import com.gistpetition.api.verification.application.signup.SignUpValidator;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@RequiredArgsConstructor
 @Service
 public class UserService {
     private final UserRepository userRepository;
     private final Encoder encoder;
     private final SignUpValidator signUpValidator;
+    private final FindPasswordValidator passwordValidator;
 
-    public UserService(UserRepository userRepository, Encoder encoder, SignUpValidator signUpValidator) {
-        this.userRepository = userRepository;
-        this.encoder = encoder;
-        this.signUpValidator = signUpValidator;
-    }
 
     @Transactional
     public Long signUp(SignUpRequest request) {
@@ -70,6 +67,13 @@ public class UserService {
     public void updateUserRole(Long userId, UpdateUserRoleRequest userRoleRequest) {
         User user = findUserById(userId);
         user.setUserRole(UserRole.ignoringCaseValueOf(userRoleRequest.getUserRole()));
+    }
+
+    @Transactional
+    public void updatePasswordByVerificationCode(UpdatePasswordByVerificationRequest request) {
+        User user = findUserByEmail(request.getUsername());
+        passwordValidator.checkIsVerified(user.getUsername(), request.getVerificationCode());
+        user.setPassword(encoder.hashPassword(request.getPassword()));
     }
 
     @Transactional

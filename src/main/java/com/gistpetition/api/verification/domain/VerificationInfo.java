@@ -2,18 +2,18 @@ package com.gistpetition.api.verification.domain;
 
 import lombok.Getter;
 
-import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-@Entity
 @Getter
+@MappedSuperclass
 public class VerificationInfo {
-    public static final int CONFIRM_EXPIRE_MINUTE = 15;
-    public static final int SIGN_UP_EXPIRE_MINUTE = 60;
+    public static final int CONFIRM_CODE_EXPIRE_MINUTE = 15;
+    public static final int CONFIRMATION_EXPIRE_MINUTE = 60;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,15 +39,15 @@ public class VerificationInfo {
     }
 
     public boolean isValidToConfirm(LocalDateTime time) {
-        return time.isAfter(createdAt) && time.isBefore(createdAt.plusMinutes(CONFIRM_EXPIRE_MINUTE));
+        return time.isAfter(createdAt) && time.isBefore(createdAt.plusMinutes(CONFIRM_CODE_EXPIRE_MINUTE));
     }
 
     public boolean isConfirmed() {
         return Objects.nonNull(confirmedAt);
     }
 
-    public boolean isValidToSignUp(LocalDateTime time) {
-        return time.isAfter(confirmedAt) && time.isBefore(confirmedAt.plusMinutes(SIGN_UP_EXPIRE_MINUTE));
+    public boolean isConfirmationValidAt(LocalDateTime time) {
+        return time.isAfter(confirmedAt) && time.isBefore(confirmedAt.plusMinutes(CONFIRMATION_EXPIRE_MINUTE));
     }
 
     public void confirm() {
