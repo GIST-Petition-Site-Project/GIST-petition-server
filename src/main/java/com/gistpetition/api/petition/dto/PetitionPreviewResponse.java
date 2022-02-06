@@ -9,32 +9,24 @@ import java.time.LocalDateTime;
 
 @Getter
 @RequiredArgsConstructor
-public class PetitionResponse {
+public class PetitionPreviewResponse {
     private final Long id;
     private final String title;
-    private final String description;
     private final String categoryName;
-    private final Boolean answered;
-    private final Long userId;
     private final Integer agreements;
     private final LocalDateTime createdAt;
-    private final LocalDateTime updatedAt;
 
-    public static Page<PetitionResponse> pageOf(Page<Petition> page) {
-        return page.map(PetitionResponse::of);
+    public static Page<PetitionPreviewResponse> pageOf(Page<Petition> page) {
+        return page.map(PetitionPreviewResponse::of);
     }
 
-    public static PetitionResponse of(Petition petition) {
-        return new PetitionResponse(
+    public static PetitionPreviewResponse of(Petition petition) {
+        return new PetitionPreviewResponse(
                 petition.getId(),
                 petition.getTitle(),
-                petition.getDescription(),
                 petition.getCategory().getName(),
-                petition.isAnswered(),
-                petition.getUserId(),
                 petition.getAgreements().size(),
-                petition.getCreatedAt(),
-                petition.getUpdatedAt()
+                petition.getCreatedAt()
         );
     }
 }

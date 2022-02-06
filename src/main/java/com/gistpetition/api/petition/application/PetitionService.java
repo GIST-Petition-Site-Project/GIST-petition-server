@@ -6,6 +6,7 @@ import com.gistpetition.api.exception.user.NoSuchUserException;
 import com.gistpetition.api.petition.domain.Category;
 import com.gistpetition.api.petition.domain.Petition;
 import com.gistpetition.api.petition.domain.PetitionRepository;
+import com.gistpetition.api.petition.dto.PetitionPreviewResponse;
 import com.gistpetition.api.petition.dto.PetitionRequest;
 import com.gistpetition.api.petition.dto.PetitionResponse;
 import com.gistpetition.api.user.domain.User;
@@ -39,23 +40,23 @@ public class PetitionService {
     }
 
     @Transactional(readOnly = true)
-    public Page<PetitionResponse> retrievePetition(Pageable pageable) {
-        return PetitionResponse.pageOf(petitionRepository.findAll(pageable));
+    public Page<PetitionPreviewResponse> retrievePetition(Pageable pageable) {
+        return PetitionPreviewResponse.pageOf(petitionRepository.findAll(pageable));
     }
 
     @Transactional(readOnly = true)
-    public Page<PetitionResponse> retrievePetitionByCategoryId(Long categoryId, Pageable pageable) {
-        return PetitionResponse.pageOf(petitionRepository.findByCategory(Category.getById(categoryId), pageable));
+    public Page<PetitionPreviewResponse> retrievePetitionByCategoryId(Long categoryId, Pageable pageable) {
+        return PetitionPreviewResponse.pageOf(petitionRepository.findByCategory(Category.getById(categoryId), pageable));
     }
 
     @Transactional(readOnly = true)
-    public Page<PetitionResponse> retrievePetitionByKeyword(String keyword, Pageable pageable) {
-        return PetitionResponse.pageOf(petitionRepository.findByTitleContains(keyword, pageable));
+    public Page<PetitionPreviewResponse> retrievePetitionByKeyword(String keyword, Pageable pageable) {
+        return PetitionPreviewResponse.pageOf(petitionRepository.findByTitleContains(keyword, pageable));
     }
 
     @Transactional(readOnly = true)
-    public List<Petition> retrievePetitionsByUserId(Long user_id) {
-        return petitionRepository.findByUserId(Sort.by(Sort.Direction.DESC, "id"), user_id);
+    public Page<PetitionPreviewResponse> retrievePetitionsByUserId(Long user_id,Pageable pageable) {
+        return PetitionPreviewResponse.pageOf(petitionRepository.findByUserId(user_id,pageable));
     }
 
     @Transactional(readOnly = true)
