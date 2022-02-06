@@ -12,7 +12,7 @@ import java.util.List;
 
 @Repository
 public interface PetitionRepository extends JpaRepository<Petition, Long> {
-    List<Petition> findByUserId(Sort sort, Long userId);
+    Page<Petition> findByUserId(Long userId,Pageable pageable);
 
     Page<Petition> findByCategory(Category category, Pageable pageable);
 
