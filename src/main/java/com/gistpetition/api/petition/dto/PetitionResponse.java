@@ -4,11 +4,8 @@ import com.gistpetition.api.petition.domain.Petition;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 @RequiredArgsConstructor
@@ -24,8 +21,7 @@ public class PetitionResponse {
     private final LocalDateTime updatedAt;
 
     public static Page<PetitionResponse> pageOf(Page<Petition> page) {
-        List<PetitionResponse> petitionResponseList = page.getContent().stream().map(PetitionResponse::of).collect(Collectors.toList());
-        return new PageImpl<>(petitionResponseList, page.getPageable(), page.getTotalElements());
+        return page.map(PetitionResponse::of);
     }
 
     public static PetitionResponse of(Petition petition) {
