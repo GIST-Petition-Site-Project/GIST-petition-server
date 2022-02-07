@@ -51,7 +51,7 @@ public enum TUser {
                 contentType(ContentType.JSON).
                 body(verificationEmailRequest).
                 when().
-                post("/v1/username/verifications").
+                post("/v1/sign-up/verifications").
                 then().log().all().
                 statusCode(HttpStatus.NO_CONTENT.value());
 
@@ -60,7 +60,7 @@ public enum TUser {
                 contentType(ContentType.JSON).
                 body(usernameConfirmationRequest).
                 when().
-                post("/v1/username/confirm").
+                post("/v1/sign-up/confirm").
                 then().log().all().
                 statusCode(HttpStatus.NO_CONTENT.value());
 

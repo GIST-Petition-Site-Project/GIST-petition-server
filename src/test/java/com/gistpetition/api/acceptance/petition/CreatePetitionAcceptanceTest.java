@@ -6,7 +6,7 @@ import com.gistpetition.api.petition.domain.PetitionRepository;
 import com.gistpetition.api.petition.dto.PetitionRequest;
 import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRepository;
-import com.gistpetition.api.verification.domain.VerificationInfoRepository;
+import com.gistpetition.api.verification.domain.SignUpVerificationInfoRepository;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import org.apache.http.HttpHeaders;
@@ -29,7 +29,7 @@ public class CreatePetitionAcceptanceTest {
     PetitionRepository petitionRepository;
 
     @Autowired
-    VerificationInfoRepository verificationInfoRepository;
+    SignUpVerificationInfoRepository signUpVerificationInfoRepository;
 
     @Autowired
     UserRepository userRepository;
