@@ -3,10 +3,14 @@ package com.gistpetition.api.answer.presentation;
 import com.gistpetition.api.answer.application.AnswerService;
 import com.gistpetition.api.answer.domain.Answer;
 import com.gistpetition.api.answer.dto.AnswerRequest;
+import com.gistpetition.api.answer.dto.AnswerRevisionResponse;
+import com.gistpetition.api.config.annotation.AdminPermissionRequired;
 import com.gistpetition.api.config.annotation.LoginUser;
 import com.gistpetition.api.config.annotation.ManagerPermissionRequired;
 import com.gistpetition.api.user.domain.SimpleUser;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -37,6 +41,12 @@ public class AnswerController {
     @GetMapping("/answers/count")
     public ResponseEntity<Long> getNumberOfAnswers() {
         return ResponseEntity.ok().body(answerService.getNumberOfAnswers());
+    }
+
+    @AdminPermissionRequired
+    @GetMapping("/answers/{answerId}/revisions")
+    public ResponseEntity<Page<AnswerRevisionResponse>> retrieveAnswerRevisions(@PathVariable Long answerId, Pageable pageable) {
+        return ResponseEntity.ok().body(answerService.retrieveRevisionsOfAnswer(answerId, pageable));
     }
 
     @ManagerPermissionRequired
