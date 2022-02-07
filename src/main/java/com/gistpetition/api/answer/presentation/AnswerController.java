@@ -59,7 +59,7 @@ public class AnswerController {
 
     @ManagerPermissionRequired
     @DeleteMapping("/petitions/{petitionId}/answer")
-    public ResponseEntity<Object> deleteComment(@PathVariable Long petitionId) {
+    public ResponseEntity<Object> deleteAnswer(@PathVariable Long petitionId) {
         answerService.deleteAnswer(petitionId);
         return ResponseEntity.noContent().build();
     }
