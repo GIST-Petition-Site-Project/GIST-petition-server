@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface AnswerRepository extends RevisionRepository<Answer, Long, Integer>, JpaRepository<Answer, Long> {
+public interface AnswerRepository extends RevisionRepository<Answer, Long, Long>, JpaRepository<Answer, Long> {
     Optional<Answer> findByPetitionId(Long petitionId);
 
     boolean existsByPetitionId(Long petitionId);

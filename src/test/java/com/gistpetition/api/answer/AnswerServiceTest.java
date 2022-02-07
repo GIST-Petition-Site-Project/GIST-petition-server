@@ -166,6 +166,7 @@ class AnswerServiceTest extends ServiceTest {
     void retrieveAnswerRevisions() {
         Long answerId = answerService.createAnswer(savedPetition.getId(), ANSWER_REQUEST);
         answerService.updateAnswer(savedPetition.getId(), UPDATE_REQUEST);
+        httpSession.setAttribute("user", new SimpleUser(user));
         answerService.deleteAnswer(savedPetition.getId());
 
         Pageable pageable = PageRequest.of(0, 10);
