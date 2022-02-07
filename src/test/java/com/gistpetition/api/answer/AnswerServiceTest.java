@@ -5,6 +5,7 @@ import com.gistpetition.api.answer.application.AnswerService;
 import com.gistpetition.api.answer.domain.Answer;
 import com.gistpetition.api.answer.domain.AnswerRepository;
 import com.gistpetition.api.answer.dto.AnswerRequest;
+import com.gistpetition.api.answer.dto.AnswerRevisionResponse;
 import com.gistpetition.api.exception.WrappedException;
 import com.gistpetition.api.exception.petition.NoSuchPetitionException;
 import com.gistpetition.api.exception.petition.UnAnsweredPetitionException;
@@ -18,6 +19,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -148,6 +152,18 @@ class AnswerServiceTest extends ServiceTest {
         assertThatThrownBy(
                 () -> answerService.deleteAnswer(savedPetition.getId())
         ).isInstanceOf(UnAnsweredPetitionException.class);
+    }
+
+    @Test
+    void retrieveAnswerRevisions() {
+        Long answerId = answerService.createAnswer(savedPetition.getId(), ANSWER_REQUEST, manager.getId());
+        answerService.updateAnswer(savedPetition.getId(), UPDATE_REQUEST);
+        answerService.deleteAnswer(savedPetition.getId());
+
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<AnswerRevisionResponse> answerRevisionResponses = answerService.retrieveRevisionsOfAnswer(answerId, pageable);
+
+        assertThat(answerRevisionResponses.getContent()).hasSize(3);
     }
 
     @AfterEach

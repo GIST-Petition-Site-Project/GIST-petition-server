@@ -2,9 +2,11 @@ package com.gistpetition.api.answer.domain;
 
 import com.gistpetition.api.common.persistence.BaseEntity;
 import lombok.Getter;
+import org.hibernate.envers.Audited;
 
 import javax.persistence.*;
 
+@Audited
 @Entity
 @Getter
 public class Answer extends BaseEntity {
