@@ -4,16 +4,14 @@ import com.gistpetition.api.exception.user.DuplicatedUserException;
 import com.gistpetition.api.exception.user.InvalidEmailFormException;
 import com.gistpetition.api.exception.user.NoSuchUserException;
 import com.gistpetition.api.exception.user.NotMatchedPasswordException;
-import com.gistpetition.api.user.application.SignUpValidator;
 import com.gistpetition.api.user.application.UserService;
 import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRepository;
 import com.gistpetition.api.user.domain.UserRole;
-import com.gistpetition.api.user.dto.request.DeleteUserRequest;
-import com.gistpetition.api.user.dto.request.SignUpRequest;
-import com.gistpetition.api.user.dto.request.UpdatePasswordRequest;
-import com.gistpetition.api.user.dto.request.UpdateUserRoleRequest;
+import com.gistpetition.api.user.dto.request.*;
 import com.gistpetition.api.utils.password.Encoder;
+import com.gistpetition.api.verification.application.password.FindPasswordValidator;
+import com.gistpetition.api.verification.application.signup.SignUpValidator;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,9 +46,13 @@ class UserServiceTest {
     @MockBean
     private SignUpValidator signUpValidator;
 
+    @MockBean
+    private FindPasswordValidator passwordValidator;
+
     @BeforeEach
     void setUp() {
         doNothing().when(signUpValidator).checkIsVerified(any(), eq(VERIFICATION_CODE));
+        doNothing().when(passwordValidator).checkIsVerified(any(), eq(VERIFICATION_CODE));
     }
 
     @ParameterizedTest
@@ -103,6 +105,17 @@ class UserServiceTest {
 
         User user = userRepository.findById(userId).orElseThrow(IllegalArgumentException::new);
         Assertions.assertThat(user.getUserRole()).isEqualTo(UserRole.ADMIN);
+    }
+
+    @Test
+    void updateUserPasswordByVerification() {
+        Long userId = userService.signUp(DEFAULT_SIGN_UP_REQUEST);
+        String newPassword = "new" + PASSWORD;
+        UpdatePasswordByVerificationRequest passwordRequest = new UpdatePasswordByVerificationRequest(GIST_EMAIL, newPassword, VERIFICATION_CODE);
+        userService.updatePasswordByVerificationCode(passwordRequest);
+
+        User user = userRepository.findById(userId).orElseThrow(IllegalArgumentException::new);
+        assertTrue(encoder.isMatch(passwordRequest.getPassword(), user.getPassword()));
     }
 
     @Test
