@@ -12,6 +12,7 @@ import com.gistpetition.api.exception.petition.UnAnsweredPetitionException;
 import com.gistpetition.api.petition.domain.Category;
 import com.gistpetition.api.petition.domain.Petition;
 import com.gistpetition.api.petition.domain.PetitionRepository;
+import com.gistpetition.api.user.domain.SimpleUser;
 import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRepository;
 import com.gistpetition.api.user.domain.UserRole;
@@ -22,6 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+
+import javax.servlet.http.HttpSession;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -43,24 +46,28 @@ class AnswerServiceTest extends ServiceTest {
     @Autowired
     private AnswerRepository answerRepository;
 
+    private User user;
     private User manager;
     private Petition savedPetition;
+    @Autowired
+    private HttpSession httpSession;
 
     @BeforeEach
     void setup() {
-        User user = userRepository.save(new User("normal@email.com", "password", UserRole.USER));
+        user = userRepository.save(new User("normal@email.com", "password", UserRole.USER));
         manager = userRepository.save(new User("manager@email.com", "password", UserRole.MANAGER));
+        httpSession.setAttribute("user", new SimpleUser(manager));
         savedPetition = petitionRepository.save(new Petition("title", "description", Category.DORMITORY, user.getId()));
     }
 
     @Test
     void createAnswerByManager() {
-        Long savedAnswer = answerService.createAnswer(savedPetition.getId(), ANSWER_REQUEST, manager.getId());
+        Long savedAnswer = answerService.createAnswer(savedPetition.getId(), ANSWER_REQUEST);
 
         Answer answer = answerRepository.findById(savedAnswer).orElseThrow(() -> new WrappedException("존재하지 않는 answer입니다.", null));
         assertThat(answer.getId()).isEqualTo(savedAnswer);
         assertThat(answer.getContent()).isEqualTo(ANSWER_REQUEST.getContent());
-        assertThat(answer.getUserId()).isEqualTo(manager.getId());
+        assertThat(answer.getCreatedBy()).isEqualTo(manager.getId());
         assertThat(answer.getPetitionId()).isEqualTo(savedPetition.getId());
 
         Petition petition = petitionRepository.findById(savedPetition.getId()).orElseThrow(NoSuchPetitionException::new);
@@ -71,13 +78,13 @@ class AnswerServiceTest extends ServiceTest {
     void createAnswerToNonExistingPetition() {
         Long fakePetitionId = Long.MAX_VALUE;
         assertThatThrownBy(
-                () -> answerService.createAnswer(fakePetitionId, ANSWER_REQUEST, manager.getId())
+                () -> answerService.createAnswer(fakePetitionId, ANSWER_REQUEST)
         ).isInstanceOf(NoSuchPetitionException.class);
     }
 
     @Test
     void retrieveAnswer() {
-        Answer saved = answerRepository.save(new Answer(ANSWER_CONTENT, savedPetition.getId(), manager.getId()));
+        Answer saved = answerRepository.save(new Answer(ANSWER_CONTENT, savedPetition.getId()));
 
         Answer retrievedAnswer = answerService.retrieveAnswerByPetitionId(savedPetition.getId());
 
@@ -102,12 +109,13 @@ class AnswerServiceTest extends ServiceTest {
 
     @Test
     void updateAnswer() {
-        Answer answer = answerRepository.save(new Answer(ANSWER_CONTENT, savedPetition.getId(), manager.getId()));
+        Answer answer = answerRepository.save(new Answer(ANSWER_CONTENT, savedPetition.getId()));
         answerService.updateAnswer(savedPetition.getId(), UPDATE_REQUEST);
 
         Answer updatedAnswer = answerRepository.findByPetitionId(savedPetition.getId()).orElseThrow(() -> new WrappedException("", null));
 
         assertThat(answer.getId()).isEqualTo(updatedAnswer.getId());
+        assertThat(answer.getModifiedBy()).isEqualTo(manager.getId());
         assertThat(updatedAnswer.getContent()).isEqualTo(UPDATE_REQUEST.getContent());
     }
 
@@ -129,7 +137,7 @@ class AnswerServiceTest extends ServiceTest {
 
     @Test
     void deleteAnswer() {
-        Answer answer = answerRepository.save(new Answer(ANSWER_CONTENT, savedPetition.getId(), manager.getId()));
+        Answer answer = answerRepository.save(new Answer(ANSWER_CONTENT, savedPetition.getId()));
 
         answerService.deleteAnswer(savedPetition.getId());
 
@@ -156,7 +164,7 @@ class AnswerServiceTest extends ServiceTest {
 
     @Test
     void retrieveAnswerRevisions() {
-        Long answerId = answerService.createAnswer(savedPetition.getId(), ANSWER_REQUEST, manager.getId());
+        Long answerId = answerService.createAnswer(savedPetition.getId(), ANSWER_REQUEST);
         answerService.updateAnswer(savedPetition.getId(), UPDATE_REQUEST);
         answerService.deleteAnswer(savedPetition.getId());
 

@@ -27,12 +27,12 @@ public class AnswerService {
     }
 
     @Transactional
-    public Long createAnswer(Long petitionId, AnswerRequest answerRequest, Long userId) {
+    public Long createAnswer(Long petitionId, AnswerRequest answerRequest) {
         Petition petition = findPetitionById(petitionId);
         if (petition.isAnswered()) {
             throw new DuplicatedAnswerException();
         }
-        Answer answer = new Answer(answerRequest.getContent(), petitionId, userId);
+        Answer answer = new Answer(answerRequest.getContent(), petitionId);
         petition.setAnswered(true);
         return answerRepository.save(answer).getId();
     }

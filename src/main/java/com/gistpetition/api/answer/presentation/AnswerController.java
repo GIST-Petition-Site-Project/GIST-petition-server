@@ -5,9 +5,7 @@ import com.gistpetition.api.answer.domain.Answer;
 import com.gistpetition.api.answer.dto.AnswerRequest;
 import com.gistpetition.api.answer.dto.AnswerRevisionResponse;
 import com.gistpetition.api.config.annotation.AdminPermissionRequired;
-import com.gistpetition.api.config.annotation.LoginUser;
 import com.gistpetition.api.config.annotation.ManagerPermissionRequired;
-import com.gistpetition.api.user.domain.SimpleUser;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,9 +25,8 @@ public class AnswerController {
     @ManagerPermissionRequired
     @PostMapping("/petitions/{petitionId}/answer")
     public ResponseEntity<Object> createAnswer(@PathVariable Long petitionId,
-                                               @Validated @RequestBody AnswerRequest answerRequest,
-                                               @LoginUser SimpleUser simpleUser) {
-        Long answerId = answerService.createAnswer(petitionId, answerRequest, simpleUser.getId());
+                                               @Validated @RequestBody AnswerRequest answerRequest) {
+        Long answerId = answerService.createAnswer(petitionId, answerRequest);
         return ResponseEntity.created(URI.create("/petitions/" + petitionId + "/answer/" + answerId)).build();
     }
 

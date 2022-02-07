@@ -17,16 +17,15 @@ public class AnswerRevisionResponse {
     private Integer revisionId;
     private Instant revisionTime;
     private RevisionMetadata.RevisionType revisionType;
-    private Long userId;
+    private Long modifiedBy;
     private String answerContent;
-
 
     public static AnswerRevisionResponse of(Revision<Integer, Answer> revision) {
         return new AnswerRevisionResponse(
                 revision.getRequiredRevisionNumber(),
                 revision.getRequiredRevisionInstant(),
                 revision.getMetadata().getRevisionType(),
-                revision.getEntity().getUserId(),
+                revision.getEntity().getModifiedBy(),
                 revision.getEntity().getContent()
         );
     }
