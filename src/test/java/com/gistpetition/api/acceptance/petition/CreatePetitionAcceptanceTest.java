@@ -1,44 +1,28 @@
 package com.gistpetition.api.acceptance.petition;
 
+import com.gistpetition.api.acceptance.AcceptanceTest;
 import com.gistpetition.api.acceptance.common.TUser;
 import com.gistpetition.api.petition.domain.Category;
 import com.gistpetition.api.petition.domain.PetitionRepository;
 import com.gistpetition.api.petition.dto.PetitionRequest;
 import com.gistpetition.api.user.domain.UserRepository;
 import com.gistpetition.api.user.domain.UserRole;
-import com.gistpetition.api.verification.domain.SignUpVerificationInfoRepository;
-import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import org.apache.http.HttpHeaders;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 
 import static com.gistpetition.api.acceptance.common.TUser.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class CreatePetitionAcceptanceTest {
+public class CreatePetitionAcceptanceTest extends AcceptanceTest {
     @Autowired
     PetitionRepository petitionRepository;
 
     @Autowired
-    SignUpVerificationInfoRepository signUpVerificationInfoRepository;
-
-    @Autowired
     UserRepository userRepository;
-
-    @LocalServerPort
-    int port;
-
-    @BeforeEach
-    void setUp() {
-        RestAssured.port = port;
-    }
 
     @Test
     void createPetitionByNormal() {
