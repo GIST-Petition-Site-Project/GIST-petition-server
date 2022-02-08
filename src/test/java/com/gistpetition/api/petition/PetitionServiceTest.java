@@ -95,6 +95,14 @@ public class PetitionServiceTest extends ServiceTest {
     }
 
     @Test
+    void agreeNotExistingPetition() {
+        Long petitionId = Long.MAX_VALUE;
+        assertThatThrownBy(
+                () -> petitionService.agree(AGREEMENT_REQUEST, petitionId, petitionOwner.getId())
+        ).isInstanceOf(NoSuchPetitionException.class);
+    }
+
+    @Test
     void numberOfAgreements() {
         Long petitionId = petitionService.createPetition(PETITION_REQUEST_DTO, petitionOwner.getId());
 

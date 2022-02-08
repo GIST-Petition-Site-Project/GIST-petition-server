@@ -48,6 +48,4 @@ class PetitionTest {
         petition.applyAgreement(user3, AGREEMENT_REQUEST.getContent());
         Assertions.assertThat(petition.getAgreements()).hasSize(3);
     }
-
-
 }
