@@ -45,13 +45,13 @@ public class Petition extends BaseEntity {
         this.userId = userId;
     }
 
-    public boolean applyAgreement(User user) {
+    public boolean applyAgreement(User user, String description) {
         for (Agreement agreement : agreements) {
             if (agreement.isAgreedBy(user.getId())) {
                 throw new DuplicatedAgreementException();
             }
         }
-        this.agreements.add(new Agreement(user.getId()));
+        this.agreements.add(new Agreement(user.getId(), description));
         return true;
     }
 

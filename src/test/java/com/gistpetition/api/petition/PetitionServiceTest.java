@@ -4,6 +4,7 @@ import com.gistpetition.api.ServiceTest;
 import com.gistpetition.api.exception.petition.NoSuchPetitionException;
 import com.gistpetition.api.petition.application.PetitionService;
 import com.gistpetition.api.petition.domain.*;
+import com.gistpetition.api.petition.dto.AgreementRequest;
 import com.gistpetition.api.petition.dto.PetitionRequest;
 import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRepository;
@@ -23,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PetitionServiceTest extends ServiceTest {
     private static final PetitionRequest PETITION_REQUEST_DTO = new PetitionRequest("title", "description", 1L);
+    private static final AgreementRequest AGREEMENT_REQUEST = new AgreementRequest("동의합니다.");
     @Autowired
     private PetitionService petitionService;
     @Autowired
@@ -86,9 +88,10 @@ public class PetitionServiceTest extends ServiceTest {
         Petition petition = petitionRepository.findPetitionByWithEagerMode(petitionId);
         Assertions.assertThat(petition.getAgreements()).hasSize(0);
 
-        petitionService.agree(petitionId, petitionOwner.getId());
+        petitionService.agree(AGREEMENT_REQUEST, petitionId, petitionOwner.getId());
         petition = petitionRepository.findPetitionByWithEagerMode(petitionId);
-        Assertions.assertThat(petition.getAgreements()).hasSize(1);
+        assertThat(petition.getAgreements()).hasSize(1);
+        assertThat(petition.getAgreements().get(0).getDescription()).isEqualTo(AGREEMENT_REQUEST.getContent());
     }
 
     @Test
@@ -100,9 +103,9 @@ public class PetitionServiceTest extends ServiceTest {
 
         assertThat(petitionService.getNumberOfAgreements(petitionId)).isEqualTo(0);
 
-        petitionService.agree(petitionId, petitionOwner.getId());
-        petitionService.agree(petitionId, user.getId());
-        petitionService.agree(petitionId, user3.getId());
+        petitionService.agree(AGREEMENT_REQUEST,petitionId, petitionOwner.getId());
+        petitionService.agree(AGREEMENT_REQUEST,petitionId, user.getId());
+        petitionService.agree(AGREEMENT_REQUEST,petitionId, user3.getId());
 
         assertThat(petitionService.getNumberOfAgreements(petitionId)).isEqualTo(3);
     }
@@ -112,7 +115,7 @@ public class PetitionServiceTest extends ServiceTest {
         Long petitionId = petitionService.createPetition(PETITION_REQUEST_DTO, petitionOwner.getId());
         assertThat(petitionService.getStateOfAgreement(petitionId, petitionOwner.getId())).isFalse();
 
-        petitionService.agree(petitionId, petitionOwner.getId());
+        petitionService.agree(AGREEMENT_REQUEST, petitionId, petitionOwner.getId());
 
         assertThat(petitionService.getStateOfAgreement(petitionId, petitionOwner.getId())).isTrue();
         Agreement agreement = agreementRepository.findByUserId(petitionOwner.getId()).orElseThrow(IllegalArgumentException::new);

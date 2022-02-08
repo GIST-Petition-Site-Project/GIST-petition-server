@@ -6,6 +6,7 @@ import com.gistpetition.api.exception.user.NoSuchUserException;
 import com.gistpetition.api.petition.domain.Category;
 import com.gistpetition.api.petition.domain.Petition;
 import com.gistpetition.api.petition.domain.PetitionRepository;
+import com.gistpetition.api.petition.dto.AgreementRequest;
 import com.gistpetition.api.petition.dto.PetitionPreviewResponse;
 import com.gistpetition.api.petition.dto.PetitionRequest;
 import com.gistpetition.api.petition.dto.PetitionResponse;
@@ -85,10 +86,10 @@ public class PetitionService {
     }
 
     @Transactional
-    public Boolean agree(Long petitionId, Long userId) {
+    public Boolean agree(AgreementRequest request, Long petitionId,  Long userId) {
         Petition petition = findPetitionById(petitionId);
         User user = findUserById(userId);
-        return petition.applyAgreement(user);
+        return petition.applyAgreement(user, request.getContent());
     }
 
     @Transactional(readOnly = true)

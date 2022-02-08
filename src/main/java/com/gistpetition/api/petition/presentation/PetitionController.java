@@ -5,6 +5,7 @@ import com.gistpetition.api.config.annotation.LoginUser;
 import com.gistpetition.api.config.annotation.ManagerPermissionRequired;
 import com.gistpetition.api.petition.application.PetitionService;
 import com.gistpetition.api.petition.domain.Petition;
+import com.gistpetition.api.petition.dto.AgreementRequest;
 import com.gistpetition.api.petition.dto.PetitionPreviewResponse;
 import com.gistpetition.api.petition.dto.PetitionRequest;
 import com.gistpetition.api.petition.dto.PetitionResponse;
@@ -85,9 +86,10 @@ public class PetitionController {
 
     @LoginRequired
     @PostMapping("/petitions/{petitionId}/agreements")
-    public ResponseEntity<Boolean> agreePetition(@PathVariable Long petitionId,
+    public ResponseEntity<Boolean> agreePetition(@RequestBody AgreementRequest agreementRequest,
+                                                 @PathVariable Long petitionId,
                                                  @LoginUser SimpleUser simpleUser) {
-        return ResponseEntity.ok().body(petitionService.agree(petitionId, simpleUser.getId()));
+        return ResponseEntity.ok().body(petitionService.agree(agreementRequest, petitionId, simpleUser.getId()));
     }
 
     @GetMapping("/petitions/{petitionId}/agreements")
