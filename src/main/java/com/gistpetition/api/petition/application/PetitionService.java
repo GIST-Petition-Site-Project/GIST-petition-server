@@ -6,10 +6,7 @@ import com.gistpetition.api.exception.user.NoSuchUserException;
 import com.gistpetition.api.petition.domain.Category;
 import com.gistpetition.api.petition.domain.Petition;
 import com.gistpetition.api.petition.domain.PetitionRepository;
-import com.gistpetition.api.petition.dto.AgreementRequest;
-import com.gistpetition.api.petition.dto.PetitionPreviewResponse;
-import com.gistpetition.api.petition.dto.PetitionRequest;
-import com.gistpetition.api.petition.dto.PetitionResponse;
+import com.gistpetition.api.petition.dto.*;
 import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRepository;
 import lombok.AllArgsConstructor;
@@ -90,6 +87,12 @@ public class PetitionService {
         Petition petition = findPetitionById(petitionId);
         User user = findUserById(userId);
         return petition.applyAgreement(user, request.getContent());
+    }
+
+    @Transactional(readOnly = true)
+    public List<AgreementResponse> getAllOfAgreements(Long petitionId) {
+        Petition petition = findPetitionById(petitionId);
+        return AgreementResponse.listOf(petition.getAgreements());
     }
 
     @Transactional(readOnly = true)

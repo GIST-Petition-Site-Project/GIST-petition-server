@@ -5,10 +5,7 @@ import com.gistpetition.api.config.annotation.LoginUser;
 import com.gistpetition.api.config.annotation.ManagerPermissionRequired;
 import com.gistpetition.api.petition.application.PetitionService;
 import com.gistpetition.api.petition.domain.Petition;
-import com.gistpetition.api.petition.dto.AgreementRequest;
-import com.gistpetition.api.petition.dto.PetitionPreviewResponse;
-import com.gistpetition.api.petition.dto.PetitionRequest;
-import com.gistpetition.api.petition.dto.PetitionResponse;
+import com.gistpetition.api.petition.dto.*;
 import com.gistpetition.api.user.domain.SimpleUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -91,6 +88,12 @@ public class PetitionController {
                                                  @LoginUser SimpleUser simpleUser) {
         return ResponseEntity.ok().body(petitionService.agree(agreementRequest, petitionId, simpleUser.getId()));
     }
+
+    @GetMapping("/petitions/{petitionId}/agreements")
+    public ResponseEntity<List<AgreementResponse>> getAllOfAgreements(@PathVariable Long petitionId) {
+        return ResponseEntity.ok().body(petitionService.getAllOfAgreements(petitionId));
+    }
+
 
     @GetMapping("/petitions/{petitionId}/agreements/number")
     public ResponseEntity<Integer> getNumberOfAgreement(@PathVariable Long petitionId) {

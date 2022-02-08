@@ -5,6 +5,7 @@ import com.gistpetition.api.exception.petition.NoSuchPetitionException;
 import com.gistpetition.api.petition.application.PetitionService;
 import com.gistpetition.api.petition.domain.*;
 import com.gistpetition.api.petition.dto.AgreementRequest;
+import com.gistpetition.api.petition.dto.AgreementResponse;
 import com.gistpetition.api.petition.dto.PetitionRequest;
 import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRepository;
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -100,6 +102,21 @@ public class PetitionServiceTest extends ServiceTest {
         assertThatThrownBy(
                 () -> petitionService.agree(AGREEMENT_REQUEST, petitionId, petitionOwner.getId())
         ).isInstanceOf(NoSuchPetitionException.class);
+    }
+
+    @Test
+    void getAllAgreements() {
+        Long petitionId = petitionService.createPetition(PETITION_REQUEST_DTO, petitionOwner.getId());
+
+        User user1 = userRepository.save(new User("user1@email.com", "password", UserRole.USER));
+        User user2 = userRepository.save(new User("user2@email.com", "password", UserRole.USER));
+
+        petitionService.agree(AGREEMENT_REQUEST, petitionId, petitionOwner.getId());
+        petitionService.agree(AGREEMENT_REQUEST, petitionId, user1.getId());
+        petitionService.agree(AGREEMENT_REQUEST, petitionId, user2.getId());
+
+        List<AgreementResponse> allOfAgreements = petitionService.getAllOfAgreements(petitionId);
+        assertThat(allOfAgreements).hasSize(3);
     }
 
     @Test
