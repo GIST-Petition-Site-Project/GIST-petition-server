@@ -51,7 +51,7 @@ public enum TUser {
                 body(verificationEmailRequest).
                 when().
                 post("/v1/sign-up/verifications").
-                then().log().all().
+                then().
                 statusCode(HttpStatus.NO_CONTENT.value());
         String verificationCode = FixedVerificationCodeGenerator.FIXED_VERIFICATION_CODE;
 
@@ -61,7 +61,7 @@ public enum TUser {
                 body(usernameConfirmationRequest).
                 when().
                 post("/v1/sign-up/confirm").
-                then().log().all().
+                then().
                 statusCode(HttpStatus.NO_CONTENT.value());
 
         SignUpRequest signUpRequest = new SignUpRequest(username, password, verificationCode);
@@ -70,7 +70,7 @@ public enum TUser {
                 body(signUpRequest).
                 when().
                 post("/v1/users").
-                then().log().all().
+                then().
                 statusCode(HttpStatus.CREATED.value()).
                 header(HttpHeaders.LOCATION, containsString("/users/")).
                 extract().header(HttpHeaders.LOCATION);
@@ -84,7 +84,7 @@ public enum TUser {
                 body(signInRequest).
                 when().
                 post("/v1/login").
-                then().log().all().
+                then().
                 statusCode(HttpStatus.NO_CONTENT.value()).extract().response();
         this.jSessionId = login.cookie("JSESSIONID");
     }

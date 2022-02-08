@@ -23,7 +23,7 @@ public class LoginAndThenAct {
                 body(petitionRequest).
                 when().
                 post("/v1/petitions").
-                then().log().all().
+                then().
                 statusCode(HttpStatus.CREATED.value()).extract().response();
     }
 
@@ -35,7 +35,7 @@ public class LoginAndThenAct {
                 body(updateUserRoleRequest).
                 when().
                 put("/v1/users/" + target.getId() + "/userRole").
-                then().log().all().
+                then().
                 statusCode(HttpStatus.NO_CONTENT.value()).extract().response();
     }
 }
