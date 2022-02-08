@@ -1,4 +1,4 @@
-package com.gistpetition.api.acceptance.common;
+package com.gistpetition.api;
 
 import com.gistpetition.api.verification.application.VerificationCodeGenerator;
 import org.springframework.context.annotation.Profile;
