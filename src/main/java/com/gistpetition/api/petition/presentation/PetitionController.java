@@ -92,7 +92,7 @@ public class PetitionController {
         return ResponseEntity.ok().body(petitionService.agree(agreementRequest, petitionId, simpleUser.getId()));
     }
 
-    @GetMapping("/petitions/{petitionId}/agreements")
+    @GetMapping("/petitions/{petitionId}/agreements/number")
     public ResponseEntity<Integer> getNumberOfAgreement(@PathVariable Long petitionId) {
         return ResponseEntity.ok().body(petitionService.getNumberOfAgreements(petitionId));
     }
