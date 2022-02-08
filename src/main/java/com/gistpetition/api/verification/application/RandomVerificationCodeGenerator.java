@@ -1,9 +1,11 @@
 package com.gistpetition.api.verification.application;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.Random;
 
+@Profile("dev || prod")
 @Component
 public class RandomVerificationCodeGenerator implements VerificationCodeGenerator {
     private final Random random = new Random();
