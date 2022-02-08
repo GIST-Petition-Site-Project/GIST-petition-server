@@ -1,6 +1,5 @@
 package com.gistpetition.api.acceptance.common;
 
-import com.gistpetition.api.user.domain.UserRole;
 import com.gistpetition.api.user.dto.request.SignInRequest;
 import com.gistpetition.api.user.dto.request.SignUpRequest;
 import com.gistpetition.api.verification.dto.UsernameConfirmationRequest;
@@ -14,22 +13,21 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
 
 public enum TUser {
-    ADMIN("testAdmin@gist.ac.kr", "admin", UserRole.ADMIN, "AAAAAA"),
-    MANAGER("testManager@gist.ac.kr", "manager", UserRole.MANAGER, "AAAAAA"),
-    NORMAL("testNormal@gist.ac.kr", "normal", UserRole.USER, "AAAAAA");
+    T_ADMIN("testAdmin@gist.ac.kr", "admin"),
+    GUNE("gune@gm.gist.ac.kr", "gune"),
+    EUNGI("handsomeGuy@gm.gist.ac.kr", "It's me!"),
+    WANNTE("wannte@gm.gist.ac.kr", "wannte"),
+    KOSE("kose@gist.ac.kr", "kose");
 
     private final String username;
     private final String password;
-    private final String verificationCode;
-    private final UserRole userRole;
+
     private Long id;
     private String jSessionId;
 
-    TUser(String username, String password, UserRole userRole, String verificationCode) {
+    TUser(String username, String password) {
         this.username = username;
         this.password = password;
-        this.userRole = userRole;
-        this.verificationCode = verificationCode;
         this.id = -1L;
         this.jSessionId = "";
     }
@@ -54,6 +52,7 @@ public enum TUser {
                 post("/v1/sign-up/verifications").
                 then().log().all().
                 statusCode(HttpStatus.NO_CONTENT.value());
+        String verificationCode = FixedVerificationCodeGenerator.FIXED_VERIFICATION_CODE;
 
         UsernameConfirmationRequest usernameConfirmationRequest = new UsernameConfirmationRequest(username, verificationCode);
         given().
@@ -86,7 +85,7 @@ public enum TUser {
                 post("/v1/login").
                 then().log().all().
                 statusCode(HttpStatus.NO_CONTENT.value()).extract().response();
-        jSessionId = login.cookie("JSESSIONID");
+        this.jSessionId = login.cookie("JSESSIONID");
     }
 
     public LoginAndThenAct doLoginAndThen() {
@@ -94,8 +93,12 @@ public enum TUser {
         return new LoginAndThenAct(this);
     }
 
-    public UserRole getUserRole() {
-        return this.userRole;
+    public String getUsername() {
+        return this.username;
+    }
+
+    public String getPassword() {
+        return this.password;
     }
 
     public Long getId() {
@@ -105,4 +108,5 @@ public enum TUser {
     public String getJSessionId() {
         return this.jSessionId;
     }
+
 }

@@ -4,8 +4,8 @@ import com.gistpetition.api.acceptance.common.TUser;
 import com.gistpetition.api.petition.domain.Category;
 import com.gistpetition.api.petition.domain.PetitionRepository;
 import com.gistpetition.api.petition.dto.PetitionRequest;
-import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRepository;
+import com.gistpetition.api.user.domain.UserRole;
 import com.gistpetition.api.verification.domain.SignUpVerificationInfoRepository;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
@@ -18,9 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 
-import static com.gistpetition.api.acceptance.common.FirstAdmin.FIRST_ADMIN;
-import static com.gistpetition.api.acceptance.common.TUser.MANAGER;
-import static com.gistpetition.api.acceptance.common.TUser.NORMAL;
+import static com.gistpetition.api.acceptance.common.TUser.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -44,10 +42,10 @@ public class CreatePetitionAcceptanceTest {
 
     @Test
     void createPetitionByNormal() {
-        NORMAL.doSignUp();
+        KOSE.doSignUp();
 
         PetitionRequest petitionRequest = new PetitionRequest("title", "description", Category.ACADEMIC.getId());
-        Response createPetition = NORMAL.doLoginAndThen().createPetition(petitionRequest);
+        Response createPetition = KOSE.doLoginAndThen().createPetition(petitionRequest);
 
         assertThat(createPetition.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(createPetition.header(HttpHeaders.LOCATION)).contains("/petitions/");
@@ -55,11 +53,11 @@ public class CreatePetitionAcceptanceTest {
 
     @Test
     void createPetitionByManager() {
-        MANAGER.doSignUp();
-        FIRST_ADMIN.login().updateUserRole(MANAGER);
+        WANNTE.doSignUp();
+        T_ADMIN.doLoginAndThen().updateUserRole(WANNTE, UserRole.MANAGER);
 
         PetitionRequest petitionRequest = new PetitionRequest("titleOver10Characters", "description", Category.ACADEMIC.getId());
-        Response createPetition = MANAGER.doLoginAndThen().createPetition(petitionRequest);
+        Response createPetition = WANNTE.doLoginAndThen().createPetition(petitionRequest);
 
         assertThat(createPetition.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         assertThat(createPetition.header(HttpHeaders.LOCATION)).contains("/petitions/");
@@ -68,7 +66,6 @@ public class CreatePetitionAcceptanceTest {
     @AfterEach
     void tearDown() {
         TUser.clearAll();
-        FIRST_ADMIN.clear();
         petitionRepository.deleteAllInBatch();
         userRepository.deleteAllInBatch();
     }
