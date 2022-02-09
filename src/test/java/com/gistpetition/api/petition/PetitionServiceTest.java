@@ -6,6 +6,7 @@ import com.gistpetition.api.petition.application.PetitionService;
 import com.gistpetition.api.petition.domain.*;
 import com.gistpetition.api.petition.dto.AgreementRequest;
 import com.gistpetition.api.petition.dto.AgreementResponse;
+import com.gistpetition.api.petition.dto.PetitionPreviewResponse;
 import com.gistpetition.api.petition.dto.PetitionRequest;
 import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRepository;
@@ -59,6 +60,34 @@ public class PetitionServiceTest extends ServiceTest {
     }
 
     @Test
+    void findPageOfPetitions() {
+        Long petitionId = petitionService.createPetition(PETITION_REQUEST_DTO, petitionOwner.getId());
+        Petition petition = petitionRepository.findById(petitionId).orElseThrow(IllegalArgumentException::new);
+        Long petition1 = petitionService.createPetition(PETITION_REQUEST_DTO, petitionOwner.getId());
+        Long petition2 = petitionService.createPetition(PETITION_REQUEST_DTO, petitionOwner.getId());
+
+        User user1 = userRepository.save(new User("user1@gm.gist.ac.kr", "password", UserRole.USER));
+        User user2 = userRepository.save(new User("user2@gm.gist.ac.kr", "password", UserRole.USER));
+
+        petitionService.agree(AGREEMENT_REQUEST, petitionId, petitionOwner.getId());
+        petitionService.agree(AGREEMENT_REQUEST, petitionId, user1.getId());
+        petitionService.agree(AGREEMENT_REQUEST, petitionId, user2.getId());
+
+        petitionService.agree(AGREEMENT_REQUEST, petition1, petitionOwner.getId());
+        petitionService.agree(AGREEMENT_REQUEST, petition1, user1.getId());
+        petitionService.agree(AGREEMENT_REQUEST, petition1, user2.getId());
+
+        petitionService.agree(AGREEMENT_REQUEST, petition2, petitionOwner.getId());
+        petitionService.agree(AGREEMENT_REQUEST, petition2, user1.getId());
+
+        Pageable pageable = PageRequest.of(0, 3, Sort.Direction.DESC, "createdAt");
+
+        Page<PetitionPreviewResponse> petitionPreviewResponses = petitionService.retrievePetition(pageable);
+        petitionPreviewResponses.forEach(s -> System.out.println("id: "+ s.getId() + "\n" + s.getTitle() + s.getAgreements()));
+        assertThat(petitionPreviewResponses).hasSize(3);
+    }
+
+    @Test
     void updatePetition() {
         Long petitionId = petitionService.createPetition(PETITION_REQUEST_DTO, petitionOwner.getId());
         Petition petition = petitionRepository.findById(petitionId).orElseThrow(IllegalArgumentException::new);
@@ -108,7 +137,7 @@ public class PetitionServiceTest extends ServiceTest {
     }
 
     @Test
-    void getAllAgreements() {
+    void getPageOfAgreements() {
         Long petitionId = petitionService.createPetition(PETITION_REQUEST_DTO, petitionOwner.getId());
 
         User user1 = userRepository.save(new User("user1@gm.gist.ac.kr", "password", UserRole.USER));
