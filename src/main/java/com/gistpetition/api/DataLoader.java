@@ -9,11 +9,13 @@ import com.gistpetition.api.user.domain.UserRole;
 import com.gistpetition.api.utils.password.BcryptEncoder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Profile("dev || prod")
 @RequiredArgsConstructor
 @Component
 public class DataLoader implements CommandLineRunner {
