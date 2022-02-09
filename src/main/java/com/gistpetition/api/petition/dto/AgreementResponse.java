@@ -3,6 +3,7 @@ package com.gistpetition.api.petition.dto;
 import com.gistpetition.api.petition.domain.Agreement;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,9 +22,7 @@ public class AgreementResponse {
         return new AgreementResponse(agreement.getDescription());
     }
 
-    public static List<AgreementResponse> listOf(List<Agreement> agreements) {
-        return agreements.stream()
-                .map(AgreementResponse::of)
-                .collect(Collectors.toList());
+    public static Page<AgreementResponse> pageOf(Page<Agreement> agreements) {
+        return agreements.map(AgreementResponse::of);
     }
 }

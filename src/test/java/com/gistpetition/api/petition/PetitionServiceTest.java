@@ -15,9 +15,12 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -97,7 +100,7 @@ public class PetitionServiceTest extends ServiceTest {
     }
 
     @Test
-    void agreeNotExistingPetition() {
+    void agreeNotExistingPetitionId() {
         Long petitionId = Long.MAX_VALUE;
         assertThatThrownBy(
                 () -> petitionService.agree(AGREEMENT_REQUEST, petitionId, petitionOwner.getId())
@@ -108,15 +111,20 @@ public class PetitionServiceTest extends ServiceTest {
     void getAllAgreements() {
         Long petitionId = petitionService.createPetition(PETITION_REQUEST_DTO, petitionOwner.getId());
 
-        User user1 = userRepository.save(new User("user1@email.com", "password", UserRole.USER));
-        User user2 = userRepository.save(new User("user2@email.com", "password", UserRole.USER));
+        User user1 = userRepository.save(new User("user1@gm.gist.ac.kr", "password", UserRole.USER));
+        User user2 = userRepository.save(new User("user2@gm.gist.ac.kr", "password", UserRole.USER));
 
         petitionService.agree(AGREEMENT_REQUEST, petitionId, petitionOwner.getId());
         petitionService.agree(AGREEMENT_REQUEST, petitionId, user1.getId());
         petitionService.agree(AGREEMENT_REQUEST, petitionId, user2.getId());
 
-        List<AgreementResponse> allOfAgreements = petitionService.getAllOfAgreements(petitionId);
+        Pageable pageable = PageRequest.of(0, 3, Sort.Direction.DESC, "createdAt");
+        Page<AgreementResponse> allOfAgreements = petitionService.getPageOfAgreements(pageable, petitionId);
         assertThat(allOfAgreements).hasSize(3);
+
+        Pageable pageableSizeAsTwo = PageRequest.of(0, 2, Sort.Direction.DESC, "createdAt");
+        Page<AgreementResponse> twoOfAgreements = petitionService.getPageOfAgreements(pageableSizeAsTwo, petitionId);
+        assertThat(twoOfAgreements).hasSize(2);
     }
 
     @Test
@@ -128,9 +136,9 @@ public class PetitionServiceTest extends ServiceTest {
 
         assertThat(petitionService.getNumberOfAgreements(petitionId)).isEqualTo(0);
 
-        petitionService.agree(AGREEMENT_REQUEST,petitionId, petitionOwner.getId());
-        petitionService.agree(AGREEMENT_REQUEST,petitionId, user.getId());
-        petitionService.agree(AGREEMENT_REQUEST,petitionId, user3.getId());
+        petitionService.agree(AGREEMENT_REQUEST, petitionId, petitionOwner.getId());
+        petitionService.agree(AGREEMENT_REQUEST, petitionId, user.getId());
+        petitionService.agree(AGREEMENT_REQUEST, petitionId, user3.getId());
 
         assertThat(petitionService.getNumberOfAgreements(petitionId)).isEqualTo(3);
     }

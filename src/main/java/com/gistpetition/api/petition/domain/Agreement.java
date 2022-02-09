@@ -16,17 +16,22 @@ public class Agreement extends UnmodifiableEntity {
     private String description;
     private Long userId;
 
+    @ManyToOne
+    @JoinColumn(name = "petition_id")
+    private Petition petition;
+
     protected Agreement() {
     }
 
-    public Agreement(Long userId, String description) {
-        this(null, description, userId);
+    public Agreement(Long userId, String description, Petition petition) {
+        this(null, description, userId, petition);
     }
 
-    private Agreement(Long id, String description, Long userId) {
+    private Agreement(Long id, String description, Long userId, Petition petition) {
         this.id = id;
         this.description = description;
         this.userId = userId;
+        this.petition = petition;
     }
 
     public boolean isAgreedBy(Long userId) {

@@ -3,9 +3,7 @@ package com.gistpetition.api.petition.application;
 
 import com.gistpetition.api.exception.petition.NoSuchPetitionException;
 import com.gistpetition.api.exception.user.NoSuchUserException;
-import com.gistpetition.api.petition.domain.Category;
-import com.gistpetition.api.petition.domain.Petition;
-import com.gistpetition.api.petition.domain.PetitionRepository;
+import com.gistpetition.api.petition.domain.*;
 import com.gistpetition.api.petition.dto.*;
 import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRepository;
@@ -24,6 +22,7 @@ import java.util.List;
 public class PetitionService {
 
     private final PetitionRepository petitionRepository;
+    private final AgreementRepository agreementRepository;
     private final UserRepository userRepository;
     private final ApplicationEventPublisher eventPublisher;
 
@@ -83,16 +82,16 @@ public class PetitionService {
     }
 
     @Transactional
-    public Boolean agree(AgreementRequest request, Long petitionId,  Long userId) {
+    public void agree(AgreementRequest request, Long petitionId,  Long userId) {
         Petition petition = findPetitionById(petitionId);
         User user = findUserById(userId);
-        return petition.applyAgreement(user, request.getContent());
+        petition.applyAgreement(user, request.getContent());
     }
 
     @Transactional(readOnly = true)
-    public List<AgreementResponse> getAllOfAgreements(Long petitionId) {
-        Petition petition = findPetitionById(petitionId);
-        return AgreementResponse.listOf(petition.getAgreements());
+    public Page<AgreementResponse> getPageOfAgreements(Pageable pageable, Long petitionId) {
+        Page<Agreement> agreements = agreementRepository.findAgreementsByPetitionId(pageable, petitionId);
+        return AgreementResponse.pageOf(agreements);
     }
 
     @Transactional(readOnly = true)

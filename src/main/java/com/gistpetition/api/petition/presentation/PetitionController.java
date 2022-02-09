@@ -83,15 +83,17 @@ public class PetitionController {
 
     @LoginRequired
     @PostMapping("/petitions/{petitionId}/agreements")
-    public ResponseEntity<Boolean> agreePetition(@RequestBody AgreementRequest agreementRequest,
+    public ResponseEntity<Void> agreePetition(@RequestBody AgreementRequest agreementRequest,
                                                  @PathVariable Long petitionId,
                                                  @LoginUser SimpleUser simpleUser) {
-        return ResponseEntity.ok().body(petitionService.agree(agreementRequest, petitionId, simpleUser.getId()));
+        petitionService.agree(agreementRequest, petitionId, simpleUser.getId());
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/petitions/{petitionId}/agreements")
-    public ResponseEntity<List<AgreementResponse>> getAllOfAgreements(@PathVariable Long petitionId) {
-        return ResponseEntity.ok().body(petitionService.getAllOfAgreements(petitionId));
+    public ResponseEntity<Page<AgreementResponse>> getPagefAgreements(@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+                                                                      @PathVariable Long petitionId) {
+        return ResponseEntity.ok().body(petitionService.getPageOfAgreements(pageable, petitionId));
     }
 
 
