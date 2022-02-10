@@ -13,6 +13,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 
@@ -135,6 +137,16 @@ public class PetitionServiceTest extends ServiceTest {
         assertThatThrownBy(
                 () -> petitionService.deletePetition(Long.MAX_VALUE)
         ).isInstanceOf(NoSuchPetitionException.class);
+    }
+
+    @Test
+    void retrieveAnsweredPetition() {
+        Petition petition = new Petition("title", "desc", Category.DORMITORY, petitionOwner.getId());
+        petition.setAnswered(true);
+        petitionRepository.save(petition);
+
+        Pageable pageable = PageRequest.of(0, 10);
+        assertThat(petitionService.retrieveAnsweredPetition(pageable).getContent()).hasSize(1);
     }
 
     @AfterEach

@@ -52,13 +52,18 @@ public class PetitionService {
     }
 
     @Transactional(readOnly = true)
-    public Page<PetitionPreviewResponse> retrievePetitionsByUserId(Long user_id, Pageable pageable) {
-        return PetitionPreviewResponse.pageOf(petitionRepository.findByUserId(user_id, pageable));
+    public Page<PetitionPreviewResponse> retrievePetitionsByUserId(Long userId, Pageable pageable) {
+        return PetitionPreviewResponse.pageOf(petitionRepository.findByUserId(userId, pageable));
     }
 
     @Transactional(readOnly = true)
     public PetitionResponse retrievePetitionById(Long petitionId) {
         return PetitionResponse.of(findPetitionById(petitionId));
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PetitionPreviewResponse> retrieveAnsweredPetition(Pageable pageable) {
+        return PetitionPreviewResponse.pageOf(petitionRepository.findByAnsweredTrue(pageable));
     }
 
     @Transactional(readOnly = true)
