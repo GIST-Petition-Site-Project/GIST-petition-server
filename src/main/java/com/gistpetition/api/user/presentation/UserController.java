@@ -6,6 +6,7 @@ import com.gistpetition.api.config.annotation.LoginUser;
 import com.gistpetition.api.user.application.LoginService;
 import com.gistpetition.api.user.application.UserService;
 import com.gistpetition.api.user.domain.SimpleUser;
+import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.dto.request.*;
 import com.gistpetition.api.user.dto.response.UserResponse;
 import lombok.AllArgsConstructor;
@@ -44,14 +45,14 @@ public class UserController {
 
     @AdminPermissionRequired
     @GetMapping("/users")
-    public ResponseEntity<List<UserResponse>> retrieveAllUsers() {
-        return ResponseEntity.ok().body(UserResponse.listOf(userService.findAllUsers()));
+    public ResponseEntity<List<User>> retrieveAllUsers() {
+        return ResponseEntity.ok().body(userService.findAllUsers());
     }
 
     @AdminPermissionRequired
     @GetMapping("/users/{userId}")
-    public ResponseEntity<UserResponse> retrieveUser(@PathVariable Long userId) {
-        return ResponseEntity.ok().body(UserResponse.of(userService.findUserById(userId)));
+    public ResponseEntity<User> retrieveUser(@PathVariable Long userId) {
+        return ResponseEntity.ok().body(userService.findUserById(userId));
     }
 
     @LoginRequired
@@ -59,7 +60,6 @@ public class UserController {
     public ResponseEntity<UserResponse> retrieveUserOfMine(@LoginUser SimpleUser simpleUser) {
         return ResponseEntity.ok().body(UserResponse.of(userService.findUserById(simpleUser.getId())));
     }
-
 
     @AdminPermissionRequired
     @PutMapping("/users/{userId}/userRole")
