@@ -23,8 +23,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.history.RevisionMetadata;
 
 import javax.servlet.http.HttpSession;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -172,7 +175,19 @@ class AnswerServiceTest extends ServiceTest {
         Pageable pageable = PageRequest.of(0, 10);
         Page<AnswerRevisionResponse> answerRevisionResponses = answerService.retrieveRevisionsOfAnswer(answerId, pageable);
 
-        assertThat(answerRevisionResponses.getContent()).hasSize(3);
+        List<AnswerRevisionResponse> revisionResponses = answerRevisionResponses.getContent();
+        assertThat(revisionResponses).hasSize(3);
+
+        List<RevisionMetadata.RevisionType> revisionTypes = extractRevisionType(revisionResponses);
+        assertThat(revisionTypes).containsSequence(
+                RevisionMetadata.RevisionType.INSERT,
+                RevisionMetadata.RevisionType.UPDATE,
+                RevisionMetadata.RevisionType.DELETE
+        );
+    }
+
+    private List<RevisionMetadata.RevisionType> extractRevisionType(List<AnswerRevisionResponse> revisionResponses) {
+        return revisionResponses.stream().map(AnswerRevisionResponse::getRevisionType).collect(Collectors.toList());
     }
 
     @AfterEach
