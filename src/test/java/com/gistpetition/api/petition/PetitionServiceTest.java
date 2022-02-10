@@ -57,8 +57,8 @@ public class PetitionServiceTest extends ServiceTest {
         Petition petition = petitionRepository.findById(petitionId).orElseThrow(IllegalArgumentException::new);
 
         LocalDateTime initialTime = petition.getUpdatedAt();
-
-        petitionService.updatePetitionDescription(petition.getId(), "updated");
+        PetitionRequest petitionUpdateRequest = new PetitionRequest("updateTitle", "updateDescription", 2L);
+        petitionService.updatePetition(petition.getId(), petitionUpdateRequest);
 
         Petition updatedPetition = petitionRepository.findById(petitionId).orElseThrow(IllegalArgumentException::new);
         LocalDateTime updatedTime = updatedPetition.getUpdatedAt();
@@ -72,7 +72,9 @@ public class PetitionServiceTest extends ServiceTest {
 
         LocalDateTime initialTime = petition.getUpdatedAt();
 
-        assertThatThrownBy(() -> petitionService.updatePetitionDescription(Long.MAX_VALUE, "updated")).isInstanceOf(NoSuchPetitionException.class);
+        PetitionRequest petitionUpdateRequest = new PetitionRequest("updateTitle", "updateDescription", 2L);
+
+        assertThatThrownBy(() -> petitionService.updatePetition(Long.MAX_VALUE, petitionUpdateRequest)).isInstanceOf(NoSuchPetitionException.class);
 
         Petition updatedPetition = petitionRepository.findById(petitionId).orElseThrow(IllegalArgumentException::new);
         LocalDateTime updatedTime = updatedPetition.getUpdatedAt();

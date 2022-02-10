@@ -4,7 +4,6 @@ import com.gistpetition.api.config.annotation.LoginRequired;
 import com.gistpetition.api.config.annotation.LoginUser;
 import com.gistpetition.api.config.annotation.ManagerPermissionRequired;
 import com.gistpetition.api.petition.application.PetitionService;
-import com.gistpetition.api.petition.domain.Petition;
 import com.gistpetition.api.petition.dto.PetitionPreviewResponse;
 import com.gistpetition.api.petition.dto.PetitionRequest;
 import com.gistpetition.api.petition.dto.PetitionResponse;
@@ -19,7 +18,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -60,7 +58,7 @@ public class PetitionController {
     @LoginRequired
     @GetMapping("/petitions/me")
     public ResponseEntity<Page<PetitionPreviewResponse>> retrievePetitionsByUserId(@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable, @LoginUser SimpleUser simpleUser) {
-        return ResponseEntity.ok().body(petitionService.retrievePetitionsByUserId(simpleUser.getId(),pageable));
+        return ResponseEntity.ok().body(petitionService.retrievePetitionsByUserId(simpleUser.getId(), pageable));
     }
 
     @GetMapping("/petitions/count")
@@ -72,7 +70,7 @@ public class PetitionController {
     @PutMapping("/petitions/{petitionId}")
     public ResponseEntity<Void> updatePetition(@PathVariable Long petitionId,
                                                @Validated @RequestBody PetitionRequest changeRequest) {
-        petitionService.updatePetitionDescription(petitionId, changeRequest.getDescription());
+        petitionService.updatePetition(petitionId, changeRequest);
         return ResponseEntity.noContent().build();
     }
 
