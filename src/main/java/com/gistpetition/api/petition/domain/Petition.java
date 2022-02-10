@@ -4,11 +4,15 @@ import com.gistpetition.api.common.persistence.BaseEntity;
 import com.gistpetition.api.exception.petition.DuplicatedAgreementException;
 import com.gistpetition.api.user.domain.User;
 import lombok.Getter;
+import org.hibernate.envers.Audited;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
+
+@Audited
 @Getter
 @Entity
 public class Petition extends BaseEntity {
@@ -24,6 +28,7 @@ public class Petition extends BaseEntity {
     private boolean answered;
     private int accepted;
     private Long userId;
+    @Audited(targetAuditMode = NOT_AUDITED)
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "petition_id")
     private final List<Agreement> agreements = new ArrayList<>();

@@ -9,6 +9,7 @@ import com.gistpetition.api.petition.domain.PetitionRepository;
 import com.gistpetition.api.petition.dto.PetitionPreviewResponse;
 import com.gistpetition.api.petition.dto.PetitionRequest;
 import com.gistpetition.api.petition.dto.PetitionResponse;
+import com.gistpetition.api.petition.dto.PetitionRevisionResponse;
 import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRepository;
 import lombok.AllArgsConstructor;
@@ -64,6 +65,11 @@ public class PetitionService {
     @Transactional(readOnly = true)
     public Page<PetitionPreviewResponse> retrieveAnsweredPetition(Pageable pageable) {
         return PetitionPreviewResponse.pageOf(petitionRepository.findByAnsweredTrue(pageable));
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PetitionRevisionResponse> retrieveRevisionsOfPetition(Long petitionId, Pageable pageable) {
+        return PetitionRevisionResponse.pageOf(petitionRepository.findRevisions(petitionId, pageable));
     }
 
     @Transactional(readOnly = true)
