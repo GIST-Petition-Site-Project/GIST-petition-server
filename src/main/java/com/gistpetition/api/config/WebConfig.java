@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -34,6 +35,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedOrigins(origins)
                 .allowedMethods("*")
                 .allowedHeaders("*")
+                .exposedHeaders(HttpHeaders.LOCATION)
                 .allowCredentials(true);
     }
 
