@@ -70,7 +70,6 @@ class AnswerServiceTest extends ServiceTest {
         Answer answer = answerRepository.findById(savedAnswer).orElseThrow(() -> new WrappedException("존재하지 않는 answer입니다.", null));
         assertThat(answer.getId()).isEqualTo(savedAnswer);
         assertThat(answer.getContent()).isEqualTo(ANSWER_REQUEST.getContent());
-        assertThat(answer.getCreatedBy()).isEqualTo(manager.getId());
         assertThat(answer.getPetitionId()).isEqualTo(savedPetition.getId());
 
         Petition petition = petitionRepository.findById(savedPetition.getId()).orElseThrow(NoSuchPetitionException::new);
@@ -118,7 +117,6 @@ class AnswerServiceTest extends ServiceTest {
         Answer updatedAnswer = answerRepository.findByPetitionId(savedPetition.getId()).orElseThrow(() -> new WrappedException("", null));
 
         assertThat(answer.getId()).isEqualTo(updatedAnswer.getId());
-        assertThat(answer.getModifiedBy()).isEqualTo(manager.getId());
         assertThat(updatedAnswer.getContent()).isEqualTo(UPDATE_REQUEST.getContent());
     }
 

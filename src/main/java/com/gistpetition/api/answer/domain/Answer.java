@@ -3,8 +3,6 @@ package com.gistpetition.api.answer.domain;
 import com.gistpetition.api.common.persistence.BaseEntity;
 import lombok.Getter;
 import org.hibernate.envers.Audited;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.LastModifiedBy;
 
 import javax.persistence.*;
 
@@ -18,10 +16,6 @@ public class Answer extends BaseEntity {
     @Lob
     private String content;
     private Long petitionId;
-    @CreatedBy
-    private Long createdBy;
-    @LastModifiedBy
-    private Long modifiedBy;
 
     protected Answer() {
     }
