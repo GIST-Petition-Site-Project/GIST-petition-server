@@ -31,7 +31,7 @@ public class PetitionService {
         return petitionRepository.save(
                 new Petition(petitionRequest.getTitle(),
                         petitionRequest.getDescription(),
-                        Category.getById(petitionRequest.getCategoryId()),
+                        Category.of(petitionRequest.getCategoryId()),
                         userId)
         ).getId();
     }
@@ -43,7 +43,7 @@ public class PetitionService {
 
     @Transactional(readOnly = true)
     public Page<PetitionPreviewResponse> retrievePetitionByCategoryId(Long categoryId, Pageable pageable) {
-        return PetitionPreviewResponse.pageOf(petitionRepository.findByCategory(Category.getById(categoryId), pageable));
+        return PetitionPreviewResponse.pageOf(petitionRepository.findByCategory(Category.of(categoryId), pageable));
     }
 
     @Transactional(readOnly = true)
@@ -70,7 +70,7 @@ public class PetitionService {
     public void updatePetition(Long petitionId, PetitionRequest petitionRequest) {
         Petition petition = findPetitionById(petitionId);
         petition.setTitle(petitionRequest.getTitle());
-        petition.setCategory(Category.getById(petitionRequest.getCategoryId()));
+        petition.setCategory(Category.of(petitionRequest.getCategoryId()));
         petition.setDescription(petitionRequest.getDescription());
     }
 

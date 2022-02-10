@@ -1,8 +1,6 @@
-package com.gistpetition.api.petition;
+package com.gistpetition.api.petition.domain;
 
 import com.gistpetition.api.exception.petition.DuplicatedAgreementException;
-import com.gistpetition.api.petition.domain.Category;
-import com.gistpetition.api.petition.domain.Petition;
 import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRole;
 import org.assertj.core.api.Assertions;

@@ -64,7 +64,7 @@ public class PetitionServiceTest extends ServiceTest {
 
         assertThat(updatedPetition.getTitle()).isEqualTo(updateRequest.getTitle());
         assertThat(updatedPetition.getDescription()).isEqualTo(updateRequest.getDescription());
-        assertThat(updatedPetition.getCategory()).isEqualTo(Category.getById(updateRequest.getCategoryId()));
+        assertThat(updatedPetition.getCategory()).isEqualTo(Category.of(updateRequest.getCategoryId()));
         assertTrue(updatedPetition.getUpdatedAt().isAfter(initialTime));
     }
 
