@@ -34,11 +34,11 @@ public enum Category {
         return name;
     }
 
-    public static Category getById(Long id) {
-        if (id < 0L || values().length < id) {
+    public static Category of(Long categoryId) {
+        if (!lookup.containsKey(categoryId)) {
             throw new NoSuchCategoryException();
         }
-        return lookup.get(id);
+        return lookup.get(categoryId);
     }
 
     private static final Map<Long, Category> lookup = new HashMap<>();

@@ -15,11 +15,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -34,7 +31,7 @@ public class PetitionService {
         return petitionRepository.save(
                 new Petition(petitionRequest.getTitle(),
                         petitionRequest.getDescription(),
-                        Category.getById(petitionRequest.getCategoryId()),
+                        Category.of(petitionRequest.getCategoryId()),
                         userId)
         ).getId();
     }
@@ -46,7 +43,7 @@ public class PetitionService {
 
     @Transactional(readOnly = true)
     public Page<PetitionPreviewResponse> retrievePetitionByCategoryId(Long categoryId, Pageable pageable) {
-        return PetitionPreviewResponse.pageOf(petitionRepository.findByCategory(Category.getById(categoryId), pageable));
+        return PetitionPreviewResponse.pageOf(petitionRepository.findByCategory(Category.of(categoryId), pageable));
     }
 
     @Transactional(readOnly = true)
@@ -55,8 +52,8 @@ public class PetitionService {
     }
 
     @Transactional(readOnly = true)
-    public Page<PetitionPreviewResponse> retrievePetitionsByUserId(Long user_id,Pageable pageable) {
-        return PetitionPreviewResponse.pageOf(petitionRepository.findByUserId(user_id,pageable));
+    public Page<PetitionPreviewResponse> retrievePetitionsByUserId(Long user_id, Pageable pageable) {
+        return PetitionPreviewResponse.pageOf(petitionRepository.findByUserId(user_id, pageable));
     }
 
     @Transactional(readOnly = true)
@@ -70,9 +67,11 @@ public class PetitionService {
     }
 
     @Transactional
-    public void updatePetitionDescription(Long petitionId, String description) {
+    public void updatePetition(Long petitionId, PetitionRequest petitionRequest) {
         Petition petition = findPetitionById(petitionId);
-        petition.setDescription(description);
+        petition.setTitle(petitionRequest.getTitle());
+        petition.setCategory(Category.of(petitionRequest.getCategoryId()));
+        petition.setDescription(petitionRequest.getDescription());
     }
 
     @Transactional

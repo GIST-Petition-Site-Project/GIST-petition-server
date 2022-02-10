@@ -68,6 +68,14 @@ public class Petition extends BaseEntity {
         this.answered = b;
     }
 
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
     public void setDescription(String description) {
         this.description = description;
     }
