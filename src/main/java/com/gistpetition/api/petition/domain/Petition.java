@@ -21,38 +21,45 @@ public class Petition extends BaseEntity {
     private String description;
     @Enumerated(EnumType.STRING)
     private Category category;
-    private boolean answered;
-    private int accepted;
+    private Boolean answered;
+    private Boolean exposed;
     private Long userId;
+    private Long agreeCount = 0L;
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "petition_id")
     private final List<Agreement> agreements = new ArrayList<>();
+
+    public static final Long REQUIRED_AGREEMENT_NUM = 5L;
 
     protected Petition() {
     }
 
     public Petition(String title, String description, Category category, Long userId) {
-        this(null, title, description, category, false, 0, userId);
+        this(null, title, description, category, false, false, userId);
     }
 
-    private Petition(Long id, String title, String description, Category category, boolean answered, int accepted, Long userId) {
+    public Petition(Long id, String title, String description, Category category, Boolean answered, Boolean exposed, Long userId) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.category = category;
         this.answered = answered;
-        this.accepted = accepted;
+        this.exposed = exposed;
         this.userId = userId;
     }
 
-    public boolean applyAgreement(User user) {
+    public void applyAgreement(User user) {
         for (Agreement agreement : agreements) {
             if (agreement.isAgreedBy(user.getId())) {
                 throw new DuplicatedAgreementException();
             }
         }
         this.agreements.add(new Agreement(user.getId()));
-        return true;
+        agreeCount += 1;
+    }
+
+    public boolean isAnswered() {
+        return answered;
     }
 
     public boolean isAgreedBy(User user) {
@@ -78,5 +85,9 @@ public class Petition extends BaseEntity {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public void setExposed(boolean b) {
+        this.exposed = b;
     }
 }

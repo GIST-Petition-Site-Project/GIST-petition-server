@@ -18,6 +18,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.gistpetition.api.petition.domain.Petition.REQUIRED_AGREEMENT_NUM;
+
 @Service
 @AllArgsConstructor
 public class PetitionService {
@@ -67,6 +69,18 @@ public class PetitionService {
     }
 
     @Transactional(readOnly = true)
+    public Page<PetitionPreviewResponse> retrievePetitionToCheck(Pageable pageable) {
+        Page<Petition> petitions = petitionRepository.findPetitionByAgreeCountIsGreaterThanEqual(REQUIRED_AGREEMENT_NUM, pageable);
+        return PetitionPreviewResponse.pageOf(petitions);
+    }
+
+    @Transactional
+    public void exposePetition(Long petitionId) {
+        Petition petition = findPetitionById(petitionId);
+        petition.setExposed(true);
+    }
+
+    @Transactional(readOnly = true)
     public Long getPetitionCount() {
         return petitionRepository.count();
     }
@@ -89,10 +103,10 @@ public class PetitionService {
     }
 
     @Transactional
-    public Boolean agree(Long petitionId, Long userId) {
+    public void agree(Long petitionId, Long userId) {
         Petition petition = findPetitionById(petitionId);
         User user = findUserById(userId);
-        return petition.applyAgreement(user);
+        petition.applyAgreement(user);
     }
 
     @Transactional(readOnly = true)

@@ -4,6 +4,7 @@ import com.gistpetition.api.ServiceTest;
 import com.gistpetition.api.exception.petition.NoSuchPetitionException;
 import com.gistpetition.api.petition.application.PetitionService;
 import com.gistpetition.api.petition.domain.*;
+import com.gistpetition.api.petition.dto.PetitionPreviewResponse;
 import com.gistpetition.api.petition.dto.PetitionRequest;
 import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRepository;
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
@@ -148,6 +150,25 @@ public class PetitionServiceTest extends ServiceTest {
         Pageable pageable = PageRequest.of(0, 10);
         assertThat(petitionService.retrieveAnsweredPetition(pageable).getContent()).hasSize(1);
     }
+
+    @Test
+    void retrievePetitionsToCheck() {
+        Long petitionId = petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
+        User user1 = userRepository.save(new User("user1@gist.ac.kr", "pwd", UserRole.USER));
+        User user2 = userRepository.save(new User("user2@gist.ac.kr", "pwd", UserRole.USER));
+        User user3 = userRepository.save(new User("user3@gist.ac.kr", "pwd", UserRole.USER));
+        User user4 = userRepository.save(new User("user4@gist.ac.kr", "pwd", UserRole.USER));
+        User user5 = userRepository.save(new User("user5@gist.ac.kr", "pwd", UserRole.USER));
+        petitionService.agree(petitionId, user1.getId());
+        petitionService.agree(petitionId, user2.getId());
+        petitionService.agree(petitionId, user3.getId());
+        petitionService.agree(petitionId, user4.getId());
+        petitionService.agree(petitionId, user5.getId());
+        PageRequest pageRequest = PageRequest.of(0, 10);
+        Page<PetitionPreviewResponse> petitionPreviewResponses = petitionService.retrievePetitionToCheck(pageRequest);
+        assertThat(petitionPreviewResponses.getContent()).hasSize(1);
+    }
+
 
     @AfterEach
     void tearDown() {

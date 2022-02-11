@@ -41,6 +41,20 @@ public class PetitionController {
         return ResponseEntity.ok().body(petitionService.retrievePetitionByCategoryId(categoryId, pageable));
     }
 
+    @ManagerPermissionRequired
+    @GetMapping("/petitions/need-check")
+    public ResponseEntity<Page<PetitionPreviewResponse>> retrievePetitionsToCheck(@RequestParam(defaultValue = "0") Long categoryId,
+                                                                          @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ResponseEntity.ok().body(petitionService.retrievePetitionToCheck(pageable));
+    }
+
+    @ManagerPermissionRequired
+    @GetMapping("/petitions/{petitionId}/expose")
+    public ResponseEntity<Void> exposePetition(@PathVariable Long petitionId) {
+        petitionService.exposePetition(petitionId);
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/petitions/search")
     public ResponseEntity<Page<PetitionPreviewResponse>> retrievePetitionsByKeyword(@RequestParam(defaultValue = "") String keyword,
                                                                                     @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
@@ -59,6 +73,7 @@ public class PetitionController {
     public ResponseEntity<PetitionResponse> retrievePetition(@PathVariable Long petitionId) {
         return ResponseEntity.ok().body(petitionService.retrievePetitionById(petitionId));
     }
+
 
     @LoginRequired
     @GetMapping("/petitions/me")
@@ -88,9 +103,10 @@ public class PetitionController {
 
     @LoginRequired
     @PostMapping("/petitions/{petitionId}/agreements")
-    public ResponseEntity<Boolean> agreePetition(@PathVariable Long petitionId,
+    public ResponseEntity<Void> agreePetition(@PathVariable Long petitionId,
                                                  @LoginUser SimpleUser simpleUser) {
-        return ResponseEntity.ok().body(petitionService.agree(petitionId, simpleUser.getId()));
+        petitionService.agree(petitionId, simpleUser.getId());
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/petitions/{petitionId}/agreements")

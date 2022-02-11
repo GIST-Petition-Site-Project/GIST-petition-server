@@ -7,7 +7,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
 class PetitionTest {
     private User user;
@@ -21,9 +21,10 @@ class PetitionTest {
 
     @Test
     void agree() {
-        Assertions.assertThat(petition.getAgreements()).hasSize(0);
+        assertThat(petition.getAgreements()).hasSize(0);
         petition.applyAgreement(user);
-        Assertions.assertThat(petition.getAgreements()).hasSize(1);
+        assertThat(petition.getAgreements()).hasSize(1);
+        assertThat(petition.getAgreeCount()).isEqualTo(1);
     }
 
     @Test
@@ -41,7 +42,7 @@ class PetitionTest {
         petition.applyAgreement(this.user);
         petition.applyAgreement(user);
         petition.applyAgreement(user3);
-        Assertions.assertThat(petition.getAgreements()).hasSize(3);
+        assertThat(petition.getAgreements()).hasSize(3);
     }
 
 
