@@ -1,19 +1,16 @@
-package com.gistpetition.api.petition;
+package com.gistpetition.api.petition.domain;
 
 import com.gistpetition.api.exception.petition.DuplicatedAgreementException;
-import com.gistpetition.api.petition.domain.Category;
-import com.gistpetition.api.petition.domain.Petition;
-import com.gistpetition.api.petition.dto.AgreementRequest;
 import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRole;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class PetitionTest {
-    private static final String  AGREEMENT_DESCRIPTION = "동의합니다.";
+    private static final String AGREEMENT_DESCRIPTION = "동의합니다.";
 
     private User user;
     private Petition petition;
@@ -26,9 +23,9 @@ class PetitionTest {
 
     @Test
     void agree() {
-        Assertions.assertThat(petition.getAgreements()).hasSize(0);
+        assertThat(petition.getAgreements()).hasSize(0);
         petition.applyAgreement(user, AGREEMENT_DESCRIPTION);
-        Assertions.assertThat(petition.getAgreements()).hasSize(1);
+        assertThat(petition.getAgreements()).hasSize(1);
     }
 
     @Test
@@ -46,6 +43,6 @@ class PetitionTest {
         petition.applyAgreement(this.user, AGREEMENT_DESCRIPTION);
         petition.applyAgreement(user, AGREEMENT_DESCRIPTION);
         petition.applyAgreement(user3, AGREEMENT_DESCRIPTION);
-        Assertions.assertThat(petition.getAgreements()).hasSize(3);
+        assertThat(petition.getAgreements()).hasSize(3);
     }
 }
