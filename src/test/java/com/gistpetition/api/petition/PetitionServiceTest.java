@@ -56,34 +56,17 @@ public class PetitionServiceTest extends ServiceTest {
         assertThat(petition.getDescription()).isEqualTo(PETITION_REQUEST_DTO.getDescription());
         assertThat(petition.getCategory().getId()).isEqualTo(PETITION_REQUEST_DTO.getCategoryId());
         assertThat(petition.getUserId()).isEqualTo(petitionOwner.getId());
-        Assertions.assertThat(petition.getCreatedAt()).isNotNull();
+        assertThat(petition.getCreatedAt()).isNotNull();
     }
 
     @Test
     void findPageOfPetitions() {
-        Long petitionId = petitionService.createPetition(PETITION_REQUEST_DTO, petitionOwner.getId());
-        Petition petition = petitionRepository.findById(petitionId).orElseThrow(IllegalArgumentException::new);
-        Long petition1 = petitionService.createPetition(PETITION_REQUEST_DTO, petitionOwner.getId());
-        Long petition2 = petitionService.createPetition(PETITION_REQUEST_DTO, petitionOwner.getId());
-
-        User user1 = userRepository.save(new User("user1@gm.gist.ac.kr", "password", UserRole.USER));
-        User user2 = userRepository.save(new User("user2@gm.gist.ac.kr", "password", UserRole.USER));
-
-        petitionService.agree(AGREEMENT_REQUEST, petitionId, petitionOwner.getId());
-        petitionService.agree(AGREEMENT_REQUEST, petitionId, user1.getId());
-        petitionService.agree(AGREEMENT_REQUEST, petitionId, user2.getId());
-
-        petitionService.agree(AGREEMENT_REQUEST, petition1, petitionOwner.getId());
-        petitionService.agree(AGREEMENT_REQUEST, petition1, user1.getId());
-        petitionService.agree(AGREEMENT_REQUEST, petition1, user2.getId());
-
-        petitionService.agree(AGREEMENT_REQUEST, petition2, petitionOwner.getId());
-        petitionService.agree(AGREEMENT_REQUEST, petition2, user1.getId());
-
-        Pageable pageable = PageRequest.of(0, 3, Sort.Direction.DESC, "createdAt");
+        petitionService.createPetition(PETITION_REQUEST_DTO, petitionOwner.getId());
+        petitionService.createPetition(PETITION_REQUEST_DTO, petitionOwner.getId());
+        petitionService.createPetition(PETITION_REQUEST_DTO, petitionOwner.getId());
+        Pageable pageable = PageRequest.of(0, 10, Sort.Direction.DESC, "createdAt");
 
         Page<PetitionPreviewResponse> petitionPreviewResponses = petitionService.retrievePetition(pageable);
-        petitionPreviewResponses.forEach(s -> System.out.println("id: "+ s.getId() + "\n" + s.getTitle() + s.getAgreements()));
         assertThat(petitionPreviewResponses).hasSize(3);
     }
 
@@ -148,11 +131,11 @@ public class PetitionServiceTest extends ServiceTest {
         petitionService.agree(AGREEMENT_REQUEST, petitionId, user2.getId());
 
         Pageable pageable = PageRequest.of(0, 3, Sort.Direction.DESC, "createdAt");
-        Page<AgreementResponse> allOfAgreements = petitionService.getPageOfAgreements(pageable, petitionId);
+        Page<AgreementResponse> allOfAgreements = petitionService.retrieveAgreements(petitionId, pageable);
         assertThat(allOfAgreements).hasSize(3);
 
         Pageable pageableSizeAsTwo = PageRequest.of(0, 2, Sort.Direction.DESC, "createdAt");
-        Page<AgreementResponse> twoOfAgreements = petitionService.getPageOfAgreements(pageableSizeAsTwo, petitionId);
+        Page<AgreementResponse> twoOfAgreements = petitionService.retrieveAgreements(petitionId, pageableSizeAsTwo);
         assertThat(twoOfAgreements).hasSize(2);
     }
 
@@ -163,25 +146,25 @@ public class PetitionServiceTest extends ServiceTest {
         User user = userRepository.save(new User("email@email.com", "password", UserRole.USER));
         User user3 = userRepository.save(new User("email3@email.com", "password", UserRole.USER));
 
-        assertThat(petitionService.getNumberOfAgreements(petitionId)).isEqualTo(0);
+        assertThat(petitionService.retrieveNumberOfAgreements(petitionId)).isEqualTo(0);
 
         petitionService.agree(AGREEMENT_REQUEST, petitionId, petitionOwner.getId());
         petitionService.agree(AGREEMENT_REQUEST, petitionId, user.getId());
         petitionService.agree(AGREEMENT_REQUEST, petitionId, user3.getId());
 
-        assertThat(petitionService.getNumberOfAgreements(petitionId)).isEqualTo(3);
+        assertThat(petitionService.retrieveNumberOfAgreements(petitionId)).isEqualTo(3);
     }
 
     @Test
     void getStateOfAgreement() {
         Long petitionId = petitionService.createPetition(PETITION_REQUEST_DTO, petitionOwner.getId());
-        assertThat(petitionService.getStateOfAgreement(petitionId, petitionOwner.getId())).isFalse();
+        assertThat(petitionService.retrieveStateOfAgreement(petitionId, petitionOwner.getId())).isFalse();
 
         petitionService.agree(AGREEMENT_REQUEST, petitionId, petitionOwner.getId());
 
-        assertThat(petitionService.getStateOfAgreement(petitionId, petitionOwner.getId())).isTrue();
+        assertThat(petitionService.retrieveStateOfAgreement(petitionId, petitionOwner.getId())).isTrue();
         Agreement agreement = agreementRepository.findByUserId(petitionOwner.getId()).orElseThrow(IllegalArgumentException::new);
-        Assertions.assertThat(agreement.getCreatedAt()).isNotNull();
+        assertThat(agreement.getCreatedAt()).isNotNull();
     }
 
     @Test

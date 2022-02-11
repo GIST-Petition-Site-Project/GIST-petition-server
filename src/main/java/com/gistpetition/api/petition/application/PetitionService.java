@@ -11,11 +11,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -52,8 +49,8 @@ public class PetitionService {
     }
 
     @Transactional(readOnly = true)
-    public Page<PetitionPreviewResponse> retrievePetitionsByUserId(Long user_id,Pageable pageable) {
-        return PetitionPreviewResponse.pageOf(petitionRepository.findByUserId(user_id,pageable));
+    public Page<PetitionPreviewResponse> retrievePetitionsByUserId(Long user_id, Pageable pageable) {
+        return PetitionPreviewResponse.pageOf(petitionRepository.findByUserId(user_id, pageable));
     }
 
     @Transactional(readOnly = true)
@@ -62,7 +59,7 @@ public class PetitionService {
     }
 
     @Transactional(readOnly = true)
-    public Long getPetitionCount() {
+    public Long retrievePetitionCount() {
         return petitionRepository.count();
     }
 
@@ -82,26 +79,26 @@ public class PetitionService {
     }
 
     @Transactional
-    public void agree(AgreementRequest request, Long petitionId,  Long userId) {
+    public void agree(AgreementRequest request, Long petitionId, Long userId) {
         Petition petition = findPetitionById(petitionId);
         User user = findUserById(userId);
         petition.applyAgreement(user, request.getContent());
     }
 
     @Transactional(readOnly = true)
-    public Page<AgreementResponse> getPageOfAgreements(Pageable pageable, Long petitionId) {
+    public Page<AgreementResponse> retrieveAgreements(Long petitionId, Pageable pageable) {
         Page<Agreement> agreements = agreementRepository.findAgreementsByPetitionId(pageable, petitionId);
         return AgreementResponse.pageOf(agreements);
     }
 
     @Transactional(readOnly = true)
-    public int getNumberOfAgreements(Long petitionId) {
+    public int retrieveNumberOfAgreements(Long petitionId) {
         Petition petition = findPetitionById(petitionId);
         return petition.getAgreements().size();
     }
 
     @Transactional(readOnly = true)
-    public Boolean getStateOfAgreement(Long petitionId, Long userId) {
+    public Boolean retrieveStateOfAgreement(Long petitionId, Long userId) {
         Petition petition = findPetitionById(petitionId);
         User user = findUserById(userId);
         return petition.isAgreedBy(user);
