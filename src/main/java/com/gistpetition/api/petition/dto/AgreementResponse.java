@@ -13,13 +13,15 @@ import java.util.stream.Collectors;
 public class AgreementResponse {
 
     String description;
+    Long agreementId;
 
-    public AgreementResponse(String description) {
+    public AgreementResponse(String description, Long agreementId){
         this.description = description;
+        this.agreementId = agreementId;
     }
 
     public static AgreementResponse of(Agreement agreement) {
-        return new AgreementResponse(agreement.getDescription());
+        return new AgreementResponse(agreement.getDescription(), agreement.getId());
     }
 
     public static Page<AgreementResponse> pageOf(Page<Agreement> agreements) {
