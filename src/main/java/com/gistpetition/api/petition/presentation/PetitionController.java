@@ -48,6 +48,11 @@ public class PetitionController {
         return ResponseEntity.ok().body(petitionService.retrievePetitionByKeyword(keyword, pageable));
     }
 
+    @GetMapping("/petitions/answered")
+    public ResponseEntity<Page<PetitionPreviewResponse>> retrieveAnsweredPetition(@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ResponseEntity.ok().body(petitionService.retrieveAnsweredPetition(pageable));
+    }
+
     @GetMapping("/petitions/{petitionId}")
     public ResponseEntity<PetitionResponse> retrievePetition(@PathVariable Long petitionId) {
         return ResponseEntity.ok().body(petitionService.retrievePetitionById(petitionId));
@@ -68,7 +73,7 @@ public class PetitionController {
     @PutMapping("/petitions/{petitionId}")
     public ResponseEntity<Void> updatePetition(@PathVariable Long petitionId,
                                                @Validated @RequestBody PetitionRequest changeRequest) {
-        petitionService.updatePetitionDescription(petitionId, changeRequest.getDescription());
+        petitionService.updatePetition(petitionId, changeRequest);
         return ResponseEntity.noContent().build();
     }
 

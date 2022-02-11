@@ -5,17 +5,17 @@ import javax.validation.constraints.NotBlank;
 
 public class AgreementRequest {
     @NotBlank
-    private String content;
+    private String description;
 
     protected AgreementRequest() {
     }
 
-    public String getContent() {
-        return content;
+    public String getDescription() {
+        return description;
     }
 
-    public AgreementRequest(String content) {
-        this.content = content;
+    public AgreementRequest(String description) {
+        this.description = description;
     }
 
 }

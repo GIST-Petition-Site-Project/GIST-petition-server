@@ -28,7 +28,7 @@ public class PetitionService {
         return petitionRepository.save(
                 new Petition(petitionRequest.getTitle(),
                         petitionRequest.getDescription(),
-                        Category.getById(petitionRequest.getCategoryId()),
+                        Category.of(petitionRequest.getCategoryId()),
                         userId)
         ).getId();
     }
@@ -40,7 +40,7 @@ public class PetitionService {
 
     @Transactional(readOnly = true)
     public Page<PetitionPreviewResponse> retrievePetitionByCategoryId(Long categoryId, Pageable pageable) {
-        return PetitionPreviewResponse.pageOf(petitionRepository.findByCategory(Category.getById(categoryId), pageable));
+        return PetitionPreviewResponse.pageOf(petitionRepository.findByCategory(Category.of(categoryId), pageable));
     }
 
     @Transactional(readOnly = true)
@@ -49,8 +49,8 @@ public class PetitionService {
     }
 
     @Transactional(readOnly = true)
-    public Page<PetitionPreviewResponse> retrievePetitionsByUserId(Long user_id, Pageable pageable) {
-        return PetitionPreviewResponse.pageOf(petitionRepository.findByUserId(user_id, pageable));
+    public Page<PetitionPreviewResponse> retrievePetitionsByUserId(Long userId, Pageable pageable) {
+        return PetitionPreviewResponse.pageOf(petitionRepository.findByUserId(userId, pageable));
     }
 
     @Transactional(readOnly = true)
@@ -59,14 +59,21 @@ public class PetitionService {
     }
 
     @Transactional(readOnly = true)
+    public Page<PetitionPreviewResponse> retrieveAnsweredPetition(Pageable pageable) {
+        return PetitionPreviewResponse.pageOf(petitionRepository.findByAnsweredTrue(pageable));
+    }
+
+    @Transactional(readOnly = true)
     public Long retrievePetitionCount() {
         return petitionRepository.count();
     }
 
     @Transactional
-    public void updatePetitionDescription(Long petitionId, String description) {
+    public void updatePetition(Long petitionId, PetitionRequest petitionRequest) {
         Petition petition = findPetitionById(petitionId);
-        petition.setDescription(description);
+        petition.setTitle(petitionRequest.getTitle());
+        petition.setCategory(Category.of(petitionRequest.getCategoryId()));
+        petition.setDescription(petitionRequest.getDescription());
     }
 
     @Transactional
@@ -82,7 +89,7 @@ public class PetitionService {
     public void agree(AgreementRequest request, Long petitionId, Long userId) {
         Petition petition = findPetitionById(petitionId);
         User user = findUserById(userId);
-        petition.applyAgreement(user, request.getContent());
+        petition.applyAgreement(user, request.getDescription());
     }
 
     @Transactional(readOnly = true)

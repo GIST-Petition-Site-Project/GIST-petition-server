@@ -17,6 +17,8 @@ public interface PetitionRepository extends JpaRepository<Petition, Long> {
 
     Page<Petition> findByTitleContains(String keyword, Pageable pageable);
 
+    Page<Petition> findByAnsweredTrue(Pageable pageable);
+
     @Query("SELECT p FROM Petition AS p LEFT JOIN FETCH p.agreements WHERE p.id=:petitionId")
     Petition findPetitionByWithEagerMode(@Param("petitionId") Long petitionId);
 }
