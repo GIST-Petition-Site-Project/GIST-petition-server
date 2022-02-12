@@ -216,7 +216,7 @@ public class PetitionServiceTest extends ServiceTest {
     }
 
     @Test
-    void retrievePetitionsToCheck() {
+    void retrieveTempPetitions() {
         Long petitionId = petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
         User user1 = userRepository.save(new User("user1@gist.ac.kr", "pwd", UserRole.USER));
         User user2 = userRepository.save(new User("user2@gist.ac.kr", "pwd", UserRole.USER));
