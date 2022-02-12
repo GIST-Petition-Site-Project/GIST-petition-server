@@ -26,7 +26,6 @@ public class Petition extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Category category;
     private boolean answered;
-    private int accepted;
     private Long userId;
     @NotAudited
     @BatchSize(size = 10)
@@ -37,16 +36,15 @@ public class Petition extends BaseEntity {
     }
 
     public Petition(String title, String description, Category category, Long userId) {
-        this(null, title, description, category, false, 0, userId);
+        this(null, title, description, category, false, userId);
     }
 
-    private Petition(Long id, String title, String description, Category category, boolean answered, int accepted, Long userId) {
+    private Petition(Long id, String title, String description, Category category, boolean answered, Long userId) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.category = category;
         this.answered = answered;
-        this.accepted = accepted;
         this.userId = userId;
     }
 
