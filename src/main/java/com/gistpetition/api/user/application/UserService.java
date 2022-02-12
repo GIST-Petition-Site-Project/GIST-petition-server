@@ -14,10 +14,10 @@ import com.gistpetition.api.utils.password.Encoder;
 import com.gistpetition.api.verification.application.password.FindPasswordValidator;
 import com.gistpetition.api.verification.application.signup.SignUpValidator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -59,8 +59,8 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public List<User> findAllUsers() {
-        return userRepository.findAll();
+    public Page<User> findAllUsers(Pageable pageable) {
+        return userRepository.findAll(pageable);
     }
 
     @Transactional

@@ -6,16 +6,16 @@ import com.gistpetition.api.config.annotation.LoginUser;
 import com.gistpetition.api.user.application.LoginService;
 import com.gistpetition.api.user.application.UserService;
 import com.gistpetition.api.user.domain.SimpleUser;
-import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.dto.request.*;
 import com.gistpetition.api.user.dto.response.UserResponse;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.List;
 
 @RestController
 @RequestMapping("/v1")
@@ -45,14 +45,14 @@ public class UserController {
 
     @AdminPermissionRequired
     @GetMapping("/users")
-    public ResponseEntity<List<User>> retrieveAllUsers() {
-        return ResponseEntity.ok().body(userService.findAllUsers());
+    public ResponseEntity<Page<UserResponse>> retrieveUsers(Pageable pageable) {
+        return ResponseEntity.ok().body(UserResponse.pageOf(userService.findAllUsers(pageable)));
     }
 
     @AdminPermissionRequired
     @GetMapping("/users/{userId}")
-    public ResponseEntity<User> retrieveUser(@PathVariable Long userId) {
-        return ResponseEntity.ok().body(userService.findUserById(userId));
+    public ResponseEntity<UserResponse> retrieveUser(@PathVariable Long userId) {
+        return ResponseEntity.ok().body(UserResponse.of(userService.findUserById(userId)));
     }
 
     @LoginRequired
