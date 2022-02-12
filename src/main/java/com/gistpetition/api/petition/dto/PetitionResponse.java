@@ -1,14 +1,11 @@
 package com.gistpetition.api.petition.dto;
 
 import com.gistpetition.api.petition.domain.Petition;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
+import lombok.Data;
 
 import java.time.LocalDateTime;
 
-@Getter
-@RequiredArgsConstructor
+@Data
 public class PetitionResponse {
     private final Long id;
     private final String title;
@@ -19,10 +16,6 @@ public class PetitionResponse {
     private final Integer agreements;
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
-
-    public static Page<PetitionResponse> pageOf(Page<Petition> page) {
-        return page.map(PetitionResponse::of);
-    }
 
     public static PetitionResponse of(Petition petition) {
         return new PetitionResponse(

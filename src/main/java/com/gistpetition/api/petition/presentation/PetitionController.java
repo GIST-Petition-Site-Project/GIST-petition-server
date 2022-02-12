@@ -5,10 +5,7 @@ import com.gistpetition.api.config.annotation.LoginRequired;
 import com.gistpetition.api.config.annotation.LoginUser;
 import com.gistpetition.api.config.annotation.ManagerPermissionRequired;
 import com.gistpetition.api.petition.application.PetitionService;
-import com.gistpetition.api.petition.dto.PetitionPreviewResponse;
-import com.gistpetition.api.petition.dto.PetitionRequest;
-import com.gistpetition.api.petition.dto.PetitionResponse;
-import com.gistpetition.api.petition.dto.PetitionRevisionResponse;
+import com.gistpetition.api.petition.dto.*;
 import com.gistpetition.api.user.domain.SimpleUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -35,8 +32,8 @@ public class PetitionController {
     }
 
     @GetMapping("/petitions")
-    public ResponseEntity<Page<PetitionPreviewResponse>> retrievePetition(@RequestParam(defaultValue = "0") Long categoryId,
-                                                                          @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+    public ResponseEntity<Page<PetitionPreviewResponse>> retrievePetitions(@RequestParam(defaultValue = "0") Long categoryId,
+                                                                           @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         if (categoryId.equals(0L)) {
             return ResponseEntity.ok().body(petitionService.retrievePetition(pageable));
         }
@@ -72,8 +69,8 @@ public class PetitionController {
     }
 
     @GetMapping("/petitions/count")
-    public ResponseEntity<Long> getPetitionCount() {
-        return ResponseEntity.ok().body(petitionService.getPetitionCount());
+    public ResponseEntity<Long> retrievePetitionCount() {
+        return ResponseEntity.ok().body(petitionService.retrievePetitionCount());
     }
 
     @ManagerPermissionRequired
@@ -93,20 +90,28 @@ public class PetitionController {
 
     @LoginRequired
     @PostMapping("/petitions/{petitionId}/agreements")
-    public ResponseEntity<Boolean> agreePetition(@PathVariable Long petitionId,
-                                                 @LoginUser SimpleUser simpleUser) {
-        return ResponseEntity.ok().body(petitionService.agree(petitionId, simpleUser.getId()));
+    public ResponseEntity<Void> agreePetition(@RequestBody AgreementRequest agreementRequest,
+                                              @PathVariable Long petitionId,
+                                              @LoginUser SimpleUser simpleUser) {
+        petitionService.agree(agreementRequest, petitionId, simpleUser.getId());
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/petitions/{petitionId}/agreements")
-    public ResponseEntity<Integer> getNumberOfAgreement(@PathVariable Long petitionId) {
-        return ResponseEntity.ok().body(petitionService.getNumberOfAgreements(petitionId));
+    public ResponseEntity<Page<AgreementResponse>> retrieveAgreements(@PathVariable Long petitionId,
+                                                                      @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ResponseEntity.ok().body(petitionService.retrieveAgreements(petitionId, pageable));
+    }
+
+    @GetMapping("/petitions/{petitionId}/agreements/number")
+    public ResponseEntity<Integer> retrieveNumberOfAgreement(@PathVariable Long petitionId) {
+        return ResponseEntity.ok().body(petitionService.retrieveNumberOfAgreements(petitionId));
     }
 
     @LoginRequired
     @GetMapping("/petitions/{petitionId}/agreements/me")
-    public ResponseEntity<Boolean> getStateOfAgreement(@PathVariable Long petitionId,
-                                                       @LoginUser SimpleUser simpleUser) {
-        return ResponseEntity.ok().body(petitionService.getStateOfAgreement(petitionId, simpleUser.getId()));
+    public ResponseEntity<Boolean> retrieveStateOfAgreement(@PathVariable Long petitionId,
+                                                            @LoginUser SimpleUser simpleUser) {
+        return ResponseEntity.ok().body(petitionService.retrieveStateOfAgreement(petitionId, simpleUser.getId()));
     }
 }

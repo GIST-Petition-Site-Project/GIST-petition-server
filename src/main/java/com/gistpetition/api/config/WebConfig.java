@@ -1,15 +1,13 @@
 package com.gistpetition.api.config;
 
-import ch.qos.logback.access.servlet.TeeFilter;
 import com.gistpetition.api.config.argumentresolver.LoginUserArgumentResolver;
 import com.gistpetition.api.config.interceptor.AdminPermissionInterceptor;
 import com.gistpetition.api.config.interceptor.LoginInterceptor;
 import com.gistpetition.api.config.interceptor.ManagerPermissionInterceptor;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -34,6 +32,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedOrigins(origins)
                 .allowedMethods("*")
                 .allowedHeaders("*")
+                .exposedHeaders(HttpHeaders.LOCATION)
                 .allowCredentials(true);
     }
 
@@ -47,10 +46,5 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(loginUserArgumentResolver);
-    }
-
-    @Bean
-    public FilterRegistrationBean requestLoggingFilter() {
-        return new FilterRegistrationBean(new TeeFilter());
     }
 }

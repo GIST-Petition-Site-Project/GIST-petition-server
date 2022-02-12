@@ -6,6 +6,7 @@ import com.gistpetition.api.user.domain.User;
 import lombok.Getter;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
+import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -30,6 +31,7 @@ public class Petition extends BaseEntity {
     private int accepted;
     private Long userId;
     @NotAudited
+    @BatchSize(size = 10)
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "petition_id")
     private final List<Agreement> agreements = new ArrayList<>();
@@ -51,14 +53,13 @@ public class Petition extends BaseEntity {
         this.userId = userId;
     }
 
-    public boolean applyAgreement(User user) {
+    public void applyAgreement(User user, String description) {
         for (Agreement agreement : agreements) {
             if (agreement.isAgreedBy(user.getId())) {
                 throw new DuplicatedAgreementException();
             }
         }
-        this.agreements.add(new Agreement(user.getId()));
-        return true;
+        this.agreements.add(new Agreement(user.getId(), description, this));
     }
 
     public boolean isAgreedBy(User user) {

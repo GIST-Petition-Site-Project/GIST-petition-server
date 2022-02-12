@@ -1,8 +1,8 @@
 package com.gistpetition.api.acceptance.common;
 
-import com.gistpetition.api.FixedVerificationCodeGenerator;
 import com.gistpetition.api.user.dto.request.SignInRequest;
 import com.gistpetition.api.user.dto.request.SignUpRequest;
+import com.gistpetition.api.verification.application.FixedVerificationCodeGenerator;
 import com.gistpetition.api.verification.dto.UsernameConfirmationRequest;
 import com.gistpetition.api.verification.dto.VerificationEmailRequest;
 import io.restassured.http.ContentType;

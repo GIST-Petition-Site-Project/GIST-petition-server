@@ -7,13 +7,13 @@ import org.springframework.context.ApplicationEvent;
 public class EmailVerificationEvent extends ApplicationEvent {
     private final String username;
     private final String verificationCode;
-    private final VerficationType verficationType;
+    private final VerificationType verificationType;
 
-    public EmailVerificationEvent(String username, String verificationCode, VerficationType verficationType) {
+    public EmailVerificationEvent(String username, String verificationCode, VerificationType verificationType) {
         super(username);
         this.username = username;
         this.verificationCode = verificationCode;
-        this.verficationType = verficationType;
+        this.verificationType = verificationType;
     }
 
 }
