@@ -197,6 +197,15 @@ class UserServiceTest {
         ).isInstanceOf(NotMatchedPasswordException.class);
     }
 
+    @Test
+    void deleteUserOfUsername() {
+        Long userId = userService.signUp(DEFAULT_SIGN_UP_REQUEST);
+
+        userService.deleteUserOfUsername(DEFAULT_SIGN_UP_REQUEST.getUsername());
+
+        assertFalse(userRepository.existsById(userId));
+    }
+
     @AfterEach
     void tearDown() {
         userRepository.deleteAllInBatch();

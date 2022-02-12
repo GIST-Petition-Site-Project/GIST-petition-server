@@ -110,7 +110,7 @@ class SignUpVerificationServiceTest extends ServiceTest {
 
     @Test
     void confirmVerificationAlreadyConfirmedVerification() {
-        signUpVerificationInfoRepository.save(new SignUpVerificationInfo(null, GIST_EMAIL, VERIFICATION_CODE, LocalDateTime.now().minusMinutes(1), LocalDateTime.now()));
+        signUpVerificationInfoRepository.save(new SignUpVerificationInfo(null, GIST_EMAIL, VERIFICATION_CODE, LocalDateTime.now(), LocalDateTime.now()));
         assertThatThrownBy(
                 () -> signUpVerificationService.confirmUsername(new UsernameConfirmationRequest(GIST_EMAIL, VERIFICATION_CODE))
         ).isInstanceOf(DuplicatedVerificationException.class);

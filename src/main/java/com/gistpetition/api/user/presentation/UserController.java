@@ -97,4 +97,11 @@ public class UserController {
         userService.deleteUserOfMine(simpleUser.getId(), deleteUserRequest);
         return ResponseEntity.noContent().build();
     }
+
+    // api for sign-up test
+    @DeleteMapping("/users/username/{username}")
+    public ResponseEntity<Void> deleteUserOfUserName(@PathVariable String username) {
+        userService.deleteUserOfUsername(username);
+        return ResponseEntity.noContent().build();
+    }
 }
