@@ -3,7 +3,6 @@ package com.gistpetition.api.petition.application;
 
 import com.gistpetition.api.exception.petition.NoSuchPetitionException;
 import com.gistpetition.api.exception.user.NoSuchUserException;
-import com.gistpetition.api.petition.dto.PetitionRevisionResponse;
 import com.gistpetition.api.petition.domain.*;
 import com.gistpetition.api.petition.dto.*;
 import com.gistpetition.api.user.domain.User;
@@ -95,7 +94,9 @@ public class PetitionService {
     public void agree(AgreementRequest request, Long petitionId, Long userId) {
         Petition petition = findPetitionById(petitionId);
         User user = findUserById(userId);
-        petition.applyAgreement(user, request.getDescription());
+        Agreement agreement = new Agreement(request.getDescription(), user.getId());
+        agreement.setPetition(petition);
+        agreementRepository.save(agreement);
     }
 
     @Transactional(readOnly = true)
