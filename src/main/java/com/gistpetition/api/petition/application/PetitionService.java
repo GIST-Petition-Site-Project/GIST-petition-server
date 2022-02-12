@@ -3,12 +3,9 @@ package com.gistpetition.api.petition.application;
 
 import com.gistpetition.api.exception.petition.NoSuchPetitionException;
 import com.gistpetition.api.exception.user.NoSuchUserException;
-import com.gistpetition.api.petition.domain.Category;
-import com.gistpetition.api.petition.domain.Petition;
-import com.gistpetition.api.petition.domain.PetitionRepository;
-import com.gistpetition.api.petition.dto.PetitionPreviewResponse;
-import com.gistpetition.api.petition.dto.PetitionRequest;
-import com.gistpetition.api.petition.dto.PetitionResponse;
+import com.gistpetition.api.petition.dto.PetitionRevisionResponse;
+import com.gistpetition.api.petition.domain.*;
+import com.gistpetition.api.petition.dto.*;
 import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRepository;
 import lombok.AllArgsConstructor;
@@ -25,6 +22,7 @@ import static com.gistpetition.api.petition.domain.Petition.REQUIRED_AGREEMENT_N
 public class PetitionService {
 
     private final PetitionRepository petitionRepository;
+    private final AgreementRepository agreementRepository;
     private final UserRepository userRepository;
     private final ApplicationEventPublisher eventPublisher;
 
@@ -81,7 +79,12 @@ public class PetitionService {
     }
 
     @Transactional(readOnly = true)
-    public Long getPetitionCount() {
+    public Page<PetitionRevisionResponse> retrieveRevisionsOfPetition(Long petitionId, Pageable pageable) {
+        return PetitionRevisionResponse.pageOf(petitionRepository.findRevisions(petitionId, pageable));
+    }
+
+    @Transactional(readOnly = true)
+    public Long retrievePetitionCount() {
         return petitionRepository.count();
     }
 
@@ -103,20 +106,26 @@ public class PetitionService {
     }
 
     @Transactional
-    public void agree(Long petitionId, Long userId) {
+    public void agree(AgreementRequest request, Long petitionId, Long userId) {
         Petition petition = findPetitionById(petitionId);
         User user = findUserById(userId);
-        petition.applyAgreement(user);
+        petition.applyAgreement(user, request.getDescription());
     }
 
     @Transactional(readOnly = true)
-    public int getNumberOfAgreements(Long petitionId) {
+    public Page<AgreementResponse> retrieveAgreements(Long petitionId, Pageable pageable) {
+        Page<Agreement> agreements = agreementRepository.findAgreementsByPetitionId(pageable, petitionId);
+        return AgreementResponse.pageOf(agreements);
+    }
+
+    @Transactional(readOnly = true)
+    public int retrieveNumberOfAgreements(Long petitionId) {
         Petition petition = findPetitionById(petitionId);
         return petition.getAgreements().size();
     }
 
     @Transactional(readOnly = true)
-    public Boolean getStateOfAgreement(Long petitionId, Long userId) {
+    public Boolean retrieveStateOfAgreement(Long petitionId, Long userId) {
         Petition petition = findPetitionById(petitionId);
         User user = findUserById(userId);
         return petition.isAgreedBy(user);

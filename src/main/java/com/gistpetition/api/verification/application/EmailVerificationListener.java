@@ -24,8 +24,8 @@ public class EmailVerificationListener implements ApplicationListener<EmailVerif
 
     private void confirmRegistration(EmailVerificationEvent event) {
         String mailTo = event.getUsername();
-        String subject = event.getVerficationType().getSubject();
-        String body = generateMailBody(event.getVerificationCode(), event.getVerficationType().getTemplate());
+        String subject = event.getVerificationType().getSubject();
+        String body = generateMailBody(event.getVerificationCode(), event.getVerificationType().getTemplate());
 
         mailSender.send(mailTo, subject, body);
     }

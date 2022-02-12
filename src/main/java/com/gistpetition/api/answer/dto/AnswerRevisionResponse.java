@@ -2,32 +2,27 @@ package com.gistpetition.api.answer.dto;
 
 import com.gistpetition.api.answer.domain.Answer;
 import com.gistpetition.api.common.persistence.CustomRevisionEntity;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.Data;
 import org.springframework.data.domain.Page;
 import org.springframework.data.history.Revision;
 import org.springframework.data.history.RevisionMetadata;
 
 import java.time.Instant;
 
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
+@Data
 public class AnswerRevisionResponse {
-    private Long revisionId;
-    private Instant revisionTime;
-    private RevisionMetadata.RevisionType revisionType;
-    private Long workedBy;
-    private String answerContent;
+    private final Long revisionId;
+    private final Instant revisionTime;
+    private final RevisionMetadata.RevisionType revisionType;
+    private final Long workedBy;
+    private final String answerContent;
 
     public static AnswerRevisionResponse of(Revision<Long, Answer> revision) {
-        CustomRevisionEntity customRevisionEntity = revision.getMetadata().getDelegate();
         return new AnswerRevisionResponse(
                 revision.getRequiredRevisionNumber(),
                 revision.getRequiredRevisionInstant(),
                 revision.getMetadata().getRevisionType(),
-                customRevisionEntity.getUserId(),
+                revision.getMetadata().<CustomRevisionEntity>getDelegate().getUserId(),
                 revision.getEntity().getContent()
         );
     }

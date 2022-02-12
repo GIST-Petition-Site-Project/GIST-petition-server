@@ -21,6 +21,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -45,7 +47,6 @@ class UserServiceTest {
     private Encoder encoder;
     @MockBean
     private SignUpValidator signUpValidator;
-
     @MockBean
     private FindPasswordValidator passwordValidator;
 
@@ -65,12 +66,12 @@ class UserServiceTest {
         assertThat(userId).isNotNull();
         assertThat(user.getUsername()).isEqualTo(email);
         assertTrue(encoder.isMatch(PASSWORD, user.getPassword()));
-        Assertions.assertThat(user.getUserRole()).isEqualTo(UserRole.USER);
+        assertThat(user.getUserRole()).isEqualTo(UserRole.USER);
     }
 
     @Test
     void signUpFailedIfAlreadyExisted() {
-        userService.signUp(DEFAULT_SIGN_UP_REQUEST);
+        userRepository.save(new User(GIST_EMAIL, PASSWORD, UserRole.USER));
 
         assertThatThrownBy(() -> userService.signUp(DEFAULT_SIGN_UP_REQUEST)).isInstanceOf(DuplicatedUserException.class);
     }
@@ -81,6 +82,27 @@ class UserServiceTest {
         SignUpRequest signUpRequest = new SignUpRequest(notGistEmail, PASSWORD, VERIFICATION_CODE);
 
         assertThatThrownBy(() -> userService.signUp(signUpRequest)).isInstanceOf(InvalidEmailFormException.class);
+    }
+
+    @Test
+    void retrieveUser() {
+        User saved = userRepository.save(new User(GIST_EMAIL, PASSWORD, UserRole.USER));
+
+        User retrievedUser = userService.findUserById(saved.getId());
+        assertThat(retrievedUser.getUsername()).isEqualTo(saved.getUsername());
+        assertThat(retrievedUser.getPassword()).isEqualTo(saved.getPassword());
+        assertThat(retrievedUser.getUserRole()).isEqualTo(saved.getUserRole());
+    }
+
+    @Test
+    void retrieveUsers() {
+        for (int i = 0; i < 10; i++) {
+            userRepository.save(new User(i + GIST_EMAIL, PASSWORD, UserRole.USER));
+        }
+
+        PageRequest pageRequest = PageRequest.of(0, 20);
+        Page<User> users = userService.retrieveUsers(pageRequest);
+        assertThat(users).hasSize(10);
     }
 
     @ParameterizedTest
@@ -173,6 +195,15 @@ class UserServiceTest {
         assertThatThrownBy(
                 () -> userService.deleteUserOfMine(userId, new DeleteUserRequest("notPassword"))
         ).isInstanceOf(NotMatchedPasswordException.class);
+    }
+
+    @Test
+    void deleteUserOfUsername() {
+        Long userId = userService.signUp(DEFAULT_SIGN_UP_REQUEST);
+
+        userService.deleteUserOfUsername(DEFAULT_SIGN_UP_REQUEST.getUsername());
+
+        assertFalse(userRepository.existsById(userId));
     }
 
     @AfterEach

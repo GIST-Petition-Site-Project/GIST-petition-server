@@ -1,9 +1,9 @@
 package com.gistpetition.api.verification.presentation;
 
 import com.gistpetition.api.verification.application.EmailVerificationEvent;
+import com.gistpetition.api.verification.application.VerificationType;
 import com.gistpetition.api.verification.application.password.FindPasswordVerificationService;
 import com.gistpetition.api.verification.application.signup.SignUpVerificationService;
-import com.gistpetition.api.verification.application.VerficationType;
 import com.gistpetition.api.verification.dto.UsernameConfirmationRequest;
 import com.gistpetition.api.verification.dto.VerificationEmailRequest;
 import lombok.AllArgsConstructor;
@@ -26,7 +26,7 @@ public class VerificationController {
     @PostMapping("/sign-up/verifications")
     public ResponseEntity<Void> createSignUpVerificationCode(@RequestBody VerificationEmailRequest request) {
         String verificationCode = signUpVerificationService.createVerificationInfo(request);
-        publisher.publishEvent(new EmailVerificationEvent(request.getUsername(), verificationCode, VerficationType.SignUp));
+        publisher.publishEvent(new EmailVerificationEvent(request.getUsername(), verificationCode, VerificationType.SignUp));
         return ResponseEntity.noContent().build();
     }
 
@@ -39,7 +39,7 @@ public class VerificationController {
     @PostMapping("/find-password/verifications")
     public ResponseEntity<Void> createFindPasswordVerificationCode(@RequestBody VerificationEmailRequest request) {
         String verificationCode = findPasswordVerificationService.createPasswordVerificationInfo(request);
-        publisher.publishEvent(new EmailVerificationEvent(request.getUsername(), verificationCode, VerficationType.NewPassword));
+        publisher.publishEvent(new EmailVerificationEvent(request.getUsername(), verificationCode, VerificationType.NewPassword));
         return ResponseEntity.noContent().build();
     }
 
