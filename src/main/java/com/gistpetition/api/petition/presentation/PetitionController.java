@@ -1,5 +1,6 @@
 package com.gistpetition.api.petition.presentation;
 
+import com.gistpetition.api.config.annotation.AdminPermissionRequired;
 import com.gistpetition.api.config.annotation.LoginRequired;
 import com.gistpetition.api.config.annotation.LoginUser;
 import com.gistpetition.api.config.annotation.ManagerPermissionRequired;
@@ -48,11 +49,6 @@ public class PetitionController {
         return ResponseEntity.ok().body(petitionService.retrievePetitionByKeyword(keyword, pageable));
     }
 
-    @GetMapping("/petitions/answered")
-    public ResponseEntity<Page<PetitionPreviewResponse>> retrieveAnsweredPetition(@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        return ResponseEntity.ok().body(petitionService.retrieveAnsweredPetition(pageable));
-    }
-
     @GetMapping("/petitions/{petitionId}")
     public ResponseEntity<PetitionResponse> retrievePetition(@PathVariable Long petitionId) {
         return ResponseEntity.ok().body(petitionService.retrievePetitionById(petitionId));
@@ -60,8 +56,16 @@ public class PetitionController {
 
     @LoginRequired
     @GetMapping("/petitions/me")
-    public ResponseEntity<Page<PetitionPreviewResponse>> retrievePetitionsByUserId(@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable, @LoginUser SimpleUser simpleUser) {
+    public ResponseEntity<Page<PetitionPreviewResponse>> retrievePetitionsOfMine(@LoginUser SimpleUser simpleUser,
+                                                                                 @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok().body(petitionService.retrievePetitionsByUserId(simpleUser.getId(), pageable));
+    }
+
+    @AdminPermissionRequired
+    @GetMapping("/petitions/{petitionId}/revisions")
+    public ResponseEntity<Page<PetitionRevisionResponse>> retrieveRevisionsOfPetition(@PathVariable Long petitionId,
+                                                                                      @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ResponseEntity.ok().body(petitionService.retrieveRevisionsOfPetition(petitionId, pageable));
     }
 
     @GetMapping("/petitions/count")
