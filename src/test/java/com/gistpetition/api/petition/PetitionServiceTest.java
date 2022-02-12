@@ -182,8 +182,11 @@ public class PetitionServiceTest extends ServiceTest {
     @Test
     void deletePetition() {
         Petition petition = petitionRepository.save(new Petition("title", "description", Category.DORMITORY, petitionOwner.getId()));
+        petitionService.agree(AGREEMENT_REQUEST, petition.getId(), petitionOwner.getId());
         petitionService.deletePetition(petition.getId());
         assertFalse(petitionRepository.existsById(petition.getId()));
+        PageRequest pageRequest = PageRequest.of(0, 10);
+        assertThat(agreementRepository.findAgreementsByPetitionId(pageRequest,petition.getId())).hasSize(0);
     }
 
     @Test
