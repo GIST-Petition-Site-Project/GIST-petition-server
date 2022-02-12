@@ -14,6 +14,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 import static com.gistpetition.api.petition.domain.Petition.REQUIRED_AGREEMENT_NUM;
 
 @Service
@@ -58,6 +60,11 @@ public class PetitionService {
     @Transactional(readOnly = true)
     public PetitionResponse retrievePetitionById(Long petitionId) {
         return PetitionResponse.of(findPetitionById(petitionId));
+    }
+
+    @Transactional(readOnly = true)
+    public PetitionResponse retrievePetitionByUUID(String petitionUUID) {
+        return PetitionResponse.of(findPetitionByUUID(petitionUUID));
     }
 
     @Transactional(readOnly = true)
@@ -136,5 +143,9 @@ public class PetitionService {
 
     private Petition findPetitionById(Long petitionId) {
         return petitionRepository.findById(petitionId).orElseThrow(NoSuchPetitionException::new);
+    }
+
+    private Petition findPetitionByUUID(String petitionUUID) {
+        return petitionRepository.findByUuid(UUID.fromString(petitionUUID)).orElseThrow(NoSuchPetitionException::new);
     }
 }

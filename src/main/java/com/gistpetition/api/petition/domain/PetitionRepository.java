@@ -8,9 +8,14 @@ import org.springframework.data.repository.history.RevisionRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+import java.util.UUID;
+
 @Repository
 public interface PetitionRepository extends RevisionRepository<Petition, Long, Long>, JpaRepository<Petition, Long> {
     Page<Petition> findByUserId(Long userId, Pageable pageable);
+
+    Optional<Petition> findByUuid(UUID uuid);
 
     Page<Petition> findByCategory(Category category, Pageable pageable);
 

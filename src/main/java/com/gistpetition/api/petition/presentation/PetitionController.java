@@ -67,9 +67,9 @@ public class PetitionController {
         return ResponseEntity.ok().body(petitionService.retrieveAnsweredPetition(pageable));
     }
 
-    @GetMapping("/petitions/{petitionId}")
-    public ResponseEntity<PetitionResponse> retrievePetition(@PathVariable Long petitionId) {
-        return ResponseEntity.ok().body(petitionService.retrievePetitionById(petitionId));
+    @GetMapping("/petitions/{petitionUUID}")
+    public ResponseEntity<PetitionResponse> retrievePetition(@PathVariable String petitionUUID) {
+        return ResponseEntity.ok().body(petitionService.retrievePetitionByUUID(petitionUUID));
     }
 
     @LoginRequired
