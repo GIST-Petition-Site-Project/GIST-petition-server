@@ -1,14 +1,12 @@
 package com.gistpetition.api.petition.dto;
 
 import com.gistpetition.api.petition.domain.Petition;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.Data;
 import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
 
-@Getter
-@RequiredArgsConstructor
+@Data
 public class PetitionPreviewResponse {
     private final Long id;
     private final String title;
