@@ -200,6 +200,7 @@ public class PetitionServiceTest extends ServiceTest {
         assertThat(petitionService.retrieveAnsweredPetition(pageable).getContent()).hasSize(1);
     }
 
+
     @DisplayName("Insert, Update 수행 후의 revisionResponse 검증")
     @Test
     void retrieveRevisionsOfPetition() {
@@ -212,6 +213,7 @@ public class PetitionServiceTest extends ServiceTest {
         Page<PetitionRevisionResponse> revisionResponses = petitionService.retrieveRevisionsOfPetition(petitionId, pageRequest);
         assertThat(revisionResponses.getContent()).hasSize(2);
         assertThat(revisionResponses.getContent()).allMatch(content -> content.getWorkedBy().equals(petitionOwner.getId()));
+        assertThat(revisionResponses.getContent()).allMatch(content -> content.getWorkedBy() == petitionOwner.getId());
         List<PetitionRevisionResponse> content = revisionResponses.getContent();
         List<RevisionMetadata.RevisionType> revisionTypes = content.stream().map(PetitionRevisionResponse::getRevisionType).collect(Collectors.toList());
         assertThat(revisionTypes).containsExactly(RevisionMetadata.RevisionType.INSERT, RevisionMetadata.RevisionType.UPDATE);
