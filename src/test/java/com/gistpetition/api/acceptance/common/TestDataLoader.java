@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 import static com.gistpetition.api.acceptance.common.TUser.T_ADMIN;
 
-@Profile("!dev && !prod")
+@Profile("acceptance")
 @Component
 public class TestDataLoader implements CommandLineRunner {
     private final UserRepository userRepository;
