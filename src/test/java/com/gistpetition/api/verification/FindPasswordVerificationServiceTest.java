@@ -107,7 +107,7 @@ class FindPasswordVerificationServiceTest extends ServiceTest {
 
     @Test
     void confirmVerificationAlreadyConfirmedVerification() {
-        passwordVerificationInfoRepository.save(new PasswordVerificationInfo(null, user.getUsername(), VERIFICATION_CODE, LocalDateTime.now().minusMinutes(1), LocalDateTime.now()));
+        passwordVerificationInfoRepository.save(new PasswordVerificationInfo(null, user.getUsername(), VERIFICATION_CODE, LocalDateTime.now(), LocalDateTime.now()));
         assertThatThrownBy(
                 () -> findPasswordVerificationService.confirmUsername(new UsernameConfirmationRequest(GIST_EMAIL, VERIFICATION_CODE))
         ).isInstanceOf(DuplicatedVerificationException.class);

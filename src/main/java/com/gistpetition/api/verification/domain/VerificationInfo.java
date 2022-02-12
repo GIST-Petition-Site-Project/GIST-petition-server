@@ -12,8 +12,8 @@ import java.util.Objects;
 @Getter
 @MappedSuperclass
 public class VerificationInfo {
-    public static final int CONFIRM_CODE_EXPIRE_MINUTE = 15;
-    public static final int CONFIRMATION_EXPIRE_MINUTE = 60;
+    public static final int CONFIRM_CODE_EXPIRE_MINUTE = 1;
+    public static final int CONFIRMATION_EXPIRE_MINUTE = 5;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
