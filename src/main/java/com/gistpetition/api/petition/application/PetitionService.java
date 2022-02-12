@@ -3,7 +3,6 @@ package com.gistpetition.api.petition.application;
 
 import com.gistpetition.api.exception.petition.NoSuchPetitionException;
 import com.gistpetition.api.exception.user.NoSuchUserException;
-import com.gistpetition.api.petition.dto.PetitionRevisionResponse;
 import com.gistpetition.api.petition.domain.*;
 import com.gistpetition.api.petition.dto.*;
 import com.gistpetition.api.user.domain.User;
@@ -67,7 +66,7 @@ public class PetitionService {
     }
 
     @Transactional(readOnly = true)
-    public Page<PetitionPreviewResponse> retrievePetitionToCheck(Pageable pageable) {
+    public Page<PetitionPreviewResponse> retrieveTempPetitions(Pageable pageable) {
         Page<Petition> petitions = petitionRepository.findPetitionByAgreeCountIsGreaterThanEqual(REQUIRED_AGREEMENT_NUM, pageable);
         return PetitionPreviewResponse.pageOf(petitions);
     }

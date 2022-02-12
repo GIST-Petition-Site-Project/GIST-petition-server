@@ -20,7 +20,7 @@ public interface PetitionRepository extends RevisionRepository<Petition, Long, L
 
     Page<Petition> findByAnsweredTrue(Pageable pageable);
 
-    Page<Petition> findPetitionByAgreeCountIsGreaterThanEqual(Long requiredNum, Pageable pageable);
+    Page<Petition> findPetitionByAgreeCountIsGreaterThanEqual(Long requiredAgreeNum, Pageable pageable);
 
     @Query("SELECT p FROM Petition AS p LEFT JOIN FETCH p.agreements WHERE p.id=:petitionId")
     Petition findPetitionByWithEagerMode(@Param("petitionId") Long petitionId);

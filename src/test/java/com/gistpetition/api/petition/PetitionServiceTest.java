@@ -209,7 +209,7 @@ public class PetitionServiceTest extends ServiceTest {
         PageRequest pageRequest = PageRequest.of(0, 10);
         Page<PetitionRevisionResponse> revisionResponses = petitionService.retrieveRevisionsOfPetition(petitionId, pageRequest);
         assertThat(revisionResponses.getContent()).hasSize(2);
-        assertThat(revisionResponses.getContent()).allMatch(content -> content.getWorkedBy() == petitionOwner.getId());
+        assertThat(revisionResponses.getContent()).allMatch(content -> content.getWorkedBy().equals(petitionOwner.getId()));
         List<PetitionRevisionResponse> content = revisionResponses.getContent();
         List<RevisionMetadata.RevisionType> revisionTypes = content.stream().map(PetitionRevisionResponse::getRevisionType).collect(Collectors.toList());
         assertThat(revisionTypes).containsExactly(RevisionMetadata.RevisionType.INSERT, RevisionMetadata.RevisionType.UPDATE);
@@ -229,7 +229,7 @@ public class PetitionServiceTest extends ServiceTest {
         petitionService.agree(AGREEMENT_REQUEST, petitionId, user4.getId());
         petitionService.agree(AGREEMENT_REQUEST, petitionId, user5.getId());
         PageRequest pageRequest = PageRequest.of(0, 10);
-        Page<PetitionPreviewResponse> petitionPreviewResponses = petitionService.retrievePetitionToCheck(pageRequest);
+        Page<PetitionPreviewResponse> petitionPreviewResponses = petitionService.retrieveTempPetitions(pageRequest);
         assertThat(petitionPreviewResponses.getContent()).hasSize(1);
     }
 

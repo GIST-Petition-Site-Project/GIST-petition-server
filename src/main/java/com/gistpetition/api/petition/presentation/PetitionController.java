@@ -41,10 +41,9 @@ public class PetitionController {
     }
 
     @ManagerPermissionRequired
-    @GetMapping("/petitions/need-check")
-    public ResponseEntity<Page<PetitionPreviewResponse>> retrievePetitionsToCheck(@RequestParam(defaultValue = "0") Long categoryId,
-                                                                          @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        return ResponseEntity.ok().body(petitionService.retrievePetitionToCheck(pageable));
+    @GetMapping("/petitions/temp")
+    public ResponseEntity<Page<PetitionPreviewResponse>> retrieveTempPetitions(@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ResponseEntity.ok().body(petitionService.retrieveTempPetitions(pageable));
     }
 
     @ManagerPermissionRequired
