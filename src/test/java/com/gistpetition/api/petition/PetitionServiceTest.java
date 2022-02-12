@@ -8,6 +8,8 @@ import com.gistpetition.api.petition.dto.AgreementRequest;
 import com.gistpetition.api.petition.dto.AgreementResponse;
 import com.gistpetition.api.petition.dto.PetitionPreviewResponse;
 import com.gistpetition.api.petition.dto.PetitionRequest;
+import com.gistpetition.api.petition.dto.PetitionRevisionResponse;
+import com.gistpetition.api.user.domain.SimpleUser;
 import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRepository;
 import com.gistpetition.api.user.domain.UserRole;
@@ -20,8 +22,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.history.RevisionMetadata;
 
+import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -39,6 +45,8 @@ public class PetitionServiceTest extends ServiceTest {
     private PetitionRepository petitionRepository;
     @Autowired
     private AgreementRepository agreementRepository;
+    @Autowired
+    private HttpSession httpSession;
 
     private User petitionOwner;
 
@@ -193,6 +201,22 @@ public class PetitionServiceTest extends ServiceTest {
 
         Pageable pageable = PageRequest.of(0, 10);
         assertThat(petitionService.retrieveAnsweredPetition(pageable).getContent()).hasSize(1);
+    }
+
+    @Test
+    void retrieveRevisionsOfPetition() {
+        httpSession.setAttribute("user", new SimpleUser(petitionOwner));
+        PetitionRequest petitionRequest = new PetitionRequest("title", "desc", Category.DORMITORY.getId());
+        Long petitionId = petitionService.createPetition(petitionRequest, petitionOwner.getId());
+
+        petitionService.updatePetition(petitionId, new PetitionRequest("updateTitle", "updateDesc", Category.FACILITY.getId()));
+        PageRequest pageRequest = PageRequest.of(0, 10);
+        Page<PetitionRevisionResponse> revisionResponses = petitionService.retrieveRevisionsOfPetition(petitionId, pageRequest);
+        assertThat(revisionResponses.getContent()).hasSize(2);
+        assertThat(revisionResponses.getContent()).allMatch(content -> content.getWorkedBy() == petitionOwner.getId());
+        List<PetitionRevisionResponse> content = revisionResponses.getContent();
+        List<RevisionMetadata.RevisionType> revisionTypes = content.stream().map(PetitionRevisionResponse::getRevisionType).collect(Collectors.toList());
+        assertThat(revisionTypes).containsExactly(RevisionMetadata.RevisionType.INSERT, RevisionMetadata.RevisionType.UPDATE);
     }
 
     @AfterEach
