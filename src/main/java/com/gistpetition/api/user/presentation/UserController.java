@@ -46,7 +46,7 @@ public class UserController {
     @AdminPermissionRequired
     @GetMapping("/users")
     public ResponseEntity<Page<UserResponse>> retrieveUsers(Pageable pageable) {
-        return ResponseEntity.ok().body(UserResponse.pageOf(userService.findAllUsers(pageable)));
+        return ResponseEntity.ok().body(UserResponse.pageOf(userService.retrieveUsers(pageable)));
     }
 
     @AdminPermissionRequired

@@ -59,7 +59,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public Page<User> findAllUsers(Pageable pageable) {
+    public Page<User> retrieveUsers(Pageable pageable) {
         return userRepository.findAll(pageable);
     }
 
