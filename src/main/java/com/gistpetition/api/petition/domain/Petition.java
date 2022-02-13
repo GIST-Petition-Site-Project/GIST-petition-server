@@ -4,15 +4,13 @@ import com.gistpetition.api.common.persistence.BaseEntity;
 import com.gistpetition.api.exception.petition.DuplicatedAgreementException;
 import com.gistpetition.api.user.domain.User;
 import lombok.Getter;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
-import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
 
 @Audited
 @Getter
@@ -28,43 +26,40 @@ public class Petition extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Category category;
     private boolean answered;
-    private int accepted;
     private Long userId;
     @NotAudited
     @BatchSize(size = 10)
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "petition_id")
+    @OneToMany(mappedBy = "petition", orphanRemoval = true)
     private final List<Agreement> agreements = new ArrayList<>();
 
     protected Petition() {
     }
 
     public Petition(String title, String description, Category category, Long userId) {
-        this(null, title, description, category, false, 0, userId);
+        this(null, title, description, category, false, userId);
     }
 
-    private Petition(Long id, String title, String description, Category category, boolean answered, int accepted, Long userId) {
+    private Petition(Long id, String title, String description, Category category, boolean answered, Long userId) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.category = category;
         this.answered = answered;
-        this.accepted = accepted;
         this.userId = userId;
     }
 
-    public void applyAgreement(User user, String description) {
+    public void addAgreement(Agreement newAgreement) {
         for (Agreement agreement : agreements) {
-            if (agreement.isAgreedBy(user.getId())) {
+            if (agreement.writtenBy(newAgreement.getUserId())) {
                 throw new DuplicatedAgreementException();
             }
         }
-        this.agreements.add(new Agreement(user.getId(), description, this));
+        this.agreements.add(newAgreement);
     }
 
     public boolean isAgreedBy(User user) {
         for (Agreement agreement : agreements) {
-            if (agreement.isAgreedBy(user.getId())) {
+            if (agreement.writtenBy(user.getId())) {
                 return true;
             }
         }

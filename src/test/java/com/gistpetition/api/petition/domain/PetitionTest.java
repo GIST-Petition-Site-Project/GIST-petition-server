@@ -24,25 +24,28 @@ class PetitionTest {
     @Test
     void agree() {
         assertThat(petition.getAgreements()).hasSize(0);
-        petition.applyAgreement(user, AGREEMENT_DESCRIPTION);
+        Agreement agreement = new Agreement(AGREEMENT_DESCRIPTION, user.getId());
+        petition.addAgreement(agreement);
         assertThat(petition.getAgreements()).hasSize(1);
     }
 
     @Test
-    void agreeTwiceFailTest() {
-        petition.applyAgreement(user, AGREEMENT_DESCRIPTION);
+    void agreeFailedWhenSameUserAgreeTwice() {
+        Agreement agreement = new Agreement(AGREEMENT_DESCRIPTION, user.getId());
+        petition.addAgreement(agreement);
+        Agreement secondaryAgreement = new Agreement(AGREEMENT_DESCRIPTION, user.getId());
         assertThatThrownBy(
-                () -> petition.applyAgreement(user, AGREEMENT_DESCRIPTION)
+                () -> petition.addAgreement(secondaryAgreement)
         ).isInstanceOf(DuplicatedAgreementException.class);
     }
 
     @Test
     void agreeByMultipleUser() {
-        User user = new User(2L, "email@email.com", "password", UserRole.USER);
-        User user3 = new User(3L, "email@email.com", "password", UserRole.USER);
-        petition.applyAgreement(this.user, AGREEMENT_DESCRIPTION);
-        petition.applyAgreement(user, AGREEMENT_DESCRIPTION);
-        petition.applyAgreement(user3, AGREEMENT_DESCRIPTION);
+        User user1 = new User(2L, "email@email.com", "password", UserRole.USER);
+        User user2 = new User(3L, "email@email.com", "password", UserRole.USER);
+        petition.addAgreement(new Agreement(AGREEMENT_DESCRIPTION, user.getId()));
+        petition.addAgreement(new Agreement(AGREEMENT_DESCRIPTION, user1.getId()));
+        petition.addAgreement(new Agreement(AGREEMENT_DESCRIPTION, user2.getId()));
         assertThat(petition.getAgreements()).hasSize(3);
     }
 }
