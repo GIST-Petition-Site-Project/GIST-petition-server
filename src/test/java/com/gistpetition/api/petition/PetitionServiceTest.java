@@ -4,11 +4,7 @@ import com.gistpetition.api.ServiceTest;
 import com.gistpetition.api.exception.petition.NoSuchPetitionException;
 import com.gistpetition.api.petition.application.PetitionService;
 import com.gistpetition.api.petition.domain.*;
-import com.gistpetition.api.petition.dto.AgreementRequest;
-import com.gistpetition.api.petition.dto.AgreementResponse;
-import com.gistpetition.api.petition.dto.PetitionPreviewResponse;
-import com.gistpetition.api.petition.dto.PetitionRequest;
-import com.gistpetition.api.petition.dto.PetitionRevisionResponse;
+import com.gistpetition.api.petition.dto.*;
 import com.gistpetition.api.user.domain.SimpleUser;
 import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRepository;
@@ -16,6 +12,7 @@ import com.gistpetition.api.user.domain.UserRole;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -203,6 +200,8 @@ public class PetitionServiceTest extends ServiceTest {
         assertThat(petitionService.retrieveAnsweredPetition(pageable).getContent()).hasSize(1);
     }
 
+
+    @DisplayName("Insert, Update 수행 후의 revisionResponse 검증")
     @Test
     void retrieveRevisionsOfPetition() {
         httpSession.setAttribute("user", new SimpleUser(petitionOwner));
@@ -213,6 +212,7 @@ public class PetitionServiceTest extends ServiceTest {
         PageRequest pageRequest = PageRequest.of(0, 10);
         Page<PetitionRevisionResponse> revisionResponses = petitionService.retrieveRevisionsOfPetition(petitionId, pageRequest);
         assertThat(revisionResponses.getContent()).hasSize(2);
+        assertThat(revisionResponses.getContent()).allMatch(content -> content.getWorkedBy().equals(petitionOwner.getId()));
         assertThat(revisionResponses.getContent()).allMatch(content -> content.getWorkedBy() == petitionOwner.getId());
         List<PetitionRevisionResponse> content = revisionResponses.getContent();
         List<RevisionMetadata.RevisionType> revisionTypes = content.stream().map(PetitionRevisionResponse::getRevisionType).collect(Collectors.toList());
