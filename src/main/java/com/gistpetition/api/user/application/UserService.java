@@ -101,4 +101,10 @@ public class UserService {
         }
         userRepository.deleteById(userId);
     }
+
+    @Transactional
+    public void deleteUserOfUsername(String username) {
+        User user = findUserByEmail(username);
+        userRepository.delete(user);
+    }
 }
