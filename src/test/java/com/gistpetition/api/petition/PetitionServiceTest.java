@@ -1,6 +1,7 @@
 package com.gistpetition.api.petition;
 
 import com.gistpetition.api.ServiceTest;
+import com.gistpetition.api.exception.petition.DuplicatedAgreementException;
 import com.gistpetition.api.exception.petition.NoSuchPetitionException;
 import com.gistpetition.api.petition.application.PetitionService;
 import com.gistpetition.api.petition.domain.*;
@@ -24,6 +25,9 @@ import org.springframework.data.history.RevisionMetadata;
 import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -126,6 +130,29 @@ public class PetitionServiceTest extends ServiceTest {
         assertThatThrownBy(
                 () -> petitionService.agree(AGREEMENT_REQUEST, petitionId, petitionOwner.getId())
         ).isInstanceOf(NoSuchPetitionException.class);
+    }
+
+    @Test
+    public void applyAgreementWithConcurrency() throws InterruptedException {
+        Long petitionId = petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
+        int numberOfThreads = 10;
+
+        ExecutorService service = Executors.newFixedThreadPool(numberOfThreads);
+        CountDownLatch latch = new CountDownLatch(numberOfThreads);
+        for (int i = 0; i < numberOfThreads; i++) {
+            AgreementRequest agreementRequest = new AgreementRequest("description" + i);
+            service.execute(() -> {
+                try {
+                    petitionService.agree(agreementRequest, petitionId, petitionOwner.getId());
+                } catch (DuplicatedAgreementException e) {
+                    System.out.println("---동의 중복---" + agreementRequest.getDescription());
+                }
+                latch.countDown();
+            });
+        }
+        latch.await();
+        petitionService.retrieveAgreements(petitionId, PageRequest.of(0, 10));
+        assertThat(petitionService.retrieveNumberOfAgreements(petitionId)).isEqualTo(1);
     }
 
     @Test
