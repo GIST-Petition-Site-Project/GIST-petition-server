@@ -10,5 +10,6 @@ import java.util.Optional;
 @Repository
 public interface AgreementRepository extends JpaRepository<Agreement, Long> {
     Page<Agreement> findAgreementsByPetitionId(Pageable pageable, Long petitionId);
+
     Optional<Agreement> findByUserId(Long userId);
 }

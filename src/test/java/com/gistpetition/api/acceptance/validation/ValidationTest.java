@@ -2,18 +2,11 @@ package com.gistpetition.api.acceptance.validation;
 
 import com.gistpetition.api.acceptance.AcceptanceTest;
 import com.gistpetition.api.petition.domain.Category;
-import com.gistpetition.api.utils.emailsender.EmailSender;
 import com.gistpetition.api.verification.application.FixedVerificationCodeGenerator;
-import io.restassured.RestAssured;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.ActiveProfiles;
 
 import static com.gistpetition.api.acceptance.common.TUser.GUNE;
 import static org.assertj.core.api.Assertions.assertThat;

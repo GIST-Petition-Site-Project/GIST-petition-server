@@ -11,7 +11,6 @@ import com.gistpetition.api.utils.email.EmailParser;
 import com.gistpetition.api.verification.application.VerificationCodeGenerator;
 import com.gistpetition.api.verification.domain.SignUpVerificationInfo;
 import com.gistpetition.api.verification.domain.SignUpVerificationInfoRepository;
-import com.gistpetition.api.verification.domain.VerificationInfo;
 import com.gistpetition.api.verification.dto.UsernameConfirmationRequest;
 import com.gistpetition.api.verification.dto.VerificationEmailRequest;
 import org.springframework.stereotype.Service;
