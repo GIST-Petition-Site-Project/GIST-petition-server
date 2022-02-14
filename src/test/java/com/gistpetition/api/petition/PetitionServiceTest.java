@@ -133,6 +133,17 @@ public class PetitionServiceTest extends ServiceTest {
     }
 
     @Test
+    void agreeTwiceByOneUser() {
+        Long petitionId = petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
+
+        petitionService.agree(AGREEMENT_REQUEST, petitionId, petitionOwner.getId());
+
+        assertThatThrownBy(
+                () -> petitionService.agree(AGREEMENT_REQUEST, petitionId, petitionOwner.getId())
+        ).isInstanceOf(DataIntegrityViolationException.class);
+    }
+
+    @Test
     public void applyAgreementWithConcurrency() throws InterruptedException {
         Long petitionId = petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
         int numberOfThreads = 10;
@@ -271,7 +282,6 @@ public class PetitionServiceTest extends ServiceTest {
         Page<PetitionRevisionResponse> revisionResponses = petitionService.retrieveRevisionsOfPetition(petitionId, pageRequest);
         assertThat(revisionResponses.getContent()).hasSize(2);
         assertThat(revisionResponses.getContent()).allMatch(content -> content.getWorkedBy().equals(petitionOwner.getId()));
-        assertThat(revisionResponses.getContent()).allMatch(content -> content.getWorkedBy() == petitionOwner.getId());
         List<PetitionRevisionResponse> content = revisionResponses.getContent();
         List<RevisionMetadata.RevisionType> revisionTypes = content.stream().map(PetitionRevisionResponse::getRevisionType).collect(Collectors.toList());
         assertThat(revisionTypes).containsExactly(RevisionMetadata.RevisionType.INSERT, RevisionMetadata.RevisionType.UPDATE);
