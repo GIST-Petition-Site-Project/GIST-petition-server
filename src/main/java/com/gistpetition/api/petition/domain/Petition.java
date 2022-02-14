@@ -1,7 +1,6 @@
 package com.gistpetition.api.petition.domain;
 
 import com.gistpetition.api.common.persistence.BaseEntity;
-import com.gistpetition.api.exception.petition.DuplicatedAgreementException;
 import com.gistpetition.api.user.domain.User;
 import lombok.Getter;
 import org.hibernate.annotations.BatchSize;
@@ -49,11 +48,6 @@ public class Petition extends BaseEntity {
     }
 
     public void addAgreement(Agreement newAgreement) {
-        for (Agreement agreement : agreements) {
-            if (agreement.writtenBy(newAgreement.getUserId())) {
-                throw new DuplicatedAgreementException();
-            }
-        }
         this.agreements.add(newAgreement);
     }
 
