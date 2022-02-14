@@ -6,10 +6,11 @@ import javax.validation.constraints.NotNull;
 
 public class UpdatePasswordByVerificationRequest {
     @Email
+    @NotBlank
     private String username;
     @NotBlank
     private String password;
-    @NotNull
+    @NotBlank
     private String verificationCode;
 
     public UpdatePasswordByVerificationRequest() {
