@@ -8,7 +8,7 @@ public class PetitionRequest {
     private String title;
     @NotBlank
     private String description;
-    @NotBlank
+    @NotNull
     private Long categoryId;
 
     protected PetitionRequest() {
