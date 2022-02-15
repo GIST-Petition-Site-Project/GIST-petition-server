@@ -30,7 +30,7 @@ public class PetitionController {
     @PostMapping("/petitions")
     public ResponseEntity<Void> createPetition(@Validated @RequestBody PetitionRequest petitionRequest,
                                                @LoginUser SimpleUser simpleUser) {
-        return ResponseEntity.created(URI.create("/petitions/" + petitionService.createPetition(petitionRequest, simpleUser.getId()).toString())).build();
+        return ResponseEntity.created(URI.create("/petitions/" + petitionService.createPetition(petitionRequest, simpleUser.getId()))).build();
     }
 
     @GetMapping("/petitions")
@@ -42,19 +42,6 @@ public class PetitionController {
         return ResponseEntity.ok().body(petitionService.retrievePetitionByCategoryId(categoryId, pageable));
     }
 
-    @ManagerPermissionRequired
-    @GetMapping("/petitions/waitingForCheck")
-    public ResponseEntity<Page<PetitionPreviewResponse>> retrievePetitionsWaitingForCheck(@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        return ResponseEntity.ok().body(petitionService.retrievePetitionsWaitingForCheck(pageable));
-    }
-
-    @ManagerPermissionRequired
-    @PutMapping("/petitions/{petitionId}/expose")
-    public ResponseEntity<Void> exposePetition(@PathVariable Long petitionId) {
-        petitionService.exposePetition(petitionId);
-        return ResponseEntity.ok().build();
-    }
-
     @GetMapping("/petitions/search")
     public ResponseEntity<Page<PetitionPreviewResponse>> retrievePetitionsByKeyword(@RequestParam(defaultValue = "") String keyword,
                                                                                     @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
@@ -64,20 +51,9 @@ public class PetitionController {
         return ResponseEntity.ok().body(petitionService.retrievePetitionByKeyword(keyword, pageable));
     }
 
-    @GetMapping("/petitions/answered")
-    public ResponseEntity<Page<PetitionPreviewResponse>> retrieveAnsweredPetition(@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        return ResponseEntity.ok().body(petitionService.retrieveAnsweredPetition(pageable));
-    }
-
-    @ManagerPermissionRequired
     @GetMapping("/petitions/{petitionId}")
-    public ResponseEntity<PetitionResponse> retrievePetitionForManager(@PathVariable Long petitionId) {
+    public ResponseEntity<PetitionResponse> retrievePetition(@PathVariable Long petitionId) {
         return ResponseEntity.ok().body(petitionService.retrievePetitionById(petitionId));
-    }
-
-    @GetMapping("/petitions/{petitionUUID}")
-    public ResponseEntity<PetitionResponse> retrievePetition(@PathVariable String petitionUUID) {
-        return ResponseEntity.ok().body(petitionService.retrievePetitionByUUID(petitionUUID));
     }
 
     @LoginRequired

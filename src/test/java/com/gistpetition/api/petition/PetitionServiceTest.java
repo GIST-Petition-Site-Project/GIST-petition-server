@@ -24,9 +24,7 @@ import org.springframework.data.history.RevisionMetadata;
 
 import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -60,8 +58,8 @@ public class PetitionServiceTest extends ServiceTest {
 
     @Test
     void createPetition() {
-        UUID petitionUUID = petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
-        Petition petition = petitionRepository.findByUuid(petitionUUID).orElseThrow(IllegalArgumentException::new);
+        Long petitionId = petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
+        Petition petition = petitionRepository.findById(petitionId).orElseThrow(IllegalArgumentException::new);
 
         assertThat(petition.getTitle()).isEqualTo(DORM_PETITION_REQUEST.getTitle());
         assertThat(petition.getDescription()).isEqualTo(DORM_PETITION_REQUEST.getDescription());
@@ -83,14 +81,14 @@ public class PetitionServiceTest extends ServiceTest {
 
     @Test
     void updatePetition() {
-        UUID petitionUUID = petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
-        Petition petition = petitionRepository.findByUuid(petitionUUID).orElseThrow(IllegalArgumentException::new);
+        Long petitionId = petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
+        Petition petition = petitionRepository.findById(petitionId).orElseThrow(IllegalArgumentException::new);
 
         LocalDateTime initialTime = petition.getUpdatedAt();
         PetitionRequest updateRequest = new PetitionRequest("updateTitle", "updateDescription", Category.FACILITY.getId());
         petitionService.updatePetition(petition.getId(), updateRequest);
 
-        Petition updatedPetition = petitionRepository.findById(petition.getId()).orElseThrow(IllegalArgumentException::new);
+        Petition updatedPetition = petitionRepository.findById(petitionId).orElseThrow(IllegalArgumentException::new);
 
         assertThat(updatedPetition.getTitle()).isEqualTo(updateRequest.getTitle());
         assertThat(updatedPetition.getDescription()).isEqualTo(updateRequest.getDescription());
@@ -100,8 +98,8 @@ public class PetitionServiceTest extends ServiceTest {
 
     @Test
     void updatePetitionByNonExistentPetitionId() {
-        UUID petitionUUID = petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
-        Petition petition = petitionRepository.findByUuid(petitionUUID).orElseThrow(IllegalArgumentException::new);
+        Long petitionId = petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
+        Petition petition = petitionRepository.findById(petitionId).orElseThrow(IllegalArgumentException::new);
 
         LocalDateTime initialTime = petition.getUpdatedAt();
 
@@ -109,19 +107,19 @@ public class PetitionServiceTest extends ServiceTest {
 
         assertThatThrownBy(() -> petitionService.updatePetition(Long.MAX_VALUE, petitionUpdateRequest)).isInstanceOf(NoSuchPetitionException.class);
 
-        Petition updatedPetition = petitionRepository.findByUuid(petitionUUID).orElseThrow(IllegalArgumentException::new);
+        Petition updatedPetition = petitionRepository.findById(petitionId).orElseThrow(IllegalArgumentException::new);
         assertTrue(updatedPetition.getUpdatedAt().isEqual(initialTime));
     }
 
     @Test
     void agree() {
-        UUID petitionUUID = petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
-        Petition p = petitionRepository.findByUuid(petitionUUID).orElseThrow();
-        Petition petition = petitionRepository.findPetitionByWithEagerMode(p.getId());
+        Long petitionId = petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
+
+        Petition petition = petitionRepository.findPetitionByWithEagerMode(petitionId);
         Assertions.assertThat(petition.getAgreements()).hasSize(0);
 
-        petitionService.agree(AGREEMENT_REQUEST, petition.getId(), petitionOwner.getId());
-        petition = petitionRepository.findPetitionByWithEagerMode(petition.getId());
+        petitionService.agree(AGREEMENT_REQUEST, petitionId, petitionOwner.getId());
+        petition = petitionRepository.findPetitionByWithEagerMode(petitionId);
         assertThat(petition.getAgreements()).hasSize(1);
         assertThat(petition.getAgreements().get(0).getDescription()).isEqualTo(AGREEMENT_REQUEST.getDescription());
     }
@@ -136,19 +134,18 @@ public class PetitionServiceTest extends ServiceTest {
 
     @Test
     void agreeTwiceByOneUser() {
-        UUID petitionUUID = petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
-        Petition petition = petitionRepository.findByUuid(petitionUUID).orElseThrow();
-        petitionService.agree(AGREEMENT_REQUEST, petition.getId(), petitionOwner.getId());
+        Long petitionId = petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
+
+        petitionService.agree(AGREEMENT_REQUEST, petitionId, petitionOwner.getId());
 
         assertThatThrownBy(
-                () -> petitionService.agree(AGREEMENT_REQUEST, petition.getId(), petitionOwner.getId())
+                () -> petitionService.agree(AGREEMENT_REQUEST, petitionId, petitionOwner.getId())
         ).isInstanceOf(DataIntegrityViolationException.class);
     }
 
     @Test
     public void applyAgreementWithConcurrency() throws InterruptedException {
-        UUID petitionUUID = petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
-        Petition petition = petitionRepository.findByUuid(petitionUUID).orElseThrow();
+        Long petitionId = petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
         int numberOfThreads = 10;
 
         ExecutorService service = Executors.newFixedThreadPool(numberOfThreads);
@@ -157,7 +154,7 @@ public class PetitionServiceTest extends ServiceTest {
             AgreementRequest agreementRequest = new AgreementRequest("description" + i);
             service.execute(() -> {
                 try {
-                    petitionService.agree(agreementRequest, petition.getId(), petitionOwner.getId());
+                    petitionService.agree(agreementRequest, petitionId, petitionOwner.getId());
                 } catch (DataIntegrityViolationException e) {
                     System.out.println("---동의 중복---" + agreementRequest.getDescription());
                 }
@@ -165,85 +162,82 @@ public class PetitionServiceTest extends ServiceTest {
             });
         }
         latch.await();
-        assertThat(petitionService.retrieveNumberOfAgreements(petition.getId())).isEqualTo(1);
+        assertThat(petitionService.retrieveNumberOfAgreements(petitionId)).isEqualTo(1);
     }
 
     @Test
     void getPageOfAgreements() {
-        UUID petitionUUID = petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
-        Petition petition = petitionRepository.findByUuid(petitionUUID).orElseThrow();
+        Long petitionId = petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
+
         User user1 = userRepository.save(new User("user1@gm.gist.ac.kr", "password", UserRole.USER));
         User user2 = userRepository.save(new User("user2@gm.gist.ac.kr", "password", UserRole.USER));
 
-        petitionService.agree(AGREEMENT_REQUEST, petition.getId(), petitionOwner.getId());
-        petitionService.agree(AGREEMENT_REQUEST, petition.getId(), user1.getId());
-        petitionService.agree(AGREEMENT_REQUEST, petition.getId(), user2.getId());
+        petitionService.agree(AGREEMENT_REQUEST, petitionId, petitionOwner.getId());
+        petitionService.agree(AGREEMENT_REQUEST, petitionId, user1.getId());
+        petitionService.agree(AGREEMENT_REQUEST, petitionId, user2.getId());
 
         Pageable pageable = PageRequest.of(0, 3, Sort.Direction.DESC, "createdAt");
-        Page<AgreementResponse> allOfAgreements = petitionService.retrieveAgreements(petition.getId(), pageable);
+        Page<AgreementResponse> allOfAgreements = petitionService.retrieveAgreements(petitionId, pageable);
         assertThat(allOfAgreements).hasSize(3);
 
         Pageable pageableSizeAsTwo = PageRequest.of(0, 2, Sort.Direction.DESC, "createdAt");
-        Page<AgreementResponse> twoOfAgreements = petitionService.retrieveAgreements(petition.getId(), pageableSizeAsTwo);
+        Page<AgreementResponse> twoOfAgreements = petitionService.retrieveAgreements(petitionId, pageableSizeAsTwo);
         assertThat(twoOfAgreements).hasSize(2);
     }
 
     @Test
     void numberOfAgreements() {
-        UUID petitionUUID = petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
-        Petition petition = petitionRepository.findByUuid(petitionUUID).orElseThrow();
+        Long petitionId = petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
+
         User user = userRepository.save(new User("email@email.com", "password", UserRole.USER));
         User user3 = userRepository.save(new User("email3@email.com", "password", UserRole.USER));
 
-        assertThat(petitionService.retrieveNumberOfAgreements(petition.getId())).isEqualTo(0);
+        assertThat(petitionService.retrieveNumberOfAgreements(petitionId)).isEqualTo(0);
 
-        petitionService.agree(AGREEMENT_REQUEST, petition.getId(), petitionOwner.getId());
-        petitionService.agree(AGREEMENT_REQUEST, petition.getId(), user.getId());
-        petitionService.agree(AGREEMENT_REQUEST, petition.getId(), user3.getId());
+        petitionService.agree(AGREEMENT_REQUEST, petitionId, petitionOwner.getId());
+        petitionService.agree(AGREEMENT_REQUEST, petitionId, user.getId());
+        petitionService.agree(AGREEMENT_REQUEST, petitionId, user3.getId());
 
-        assertThat(petitionService.retrieveNumberOfAgreements(petition.getId())).isEqualTo(3);
+        assertThat(petitionService.retrieveNumberOfAgreements(petitionId)).isEqualTo(3);
     }
 
     @Test
     void retrieveAgreedPetitions() {
-        UUID petitionUUID1 = petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
-        UUID petitionUUID2 = petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
-        UUID petitionUUID3 = petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
-        Petition petition1 = petitionRepository.findByUuid(petitionUUID1).orElseThrow();
-        Petition petition2 = petitionRepository.findByUuid(petitionUUID2).orElseThrow();
-        Petition petition3 = petitionRepository.findByUuid(petitionUUID3).orElseThrow();
+        Long petitionId = petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
+        Long petitionId2 = petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
+        Long petitionId3 = petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
+
         User user = userRepository.save(new User("email@email.com", "password", UserRole.USER));
         User user3 = userRepository.save(new User("email3@email.com", "password", UserRole.USER));
 
-        assertThat(petitionService.retrieveNumberOfAgreements(petition1.getId())).isEqualTo(0);
+        assertThat(petitionService.retrieveNumberOfAgreements(petitionId)).isEqualTo(0);
 
-        petitionService.agree(AGREEMENT_REQUEST, petition1.getId(), petitionOwner.getId());
-        petitionService.agree(AGREEMENT_REQUEST, petition1.getId(), user.getId());
-        petitionService.agree(AGREEMENT_REQUEST, petition1.getId(), user3.getId());
+        petitionService.agree(AGREEMENT_REQUEST, petitionId, petitionOwner.getId());
+        petitionService.agree(AGREEMENT_REQUEST, petitionId, user.getId());
+        petitionService.agree(AGREEMENT_REQUEST, petitionId, user3.getId());
 
-        petitionService.agree(AGREEMENT_REQUEST, petition2.getId(), petitionOwner.getId());
-        petitionService.agree(AGREEMENT_REQUEST, petition2.getId(), user.getId());
-        petitionService.agree(AGREEMENT_REQUEST, petition2.getId(), user3.getId());
+        petitionService.agree(AGREEMENT_REQUEST, petitionId2, petitionOwner.getId());
+        petitionService.agree(AGREEMENT_REQUEST, petitionId2, user.getId());
+        petitionService.agree(AGREEMENT_REQUEST, petitionId2, user3.getId());
 
-        petitionService.agree(AGREEMENT_REQUEST, petition3.getId(), petitionOwner.getId());
-        petitionService.agree(AGREEMENT_REQUEST, petition3.getId(), user.getId());
-        petitionService.agree(AGREEMENT_REQUEST, petition3.getId(), user3.getId());
+        petitionService.agree(AGREEMENT_REQUEST, petitionId3, petitionOwner.getId());
+        petitionService.agree(AGREEMENT_REQUEST, petitionId3, user.getId());
+        petitionService.agree(AGREEMENT_REQUEST, petitionId3, user3.getId());
 
         PageRequest pageRequest = PageRequest.of(0, 10);
         Page<PetitionPreviewResponse> petitionPreviewResponses = petitionService.retrievePetition(pageRequest);
 
-        assertThat(petitionService.retrieveNumberOfAgreements(petition1.getId())).isEqualTo(3);
+        assertThat(petitionService.retrieveNumberOfAgreements(petitionId)).isEqualTo(3);
     }
 
     @Test
     void getStateOfAgreement() {
-        UUID petitionUUID = petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
-        Petition petition = petitionRepository.findByUuid(petitionUUID).orElseThrow();
-        assertThat(petitionService.retrieveStateOfAgreement(petition.getId(), petitionOwner.getId())).isFalse();
+        Long petitionId = petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
+        assertThat(petitionService.retrieveStateOfAgreement(petitionId, petitionOwner.getId())).isFalse();
 
-        petitionService.agree(AGREEMENT_REQUEST, petition.getId(), petitionOwner.getId());
+        petitionService.agree(AGREEMENT_REQUEST, petitionId, petitionOwner.getId());
 
-        assertThat(petitionService.retrieveStateOfAgreement(petition.getId(), petitionOwner.getId())).isTrue();
+        assertThat(petitionService.retrieveStateOfAgreement(petitionId, petitionOwner.getId())).isTrue();
         Agreement agreement = agreementRepository.findByUserId(petitionOwner.getId()).orElseThrow(IllegalArgumentException::new);
         assertThat(agreement.getCreatedAt()).isNotNull();
     }
@@ -281,34 +275,17 @@ public class PetitionServiceTest extends ServiceTest {
     void retrieveRevisionsOfPetition() {
         httpSession.setAttribute("user", new SimpleUser(petitionOwner));
         PetitionRequest petitionRequest = new PetitionRequest("title", "desc", Category.DORMITORY.getId());
-        UUID petitionUUID = petitionService.createPetition(petitionRequest, petitionOwner.getId());
-        Petition petition = petitionRepository.findByUuid(petitionUUID).orElseThrow();
-        petitionService.updatePetition(petition.getId(), new PetitionRequest("updateTitle", "updateDesc", Category.FACILITY.getId()));
+        Long petitionId = petitionService.createPetition(petitionRequest, petitionOwner.getId());
+
+        petitionService.updatePetition(petitionId, new PetitionRequest("updateTitle", "updateDesc", Category.FACILITY.getId()));
         PageRequest pageRequest = PageRequest.of(0, 10);
-        Page<PetitionRevisionResponse> revisionResponses = petitionService.retrieveRevisionsOfPetition(petition.getId(), pageRequest);
+        Page<PetitionRevisionResponse> revisionResponses = petitionService.retrieveRevisionsOfPetition(petitionId, pageRequest);
         assertThat(revisionResponses.getContent()).hasSize(2);
         assertThat(revisionResponses.getContent()).allMatch(content -> content.getWorkedBy().equals(petitionOwner.getId()));
         List<PetitionRevisionResponse> content = revisionResponses.getContent();
         List<RevisionMetadata.RevisionType> revisionTypes = content.stream().map(PetitionRevisionResponse::getRevisionType).collect(Collectors.toList());
         assertThat(revisionTypes).containsExactly(RevisionMetadata.RevisionType.INSERT, RevisionMetadata.RevisionType.UPDATE);
     }
-
-    @Test
-    void retrievePetitionsWaitingForCheck() {
-        UUID petitionUUID = petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
-        Petition petition = petitionRepository.findByUuid(petitionUUID).orElseThrow();
-        ArrayList<User> users = new ArrayList<>();
-        for (int i = 0; i < Petition.REQUIRED_AGREEMENT_NUM; i++) {
-            users.add(userRepository.save(new User(String.format("user%s@gist.ac.kr", i), "pwd", UserRole.USER)));
-        }
-        for (int i = 0; i < Petition.REQUIRED_AGREEMENT_NUM; i++) {
-            petitionService.agree(AGREEMENT_REQUEST, petition.getId(), users.get(i).getId());
-        }
-        PageRequest pageRequest = PageRequest.of(0, 10);
-        Page<PetitionPreviewResponse> petitionPreviewResponses = petitionService.retrievePetitionsWaitingForCheck(pageRequest);
-        assertThat(petitionPreviewResponses.getContent()).hasSize(1);
-    }
-
 
     @AfterEach
     void tearDown() {
