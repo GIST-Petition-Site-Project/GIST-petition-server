@@ -8,14 +8,9 @@ import org.springframework.data.repository.history.RevisionRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
-import java.util.UUID;
-
 @Repository
 public interface PetitionRepository extends RevisionRepository<Petition, Long, Long>, JpaRepository<Petition, Long> {
     Page<Petition> findByUserId(Long userId, Pageable pageable);
-
-    Optional<Petition> findByUuid(UUID uuid);
 
     Page<Petition> findByCategory(Category category, Pageable pageable);
 
@@ -24,8 +19,6 @@ public interface PetitionRepository extends RevisionRepository<Petition, Long, L
     Page<Petition> findByTitleContains(String keyword, Pageable pageable);
 
     Page<Petition> findByAnsweredTrue(Pageable pageable);
-
-    Page<Petition> findPetitionByAgreeCountIsGreaterThanEqualAndExposedFalse(Long requiredAgreeNum, Pageable pageable);
 
     @Query("SELECT p FROM Petition AS p LEFT JOIN FETCH p.agreements WHERE p.id=:petitionId")
     Petition findPetitionByWithEagerMode(@Param("petitionId") Long petitionId);

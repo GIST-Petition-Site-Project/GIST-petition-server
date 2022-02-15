@@ -14,10 +14,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
-
-import static com.gistpetition.api.petition.domain.Petition.REQUIRED_AGREEMENT_NUM;
-
 @Service
 @AllArgsConstructor
 public class PetitionService {
@@ -28,13 +24,13 @@ public class PetitionService {
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
-    public UUID createPetition(PetitionRequest petitionRequest, Long userId) {
+    public Long createPetition(PetitionRequest petitionRequest, Long userId) {
         return petitionRepository.save(
                 new Petition(petitionRequest.getTitle(),
                         petitionRequest.getDescription(),
                         Category.of(petitionRequest.getCategoryId()),
                         userId)
-        ).getUuid();
+        ).getId();
     }
 
     @Transactional(readOnly = true)
@@ -63,25 +59,8 @@ public class PetitionService {
     }
 
     @Transactional(readOnly = true)
-    public PetitionResponse retrievePetitionByUUID(String petitionUUID) {
-        return PetitionResponse.of(findPetitionByUUID(petitionUUID));
-    }
-
-    @Transactional(readOnly = true)
     public Page<PetitionPreviewResponse> retrieveAnsweredPetition(Pageable pageable) {
         return PetitionPreviewResponse.pageOf(petitionRepository.findByAnsweredTrue(pageable));
-    }
-
-    @Transactional(readOnly = true)
-    public Page<PetitionPreviewResponse> retrievePetitionsWaitingForCheck(Pageable pageable) {
-        Page<Petition> petitions = petitionRepository.findPetitionByAgreeCountIsGreaterThanEqualAndExposedFalse(REQUIRED_AGREEMENT_NUM, pageable);
-        return PetitionPreviewResponse.pageOf(petitions);
-    }
-
-    @Transactional
-    public void exposePetition(Long petitionId) {
-        Petition petition = findPetitionById(petitionId);
-        petition.setExposed(true);
     }
 
     @Transactional(readOnly = true)
@@ -145,9 +124,5 @@ public class PetitionService {
 
     private Petition findPetitionById(Long petitionId) {
         return petitionRepository.findById(petitionId).orElseThrow(NoSuchPetitionException::new);
-    }
-
-    private Petition findPetitionByUUID(String petitionUUID) {
-        return petitionRepository.findByUuid(UUID.fromString(petitionUUID)).orElseThrow(NoSuchPetitionException::new);
     }
 }
