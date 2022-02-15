@@ -28,13 +28,13 @@ public class PetitionService {
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
-    public Long createPetition(PetitionRequest petitionRequest, Long userId) {
+    public UUID createPetition(PetitionRequest petitionRequest, Long userId) {
         return petitionRepository.save(
                 new Petition(petitionRequest.getTitle(),
                         petitionRequest.getDescription(),
                         Category.of(petitionRequest.getCategoryId()),
                         userId)
-        ).getId();
+        ).getUuid();
     }
 
     @Transactional(readOnly = true)

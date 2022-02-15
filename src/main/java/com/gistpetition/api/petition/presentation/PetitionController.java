@@ -30,7 +30,7 @@ public class PetitionController {
     @PostMapping("/petitions")
     public ResponseEntity<Void> createPetition(@Validated @RequestBody PetitionRequest petitionRequest,
                                                @LoginUser SimpleUser simpleUser) {
-        return ResponseEntity.created(URI.create("/petitions/" + petitionService.createPetition(petitionRequest, simpleUser.getId()))).build();
+        return ResponseEntity.created(URI.create("/petitions/" + petitionService.createPetition(petitionRequest, simpleUser.getId()).toString())).build();
     }
 
     @GetMapping("/petitions")
