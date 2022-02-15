@@ -34,6 +34,7 @@ public class Petition extends BaseEntity {
     private Boolean answered;
     private Boolean exposed;
     private Long userId;
+    @NotAudited
     private Long agreeCount = 0L;
     @NotAudited
     @BatchSize(size = 10)
