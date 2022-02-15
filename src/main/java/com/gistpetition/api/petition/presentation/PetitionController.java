@@ -69,7 +69,7 @@ public class PetitionController {
         return ResponseEntity.ok().body(petitionService.retrieveAnsweredPetition(pageable));
     }
 
-    @ManagerPermissionRequired
+
     @GetMapping("/petitions/{petitionId}")
     public ResponseEntity<PetitionResponse> retrievePetitionForManager(@PathVariable Long petitionId) {
         return ResponseEntity.ok().body(petitionService.retrievePetitionById(petitionId));
