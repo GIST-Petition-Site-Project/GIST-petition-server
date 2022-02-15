@@ -15,6 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +25,9 @@ import org.springframework.data.history.RevisionMetadata;
 import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -126,6 +130,39 @@ public class PetitionServiceTest extends ServiceTest {
         assertThatThrownBy(
                 () -> petitionService.agree(AGREEMENT_REQUEST, petitionId, petitionOwner.getId())
         ).isInstanceOf(NoSuchPetitionException.class);
+    }
+
+    @Test
+    void agreeTwiceByOneUser() {
+        Long petitionId = petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
+
+        petitionService.agree(AGREEMENT_REQUEST, petitionId, petitionOwner.getId());
+
+        assertThatThrownBy(
+                () -> petitionService.agree(AGREEMENT_REQUEST, petitionId, petitionOwner.getId())
+        ).isInstanceOf(DataIntegrityViolationException.class);
+    }
+
+    @Test
+    public void applyAgreementWithConcurrency() throws InterruptedException {
+        Long petitionId = petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
+        int numberOfThreads = 10;
+
+        ExecutorService service = Executors.newFixedThreadPool(numberOfThreads);
+        CountDownLatch latch = new CountDownLatch(numberOfThreads);
+        for (int i = 0; i < numberOfThreads; i++) {
+            AgreementRequest agreementRequest = new AgreementRequest("description" + i);
+            service.execute(() -> {
+                try {
+                    petitionService.agree(agreementRequest, petitionId, petitionOwner.getId());
+                } catch (DataIntegrityViolationException e) {
+                    System.out.println("---동의 중복---" + agreementRequest.getDescription());
+                }
+                latch.countDown();
+            });
+        }
+        latch.await();
+        assertThat(petitionService.retrieveNumberOfAgreements(petitionId)).isEqualTo(1);
     }
 
     @Test
@@ -245,7 +282,6 @@ public class PetitionServiceTest extends ServiceTest {
         Page<PetitionRevisionResponse> revisionResponses = petitionService.retrieveRevisionsOfPetition(petitionId, pageRequest);
         assertThat(revisionResponses.getContent()).hasSize(2);
         assertThat(revisionResponses.getContent()).allMatch(content -> content.getWorkedBy().equals(petitionOwner.getId()));
-        assertThat(revisionResponses.getContent()).allMatch(content -> content.getWorkedBy() == petitionOwner.getId());
         List<PetitionRevisionResponse> content = revisionResponses.getContent();
         List<RevisionMetadata.RevisionType> revisionTypes = content.stream().map(PetitionRevisionResponse::getRevisionType).collect(Collectors.toList());
         assertThat(revisionTypes).containsExactly(RevisionMetadata.RevisionType.INSERT, RevisionMetadata.RevisionType.UPDATE);

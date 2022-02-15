@@ -7,6 +7,7 @@ import javax.persistence.*;
 
 @Getter
 @Entity
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "petition_id"}))
 public class Agreement extends UnmodifiableEntity {
 
     @Id
@@ -14,6 +15,7 @@ public class Agreement extends UnmodifiableEntity {
     private Long id;
     @Lob
     private String description;
+    @Column(name = "user_id")
     private Long userId;
 
     @ManyToOne(fetch = FetchType.LAZY)

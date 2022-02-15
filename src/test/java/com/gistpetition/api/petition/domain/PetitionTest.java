@@ -1,13 +1,11 @@
 package com.gistpetition.api.petition.domain;
 
-import com.gistpetition.api.exception.petition.DuplicatedAgreementException;
 import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRole;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class PetitionTest {
     private static final String AGREEMENT_DESCRIPTION = "동의합니다.";
@@ -27,16 +25,6 @@ class PetitionTest {
         Agreement agreement = new Agreement(AGREEMENT_DESCRIPTION, user.getId());
         petition.addAgreement(agreement);
         assertThat(petition.getAgreements()).hasSize(1);
-    }
-
-    @Test
-    void agreeFailedWhenSameUserAgreeTwice() {
-        Agreement agreement = new Agreement(AGREEMENT_DESCRIPTION, user.getId());
-        petition.addAgreement(agreement);
-        Agreement secondaryAgreement = new Agreement(AGREEMENT_DESCRIPTION, user.getId());
-        assertThatThrownBy(
-                () -> petition.addAgreement(secondaryAgreement)
-        ).isInstanceOf(DuplicatedAgreementException.class);
     }
 
     @Test
