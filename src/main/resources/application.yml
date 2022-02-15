@@ -33,7 +33,7 @@ spring:
     import: ./privates/application-dev-db.yml, ./privates/application-dev-mail.yml
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
 swagger:
   host: dev-api.gist-petition.com
   protocol: https
