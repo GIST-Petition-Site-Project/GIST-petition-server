@@ -6,7 +6,8 @@ import com.gistpetition.api.user.domain.UserRole;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class PetitionTest {
     private static final String AGREEMENT_DESCRIPTION = "동의합니다.";
@@ -23,26 +24,18 @@ class PetitionTest {
     @Test
     void agree() {
         assertThat(petition.getAgreements()).hasSize(0);
-        petition.applyAgreement(user, AGREEMENT_DESCRIPTION);
+        Agreement agreement = new Agreement(AGREEMENT_DESCRIPTION, user.getId());
+        petition.addAgreement(agreement);
         assertThat(petition.getAgreements()).hasSize(1);
-        assertThat(petition.getAgreeCount()).isEqualTo(1);
-    }
-
-    @Test
-    void agreeTwiceFailTest() {
-        petition.applyAgreement(user, AGREEMENT_DESCRIPTION);
-        assertThatThrownBy(
-                () -> petition.applyAgreement(user, AGREEMENT_DESCRIPTION)
-        ).isInstanceOf(DuplicatedAgreementException.class);
     }
 
     @Test
     void agreeByMultipleUser() {
-        User user = new User(2L, "email@email.com", "password", UserRole.USER);
-        User user3 = new User(3L, "email@email.com", "password", UserRole.USER);
-        petition.applyAgreement(this.user, AGREEMENT_DESCRIPTION);
-        petition.applyAgreement(user, AGREEMENT_DESCRIPTION);
-        petition.applyAgreement(user3, AGREEMENT_DESCRIPTION);
+        User user1 = new User(2L, "email@email.com", "password", UserRole.USER);
+        User user2 = new User(3L, "email@email.com", "password", UserRole.USER);
+        petition.addAgreement(new Agreement(AGREEMENT_DESCRIPTION, user.getId()));
+        petition.addAgreement(new Agreement(AGREEMENT_DESCRIPTION, user1.getId()));
+        petition.addAgreement(new Agreement(AGREEMENT_DESCRIPTION, user2.getId()));
         assertThat(petition.getAgreements()).hasSize(3);
     }
 }

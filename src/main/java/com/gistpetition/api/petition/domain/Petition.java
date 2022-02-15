@@ -4,7 +4,6 @@ import com.gistpetition.api.common.persistence.BaseEntity;
 import com.gistpetition.api.exception.petition.DuplicatedAgreementException;
 import com.gistpetition.api.user.domain.User;
 import lombok.Getter;
-import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
 import org.hibernate.annotations.BatchSize;
@@ -37,8 +36,7 @@ public class Petition extends BaseEntity {
     private Long agreeCount = 0L;
     @NotAudited
     @BatchSize(size = 10)
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "petition_id")
+    @OneToMany(mappedBy = "petition", orphanRemoval = true)
     private final List<Agreement> agreements = new ArrayList<>();
 
     public static final Long REQUIRED_AGREEMENT_NUM = 5L;
@@ -60,14 +58,9 @@ public class Petition extends BaseEntity {
         this.userId = userId;
     }
 
-    public void applyAgreement(User user, String description) {
-        for (Agreement agreement : agreements) {
-            if (agreement.isAgreedBy(user.getId())) {
-                throw new DuplicatedAgreementException();
-            }
-        }
-        this.agreements.add(new Agreement(user.getId(), description, this));
-        agreeCount += 1;
+    public void addAgreement(Agreement newAgreement) {
+        this.agreements.add(newAgreement);
+        agreeCount +=1 ;
     }
 
     public boolean isAnswered() {
@@ -75,7 +68,7 @@ public class Petition extends BaseEntity {
     }
     public boolean isAgreedBy(User user) {
         for (Agreement agreement : agreements) {
-            if (agreement.isAgreedBy(user.getId())) {
+            if (agreement.writtenBy(user.getId())) {
                 return true;
             }
         }

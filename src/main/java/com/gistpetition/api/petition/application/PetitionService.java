@@ -115,7 +115,9 @@ public class PetitionService {
     public void agree(AgreementRequest request, Long petitionId, Long userId) {
         Petition petition = findPetitionById(petitionId);
         User user = findUserById(userId);
-        petition.applyAgreement(user, request.getDescription());
+        Agreement agreement = new Agreement(request.getDescription(), user.getId());
+        agreement.setPetition(petition);
+        agreementRepository.save(agreement);
     }
 
     @Transactional(readOnly = true)

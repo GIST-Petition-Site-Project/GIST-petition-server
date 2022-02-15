@@ -12,8 +12,10 @@ import com.gistpetition.api.user.domain.UserRole;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +25,9 @@ import org.springframework.data.history.RevisionMetadata;
 import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -128,6 +133,39 @@ public class PetitionServiceTest extends ServiceTest {
     }
 
     @Test
+    void agreeTwiceByOneUser() {
+        Long petitionId = petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
+
+        petitionService.agree(AGREEMENT_REQUEST, petitionId, petitionOwner.getId());
+
+        assertThatThrownBy(
+                () -> petitionService.agree(AGREEMENT_REQUEST, petitionId, petitionOwner.getId())
+        ).isInstanceOf(DataIntegrityViolationException.class);
+    }
+
+    @Test
+    public void applyAgreementWithConcurrency() throws InterruptedException {
+        Long petitionId = petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
+        int numberOfThreads = 10;
+
+        ExecutorService service = Executors.newFixedThreadPool(numberOfThreads);
+        CountDownLatch latch = new CountDownLatch(numberOfThreads);
+        for (int i = 0; i < numberOfThreads; i++) {
+            AgreementRequest agreementRequest = new AgreementRequest("description" + i);
+            service.execute(() -> {
+                try {
+                    petitionService.agree(agreementRequest, petitionId, petitionOwner.getId());
+                } catch (DataIntegrityViolationException e) {
+                    System.out.println("---동의 중복---" + agreementRequest.getDescription());
+                }
+                latch.countDown();
+            });
+        }
+        latch.await();
+        assertThat(petitionService.retrieveNumberOfAgreements(petitionId)).isEqualTo(1);
+    }
+
+    @Test
     void getPageOfAgreements() {
         Long petitionId = petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
 
@@ -164,6 +202,35 @@ public class PetitionServiceTest extends ServiceTest {
     }
 
     @Test
+    void retrieveAgreedPetitions() {
+        Long petitionId = petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
+        Long petitionId2 = petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
+        Long petitionId3 = petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
+
+        User user = userRepository.save(new User("email@email.com", "password", UserRole.USER));
+        User user3 = userRepository.save(new User("email3@email.com", "password", UserRole.USER));
+
+        assertThat(petitionService.retrieveNumberOfAgreements(petitionId)).isEqualTo(0);
+
+        petitionService.agree(AGREEMENT_REQUEST, petitionId, petitionOwner.getId());
+        petitionService.agree(AGREEMENT_REQUEST, petitionId, user.getId());
+        petitionService.agree(AGREEMENT_REQUEST, petitionId, user3.getId());
+
+        petitionService.agree(AGREEMENT_REQUEST, petitionId2, petitionOwner.getId());
+        petitionService.agree(AGREEMENT_REQUEST, petitionId2, user.getId());
+        petitionService.agree(AGREEMENT_REQUEST, petitionId2, user3.getId());
+
+        petitionService.agree(AGREEMENT_REQUEST, petitionId3, petitionOwner.getId());
+        petitionService.agree(AGREEMENT_REQUEST, petitionId3, user.getId());
+        petitionService.agree(AGREEMENT_REQUEST, petitionId3, user3.getId());
+
+        PageRequest pageRequest = PageRequest.of(0, 10);
+        Page<PetitionPreviewResponse> petitionPreviewResponses = petitionService.retrievePetition(pageRequest);
+
+        assertThat(petitionService.retrieveNumberOfAgreements(petitionId)).isEqualTo(3);
+    }
+
+    @Test
     void getStateOfAgreement() {
         Long petitionId = petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
         assertThat(petitionService.retrieveStateOfAgreement(petitionId, petitionOwner.getId())).isFalse();
@@ -178,8 +245,11 @@ public class PetitionServiceTest extends ServiceTest {
     @Test
     void deletePetition() {
         Petition petition = petitionRepository.save(new Petition("title", "description", Category.DORMITORY, petitionOwner.getId()));
+        petitionService.agree(AGREEMENT_REQUEST, petition.getId(), petitionOwner.getId());
         petitionService.deletePetition(petition.getId());
         assertFalse(petitionRepository.existsById(petition.getId()));
+        PageRequest pageRequest = PageRequest.of(0, 10);
+        assertThat(agreementRepository.findAgreementsByPetitionId(pageRequest, petition.getId())).hasSize(0);
     }
 
     @Test
@@ -199,6 +269,8 @@ public class PetitionServiceTest extends ServiceTest {
         assertThat(petitionService.retrieveAnsweredPetition(pageable).getContent()).hasSize(1);
     }
 
+
+    @DisplayName("Insert, Update 수행 후의 revisionResponse 검증")
     @Test
     void retrieveRevisionsOfPetition() {
         httpSession.setAttribute("user", new SimpleUser(petitionOwner));

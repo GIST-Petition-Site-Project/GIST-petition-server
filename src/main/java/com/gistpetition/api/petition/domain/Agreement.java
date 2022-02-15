@@ -7,6 +7,7 @@ import javax.persistence.*;
 
 @Getter
 @Entity
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "petition_id"}))
 public class Agreement extends UnmodifiableEntity {
 
     @Id
@@ -14,18 +15,24 @@ public class Agreement extends UnmodifiableEntity {
     private Long id;
     @Lob
     private String description;
+    @Column(name = "user_id")
     private Long userId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "petition_id")
     private Petition petition;
 
     protected Agreement() {
     }
 
-    public Agreement(Long userId, String description, Petition petition) {
+    public Agreement(String description, Long userId) {
+        this(null, description, userId, null);
+    }
+
+    public Agreement(String description, Long userId, Petition petition) {
         this(null, description, userId, petition);
     }
+
 
     private Agreement(Long id, String description, Long userId, Petition petition) {
         this.id = id;
@@ -34,7 +41,13 @@ public class Agreement extends UnmodifiableEntity {
         this.petition = petition;
     }
 
-    public boolean isAgreedBy(Long userId) {
+
+    public boolean writtenBy(Long userId) {
         return this.userId.equals(userId);
+    }
+
+    public void setPetition(Petition petition) {
+        this.petition = petition;
+        petition.addAgreement(this);
     }
 }
