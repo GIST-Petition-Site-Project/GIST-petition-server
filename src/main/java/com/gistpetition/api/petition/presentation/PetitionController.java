@@ -43,13 +43,13 @@ public class PetitionController {
     }
 
     @ManagerPermissionRequired
-    @GetMapping("/petitions/temp")
-    public ResponseEntity<Page<PetitionPreviewResponse>> retrieveTempPetitions(@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        return ResponseEntity.ok().body(petitionService.retrieveTempPetitions(pageable));
+    @GetMapping("/petitions/waitingForCheck")
+    public ResponseEntity<Page<PetitionPreviewResponse>> retrievePetitionsWaitingForCheck(@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ResponseEntity.ok().body(petitionService.retrievePetitionsWaitingForCheck(pageable));
     }
 
     @ManagerPermissionRequired
-    @GetMapping("/petitions/{petitionId}/expose")
+    @PutMapping("/petitions/{petitionId}/expose")
     public ResponseEntity<Void> exposePetition(@PathVariable Long petitionId) {
         petitionService.exposePetition(petitionId);
         return ResponseEntity.ok().build();
@@ -67,6 +67,12 @@ public class PetitionController {
     @GetMapping("/petitions/answered")
     public ResponseEntity<Page<PetitionPreviewResponse>> retrieveAnsweredPetition(@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok().body(petitionService.retrieveAnsweredPetition(pageable));
+    }
+
+    @ManagerPermissionRequired
+    @GetMapping("/petitions/{petitionId}")
+    public ResponseEntity<PetitionResponse> retrievePetitionForManager(@PathVariable Long petitionId) {
+        return ResponseEntity.ok().body(petitionService.retrievePetitionById(petitionId));
     }
 
     @GetMapping("/petitions/{petitionUUID}")

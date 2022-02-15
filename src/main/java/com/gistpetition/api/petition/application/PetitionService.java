@@ -73,7 +73,7 @@ public class PetitionService {
     }
 
     @Transactional(readOnly = true)
-    public Page<PetitionPreviewResponse> retrieveTempPetitions(Pageable pageable) {
+    public Page<PetitionPreviewResponse> retrievePetitionsWaitingForCheck(Pageable pageable) {
         Page<Petition> petitions = petitionRepository.findPetitionByAgreeCountIsGreaterThanEqualAndExposedFalse(REQUIRED_AGREEMENT_NUM, pageable);
         return PetitionPreviewResponse.pageOf(petitions);
     }

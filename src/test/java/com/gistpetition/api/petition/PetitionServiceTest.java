@@ -24,6 +24,7 @@ import org.springframework.data.history.RevisionMetadata;
 
 import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -288,20 +289,17 @@ public class PetitionServiceTest extends ServiceTest {
     }
 
     @Test
-    void retrieveTempPetitions() {
+    void retrievePetitionsWaitingForCheck() {
         Long petitionId = petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
-        User user1 = userRepository.save(new User("user1@gist.ac.kr", "pwd", UserRole.USER));
-        User user2 = userRepository.save(new User("user2@gist.ac.kr", "pwd", UserRole.USER));
-        User user3 = userRepository.save(new User("user3@gist.ac.kr", "pwd", UserRole.USER));
-        User user4 = userRepository.save(new User("user4@gist.ac.kr", "pwd", UserRole.USER));
-        User user5 = userRepository.save(new User("user5@gist.ac.kr", "pwd", UserRole.USER));
-        petitionService.agree(AGREEMENT_REQUEST, petitionId, user1.getId());
-        petitionService.agree(AGREEMENT_REQUEST, petitionId, user2.getId());
-        petitionService.agree(AGREEMENT_REQUEST, petitionId, user3.getId());
-        petitionService.agree(AGREEMENT_REQUEST, petitionId, user4.getId());
-        petitionService.agree(AGREEMENT_REQUEST, petitionId, user5.getId());
+        ArrayList<User> users = new ArrayList<>();
+        for (int i = 0; i < Petition.REQUIRED_AGREEMENT_NUM; i++) {
+            users.add(userRepository.save(new User(String.format("user%s@gist.ac.kr", i), "pwd", UserRole.USER)));
+        }
+        for (int i = 0; i < Petition.REQUIRED_AGREEMENT_NUM; i++) {
+            petitionService.agree(AGREEMENT_REQUEST, petitionId, users.get(i).getId());
+        }
         PageRequest pageRequest = PageRequest.of(0, 10);
-        Page<PetitionPreviewResponse> petitionPreviewResponses = petitionService.retrieveTempPetitions(pageRequest);
+        Page<PetitionPreviewResponse> petitionPreviewResponses = petitionService.retrievePetitionsWaitingForCheck(pageRequest);
         assertThat(petitionPreviewResponses.getContent()).hasSize(1);
     }
 
