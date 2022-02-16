@@ -1,5 +1,6 @@
 package com.gistpetition.api.petition.application;
 
+import com.gistpetition.api.ServiceTest;
 import com.gistpetition.api.exception.petition.DuplicatedTempUrlException;
 import com.gistpetition.api.exception.petition.NoSuchTempUrlException;
 import com.gistpetition.api.petition.domain.TempPetitionUrl;
@@ -14,8 +15,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@SpringBootTest
-class TempPetitionServiceTest {
+class TempPetitionServiceTest extends ServiceTest {
     @Autowired
     private TempPetitionService tempPetitionService;
     @Autowired
