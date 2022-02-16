@@ -39,4 +39,4 @@ swagger:
   protocol: https
 
 request:
-  origins: https://localhost:3000, https://localhost:3001, https://dev.gist-petition.com
+  origins: https://localhost:3000, https://localhost:3001, https://dev.gist-petition.com, https://dev-staff.gist-petition.com
