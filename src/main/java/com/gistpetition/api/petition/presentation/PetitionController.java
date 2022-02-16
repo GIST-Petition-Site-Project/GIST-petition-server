@@ -126,8 +126,8 @@ public class PetitionController {
     }
 
     @GetMapping("/petitions/temp/{tempUrl}")
-    public ResponseEntity<PetitionResponse> retrieveTempPetition(@PathVariable String tempUrl) {
+    public ResponseEntity<TempPetitionResponse> retrieveTempPetition(@PathVariable String tempUrl) {
         Long petitionId = tempPetitionService.findPetitionIdByTempUrl(tempUrl);
-        return ResponseEntity.ok().body(petitionService.retrievePetitionById(petitionId));
+        return ResponseEntity.ok().body(petitionService.retrieveTempPetitionById(petitionId, tempUrl));
     }
 }

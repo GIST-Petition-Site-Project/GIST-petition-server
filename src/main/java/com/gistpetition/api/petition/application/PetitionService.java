@@ -60,6 +60,11 @@ public class PetitionService {
     }
 
     @Transactional(readOnly = true)
+    public TempPetitionResponse retrieveTempPetitionById(Long petitionId, String tempUrl) {
+        return TempPetitionResponse.of(findPetitionById(petitionId), tempUrl);
+    }
+
+    @Transactional(readOnly = true)
     public Page<PetitionPreviewResponse> retrieveAnsweredPetition(Pageable pageable) {
         return PetitionPreviewResponse.pageOf(petitionRepository.findByAnsweredTrue(pageable));
     }
