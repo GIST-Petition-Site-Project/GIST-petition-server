@@ -23,9 +23,6 @@ public class TempPetitionService {
             throw new DuplicatedTempUrlException();
         }
         String generatedUrl = urlGenerator.generate(TEMP_URL_LENGTH);
-        while (tempPetitionUrlRepository.existsByTempUrlEquals(generatedUrl)) {
-            generatedUrl = urlGenerator.generate(TEMP_URL_LENGTH);
-        }
         TempPetitionUrl tempPetitionUrl = tempPetitionUrlRepository.save(new TempPetitionUrl(petitionId, generatedUrl));
         return tempPetitionUrl.getTempUrl();
     }
