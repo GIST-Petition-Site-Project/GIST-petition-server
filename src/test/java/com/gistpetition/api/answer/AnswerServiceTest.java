@@ -12,6 +12,7 @@ import com.gistpetition.api.exception.petition.UnAnsweredPetitionException;
 import com.gistpetition.api.petition.domain.Category;
 import com.gistpetition.api.petition.domain.Petition;
 import com.gistpetition.api.petition.domain.PetitionRepository;
+import com.gistpetition.api.petition.dto.AgreementRequest;
 import com.gistpetition.api.user.domain.SimpleUser;
 import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRepository;
@@ -20,6 +21,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +29,9 @@ import org.springframework.data.history.RevisionMetadata;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -74,6 +79,27 @@ class AnswerServiceTest extends ServiceTest {
 
         Petition petition = petitionRepository.findById(savedPetition.getId()).orElseThrow(NoSuchPetitionException::new);
         assertTrue(petition.isAnswered());
+    }
+
+    @Test
+    public void createAnswerWithConcurrency() throws InterruptedException {
+        Long petitionId = answerService.createAnswer(savedPetition.getId(), ANSWER_REQUEST);
+        int numberOfThreads = 10;
+
+        ExecutorService service = Executors.newFixedThreadPool(numberOfThreads);
+        CountDownLatch latch = new CountDownLatch(numberOfThreads);
+        for (int i = 0; i < numberOfThreads; i++) {
+            service.execute(() -> {
+                try {
+                    answerService.createAnswer(savedPetition.getId(),ANSWER_REQUEST);
+                } catch (DataIntegrityViolationException e) {
+                    System.out.println("---답변 중복---" + ANSWER_REQUEST.getContent());
+                }
+                latch.countDown();
+            });
+        }
+        latch.await();
+        assertThat(answerService.retrieveAnswerByPetitionId(petitionId)).isNotNull();
     }
 
     @Test
