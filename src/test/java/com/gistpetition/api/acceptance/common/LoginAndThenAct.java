@@ -16,18 +16,33 @@ public class LoginAndThenAct {
         this.tUser = tUser;
     }
 
+    public Response createPetitionWith(String title, String description, Long categoryId) {
+        PetitionRequest petitionRequest = new PetitionRequest(title, description, categoryId);
+        return createPetition(petitionRequest);
+    }
+
     public Response createPetition(PetitionRequest petitionRequest) {
         return given().
                 contentType(ContentType.JSON).
                 cookie("JSESSIONID", tUser.getJSessionId()).
                 body(petitionRequest).
                 when().
-                post("/v1/petitions").
-                then().
-                statusCode(HttpStatus.CREATED.value()).extract().response();
+                post("/v1/petitions");
     }
 
-    public void updateUserRole(TUser target, UserRole userRole) {
+    public LoginAndThenAct createPetitionAndThen(PetitionRequest petitionRequest) {
+        given().
+                contentType(ContentType.JSON).
+                cookie("JSESSIONID", tUser.getJSessionId()).
+                body(petitionRequest).
+                when().
+                post("/v1/petitions").
+                then().
+                statusCode(HttpStatus.CREATED.value());
+        return this;
+    }
+
+    public LoginAndThenAct updateUserRoleAndThen(TUser target, UserRole userRole) {
         UpdateUserRoleRequest updateUserRoleRequest = new UpdateUserRoleRequest(userRole.name());
         given().
                 cookie("JSESSIONID", tUser.getJSessionId()).
@@ -37,5 +52,6 @@ public class LoginAndThenAct {
                 put("/v1/users/" + target.getId() + "/userRole").
                 then().
                 statusCode(HttpStatus.NO_CONTENT.value()).extract().response();
+        return this;
     }
 }

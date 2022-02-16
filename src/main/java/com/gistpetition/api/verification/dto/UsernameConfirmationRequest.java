@@ -1,7 +1,13 @@
 package com.gistpetition.api.verification.dto;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+
 public class UsernameConfirmationRequest {
+    @Email
+    @NotBlank
     private String username;
+    @NotBlank
     private String verificationCode;
 
     public UsernameConfirmationRequest() {

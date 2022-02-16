@@ -1,11 +1,13 @@
 package com.gistpetition.api.user.dto.request;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 
 public class SignInRequest {
-    @NotNull
+    @Email
+    @NotBlank
     private String username;
-    @NotNull
+    @NotBlank
     private String password;
 
     protected SignInRequest() {

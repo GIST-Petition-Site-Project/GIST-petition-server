@@ -38,7 +38,7 @@ public class CreatePetitionAcceptanceTest extends AcceptanceTest {
     @Test
     void createPetitionByManager() {
         WANNTE.doSignUp();
-        T_ADMIN.doLoginAndThen().updateUserRole(WANNTE, UserRole.MANAGER);
+        T_ADMIN.doLoginAndThen().updateUserRoleAndThen(WANNTE, UserRole.MANAGER);
 
         PetitionRequest petitionRequest = new PetitionRequest("titleOver10Characters", "description", Category.ACADEMIC.getId());
         Response createPetition = WANNTE.doLoginAndThen().createPetition(petitionRequest);

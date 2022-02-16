@@ -45,45 +45,11 @@ public enum TUser {
     }
 
     public void doSignUp() {
-        VerificationEmailRequest verificationEmailRequest = new VerificationEmailRequest(username);
-        given().
-                contentType(ContentType.JSON).
-                body(verificationEmailRequest).
-                when().
-                post("/v1/sign-up/verifications").
-                then().
-                statusCode(HttpStatus.NO_CONTENT.value());
-        String verificationCode = FixedVerificationCodeGenerator.FIXED_VERIFICATION_CODE;
-
-        UsernameConfirmationRequest usernameConfirmationRequest = new UsernameConfirmationRequest(username, verificationCode);
-        given().
-                contentType(ContentType.JSON).
-                body(usernameConfirmationRequest).
-                when().
-                post("/v1/sign-up/confirm").
-                then().
-                statusCode(HttpStatus.NO_CONTENT.value());
-
-        SignUpRequest signUpRequest = new SignUpRequest(username, password, verificationCode);
-        String location = given().
-                contentType(ContentType.JSON).
-                body(signUpRequest).
-                when().
-                post("/v1/users").
-                then().
-                statusCode(HttpStatus.CREATED.value()).
-                header(HttpHeaders.LOCATION, containsString("/users/")).
-                extract().header(HttpHeaders.LOCATION);
-        id = Long.valueOf(location.substring(7));
+        doSignUpWith(username, password);
     }
 
     public void doLogin() {
-        SignInRequest signInRequest = new SignInRequest(username, password);
-        Response login = given().
-                contentType(ContentType.JSON).
-                body(signInRequest).
-                when().
-                post("/v1/login").
+        Response login = doLoginWith(username, password).
                 then().
                 statusCode(HttpStatus.NO_CONTENT.value()).extract().response();
         this.jSessionId = login.cookie("JSESSIONID");
@@ -92,6 +58,61 @@ public enum TUser {
     public LoginAndThenAct doLoginAndThen() {
         this.doLogin();
         return new LoginAndThenAct(this);
+    }
+
+    public Response doLoginWith(String username, String password) {
+        SignInRequest signInRequest = new SignInRequest(username, password);
+        return given().
+                contentType(ContentType.JSON).
+                body(signInRequest).
+                when().
+                post("/v1/login");
+    }
+
+    public void doSignUpWith(String username, String password) {
+        getVerificationCodeWith(username).
+                then().
+                statusCode(HttpStatus.NO_CONTENT.value());
+        String verificationCode = FixedVerificationCodeGenerator.FIXED_VERIFICATION_CODE;
+
+        confirmVerificationCodeWith(username, verificationCode).
+                then().
+                statusCode(HttpStatus.NO_CONTENT.value());
+
+        String location = doRegisterWith(username, password, verificationCode).
+                then().
+                statusCode(HttpStatus.CREATED.value()).
+                header(HttpHeaders.LOCATION, containsString("/users/")).
+                extract().header(HttpHeaders.LOCATION);
+        id = Long.valueOf(location.substring(7));
+    }
+
+
+    public Response getVerificationCodeWith(String username) {
+        VerificationEmailRequest verificationEmailRequest = new VerificationEmailRequest(username);
+        return given().
+                contentType(ContentType.JSON).
+                body(verificationEmailRequest).
+                when().
+                post("/v1/sign-up/verifications");
+    }
+
+    public Response confirmVerificationCodeWith(String username, String verificationCode) {
+        UsernameConfirmationRequest usernameConfirmationRequest = new UsernameConfirmationRequest(username, verificationCode);
+        return given().
+                contentType(ContentType.JSON).
+                body(usernameConfirmationRequest).
+                when().
+                post("/v1/sign-up/confirm");
+    }
+
+    public Response doRegisterWith(String username, String password, String verificationCode) {
+        SignUpRequest signUpRequest = new SignUpRequest(username, password, verificationCode);
+        return given().
+                contentType(ContentType.JSON).
+                body(signUpRequest).
+                when().
+                post("/v1/users");
     }
 
     public String getUsername() {

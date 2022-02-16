@@ -1,9 +1,9 @@
 package com.gistpetition.api.user.dto.request;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 
 public class UpdateUserRoleRequest {
-    @NotNull
+    @NotBlank
     private String userRole;
 
     public UpdateUserRoleRequest() {
