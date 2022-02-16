@@ -7,7 +7,7 @@ import com.gistpetition.api.petition.domain.*;
 import com.gistpetition.api.petition.dto.*;
 import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class PetitionService {
 
     private final PetitionRepository petitionRepository;
@@ -25,12 +25,13 @@ public class PetitionService {
 
     @Transactional
     public Long createPetition(PetitionRequest petitionRequest, Long userId) {
-        return petitionRepository.save(
+        Petition created = petitionRepository.save(
                 new Petition(petitionRequest.getTitle(),
                         petitionRequest.getDescription(),
                         Category.of(petitionRequest.getCategoryId()),
                         userId)
-        ).getId();
+        );
+        return created.getId();
     }
 
     @Transactional(readOnly = true)
