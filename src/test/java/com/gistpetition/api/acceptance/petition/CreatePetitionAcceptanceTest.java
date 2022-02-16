@@ -51,6 +51,5 @@ public class CreatePetitionAcceptanceTest extends AcceptanceTest {
     void tearDown() {
         TUser.clearAll();
         petitionRepository.deleteAllInBatch();
-        userRepository.deleteAllInBatch();
     }
 }

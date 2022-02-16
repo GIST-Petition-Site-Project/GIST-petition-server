@@ -1,13 +1,17 @@
 package com.gistpetition.api.acceptance.answer;
 
 import com.gistpetition.api.acceptance.AcceptanceTest;
+import com.gistpetition.api.acceptance.common.TUser;
 import com.gistpetition.api.answer.domain.AnswerRepository;
 import com.gistpetition.api.answer.dto.AnswerRequest;
 import com.gistpetition.api.exception.petition.DuplicatedAnswerException;
 import com.gistpetition.api.petition.domain.Category;
+import com.gistpetition.api.petition.domain.PetitionRepository;
 import com.gistpetition.api.petition.dto.PetitionRequest;
+import com.gistpetition.api.user.domain.UserRepository;
 import com.gistpetition.api.user.domain.UserRole;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -23,6 +27,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class CreateAnswerAcceptanceTest extends AcceptanceTest {
     @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private PetitionRepository petitionRepository;
+    @Autowired
     private AnswerRepository answerRepository;
 
     @Test
@@ -36,7 +44,7 @@ public class CreateAnswerAcceptanceTest extends AcceptanceTest {
         String[] locationHeader = createPetition.header(HttpHeaders.LOCATION).split("/");
         Long petitionId = Long.valueOf(locationHeader[locationHeader.length - 1]);
 
-        int numberOfThreads = 100;
+        int numberOfThreads = 10;
         ExecutorService service = Executors.newFixedThreadPool(numberOfThreads);
         CountDownLatch latch = new CountDownLatch(numberOfThreads);
         for (int i = 0; i < numberOfThreads; i++) {
@@ -54,5 +62,12 @@ public class CreateAnswerAcceptanceTest extends AcceptanceTest {
         }
         latch.await();
         assertThat(answerRepository.findListByPetitionId(petitionId)).hasSize(1);
+    }
+
+    @AfterEach
+    void tearDown() {
+        TUser.clearAll();
+        answerRepository.deleteAllInBatch();
+        petitionRepository.deleteAllInBatch();
     }
 }
