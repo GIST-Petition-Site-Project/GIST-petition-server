@@ -1,6 +1,7 @@
 package com.gistpetition.api.petition.application;
 
 
+import com.gistpetition.api.exception.petition.AlreadyReleasedPetitionException;
 import com.gistpetition.api.exception.petition.NoSuchPetitionException;
 import com.gistpetition.api.exception.user.NoSuchUserException;
 import com.gistpetition.api.petition.domain.*;
@@ -122,6 +123,12 @@ public class PetitionService {
         Petition petition = findPetitionById(petitionId);
         User user = findUserById(userId);
         return petition.isAgreedBy(user);
+    }
+
+    @Transactional
+    public void releasePetition(Long petitionId) {
+        Petition petition = findPetitionById(petitionId);
+        petition.release();
     }
 
     private User findUserById(Long userId) {

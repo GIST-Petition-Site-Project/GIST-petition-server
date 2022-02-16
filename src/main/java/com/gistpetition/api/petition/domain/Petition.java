@@ -32,7 +32,7 @@ public class Petition extends BaseEntity {
     private Long userId;
     @NotAudited
     @BatchSize(size = 10)
-    @OneToMany(mappedBy = "petition", orphanRemoval = true)
+    @OneToMany(mappedBy = "petition", orphanRemoval = true, fetch = FetchType.EAGER)
     private final List<Agreement> agreements = new ArrayList<>();
 
     protected Petition() {

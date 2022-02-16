@@ -1,8 +1,7 @@
-package com.gistpetition.api.petition;
+package com.gistpetition.api.petition.application;
 
 import com.gistpetition.api.ServiceTest;
 import com.gistpetition.api.exception.petition.NoSuchPetitionException;
-import com.gistpetition.api.petition.application.PetitionService;
 import com.gistpetition.api.petition.domain.*;
 import com.gistpetition.api.petition.dto.*;
 import com.gistpetition.api.user.domain.SimpleUser;
@@ -29,6 +28,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
+import java.util.stream.LongStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -38,6 +38,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class PetitionServiceTest extends ServiceTest {
     private static final PetitionRequest DORM_PETITION_REQUEST = new PetitionRequest("title", "description", Category.DORMITORY.getId());
     private static final AgreementRequest AGREEMENT_REQUEST = new AgreementRequest("동의합니다.");
+    public static final String EMAIL = "email@gist.ac.kr";
+    public static final String PASSWORD = "password";
     @Autowired
     private PetitionService petitionService;
     @Autowired
@@ -53,7 +55,7 @@ public class PetitionServiceTest extends ServiceTest {
 
     @BeforeEach
     void setUp() {
-        petitionOwner = userRepository.save(new User("email@email.com", "password", UserRole.USER));
+        petitionOwner = userRepository.save(new User(EMAIL, PASSWORD, UserRole.USER));
     }
 
     @Test
@@ -285,6 +287,31 @@ public class PetitionServiceTest extends ServiceTest {
         List<PetitionRevisionResponse> content = revisionResponses.getContent();
         List<RevisionMetadata.RevisionType> revisionTypes = content.stream().map(PetitionRevisionResponse::getRevisionType).collect(Collectors.toList());
         assertThat(revisionTypes).containsExactly(RevisionMetadata.RevisionType.INSERT, RevisionMetadata.RevisionType.UPDATE);
+    }
+
+    @Test
+    void release() {
+        Long petitionId = petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
+        Petition newPetition = petitionRepository.findById(petitionId).orElseThrow(IllegalArgumentException::new);
+        assertFalse(newPetition.isReleased());
+
+        LongStream.range(0, 5)
+                .mapToObj(i -> userRepository.save(new User(i + EMAIL, PASSWORD, UserRole.USER)))
+                .forEach(user -> petitionService.agree(AGREEMENT_REQUEST, petitionId, user.getId()));
+
+        petitionService.releasePetition(petitionId);
+
+        Petition releasedPetition = petitionRepository.findById(petitionId).orElseThrow(IllegalArgumentException::new);
+        assertTrue(releasedPetition.isReleased());
+    }
+
+    @Test
+    void releaseNotExistingPetition() {
+        Long petitionId = Long.MAX_VALUE;
+
+        assertThatThrownBy(
+                () -> petitionService.releasePetition(petitionId)
+        ).isInstanceOf(NoSuchPetitionException.class);
     }
 
     @AfterEach
