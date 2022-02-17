@@ -21,9 +21,6 @@ public class CreatePetitionAcceptanceTest extends AcceptanceTest {
     @Autowired
     PetitionRepository petitionRepository;
 
-    @Autowired
-    UserRepository userRepository;
-
     @Test
     void createPetitionByNormal() {
         KOSE.doSignUp();
