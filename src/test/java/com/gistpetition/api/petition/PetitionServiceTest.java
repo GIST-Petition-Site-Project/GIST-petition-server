@@ -141,7 +141,7 @@ public class PetitionServiceTest extends ServiceTest {
 
         assertThatThrownBy(
                 () -> petitionService.agree(AGREEMENT_REQUEST, petitionId, petitionOwner.getId())
-        ).isInstanceOf(DataIntegrityViolationException.class);
+        ).isInstanceOf(DuplicatedAgreementException.class);
     }
 
     @Test
