@@ -20,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.gistpetition.api.acceptance.common.TUser.GUNE;
 import static com.gistpetition.api.acceptance.common.TUser.T_ADMIN;
@@ -49,15 +50,20 @@ public class CreateAnswerAcceptanceTest extends AcceptanceTest {
         Long petitionId = retrieveTempPetition.as(TempPetitionResponse.class).getId();
 
         int numberOfThreads = 10;
+        AtomicInteger errorCount = new AtomicInteger(0);
         ExecutorService service = Executors.newFixedThreadPool(numberOfThreads);
         CountDownLatch latch = new CountDownLatch(numberOfThreads);
         for (int i = 0; i < numberOfThreads; i++) {
             service.execute(() -> {
-                GUNE.doAct().createAnswer(petitionId, answerRequest);
+                Response createAnswerResponse = GUNE.doAct().createAnswer(petitionId, answerRequest);
+                if (createAnswerResponse.statusCode() != HttpStatus.CREATED.value()) {
+                    errorCount.incrementAndGet();
+                }
                 latch.countDown();
             });
         }
         latch.await();
+        assertThat(errorCount.get()).isEqualTo(numberOfThreads - 1);
         assertThat(answerRepository.findAllByPetitionId(petitionId)).hasSize(1);
     }
 
