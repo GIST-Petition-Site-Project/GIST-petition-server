@@ -4,11 +4,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.history.RevisionRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface AnswerRepository extends RevisionRepository<Answer, Long, Long>, JpaRepository<Answer, Long> {
     Optional<Answer> findByPetitionId(Long petitionId);
+
+    List<Answer> findAllByPetitionId(Long petitionId);
 
     boolean existsByPetitionId(Long petitionId);
 
