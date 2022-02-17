@@ -106,8 +106,9 @@ class AnswerServiceTest extends ServiceTest {
                     answerService.createAnswer(petitionId, ANSWER_REQUEST);
                 } catch (DuplicatedAnswerException ex) {
                     errorCount.incrementAndGet();
+                } finally {
+                    latch.countDown();
                 }
-                latch.countDown();
             });
         }
         latch.await();

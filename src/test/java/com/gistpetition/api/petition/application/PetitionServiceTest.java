@@ -161,8 +161,9 @@ public class PetitionServiceTest extends ServiceTest {
                     petitionService.agree(agreementRequest, petitionId, petitionOwner.getId());
                 } catch (DuplicatedAgreementException e) {
                     errorCount.incrementAndGet();
+                } finally {
+                    latch.countDown();
                 }
-                latch.countDown();
             });
         }
         latch.await();
