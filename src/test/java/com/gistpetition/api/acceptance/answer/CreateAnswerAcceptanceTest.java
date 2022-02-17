@@ -1,7 +1,6 @@
 package com.gistpetition.api.acceptance.answer;
 
 import com.gistpetition.api.acceptance.AcceptanceTest;
-import com.gistpetition.api.acceptance.common.LoginAndThenAct;
 import com.gistpetition.api.acceptance.common.TUser;
 import com.gistpetition.api.answer.domain.AnswerRepository;
 import com.gistpetition.api.answer.dto.AnswerRequest;

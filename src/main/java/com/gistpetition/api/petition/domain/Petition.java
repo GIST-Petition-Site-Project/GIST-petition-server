@@ -1,6 +1,8 @@
 package com.gistpetition.api.petition.domain;
 
 import com.gistpetition.api.common.persistence.BaseEntity;
+import com.gistpetition.api.exception.petition.AlreadyReleasedPetitionException;
+import com.gistpetition.api.exception.petition.NotEnoughAgreementException;
 import com.gistpetition.api.user.domain.User;
 import lombok.Getter;
 import org.hibernate.annotations.BatchSize;
@@ -16,6 +18,7 @@ import java.util.List;
 @Entity
 public class Petition extends BaseEntity {
 
+    public static final int REQUIRED_AGREMMENT = 5;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -24,7 +27,8 @@ public class Petition extends BaseEntity {
     private String description;
     @Enumerated(EnumType.STRING)
     private Category category;
-    private boolean answered;
+    private Boolean answered = false;
+    private Boolean released = false;
     private Long userId;
     @NotAudited
     @BatchSize(size = 10)
@@ -35,15 +39,14 @@ public class Petition extends BaseEntity {
     }
 
     public Petition(String title, String description, Category category, Long userId) {
-        this(null, title, description, category, false, userId);
+        this(null, title, description, category, userId);
     }
 
-    private Petition(Long id, String title, String description, Category category, boolean answered, Long userId) {
+    private Petition(Long id, String title, String description, Category category, Long userId) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.category = category;
-        this.answered = answered;
         this.userId = userId;
     }
 
@@ -60,6 +63,16 @@ public class Petition extends BaseEntity {
         return false;
     }
 
+    public void release() {
+        if (released) {
+            throw new AlreadyReleasedPetitionException();
+        }
+        if (agreements.size() < REQUIRED_AGREMMENT) {
+            throw new NotEnoughAgreementException();
+        }
+        this.released = true;
+    }
+
     public void setAnswered(boolean b) {
         this.answered = b;
     }
@@ -74,5 +87,13 @@ public class Petition extends BaseEntity {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public boolean isReleased() {
+        return released;
+    }
+
+    public boolean isAnswered() {
+        return answered;
     }
 }

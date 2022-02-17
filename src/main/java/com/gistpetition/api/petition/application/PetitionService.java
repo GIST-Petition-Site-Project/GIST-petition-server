@@ -130,6 +130,12 @@ public class PetitionService {
         return petition.isAgreedBy(user);
     }
 
+    @Transactional
+    public void releasePetition(Long petitionId) {
+        Petition petition = findPetitionById(petitionId);
+        petition.release();
+    }
+
     private User findUserById(Long userId) {
         return userRepository.findById(userId).orElseThrow(NoSuchUserException::new);
     }

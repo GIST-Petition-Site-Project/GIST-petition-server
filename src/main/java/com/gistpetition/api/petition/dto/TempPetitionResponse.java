@@ -2,7 +2,6 @@ package com.gistpetition.api.petition.dto;
 
 import com.gistpetition.api.petition.domain.Petition;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -13,15 +12,15 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class TempPetitionResponse {
     private Long id;
-    private  String title;
-    private  String description;
-    private  String categoryName;
-    private  Boolean answered;
-    private  Long userId;
-    private  Integer agreements;
-    private  LocalDateTime createdAt;
-    private  LocalDateTime updatedAt;
-    private  String tempUrl;
+    private String title;
+    private String description;
+    private String categoryName;
+    private Boolean answered;
+    private Long userId;
+    private Integer agreements;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private String tempUrl;
 
     public static TempPetitionResponse of(Petition petition, String tempUrl) {
         return new TempPetitionResponse(

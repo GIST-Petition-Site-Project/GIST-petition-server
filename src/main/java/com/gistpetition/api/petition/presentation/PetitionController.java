@@ -129,4 +129,11 @@ public class PetitionController {
         Long petitionId = tempPetitionService.findPetitionIdByTempUrl(tempUrl);
         return ResponseEntity.ok().body(petitionService.retrieveTempPetitionById(petitionId, tempUrl));
     }
+
+    @ManagerPermissionRequired
+    @PostMapping("/petitions/{petitionId}/release")
+    public ResponseEntity<Void> releasePetition(@PathVariable Long petitionId) {
+        petitionService.releasePetition(petitionId);
+        return ResponseEntity.noContent().build();
+    }
 }
