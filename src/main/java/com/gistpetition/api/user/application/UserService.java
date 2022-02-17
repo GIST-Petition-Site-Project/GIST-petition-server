@@ -14,6 +14,7 @@ import com.gistpetition.api.utils.password.Encoder;
 import com.gistpetition.api.verification.application.password.FindPasswordValidator;
 import com.gistpetition.api.verification.application.signup.SignUpValidator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -43,7 +44,11 @@ public class UserService {
         signUpValidator.checkIsVerified(username, verificationCode);
 
         User user = new User(username, encoder.hashPassword(request.getPassword()), UserRole.USER);
-        return userRepository.save(user).getId();
+        try {
+            return userRepository.save(user).getId();
+        } catch (DataIntegrityViolationException ex) {
+            throw new DuplicatedUserException();
+        }
     }
 
     @Transactional(readOnly = true)

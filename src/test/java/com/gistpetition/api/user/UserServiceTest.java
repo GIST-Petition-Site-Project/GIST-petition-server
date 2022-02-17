@@ -100,7 +100,7 @@ class UserServiceTest {
             service.execute(() -> {
                 try {
                     userService.signUp(DEFAULT_SIGN_UP_REQUEST);
-                } catch (DataIntegrityViolationException e) {
+                } catch (DuplicatedUserException e) {
                     errorCount.incrementAndGet();
                 } finally {
                     latch.countDown();
