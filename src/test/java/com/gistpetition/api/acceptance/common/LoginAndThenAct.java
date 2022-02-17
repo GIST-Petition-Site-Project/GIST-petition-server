@@ -52,6 +52,13 @@ public class LoginAndThenAct {
         return this;
     }
 
+    public Response retrieveTempPetition(String tempUrl) {
+        return given().
+                cookie("JSESSIONID", tUser.getJSessionId()).
+                when().
+                get("/v1/petitions/temp/" + tempUrl);
+    }
+
     public LoginAndThenAct updateUserRoleAndThen(TUser target, UserRole userRole) {
         UpdateUserRoleRequest updateUserRoleRequest = new UpdateUserRoleRequest(userRole.name());
         given().

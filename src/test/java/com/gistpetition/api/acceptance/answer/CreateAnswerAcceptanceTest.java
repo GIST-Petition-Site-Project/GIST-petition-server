@@ -1,12 +1,14 @@
 package com.gistpetition.api.acceptance.answer;
 
 import com.gistpetition.api.acceptance.AcceptanceTest;
+import com.gistpetition.api.acceptance.common.LoginAndThenAct;
 import com.gistpetition.api.acceptance.common.TUser;
 import com.gistpetition.api.answer.domain.AnswerRepository;
 import com.gistpetition.api.answer.dto.AnswerRequest;
 import com.gistpetition.api.petition.domain.Category;
 import com.gistpetition.api.petition.domain.PetitionRepository;
 import com.gistpetition.api.petition.dto.PetitionRequest;
+import com.gistpetition.api.petition.dto.TempPetitionResponse;
 import com.gistpetition.api.user.domain.UserRepository;
 import com.gistpetition.api.user.domain.UserRole;
 import io.restassured.response.Response;
@@ -38,17 +40,21 @@ public class CreateAnswerAcceptanceTest extends AcceptanceTest {
         AnswerRequest answerRequest = new AnswerRequest("contents");
 
         GUNE.doSignUp();
+
         Response createPetition = T_ADMIN.doLoginAndThen().updateUserRoleAndThen(GUNE, UserRole.MANAGER).createPetition(petitionRequest);
         assertThat(createPetition.statusCode()).isEqualTo(HttpStatus.CREATED.value());
         String[] locationHeader = createPetition.header(HttpHeaders.LOCATION).split("/");
-        Long petitionId = Long.valueOf(locationHeader[locationHeader.length - 1]);
+        String tmpUrl = locationHeader[locationHeader.length - 1];
+
+        Response retrieveTempPetition = GUNE.doLoginAndThen().retrieveTempPetition(tmpUrl);
+        Long petitionId = retrieveTempPetition.as(TempPetitionResponse.class).getId();
 
         int numberOfThreads = 10;
         ExecutorService service = Executors.newFixedThreadPool(numberOfThreads);
         CountDownLatch latch = new CountDownLatch(numberOfThreads);
         for (int i = 0; i < numberOfThreads; i++) {
             service.execute(() -> {
-                GUNE.doLoginAndThen().createAnswer(petitionId, answerRequest);
+                GUNE.doAct().createAnswer(petitionId, answerRequest);
                 latch.countDown();
             });
         }

@@ -18,7 +18,8 @@ public enum TUser {
     GUNE("gune@gm.gist.ac.kr", "gune"),
     EUNGI("handsomeGuy@gm.gist.ac.kr", "It's me!"),
     WANNTE("wannte@gm.gist.ac.kr", "wannte"),
-    KOSE("kose@gist.ac.kr", "kose");
+    KOSE("kose@gist.ac.kr", "kose"),
+    ;
 
     private final String username;
     private final String password;
@@ -113,6 +114,10 @@ public enum TUser {
                 body(signUpRequest).
                 when().
                 post("/v1/users");
+    }
+
+    public LoginAndThenAct doAct() {
+        return new LoginAndThenAct(this);
     }
 
     public String getUsername() {
