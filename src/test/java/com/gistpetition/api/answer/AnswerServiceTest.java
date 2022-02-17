@@ -101,9 +101,8 @@ class AnswerServiceTest extends ServiceTest {
         CountDownLatch latch = new CountDownLatch(numberOfThreads);
         for (int i = 0; i < numberOfThreads; i++) {
             service.execute(() -> {
-                AnswerRequest answerRequest = new AnswerRequest("contents");
                 try {
-                    answerService.createAnswer(petitionId, answerRequest);
+                    answerService.createAnswer(petitionId, ANSWER_REQUEST);
                 } catch (DuplicatedAnswerException | DataIntegrityViolationException ex) {
                     System.out.println(Thread.currentThread().getName() + ": " + ex.getMessage());
                 }
@@ -197,7 +196,6 @@ class AnswerServiceTest extends ServiceTest {
     void retrieveAnswerRevisions() {
         Long answerId = answerService.createAnswer(savedPetition.getId(), ANSWER_REQUEST);
         answerService.updateAnswer(savedPetition.getId(), UPDATE_REQUEST);
-        httpSession.setAttribute(SESSION_KEY, new SimpleUser(user));
         given(httpSession.getAttribute(SESSION_KEY)).willReturn(new SimpleUser(user));
         answerService.deleteAnswer(savedPetition.getId());
 
