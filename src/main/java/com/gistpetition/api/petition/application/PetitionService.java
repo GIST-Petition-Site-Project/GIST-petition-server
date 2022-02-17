@@ -1,21 +1,23 @@
 package com.gistpetition.api.petition.application;
 
 
+import com.gistpetition.api.exception.petition.DuplicatedAgreementException;
 import com.gistpetition.api.exception.petition.NoSuchPetitionException;
 import com.gistpetition.api.exception.user.NoSuchUserException;
 import com.gistpetition.api.petition.domain.*;
 import com.gistpetition.api.petition.dto.*;
 import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class PetitionService {
 
     private final PetitionRepository petitionRepository;
@@ -25,12 +27,13 @@ public class PetitionService {
 
     @Transactional
     public Long createPetition(PetitionRequest petitionRequest, Long userId) {
-        return petitionRepository.save(
+        Petition created = petitionRepository.save(
                 new Petition(petitionRequest.getTitle(),
                         petitionRequest.getDescription(),
                         Category.of(petitionRequest.getCategoryId()),
                         userId)
-        ).getId();
+        );
+        return created.getId();
     }
 
     @Transactional(readOnly = true)
@@ -56,6 +59,11 @@ public class PetitionService {
     @Transactional(readOnly = true)
     public PetitionResponse retrievePetitionById(Long petitionId) {
         return PetitionResponse.of(findPetitionById(petitionId));
+    }
+
+    @Transactional(readOnly = true)
+    public TempPetitionResponse retrieveTempPetitionById(Long petitionId, String tempUrl) {
+        return TempPetitionResponse.of(findPetitionById(petitionId), tempUrl);
     }
 
     @Transactional(readOnly = true)
@@ -96,7 +104,11 @@ public class PetitionService {
         User user = findUserById(userId);
         Agreement agreement = new Agreement(request.getDescription(), user.getId());
         agreement.setPetition(petition);
-        agreementRepository.save(agreement);
+        try {
+            agreementRepository.save(agreement);
+        } catch (DataIntegrityViolationException e) {
+            throw new DuplicatedAgreementException();
+        }
     }
 
     @Transactional(readOnly = true)

@@ -4,12 +4,11 @@ import com.gistpetition.api.config.annotation.AdminPermissionRequired;
 import com.gistpetition.api.config.annotation.LoginRequired;
 import com.gistpetition.api.config.annotation.LoginUser;
 import com.gistpetition.api.config.annotation.ManagerPermissionRequired;
-import com.gistpetition.api.exception.petition.DuplicatedAgreementException;
 import com.gistpetition.api.petition.application.PetitionService;
+import com.gistpetition.api.petition.application.TempPetitionService;
 import com.gistpetition.api.petition.dto.*;
 import com.gistpetition.api.user.domain.SimpleUser;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -25,12 +24,15 @@ import java.net.URI;
 @RequestMapping("/v1")
 public class PetitionController {
     private final PetitionService petitionService;
+    private final TempPetitionService tempPetitionService;
 
     @LoginRequired
     @PostMapping("/petitions")
     public ResponseEntity<Void> createPetition(@Validated @RequestBody PetitionRequest petitionRequest,
                                                @LoginUser SimpleUser simpleUser) {
-        return ResponseEntity.created(URI.create("/petitions/" + petitionService.createPetition(petitionRequest, simpleUser.getId()))).build();
+        Long createdPetitionId = petitionService.createPetition(petitionRequest, simpleUser.getId());
+        String tempUrl = tempPetitionService.createTempUrl(createdPetitionId);
+        return ResponseEntity.created(URI.create("/petitions/temp/" + tempUrl)).build();
     }
 
     @GetMapping("/petitions")
@@ -40,6 +42,11 @@ public class PetitionController {
             return ResponseEntity.ok().body(petitionService.retrievePetition(pageable));
         }
         return ResponseEntity.ok().body(petitionService.retrievePetitionByCategoryId(categoryId, pageable));
+    }
+
+    @GetMapping("/petitions/answered")
+    public ResponseEntity<Page<PetitionPreviewResponse>> retrieveAnsweredPetitions(@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ResponseEntity.ok().body(petitionService.retrieveAnsweredPetition(pageable));
     }
 
     @GetMapping("/petitions/search")
@@ -95,11 +102,7 @@ public class PetitionController {
     public ResponseEntity<Void> agreePetition(@RequestBody AgreementRequest agreementRequest,
                                               @PathVariable Long petitionId,
                                               @LoginUser SimpleUser simpleUser) {
-        try {
-            petitionService.agree(agreementRequest, petitionId, simpleUser.getId());
-        } catch (DataIntegrityViolationException e) {
-            throw new DuplicatedAgreementException();
-        }
+        petitionService.agree(agreementRequest, petitionId, simpleUser.getId());
         return ResponseEntity.ok().build();
     }
 
@@ -119,5 +122,11 @@ public class PetitionController {
     public ResponseEntity<Boolean> retrieveStateOfAgreement(@PathVariable Long petitionId,
                                                             @LoginUser SimpleUser simpleUser) {
         return ResponseEntity.ok().body(petitionService.retrieveStateOfAgreement(petitionId, simpleUser.getId()));
+    }
+
+    @GetMapping("/petitions/temp/{tempUrl}")
+    public ResponseEntity<TempPetitionResponse> retrieveTempPetition(@PathVariable String tempUrl) {
+        Long petitionId = tempPetitionService.findPetitionIdByTempUrl(tempUrl);
+        return ResponseEntity.ok().body(petitionService.retrieveTempPetitionById(petitionId, tempUrl));
     }
 }
