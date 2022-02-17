@@ -22,7 +22,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -33,6 +32,7 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static com.gistpetition.api.user.application.SessionLoginService.SESSION_KEY;
@@ -93,23 +93,26 @@ class AnswerServiceTest extends ServiceTest {
     }
 
     @Test
-    public void createAnswerWithConcurrencyByOne() throws InterruptedException {
+    public void createAnswerWithConcurrency() throws InterruptedException {
         Long petitionId = savedPetition.getId();
 
         int numberOfThreads = 10;
         ExecutorService service = Executors.newFixedThreadPool(numberOfThreads);
         CountDownLatch latch = new CountDownLatch(numberOfThreads);
+        AtomicInteger errorCount = new AtomicInteger(0);
         for (int i = 0; i < numberOfThreads; i++) {
             service.execute(() -> {
                 try {
                     answerService.createAnswer(petitionId, ANSWER_REQUEST);
-                } catch (DuplicatedAnswerException | DataIntegrityViolationException ex) {
-                    System.out.println(Thread.currentThread().getName() + ": " + ex.getMessage());
+                } catch (DuplicatedAnswerException ex) {
+                    errorCount.incrementAndGet();
+                } finally {
+                    latch.countDown();
                 }
-                latch.countDown();
             });
         }
         latch.await();
+        assertThat(errorCount.get()).isEqualTo(numberOfThreads - 1);
         assertThat(answerRepository.findAllByPetitionId(petitionId)).hasSize(1);
     }
 

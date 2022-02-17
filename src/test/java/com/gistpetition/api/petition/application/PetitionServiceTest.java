@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
@@ -152,18 +153,21 @@ public class PetitionServiceTest extends ServiceTest {
 
         ExecutorService service = Executors.newFixedThreadPool(numberOfThreads);
         CountDownLatch latch = new CountDownLatch(numberOfThreads);
+        AtomicInteger errorCount = new AtomicInteger(0);
         for (int i = 0; i < numberOfThreads; i++) {
             AgreementRequest agreementRequest = new AgreementRequest("description" + i);
             service.execute(() -> {
                 try {
                     petitionService.agree(agreementRequest, petitionId, petitionOwner.getId());
                 } catch (DuplicatedAgreementException e) {
-                    System.out.println("---동의 중복---" + agreementRequest.getDescription());
+                    errorCount.incrementAndGet();
+                } finally {
+                    latch.countDown();
                 }
-                latch.countDown();
             });
         }
         latch.await();
+        assertThat(errorCount.get()).isEqualTo(numberOfThreads - 1);
         assertThat(petitionService.retrieveNumberOfAgreements(petitionId)).isEqualTo(1);
     }
 

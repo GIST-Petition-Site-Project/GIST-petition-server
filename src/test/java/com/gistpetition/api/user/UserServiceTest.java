@@ -21,8 +21,14 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -82,6 +88,28 @@ class UserServiceTest {
         SignUpRequest signUpRequest = new SignUpRequest(notGistEmail, PASSWORD, VERIFICATION_CODE);
 
         assertThatThrownBy(() -> userService.signUp(signUpRequest)).isInstanceOf(InvalidEmailFormException.class);
+    }
+
+    @Test
+    void signUpWithConcurrency() throws InterruptedException {
+        int numberOfThreads = 10;
+        ExecutorService service = Executors.newFixedThreadPool(numberOfThreads);
+        CountDownLatch latch = new CountDownLatch(numberOfThreads);
+        AtomicInteger errorCount = new AtomicInteger(0);
+        for (int i = 0; i < numberOfThreads; i++) {
+            service.execute(() -> {
+                try {
+                    userService.signUp(DEFAULT_SIGN_UP_REQUEST);
+                } catch (DuplicatedUserException e) {
+                    errorCount.incrementAndGet();
+                } finally {
+                    latch.countDown();
+                }
+            });
+        }
+        latch.await();
+        assertThat(errorCount.get()).isEqualTo(numberOfThreads - 1);
+        assertThat(userRepository.findAllByUsername(DEFAULT_SIGN_UP_REQUEST.getUsername())).hasSize(1);
     }
 
     @Test
