@@ -9,6 +9,7 @@ import com.gistpetition.api.exception.petition.NoSuchPetitionException;
 import com.gistpetition.api.exception.petition.UnAnsweredPetitionException;
 import com.gistpetition.api.petition.domain.Petition;
 import com.gistpetition.api.petition.domain.PetitionRepository;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -34,7 +35,13 @@ public class AnswerService {
         }
         Answer answer = new Answer(answerRequest.getContent(), petitionId);
         petition.setAnswered(true);
-        return answerRepository.save(answer).getId();
+        Answer saved;
+        try {
+            saved = answerRepository.save(answer);
+        } catch (DataIntegrityViolationException ex) {
+            throw new DuplicatedAnswerException();
+        }
+        return saved.getId();
     }
 
     @Transactional(readOnly = true)

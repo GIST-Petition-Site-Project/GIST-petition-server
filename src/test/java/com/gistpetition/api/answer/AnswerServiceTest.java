@@ -7,6 +7,7 @@ import com.gistpetition.api.answer.domain.AnswerRepository;
 import com.gistpetition.api.answer.dto.AnswerRequest;
 import com.gistpetition.api.answer.dto.AnswerRevisionResponse;
 import com.gistpetition.api.exception.WrappedException;
+import com.gistpetition.api.exception.petition.DuplicatedAnswerException;
 import com.gistpetition.api.exception.petition.NoSuchPetitionException;
 import com.gistpetition.api.exception.petition.UnAnsweredPetitionException;
 import com.gistpetition.api.petition.domain.Category;
@@ -20,6 +21,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,12 +30,17 @@ import org.springframework.data.history.RevisionMetadata;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
+import static com.gistpetition.api.user.application.SessionLoginService.SESSION_KEY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.BDDMockito.given;
 
 class AnswerServiceTest extends ServiceTest {
 
@@ -52,7 +60,7 @@ class AnswerServiceTest extends ServiceTest {
     private User user;
     private User manager;
     private Petition savedPetition;
-    @Autowired
+    @MockBean(name = "httpSession")
     private HttpSession httpSession;
 
     @BeforeEach
@@ -82,6 +90,27 @@ class AnswerServiceTest extends ServiceTest {
         assertThatThrownBy(
                 () -> answerService.createAnswer(fakePetitionId, ANSWER_REQUEST)
         ).isInstanceOf(NoSuchPetitionException.class);
+    }
+
+    @Test
+    public void createAnswerWithConcurrencyByOne() throws InterruptedException {
+        Long petitionId = savedPetition.getId();
+
+        int numberOfThreads = 10;
+        ExecutorService service = Executors.newFixedThreadPool(numberOfThreads);
+        CountDownLatch latch = new CountDownLatch(numberOfThreads);
+        for (int i = 0; i < numberOfThreads; i++) {
+            service.execute(() -> {
+                try {
+                    answerService.createAnswer(petitionId, ANSWER_REQUEST);
+                } catch (DuplicatedAnswerException | DataIntegrityViolationException ex) {
+                    System.out.println(Thread.currentThread().getName() + ": " + ex.getMessage());
+                }
+                latch.countDown();
+            });
+        }
+        latch.await();
+        assertThat(answerRepository.findAllByPetitionId(petitionId)).hasSize(1);
     }
 
     @Test
@@ -167,7 +196,7 @@ class AnswerServiceTest extends ServiceTest {
     void retrieveAnswerRevisions() {
         Long answerId = answerService.createAnswer(savedPetition.getId(), ANSWER_REQUEST);
         answerService.updateAnswer(savedPetition.getId(), UPDATE_REQUEST);
-        httpSession.setAttribute("user", new SimpleUser(user));
+        given(httpSession.getAttribute(SESSION_KEY)).willReturn(new SimpleUser(user));
         answerService.deleteAnswer(savedPetition.getId());
 
         Pageable pageable = PageRequest.of(0, 10);

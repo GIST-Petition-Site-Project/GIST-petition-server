@@ -1,6 +1,7 @@
 package com.gistpetition.api.petition.application;
 
 import com.gistpetition.api.ServiceTest;
+import com.gistpetition.api.exception.petition.DuplicatedAgreementException;
 import com.gistpetition.api.exception.petition.NoSuchPetitionException;
 import com.gistpetition.api.petition.domain.*;
 import com.gistpetition.api.petition.dto.*;
@@ -14,7 +15,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -142,7 +142,7 @@ public class PetitionServiceTest extends ServiceTest {
 
         assertThatThrownBy(
                 () -> petitionService.agree(AGREEMENT_REQUEST, petitionId, petitionOwner.getId())
-        ).isInstanceOf(DataIntegrityViolationException.class);
+        ).isInstanceOf(DuplicatedAgreementException.class);
     }
 
     @Test
@@ -157,7 +157,7 @@ public class PetitionServiceTest extends ServiceTest {
             service.execute(() -> {
                 try {
                     petitionService.agree(agreementRequest, petitionId, petitionOwner.getId());
-                } catch (DataIntegrityViolationException e) {
+                } catch (DuplicatedAgreementException e) {
                     System.out.println("---동의 중복---" + agreementRequest.getDescription());
                 }
                 latch.countDown();

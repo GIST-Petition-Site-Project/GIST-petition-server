@@ -1,5 +1,6 @@
 package com.gistpetition.api.acceptance.common;
 
+import com.gistpetition.api.answer.dto.AnswerRequest;
 import com.gistpetition.api.petition.dto.PetitionRequest;
 import com.gistpetition.api.user.domain.UserRole;
 import com.gistpetition.api.user.dto.request.UpdateUserRoleRequest;
@@ -14,6 +15,15 @@ public class LoginAndThenAct {
 
     LoginAndThenAct(TUser tUser) {
         this.tUser = tUser;
+    }
+
+    public Response createAnswer(Long petitionId, AnswerRequest answerRequest) {
+        return given().
+                contentType(ContentType.JSON).
+                cookie("JSESSIONID", tUser.getJSessionId()).
+                body(answerRequest).
+                when().
+                post("/v1/petitions/" + petitionId + "/answer");
     }
 
     public Response createPetitionWith(String title, String description, Long categoryId) {
@@ -40,6 +50,13 @@ public class LoginAndThenAct {
                 then().
                 statusCode(HttpStatus.CREATED.value());
         return this;
+    }
+
+    public Response retrieveTempPetition(String tempUrl) {
+        return given().
+                cookie("JSESSIONID", tUser.getJSessionId()).
+                when().
+                get("/v1/petitions/temp/" + tempUrl);
     }
 
     public LoginAndThenAct updateUserRoleAndThen(TUser target, UserRole userRole) {
