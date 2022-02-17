@@ -1,6 +1,7 @@
 package com.gistpetition.api.petition;
 
 import com.gistpetition.api.ServiceTest;
+import com.gistpetition.api.exception.petition.DuplicatedAgreementException;
 import com.gistpetition.api.exception.petition.NoSuchPetitionException;
 import com.gistpetition.api.petition.application.PetitionService;
 import com.gistpetition.api.petition.domain.*;
@@ -155,7 +156,7 @@ public class PetitionServiceTest extends ServiceTest {
             service.execute(() -> {
                 try {
                     petitionService.agree(agreementRequest, petitionId, petitionOwner.getId());
-                } catch (DataIntegrityViolationException e) {
+                } catch (DuplicatedAgreementException e) {
                     System.out.println("---동의 중복---" + agreementRequest.getDescription());
                 }
                 latch.countDown();

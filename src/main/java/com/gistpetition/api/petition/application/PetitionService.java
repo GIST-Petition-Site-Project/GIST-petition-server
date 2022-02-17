@@ -1,6 +1,7 @@
 package com.gistpetition.api.petition.application;
 
 
+import com.gistpetition.api.exception.petition.DuplicatedAgreementException;
 import com.gistpetition.api.exception.petition.NoSuchPetitionException;
 import com.gistpetition.api.exception.user.NoSuchUserException;
 import com.gistpetition.api.petition.domain.*;
@@ -9,6 +10,7 @@ import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -102,7 +104,11 @@ public class PetitionService {
         User user = findUserById(userId);
         Agreement agreement = new Agreement(request.getDescription(), user.getId());
         agreement.setPetition(petition);
-        agreementRepository.save(agreement);
+        try {
+            agreementRepository.save(agreement);
+        } catch (DataIntegrityViolationException e) {
+            throw new DuplicatedAgreementException();
+        }
     }
 
     @Transactional(readOnly = true)
