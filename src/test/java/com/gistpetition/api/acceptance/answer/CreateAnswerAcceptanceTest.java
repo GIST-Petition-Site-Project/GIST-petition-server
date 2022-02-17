@@ -4,7 +4,6 @@ import com.gistpetition.api.acceptance.AcceptanceTest;
 import com.gistpetition.api.acceptance.common.TUser;
 import com.gistpetition.api.answer.domain.AnswerRepository;
 import com.gistpetition.api.answer.dto.AnswerRequest;
-import com.gistpetition.api.exception.petition.DuplicatedAnswerException;
 import com.gistpetition.api.petition.domain.Category;
 import com.gistpetition.api.petition.domain.PetitionRepository;
 import com.gistpetition.api.petition.dto.PetitionRequest;
@@ -49,19 +48,12 @@ public class CreateAnswerAcceptanceTest extends AcceptanceTest {
         CountDownLatch latch = new CountDownLatch(numberOfThreads);
         for (int i = 0; i < numberOfThreads; i++) {
             service.execute(() -> {
-                try {
-                    Response createAnswer = GUNE.doLoginAndThen().createAnswer(petitionId, answerRequest);
-                    if (createAnswer.statusCode() != HttpStatus.CREATED.value()) {
-                        throw new DuplicatedAnswerException();
-                    }
-                } catch (DuplicatedAnswerException ex) {
-                    System.out.println(Thread.currentThread().getName() + ": " + ex);
-                }
+                GUNE.doLoginAndThen().createAnswer(petitionId, answerRequest);
                 latch.countDown();
             });
         }
         latch.await();
-        assertThat(answerRepository.findListByPetitionId(petitionId)).hasSize(1);
+        assertThat(answerRepository.findAllByPetitionId(petitionId)).hasSize(1);
     }
 
     @AfterEach

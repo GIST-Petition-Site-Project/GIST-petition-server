@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface AnswerRepository extends RevisionRepository<Answer, Long, Long>, JpaRepository<Answer, Long> {
     Optional<Answer> findByPetitionId(Long petitionId);
 
-    List<Answer> findListByPetitionId(Long petitionId);
+    List<Answer> findAllByPetitionId(Long petitionId);
 
     boolean existsByPetitionId(Long petitionId);
 
