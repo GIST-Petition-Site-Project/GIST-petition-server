@@ -3,7 +3,6 @@ package com.gistpetition.api.answer.domain;
 import com.gistpetition.api.common.persistence.BaseEntity;
 import lombok.Getter;
 import org.hibernate.envers.Audited;
-import org.hibernate.validator.constraints.UniqueElements;
 
 import javax.persistence.*;
 
