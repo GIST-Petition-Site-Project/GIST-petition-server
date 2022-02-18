@@ -14,7 +14,6 @@ import com.gistpetition.api.user.domain.UserRepository;
 import com.gistpetition.api.user.domain.UserRole;
 import com.gistpetition.api.utils.password.BcryptEncoder;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +25,7 @@ import java.util.List;
 @Profile("dev")
 @RequiredArgsConstructor
 @Component
-public class DataLoader implements CommandLineRunner {
+public class DataLoader {
     public static final String PASSWORD = new BcryptEncoder().hashPassword("test1234!");
     private static final String CONTENT = "해당 드라마는 방영 전 이미 시놉시스 공개로 한차례 민주화운동을 폄훼하는 내용으로 큰 논란이 된 바 있으며 20만명 이상의 국민들이 해당 드라마의 방영 중지 청원에 동의하였습니다. 당시 제작진은 전혀 그럴 의도가 없으며 “남녀 주인공이 민주화 운동에 참여하거나 이끄는 설정은 대본 어디에도 존재하지 않는다.” 라고 주장했습니다. 그러나 1화가 방영된 현재 드라마에서 여주인공은 간첩인 남주인공을 운동권으로 오인해 구해주었습니다.\n" +
             "\n" +
@@ -59,11 +58,6 @@ public class DataLoader implements CommandLineRunner {
     private final PetitionService petitionService;
     private final AnswerService answerService;
     private final AgreementRepository agreementRepository;
-
-    @Override
-    public void run(String... args) {
-        userRepository.save(new User("admin@gist.ac.kr", PASSWORD, UserRole.ADMIN));
-    }
 
     @Transactional
     public void loadData() {
