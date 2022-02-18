@@ -14,7 +14,6 @@ import com.gistpetition.api.user.domain.UserRepository;
 import com.gistpetition.api.user.domain.UserRole;
 import com.gistpetition.api.utils.password.BcryptEncoder;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +25,7 @@ import java.util.List;
 @Profile("dev")
 @RequiredArgsConstructor
 @Component
-public class DataLoader implements CommandLineRunner {
+public class DataLoader {
     public static final String PASSWORD = new BcryptEncoder().hashPassword("test1234!");
     private static final String CONTENT = "해당 드라마는 방영 전 이미 시놉시스 공개로 한차례 민주화운동을 폄훼하는 내용으로 큰 논란이 된 바 있으며 20만명 이상의 국민들이 해당 드라마의 방영 중지 청원에 동의하였습니다. 당시 제작진은 전혀 그럴 의도가 없으며 “남녀 주인공이 민주화 운동에 참여하거나 이끄는 설정은 대본 어디에도 존재하지 않는다.” 라고 주장했습니다. 그러나 1화가 방영된 현재 드라마에서 여주인공은 간첩인 남주인공을 운동권으로 오인해 구해주었습니다.\n" +
             "\n" +
@@ -60,11 +59,6 @@ public class DataLoader implements CommandLineRunner {
     private final AnswerService answerService;
     private final AgreementRepository agreementRepository;
 
-    @Override
-    public void run(String... args) {
-        userRepository.save(new User("admin@gist.ac.kr", PASSWORD, UserRole.ADMIN));
-    }
-
     @Transactional
     public void loadData() {
         answerRepository.deleteAllInBatch();
@@ -72,36 +66,40 @@ public class DataLoader implements CommandLineRunner {
         petitionRepository.deleteAllInBatch();
         userRepository.deleteAllInBatch();
 
-        userRepository.save(new User("admin@gist.ac.kr", PASSWORD, UserRole.ADMIN));
-        userRepository.save(new User("manager@gist.ac.kr", PASSWORD, UserRole.MANAGER));
-        User user = userRepository.save(new User("user@gist.ac.kr", PASSWORD, UserRole.USER));
+        User admin = userRepository.save(new User("admin@gist.ac.kr", PASSWORD, UserRole.ADMIN));
+        User manager = userRepository.save(new User("manager@gist.ac.kr", PASSWORD, UserRole.MANAGER));
+        User normal = userRepository.save(new User("user@gist.ac.kr", PASSWORD, UserRole.USER));
 
         ArrayList<User> alphabetUsers = new ArrayList<>();
         for (char alphabet = 'a'; alphabet <= 'z'; alphabet++) {
             alphabetUsers.add(userRepository.save(new User(alphabet + "@gist.ac.kr", PASSWORD, UserRole.USER)));
         }
 
-        Petition petition1 = savePetition("국민 청원에 글을 써버렸다.", user);
-        Petition petition2 = savePetition("방송 촬영을 위해 안전과 생존을 위협당하는 동물의 대책 마련이 필요합니다", user);
-        Petition petition3 = savePetition("길고양이를 학대하는 갤러리를 폐쇄하고 엄중한 수사를 해주십시오.", user);
-        Petition petition4 = savePetition("코로나19로 부터 우리 아이들을 지켜주세요.", user);
-        Petition petition5 = savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", user);
-        Petition petition6 = savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", user);
-        Petition petition7 = savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", user);
-        Petition petition8 = savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", user);
-        Petition petition9 = savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", user);
-        Petition petition10 = savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", user);
-        Petition petition11 = savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", user);
-        Petition petition12 = savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", user);
-        savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", user);
-        savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", user);
-        savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", user);
-        List<Petition> answeredPetitions = Arrays.asList(petition1, petition2, petition3, petition4, petition5, petition6, petition7, petition8, petition9, petition10, petition11, petition12);
+        Petition petition1 = savePetition("국민 청원에 글을 써버렸다.", normal);
+        Petition petition2 = savePetition("방송 촬영을 위해 안전과 생존을 위협당하는 동물의 대책 마련이 필요합니다", manager);
+        Petition petition3 = savePetition("길고양이를 학대하는 갤러리를 폐쇄하고 엄중한 수사를 해주십시오.", admin);
+        Petition petition4 = savePetition("코로나19로 부터 우리 아이들을 지켜주세요.", normal);
+        Petition petition5 = savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal);
+        Petition petition6 = savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal);
+        Petition petition7 = savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal);
+        Petition petition8 = savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal);
+        Petition petition9 = savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal);
+        Petition petition10 = savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal);
+        Petition petition11 = savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal);
+        Petition petition12 = savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal);
+        savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal);
+        savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal);
+        savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal);
+        List<Petition> petitions = Arrays.asList(petition1, petition2, petition3, petition4, petition5, petition6, petition7, petition8, petition9, petition10, petition11, petition12);
 
-        for (Petition petition : answeredPetitions) {
-            for (User alphabetUser : alphabetUsers) {
-                petitionService.agree(AGREEMENT_REQUEST, petition.getId(), alphabetUser.getId());
+        List<Integer> numOfAgree = List.of(26, 13, 16, 21, 6, 9, 8, 5, 5, 21, 17, 16);
+        for (int i = 0; i < petitions.size(); i++) {
+            Petition petition = petitions.get(i);
+            for (int j = 0; j < numOfAgree.get(i); j++) {
+                User user = alphabetUsers.get(j);
+                petitionService.agree(AGREEMENT_REQUEST, petition.getId(), user.getId());
             }
+            petitionService.releasePetition(petition.getId());
             answerService.createAnswer(petition.getId(), new AnswerRequest(ANSWER_CONTENT));
         }
     }

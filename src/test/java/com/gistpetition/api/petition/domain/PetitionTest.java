@@ -33,6 +33,7 @@ class PetitionTest {
         Agreement agreement = new Agreement(AGREEMENT_DESCRIPTION, user.getId());
         petition.addAgreement(agreement);
         assertThat(petition.getAgreements()).hasSize(1);
+        assertThat(petition.getAgreeCount()).isEqualTo(1);
     }
 
     @Test
@@ -43,6 +44,7 @@ class PetitionTest {
         petition.addAgreement(new Agreement(AGREEMENT_DESCRIPTION, user1.getId()));
         petition.addAgreement(new Agreement(AGREEMENT_DESCRIPTION, user2.getId()));
         assertThat(petition.getAgreements()).hasSize(3);
+        assertThat(petition.getAgreeCount()).isEqualTo(3);
     }
 
     @Test

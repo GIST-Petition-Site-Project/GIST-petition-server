@@ -31,6 +31,8 @@ public class Petition extends BaseEntity {
     private Boolean released = false;
     private Long userId;
     @NotAudited
+    private Long agreeCount = 0L;
+    @NotAudited
     @BatchSize(size = 10)
     @OneToMany(mappedBy = "petition", orphanRemoval = true)
     private final List<Agreement> agreements = new ArrayList<>();
@@ -52,6 +54,7 @@ public class Petition extends BaseEntity {
 
     public void addAgreement(Agreement newAgreement) {
         this.agreements.add(newAgreement);
+        this.agreeCount += 1;
     }
 
     public boolean isAgreedBy(User user) {

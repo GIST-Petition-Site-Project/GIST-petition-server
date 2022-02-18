@@ -130,6 +130,11 @@ public class PetitionController {
         return ResponseEntity.ok().body(petitionService.retrieveTempPetitionById(petitionId, tempUrl));
     }
 
+    @GetMapping("/petitions/best")
+    public ResponseEntity<Page<PetitionPreviewResponse>> retrieveTempPetition(Pageable pageable) {
+        return ResponseEntity.ok().body(petitionService.retrievePetitionsOrderByAgreeCount(pageable));
+    }
+
     @ManagerPermissionRequired
     @PostMapping("/petitions/{petitionId}/release")
     public ResponseEntity<Void> releasePetition(@PathVariable Long petitionId) {

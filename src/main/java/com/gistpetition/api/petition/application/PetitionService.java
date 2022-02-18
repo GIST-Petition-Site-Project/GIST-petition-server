@@ -136,6 +136,11 @@ public class PetitionService {
         petition.release();
     }
 
+    @Transactional(readOnly = true)
+    public Page<PetitionPreviewResponse> retrievePetitionsOrderByAgreeCount(Pageable pageable) {
+        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByOrderByAgreeCountDesc(pageable));
+    }
+
     private User findUserById(Long userId) {
         return userRepository.findById(userId).orElseThrow(NoSuchUserException::new);
     }
