@@ -72,36 +72,40 @@ public class DataLoader implements CommandLineRunner {
         petitionRepository.deleteAllInBatch();
         userRepository.deleteAllInBatch();
 
-        userRepository.save(new User("admin@gist.ac.kr", PASSWORD, UserRole.ADMIN));
-        userRepository.save(new User("manager@gist.ac.kr", PASSWORD, UserRole.MANAGER));
-        User user = userRepository.save(new User("user@gist.ac.kr", PASSWORD, UserRole.USER));
+        User admin = userRepository.save(new User("admin@gist.ac.kr", PASSWORD, UserRole.ADMIN));
+        User manager = userRepository.save(new User("manager@gist.ac.kr", PASSWORD, UserRole.MANAGER));
+        User normal = userRepository.save(new User("user@gist.ac.kr", PASSWORD, UserRole.USER));
 
         ArrayList<User> alphabetUsers = new ArrayList<>();
         for (char alphabet = 'a'; alphabet <= 'z'; alphabet++) {
             alphabetUsers.add(userRepository.save(new User(alphabet + "@gist.ac.kr", PASSWORD, UserRole.USER)));
         }
 
-        Petition petition1 = savePetition("국민 청원에 글을 써버렸다.", user);
-        Petition petition2 = savePetition("방송 촬영을 위해 안전과 생존을 위협당하는 동물의 대책 마련이 필요합니다", user);
-        Petition petition3 = savePetition("길고양이를 학대하는 갤러리를 폐쇄하고 엄중한 수사를 해주십시오.", user);
-        Petition petition4 = savePetition("코로나19로 부터 우리 아이들을 지켜주세요.", user);
-        Petition petition5 = savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", user);
-        Petition petition6 = savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", user);
-        Petition petition7 = savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", user);
-        Petition petition8 = savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", user);
-        Petition petition9 = savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", user);
-        Petition petition10 = savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", user);
-        Petition petition11 = savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", user);
-        Petition petition12 = savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", user);
-        savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", user);
-        savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", user);
-        savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", user);
-        List<Petition> answeredPetitions = Arrays.asList(petition1, petition2, petition3, petition4, petition5, petition6, petition7, petition8, petition9, petition10, petition11, petition12);
+        Petition petition1 = savePetition("국민 청원에 글을 써버렸다.", normal);
+        Petition petition2 = savePetition("방송 촬영을 위해 안전과 생존을 위협당하는 동물의 대책 마련이 필요합니다", manager);
+        Petition petition3 = savePetition("길고양이를 학대하는 갤러리를 폐쇄하고 엄중한 수사를 해주십시오.", admin);
+        Petition petition4 = savePetition("코로나19로 부터 우리 아이들을 지켜주세요.", normal);
+        Petition petition5 = savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal);
+        Petition petition6 = savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal);
+        Petition petition7 = savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal);
+        Petition petition8 = savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal);
+        Petition petition9 = savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal);
+        Petition petition10 = savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal);
+        Petition petition11 = savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal);
+        Petition petition12 = savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal);
+        savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal);
+        savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal);
+        savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal);
+        List<Petition> petitions = Arrays.asList(petition1, petition2, petition3, petition4, petition5, petition6, petition7, petition8, petition9, petition10, petition11, petition12);
 
-        for (Petition petition : answeredPetitions) {
-            for (User alphabetUser : alphabetUsers) {
-                petitionService.agree(AGREEMENT_REQUEST, petition.getId(), alphabetUser.getId());
+        List<Integer> numOfAgree = List.of(26, 13, 16, 21, 6, 9, 8, 5, 5, 21, 17, 16);
+        for (int i = 0; i < petitions.size(); i++) {
+            Petition petition = petitions.get(i);
+            for (int j = 0; j < numOfAgree.get(i); j++) {
+                User user = alphabetUsers.get(j);
+                petitionService.agree(AGREEMENT_REQUEST, petition.getId(), user.getId());
             }
+            petitionService.releasePetition(petition.getId());
             answerService.createAnswer(petition.getId(), new AnswerRequest(ANSWER_CONTENT));
         }
     }
