@@ -19,8 +19,10 @@ import java.util.List;
 @Entity
 public class Petition extends BaseEntity {
 
-    public static final int REQUIRED_AGREEMENT = 5;
-    public static final int POSTING_PERIOD = 30;
+
+    public static final int REQUIRED_AGREEMENT_FOR_RELEASE = 5;
+    public static final int REQUIRED_AGREEMENT_FOR_ANSWER = 20;
+  
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -75,7 +77,7 @@ public class Petition extends BaseEntity {
         if (released) {
             throw new AlreadyReleasedPetitionException();
         }
-        if (agreeCount < REQUIRED_AGREEMENT) {
+        if (agreeCount < REQUIRED_AGREEMENT_FOR_RELEASE) {
             throw new NotEnoughAgreementException();
         }
         this.released = true;

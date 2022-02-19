@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static com.gistpetition.api.petition.domain.Petition.REQUIRED_AGREEMENT;
+import static com.gistpetition.api.petition.domain.Petition.REQUIRED_AGREEMENT_FOR_ANSWER;
 
 @Profile("dev")
 @RequiredArgsConstructor
@@ -110,18 +110,24 @@ public class DataLoader {
         savePetition("Temp 2차방역지원금 지금 자영업분들 농락하시나요?", normal);
 
         Random random = new Random();
-        int waitingForCheckPetitionCount = 3;
+        int waitingForCheckReleaseCount = 3;
+        int waitingForCheckAnswerCount = 2;
 
         for (Long petitionId : petitionIds) {
-            int agreeCount = random.nextInt(alphabetUsers.size() - REQUIRED_AGREEMENT) + REQUIRED_AGREEMENT;
+            int agreeCount = random.nextInt(alphabetUsers.size() - REQUIRED_AGREEMENT_FOR_ANSWER) + REQUIRED_AGREEMENT_FOR_ANSWER;
             for (int j = 0; j < agreeCount; j++) {
                 User user = alphabetUsers.get(j);
                 petitionService.agree(AGREEMENT_REQUEST, petitionId, user.getId());
             }
-            if (petitionId < petitionIds.get(0) + waitingForCheckPetitionCount) {
+
+            if (petitionId < petitionIds.get(0) + waitingForCheckReleaseCount) {
                 continue;
             }
             petitionService.releasePetition(petitionId);
+
+            if (petitionId < petitionIds.get(0) + waitingForCheckReleaseCount + waitingForCheckAnswerCount) {
+                continue;
+            }
             answerService.createAnswer(petitionId, new AnswerRequest(ANSWER_CONTENT));
         }
     }

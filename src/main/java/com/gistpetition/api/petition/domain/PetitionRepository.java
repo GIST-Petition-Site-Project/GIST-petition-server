@@ -38,11 +38,17 @@ public interface PetitionRepository extends RevisionRepository<Petition, Long, L
     Page<Petition> findAllByCreatedAtAfterAndReleasedTrue(LocalDateTime time, Pageable pageable);
 
     Page<Petition> findAllByCategoryAndCreatedAtAfterAndReleasedTrue(Category category, LocalDateTime time, Pageable pageable);
-
+  
+    Page<Petition> findPetitionByAgreeCountIsGreaterThanEqualAndReleasedTrueAndAnsweredFalse(int requiredAnswerCount, Pageable pageable);
+    
     Long countByReleasedTrue();
 
     @Query("SELECT p FROM Petition AS p LEFT JOIN FETCH p.agreements WHERE p.id=:petitionId")
     Petition findPetitionByWithEagerMode(@Param("petitionId") Long petitionId);
 
     Optional<Petition> findByTempUrl(String tempUrl);
+
+    Long countByAgreeCountIsGreaterThanEqualAndReleasedFalse(int requiredReleaseCount);
+
+    Long countByAgreeCountIsGreaterThanEqualAndReleasedTrueAndAnsweredFalse(int requiredAnswerCount);
 }
