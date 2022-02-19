@@ -12,9 +12,13 @@ import org.springframework.stereotype.Repository;
 public interface PetitionRepository extends RevisionRepository<Petition, Long, Long>, JpaRepository<Petition, Long> {
     Page<Petition> findByUserId(Long userId, Pageable pageable);
 
-    Page<Petition> findByCategory(Category category, Pageable pageable);
+    Page<Petition> findAllByCategory(Category category, Pageable pageable);
+
+    Page<Petition> findAllByCategoryAndReleasedTrue(Category category, Pageable pageable);
 
     Page<Petition> findAll(Pageable pageable);
+
+    Page<Petition> findAllByReleasedTrue(Pageable pageable);
 
     Page<Petition> findByTitleContains(String keyword, Pageable pageable);
 

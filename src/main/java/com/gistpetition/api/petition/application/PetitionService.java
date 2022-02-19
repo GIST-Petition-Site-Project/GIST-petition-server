@@ -44,7 +44,17 @@ public class PetitionService {
 
     @Transactional(readOnly = true)
     public Page<PetitionPreviewResponse> retrievePetitionByCategoryId(Long categoryId, Pageable pageable) {
-        return PetitionPreviewResponse.pageOf(petitionRepository.findByCategory(Category.of(categoryId), pageable));
+        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCategory(Category.of(categoryId), pageable));
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PetitionPreviewResponse> retrieveReleasedPetition(Pageable pageable) {
+        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByReleasedTrue(pageable));
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PetitionPreviewResponse> retrieveReleasedPetitionByCategoryId(Long categoryId, Pageable pageable) {
+        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCategoryAndReleasedTrue(Category.of(categoryId), pageable));
     }
 
     @Transactional(readOnly = true)

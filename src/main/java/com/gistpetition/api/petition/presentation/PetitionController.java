@@ -36,8 +36,18 @@ public class PetitionController {
     }
 
     @GetMapping("/petitions")
-    public ResponseEntity<Page<PetitionPreviewResponse>> retrievePetitions(@RequestParam(defaultValue = "0") Long categoryId,
-                                                                           @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+    public ResponseEntity<Page<PetitionPreviewResponse>> retrieveReleasedPetitions(@RequestParam(defaultValue = "0") Long categoryId,
+                                                                                   @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        if (categoryId.equals(0L)) {
+            return ResponseEntity.ok().body(petitionService.retrieveReleasedPetition(pageable));
+        }
+        return ResponseEntity.ok().body(petitionService.retrieveReleasedPetitionByCategoryId(categoryId, pageable));
+    }
+
+
+    @GetMapping("/petitions/all")
+    public ResponseEntity<Page<PetitionPreviewResponse>> retrieveAllPetitions(@RequestParam(defaultValue = "0") Long categoryId,
+                                                                              @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         if (categoryId.equals(0L)) {
             return ResponseEntity.ok().body(petitionService.retrievePetition(pageable));
         }
