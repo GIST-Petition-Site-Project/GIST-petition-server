@@ -111,13 +111,14 @@ public class DataLoader {
 
         Random random = new Random();
         int waitingForCheckPetitionCount = 3;
-        for (long petitionId = 0; petitionId < petitionIds.size(); petitionId++) {
+
+        for (Long petitionId : petitionIds) {
             int agreeCount = random.nextInt(alphabetUsers.size() - REQUIRED_AGREEMENT) + REQUIRED_AGREEMENT;
             for (int j = 0; j < agreeCount; j++) {
                 User user = alphabetUsers.get(j);
                 petitionService.agree(AGREEMENT_REQUEST, petitionId, user.getId());
             }
-            if (petitionId < waitingForCheckPetitionCount) {
+            if (petitionId < petitionIds.get(0) + waitingForCheckPetitionCount) {
                 continue;
             }
             petitionService.releasePetition(petitionId);
