@@ -100,7 +100,7 @@ public class PetitionService {
     }
 
     @Transactional(readOnly = true)
-    public Long retrievePetitionCount() {
+    public Long retrieveReleasedPetitionCount() {
         return petitionRepository.countByReleasedTrue();
     }
 
