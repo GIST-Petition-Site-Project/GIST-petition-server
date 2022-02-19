@@ -59,8 +59,8 @@ public class PetitionController {
     }
 
     @GetMapping("/petitions/{petitionId}")
-    public ResponseEntity<PetitionResponse> retrievePetition(@PathVariable Long petitionId) {
-        return ResponseEntity.ok().body(petitionService.retrievePetitionById(petitionId));
+    public ResponseEntity<PetitionResponse> retrieveReleasedPetition(@PathVariable Long petitionId) {
+        return ResponseEntity.ok().body(petitionService.retrieveReleasedPetitionById(petitionId));
     }
 
     @LoginRequired

@@ -3,6 +3,7 @@ package com.gistpetition.api.petition.application;
 
 import com.gistpetition.api.exception.petition.DuplicatedAgreementException;
 import com.gistpetition.api.exception.petition.NoSuchPetitionException;
+import com.gistpetition.api.exception.petition.NotReleasedPetitionException;
 import com.gistpetition.api.exception.user.NoSuchUserException;
 import com.gistpetition.api.petition.domain.*;
 import com.gistpetition.api.petition.dto.*;
@@ -57,8 +58,12 @@ public class PetitionService {
     }
 
     @Transactional(readOnly = true)
-    public PetitionResponse retrievePetitionById(Long petitionId) {
-        return PetitionResponse.of(findPetitionById(petitionId));
+    public PetitionResponse retrieveReleasedPetitionById(Long petitionId) {
+        Petition petition = findPetitionById(petitionId);
+        if (!petition.isReleased()) {
+            throw new NotReleasedPetitionException();
+        }
+        return PetitionResponse.of(petition);
     }
 
     @Transactional(readOnly = true)
