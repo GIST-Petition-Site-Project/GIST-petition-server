@@ -91,8 +91,8 @@ public class PetitionController {
     }
 
     @GetMapping("/petitions/count")
-    public ResponseEntity<Long> retrievePetitionCount() {
-        return ResponseEntity.ok().body(petitionService.retrievePetitionCount());
+    public ResponseEntity<Long> retrieveReleasedPetitionCount() {
+        return ResponseEntity.ok().body(petitionService.retrieveReleasedPetitionCount());
     }
 
     @ManagerPermissionRequired
