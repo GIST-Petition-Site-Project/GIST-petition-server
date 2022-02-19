@@ -13,6 +13,7 @@ public class PetitionPreviewResponse {
     private final String categoryName;
     private final Integer agreements;
     private final LocalDateTime createdAt;
+    private final String tempUrl;
 
     public static PetitionPreviewResponse of(Petition petition) {
         return new PetitionPreviewResponse(
@@ -20,7 +21,8 @@ public class PetitionPreviewResponse {
                 petition.getTitle(),
                 petition.getCategory().getName(),
                 petition.getAgreeCount(),
-                petition.getCreatedAt()
+                petition.getCreatedAt(),
+                petition.getTempUrl()
         );
     }
 
