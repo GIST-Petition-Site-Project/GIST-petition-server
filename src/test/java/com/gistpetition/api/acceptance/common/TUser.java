@@ -15,6 +15,7 @@ import static org.hamcrest.Matchers.containsString;
 
 public enum TUser {
     T_ADMIN("testAdmin@gist.ac.kr", "admin"),
+    T_MANAGER("testManager@gist.ac.kr", "manager"),
     GUNE("gune@gm.gist.ac.kr", "gune"),
     EUNGI("handsomeGuy@gm.gist.ac.kr", "It's me!"),
     WANNTE("wannte@gm.gist.ac.kr", "wannte"),

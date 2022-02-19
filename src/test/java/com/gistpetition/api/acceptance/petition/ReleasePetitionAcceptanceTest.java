@@ -8,7 +8,6 @@ import com.gistpetition.api.petition.domain.PetitionRepository;
 import com.gistpetition.api.petition.dto.AgreementRequest;
 import com.gistpetition.api.petition.dto.PetitionRequest;
 import com.gistpetition.api.petition.dto.TempPetitionResponse;
-import com.gistpetition.api.user.domain.UserRole;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -45,11 +44,10 @@ public class ReleasePetitionAcceptanceTest extends AcceptanceTest {
 
         agreePetitionByFiveUsers(tmpUrl);
 
-        GUNE.doSignUp();
-        Response petition = T_ADMIN.doLoginAndThen().updateUserRoleAndThen(GUNE, UserRole.MANAGER).retrieveTempPetition(tmpUrl);
+        Response petition = T_MANAGER.doLoginAndThen().retrieveTempPetition(tmpUrl);
         TempPetitionResponse willBeReleasedPetition = petition.as(TempPetitionResponse.class);
 
-        GUNE.doLoginAndThen().releasePetition(willBeReleasedPetition.getId());
+        T_MANAGER.doLoginAndThen().releasePetition(willBeReleasedPetition.getId());
 
         Response releasedPetition = EUNGI.doLoginAndThen().retrieveReleasedPetition(willBeReleasedPetition.getId());
         assertThat(releasedPetition.statusCode()).isEqualTo(HttpStatus.OK.value());
