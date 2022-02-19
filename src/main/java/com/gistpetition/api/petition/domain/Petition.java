@@ -22,6 +22,7 @@ public class Petition extends BaseEntity {
 
     public static final int REQUIRED_AGREEMENT_FOR_RELEASE = 5;
     public static final int REQUIRED_AGREEMENT_FOR_ANSWER = 20;
+    public static final int POSTING_PERIOD = 30;
   
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
