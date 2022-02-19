@@ -18,8 +18,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.gistpetition.api.petition.domain.Petition.REQUIRED_AGREEMENT;
-import static com.gistpetition.api.petition.domain.Petition.REQUIRED_ANSWER;
+import static com.gistpetition.api.petition.domain.Petition.REQUIRED_AGREEMENT_FOR_ANSWER;
+import static com.gistpetition.api.petition.domain.Petition.REQUIRED_AGREEMENT_FOR_RELEASE;
 
 @Service
 @RequiredArgsConstructor
@@ -76,15 +76,25 @@ public class PetitionService {
     }
 
     @Transactional(readOnly = true)
-    public Page<PetitionPreviewResponse> retrievePetitionsWaitingForCheck(Pageable pageable) {
-        Page<Petition> petitions = petitionRepository.findPetitionByAgreeCountIsGreaterThanEqualAndReleasedFalse(REQUIRED_AGREEMENT, pageable);
+    public Page<PetitionPreviewResponse> retrievePetitionsWaitingForRelease(Pageable pageable) {
+        Page<Petition> petitions = petitionRepository.findPetitionByAgreeCountIsGreaterThanEqualAndReleasedFalse(REQUIRED_AGREEMENT_FOR_RELEASE, pageable);
         return PetitionPreviewResponse.pageOf(petitions);
     }
 
     @Transactional(readOnly = true)
     public Page<PetitionPreviewResponse> retrievePetitionsWaitingForAnswer(Pageable pageable) {
-        Page<Petition> petitions = petitionRepository.findPetitionByAgreeCountIsGreaterThanEqualAndReleasedTrue(REQUIRED_ANSWER, pageable);
+        Page<Petition> petitions = petitionRepository.findPetitionByAgreeCountIsGreaterThanEqualAndReleasedTrueAndAnsweredFalse(REQUIRED_AGREEMENT_FOR_ANSWER, pageable);
         return PetitionPreviewResponse.pageOf(petitions);
+    }
+
+    @Transactional(readOnly = true)
+    public Long retrieveWaitingForReleasePetitionCount() {
+        return petitionRepository.countByAgreeCountIsGreaterThanEqualAndReleasedFalse(REQUIRED_AGREEMENT_FOR_RELEASE);
+    }
+
+    @Transactional(readOnly = true)
+    public Long retrieveWaitingForAnswerPetitionCount() {
+        return petitionRepository.countByAgreeCountIsGreaterThanEqualAndReleasedTrueAndAnsweredFalse(REQUIRED_AGREEMENT_FOR_ANSWER);
     }
 
     @Transactional(readOnly = true)

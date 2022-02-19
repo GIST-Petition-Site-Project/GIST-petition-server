@@ -51,17 +51,28 @@ public class PetitionController {
         return ResponseEntity.ok().body(petitionService.retrievePetitionByCategoryId(categoryId, pageable));
     }
 
-    @ManagerPermissionRequired
-    @GetMapping("/petitions/waitingForCheck")
+    //    @ManagerPermissionRequired
+    @GetMapping("/petitions/waitingForRelease")
     public ResponseEntity<Page<PetitionPreviewResponse>> retrievePetitionsWaitingForCheck(@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        return ResponseEntity.ok().body(petitionService.retrievePetitionsWaitingForCheck(pageable));
+        return ResponseEntity.ok().body(petitionService.retrievePetitionsWaitingForRelease(pageable));
     }
 
-
-    @ManagerPermissionRequired
+    //    @ManagerPermissionRequired
     @GetMapping("/petitions/waitingForAnswer")
     public ResponseEntity<Page<PetitionPreviewResponse>> retrievePetitionsWaitingForAnswer(@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok().body(petitionService.retrievePetitionsWaitingForAnswer(pageable));
+    }
+
+    //    @ManagerPermissionRequired
+    @GetMapping("/petitions/waitingForRelease/count")
+    public ResponseEntity<Long> retrievePetitionsWaitingForCheckCount() {
+        return ResponseEntity.ok().body(petitionService.retrieveWaitingForReleasePetitionCount());
+    }
+
+    //    @ManagerPermissionRequired
+    @GetMapping("/petitions/waitingForAnswer/count")
+    public ResponseEntity<Long> retrievePetitionsWaitingForAnswerCount() {
+        return ResponseEntity.ok().body(petitionService.retrieveWaitingForAnswerPetitionCount());
     }
 
     @GetMapping("/petitions/answered")
