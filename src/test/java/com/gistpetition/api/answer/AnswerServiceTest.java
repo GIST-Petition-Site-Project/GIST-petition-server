@@ -47,6 +47,7 @@ class AnswerServiceTest extends ServiceTest {
     public static final String ANSWER_CONTENT = "test contents";
     public static final AnswerRequest ANSWER_REQUEST = new AnswerRequest("test contents");
     public static final AnswerRequest UPDATE_REQUEST = new AnswerRequest("change contents");
+    private static final String TEMP_URL = "AAAAAA";
 
     @Autowired
     private AnswerService answerService;
@@ -68,7 +69,7 @@ class AnswerServiceTest extends ServiceTest {
         user = userRepository.save(new User("normal@email.com", "password", UserRole.USER));
         manager = userRepository.save(new User("manager@email.com", "password", UserRole.MANAGER));
         httpSession.setAttribute("user", new SimpleUser(manager));
-        savedPetition = petitionRepository.save(new Petition("title", "description", Category.DORMITORY, user.getId()));
+        savedPetition = petitionRepository.save(new Petition("title", "description", Category.DORMITORY, user.getId(), TEMP_URL));
     }
 
     @Test

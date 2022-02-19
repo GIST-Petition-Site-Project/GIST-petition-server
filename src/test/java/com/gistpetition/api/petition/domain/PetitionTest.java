@@ -15,8 +15,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PetitionTest {
     private static final String AGREEMENT_DESCRIPTION = "동의합니다.";
-    public static final String EMAIL = "email@gist.ac.kr";
-    public static final String PASSWORD = "password";
+    private static final String EMAIL = "email@gist.ac.kr";
+    private static final String PASSWORD = "password";
+    private static final String TEMP_URL = "AAAAAA";
 
     private User user;
     private Petition petition;
@@ -24,7 +25,7 @@ class PetitionTest {
     @BeforeEach
     void setUp() {
         user = new User(1L, EMAIL, PASSWORD, UserRole.USER);
-        petition = new Petition("title", "description", Category.DORMITORY, user.getId());
+        petition = new Petition("title", "description", Category.DORMITORY, user.getId(), TEMP_URL);
     }
 
     @Test

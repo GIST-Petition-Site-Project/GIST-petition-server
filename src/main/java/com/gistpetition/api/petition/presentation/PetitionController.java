@@ -5,7 +5,6 @@ import com.gistpetition.api.config.annotation.LoginRequired;
 import com.gistpetition.api.config.annotation.LoginUser;
 import com.gistpetition.api.config.annotation.ManagerPermissionRequired;
 import com.gistpetition.api.petition.application.PetitionService;
-import com.gistpetition.api.petition.application.TempPetitionService;
 import com.gistpetition.api.petition.dto.*;
 import com.gistpetition.api.user.domain.SimpleUser;
 import lombok.RequiredArgsConstructor;
@@ -24,14 +23,13 @@ import java.net.URI;
 @RequestMapping("/v1")
 public class PetitionController {
     private final PetitionService petitionService;
-    private final TempPetitionService tempPetitionService;
 
     @LoginRequired
     @PostMapping("/petitions")
     public ResponseEntity<Void> createPetition(@Validated @RequestBody PetitionRequest petitionRequest,
                                                @LoginUser SimpleUser simpleUser) {
         Long createdPetitionId = petitionService.createPetition(petitionRequest, simpleUser.getId());
-        String tempUrl = tempPetitionService.createTempUrl(createdPetitionId);
+        String tempUrl = petitionService.retrieveTempUrlOf(createdPetitionId);
         return ResponseEntity.created(URI.create("/petitions/temp/" + tempUrl)).build();
     }
 
@@ -140,13 +138,12 @@ public class PetitionController {
     }
 
     @GetMapping("/petitions/temp/{tempUrl}")
-    public ResponseEntity<TempPetitionResponse> retrieveTempPetition(@PathVariable String tempUrl) {
-        Long petitionId = tempPetitionService.findPetitionIdByTempUrl(tempUrl);
-        return ResponseEntity.ok().body(petitionService.retrieveTempPetitionById(petitionId, tempUrl));
+    public ResponseEntity<PetitionResponse> retrieveTempPetition(@PathVariable String tempUrl) {
+        return ResponseEntity.ok().body(petitionService.retrievePetitionByTempUrl(tempUrl));
     }
 
     @GetMapping("/petitions/best")
-    public ResponseEntity<Page<PetitionPreviewResponse>> retrieveTempPetition(Pageable pageable) {
+    public ResponseEntity<Page<PetitionPreviewResponse>> retrieveBestPetition(Pageable pageable) {
         return ResponseEntity.ok().body(petitionService.retrievePetitionsOrderByAgreeCount(pageable));
     }
 

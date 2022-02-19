@@ -7,7 +7,7 @@ import com.gistpetition.api.answer.dto.AnswerRequest;
 import com.gistpetition.api.petition.domain.Category;
 import com.gistpetition.api.petition.domain.PetitionRepository;
 import com.gistpetition.api.petition.dto.PetitionRequest;
-import com.gistpetition.api.petition.dto.TempPetitionResponse;
+import com.gistpetition.api.petition.dto.PetitionResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -46,7 +46,7 @@ public class CreateAnswerAcceptanceTest extends AcceptanceTest {
         String tmpUrl = locationHeader[locationHeader.length - 1];
 
         Response retrieveTempPetition = T_MANAGER.doLoginAndThen().retrieveTempPetition(tmpUrl);
-        Long petitionId = retrieveTempPetition.as(TempPetitionResponse.class).getId();
+        Long petitionId = retrieveTempPetition.as(PetitionResponse.class).getId();
 
         int numberOfThreads = 10;
         AtomicInteger errorCount = new AtomicInteger(0);

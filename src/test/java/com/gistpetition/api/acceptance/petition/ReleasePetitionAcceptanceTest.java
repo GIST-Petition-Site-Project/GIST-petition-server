@@ -7,7 +7,7 @@ import com.gistpetition.api.petition.domain.Category;
 import com.gistpetition.api.petition.domain.PetitionRepository;
 import com.gistpetition.api.petition.dto.AgreementRequest;
 import com.gistpetition.api.petition.dto.PetitionRequest;
-import com.gistpetition.api.petition.dto.TempPetitionResponse;
+import com.gistpetition.api.petition.dto.PetitionResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -45,7 +45,7 @@ public class ReleasePetitionAcceptanceTest extends AcceptanceTest {
         agreePetitionByFiveUsers(tmpUrl);
 
         Response petition = T_MANAGER.doLoginAndThen().retrieveTempPetition(tmpUrl);
-        TempPetitionResponse willBeReleasedPetition = petition.as(TempPetitionResponse.class);
+        PetitionResponse willBeReleasedPetition = petition.as(PetitionResponse.class);
 
         T_MANAGER.doLoginAndThen().releasePetition(willBeReleasedPetition.getId());
 
@@ -58,7 +58,7 @@ public class ReleasePetitionAcceptanceTest extends AcceptanceTest {
         for (TUser tUser : agreeUsers) {
             tUser.doSignUp();
             Response petition = tUser.doLoginAndThen().retrieveTempPetition(tmpUrl);
-            TempPetitionResponse petitionResponse = petition.as(TempPetitionResponse.class);
+            PetitionResponse petitionResponse = petition.as(PetitionResponse.class);
             Long petitionId = petitionResponse.getId();
             AgreementRequest agreementRequest = new AgreementRequest("동의합니다. ");
             tUser.doLoginAndThen().agreePetitionWith(agreementRequest, petitionId);

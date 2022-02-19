@@ -6,9 +6,9 @@ import com.gistpetition.api.answer.dto.AnswerRequest;
 import com.gistpetition.api.petition.application.PetitionService;
 import com.gistpetition.api.petition.domain.AgreementRepository;
 import com.gistpetition.api.petition.domain.Category;
-import com.gistpetition.api.petition.domain.Petition;
 import com.gistpetition.api.petition.domain.PetitionRepository;
 import com.gistpetition.api.petition.dto.AgreementRequest;
+import com.gistpetition.api.petition.dto.PetitionRequest;
 import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRepository;
 import com.gistpetition.api.user.domain.UserRole;
@@ -78,7 +78,7 @@ public class DataLoader {
             alphabetUsers.add(userRepository.save(new User(alphabet + "@gist.ac.kr", PASSWORD, UserRole.USER)));
         }
 
-        List<Petition> petitions = List.of(
+        List<Long> petitionIds = List.of(
                 savePetition("국민 청원에 글을 써버렸다.", normal),
                 savePetition("국민 청원에 글을 써버렸다.", normal),
                 savePetition("국민 청원에 글을 써버렸다.", normal),
@@ -111,22 +111,22 @@ public class DataLoader {
 
         Random random = new Random();
         int waitingForCheckPetitionCount = 3;
-        for (int i = 0; i < petitions.size(); i++) {
-            Petition petition = petitions.get(i);
+
+        for (Long petitionId : petitionIds) {
             int agreeCount = random.nextInt(alphabetUsers.size() - REQUIRED_AGREEMENT) + REQUIRED_AGREEMENT;
             for (int j = 0; j < agreeCount; j++) {
                 User user = alphabetUsers.get(j);
-                petitionService.agree(AGREEMENT_REQUEST, petition.getId(), user.getId());
+                petitionService.agree(AGREEMENT_REQUEST, petitionId, user.getId());
             }
-            if (i < waitingForCheckPetitionCount) {
+            if (petitionId < petitionIds.get(0) + waitingForCheckPetitionCount) {
                 continue;
             }
-            petitionService.releasePetition(petition.getId());
-            answerService.createAnswer(petition.getId(), new AnswerRequest(ANSWER_CONTENT));
+            petitionService.releasePetition(petitionId);
+            answerService.createAnswer(petitionId, new AnswerRequest(ANSWER_CONTENT));
         }
     }
 
-    private Petition savePetition(String title, User user) {
-        return petitionRepository.save(new Petition(title, CONTENT, Category.DORMITORY, user.getId()));
+    private Long savePetition(String title, User user) {
+        return petitionService.createPetition(new PetitionRequest(title, CONTENT, Category.DORMITORY.getId()), user.getId());
     }
 }

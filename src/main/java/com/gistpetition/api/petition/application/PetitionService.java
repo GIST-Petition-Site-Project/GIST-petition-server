@@ -9,6 +9,7 @@ import com.gistpetition.api.petition.domain.*;
 import com.gistpetition.api.petition.dto.*;
 import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRepository;
+import com.gistpetition.api.utils.urlGenerator.UrlGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -22,20 +23,24 @@ import static com.gistpetition.api.petition.domain.Petition.REQUIRED_AGREEMENT;
 @Service
 @RequiredArgsConstructor
 public class PetitionService {
+    public static final int TEMP_URL_LENGTH = 6;
 
     private final PetitionRepository petitionRepository;
     private final AgreementRepository agreementRepository;
     private final UserRepository userRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final UrlGenerator urlGenerator;
 
     @Transactional
     public Long createPetition(PetitionRequest petitionRequest, Long userId) {
+        String tempUrl = urlGenerator.generate(TEMP_URL_LENGTH);
         Petition created = petitionRepository.save(
-                new Petition(petitionRequest.getTitle(),
+                new Petition(
+                        petitionRequest.getTitle(),
                         petitionRequest.getDescription(),
                         Category.of(petitionRequest.getCategoryId()),
-                        userId)
-        );
+                        userId,
+                        tempUrl));
         return created.getId();
     }
 
@@ -82,11 +87,6 @@ public class PetitionService {
             throw new NotReleasedPetitionException();
         }
         return PetitionResponse.of(petition);
-    }
-
-    @Transactional(readOnly = true)
-    public TempPetitionResponse retrieveTempPetitionById(Long petitionId, String tempUrl) {
-        return TempPetitionResponse.of(findPetitionById(petitionId), tempUrl);
     }
 
     @Transactional(readOnly = true)
@@ -162,6 +162,18 @@ public class PetitionService {
     @Transactional(readOnly = true)
     public Page<PetitionPreviewResponse> retrievePetitionsOrderByAgreeCount(Pageable pageable) {
         return PetitionPreviewResponse.pageOf(petitionRepository.findAllByOrderByAgreeCountDesc(pageable));
+    }
+
+    @Transactional(readOnly = true)
+    public PetitionResponse retrievePetitionByTempUrl(String tempUrl) {
+        Petition petition = petitionRepository.findByTempUrl(tempUrl).orElseThrow(NoSuchPetitionException::new);
+        return PetitionResponse.of(petition);
+    }
+
+    @Transactional(readOnly = true)
+    public String retrieveTempUrlOf(Long petitionId) {
+        Petition petition = findPetitionById(petitionId);
+        return petition.getTempUrl();
     }
 
     private User findUserById(Long userId) {

@@ -23,6 +23,8 @@ public class Petition extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String title;
+    @Column(unique = true)
+    private String tempUrl;
     @Lob
     private String description;
     @Enumerated(EnumType.STRING)
@@ -40,13 +42,14 @@ public class Petition extends BaseEntity {
     protected Petition() {
     }
 
-    public Petition(String title, String description, Category category, Long userId) {
-        this(null, title, description, category, userId);
+    public Petition(String title, String description, Category category, Long userId, String tempUrl) {
+        this(null, title, tempUrl, description, category, userId);
     }
 
-    private Petition(Long id, String title, String description, Category category, Long userId) {
+    private Petition(Long id, String title, String tempUrl, String description, Category category, Long userId) {
         this.id = id;
         this.title = title;
+        this.tempUrl = tempUrl;
         this.description = description;
         this.category = category;
         this.userId = userId;

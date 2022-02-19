@@ -8,6 +8,8 @@ import org.springframework.data.repository.history.RevisionRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface PetitionRepository extends RevisionRepository<Petition, Long, Long>, JpaRepository<Petition, Long> {
     Page<Petition> findByUserId(Long userId, Pageable pageable);
@@ -30,4 +32,6 @@ public interface PetitionRepository extends RevisionRepository<Petition, Long, L
 
     @Query("SELECT p FROM Petition AS p LEFT JOIN FETCH p.agreements WHERE p.id=:petitionId")
     Petition findPetitionByWithEagerMode(@Param("petitionId") Long petitionId);
+
+    Optional<Petition> findByTempUrl(String tempUrl);
 }

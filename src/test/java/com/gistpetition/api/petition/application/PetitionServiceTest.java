@@ -39,6 +39,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class PetitionServiceTest extends ServiceTest {
     private static final PetitionRequest DORM_PETITION_REQUEST = new PetitionRequest("title", "description", Category.DORMITORY.getId());
     private static final AgreementRequest AGREEMENT_REQUEST = new AgreementRequest("동의합니다.");
+    private static final String TEMP_URL = "AAAAAA";
+
     public static final String EMAIL = "email@gist.ac.kr";
     public static final String PASSWORD = "password";
     @Autowired
@@ -250,7 +252,7 @@ public class PetitionServiceTest extends ServiceTest {
 
     @Test
     void deletePetition() {
-        Petition petition = petitionRepository.save(new Petition("title", "description", Category.DORMITORY, petitionOwner.getId()));
+        Petition petition = petitionRepository.save(new Petition("title", "description", Category.DORMITORY, petitionOwner.getId(), TEMP_URL));
         petitionService.agree(AGREEMENT_REQUEST, petition.getId(), petitionOwner.getId());
         petitionService.deletePetition(petition.getId());
         assertFalse(petitionRepository.existsById(petition.getId()));
@@ -267,7 +269,7 @@ public class PetitionServiceTest extends ServiceTest {
 
     @Test
     void retrieveAnsweredPetition() {
-        Petition petition = new Petition("title", "desc", Category.DORMITORY, petitionOwner.getId());
+        Petition petition = new Petition("title", "desc", Category.DORMITORY, petitionOwner.getId(), TEMP_URL);
         petition.setAnswered(true);
         petitionRepository.save(petition);
 
