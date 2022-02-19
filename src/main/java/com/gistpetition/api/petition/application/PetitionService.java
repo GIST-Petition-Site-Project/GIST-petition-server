@@ -143,7 +143,7 @@ public class PetitionService {
     @Transactional(readOnly = true)
     public int retrieveNumberOfAgreements(Long petitionId) {
         Petition petition = findPetitionById(petitionId);
-        return petition.getAgreements().size();
+        return petition.getAgreeCount();
     }
 
     @Transactional(readOnly = true)

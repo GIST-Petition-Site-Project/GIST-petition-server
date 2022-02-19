@@ -19,7 +19,7 @@ public class PetitionPreviewResponse {
                 petition.getId(),
                 petition.getTitle(),
                 petition.getCategory().getName(),
-                petition.getAgreements().size(),
+                petition.getAgreeCount(),
                 petition.getCreatedAt()
         );
     }

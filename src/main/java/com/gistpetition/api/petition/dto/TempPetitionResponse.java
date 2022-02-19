@@ -30,7 +30,7 @@ public class TempPetitionResponse {
                 petition.getCategory().getName(),
                 petition.isAnswered(),
                 petition.getUserId(),
-                petition.getAgreements().size(),
+                petition.getAgreeCount(),
                 petition.getCreatedAt(),
                 petition.getUpdatedAt(),
                 tempUrl

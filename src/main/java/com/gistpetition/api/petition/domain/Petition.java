@@ -70,7 +70,7 @@ public class Petition extends BaseEntity {
         if (released) {
             throw new AlreadyReleasedPetitionException();
         }
-        if (agreements.size() < REQUIRED_AGREEMENT) {
+        if (agreeCount < REQUIRED_AGREEMENT) {
             throw new NotEnoughAgreementException();
         }
         this.released = true;
