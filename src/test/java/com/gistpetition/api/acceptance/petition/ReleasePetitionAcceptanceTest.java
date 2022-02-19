@@ -31,7 +31,7 @@ public class ReleasePetitionAcceptanceTest extends AcceptanceTest {
 
     @Test
     @DisplayName("청원을 만들고 5명이 동의해서 Manager가 release하는 테스트")
-    void ReleasePetition() {
+    void releasePetition() {
         EUNGI.doSignUp();
 
         PetitionRequest petitionRequest = new PetitionRequest("title", "description", Category.ACADEMIC.getId());
@@ -61,7 +61,7 @@ public class ReleasePetitionAcceptanceTest extends AcceptanceTest {
             TempPetitionResponse petitionResponse = petition.as(TempPetitionResponse.class);
             Long petitionId = petitionResponse.getId();
             AgreementRequest agreementRequest = new AgreementRequest("동의합니다. ");
-            tUser.doLoginAndThen().agreePetition(agreementRequest, petitionId);
+            tUser.doLoginAndThen().agreePetitionWith(agreementRequest, petitionId);
         }
     }
 

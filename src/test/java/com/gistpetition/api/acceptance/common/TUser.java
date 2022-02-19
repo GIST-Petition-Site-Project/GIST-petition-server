@@ -91,7 +91,7 @@ public enum TUser {
                 statusCode(HttpStatus.CREATED.value()).
                 header(HttpHeaders.LOCATION, containsString("/users/")).
                 extract().header(HttpHeaders.LOCATION).split("/");
-        id = Long.parseLong(location[location.length - 1]);
+        id = Long.valueOf(location[location.length - 1]);
     }
 
 

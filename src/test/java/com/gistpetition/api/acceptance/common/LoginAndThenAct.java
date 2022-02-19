@@ -67,7 +67,7 @@ public class LoginAndThenAct {
                 get("/v1/petitions/" + petitionId);
     }
 
-    public Response agreePetition(AgreementRequest agreementRequest, Long petitionId) {
+    public Response agreePetitionWith(AgreementRequest agreementRequest, Long petitionId) {
         return given().
                 contentType(ContentType.JSON).
                 cookie("JSESSIONID", tUser.getJSessionId()).
