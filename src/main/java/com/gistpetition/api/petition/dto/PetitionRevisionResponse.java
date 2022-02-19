@@ -1,6 +1,7 @@
 package com.gistpetition.api.petition.dto;
 
 import com.gistpetition.api.common.persistence.CustomRevisionEntity;
+import com.gistpetition.api.petition.domain.Category;
 import com.gistpetition.api.petition.domain.Petition;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,7 +20,9 @@ public class PetitionRevisionResponse {
     private Instant revisionTime;
     private RevisionMetadata.RevisionType revisionType;
     private Long workedBy;
+    private String petitionTitle;
     private String petitionDescription;
+    private Category petitionCategory;
 
     public static PetitionRevisionResponse of(Revision<Long, Petition> revision) {
         CustomRevisionEntity customRevisionEntity = revision.getMetadata().getDelegate();
@@ -28,7 +31,9 @@ public class PetitionRevisionResponse {
                 revision.getRequiredRevisionInstant(),
                 revision.getMetadata().getRevisionType(),
                 customRevisionEntity.getUserId(),
-                revision.getEntity().getDescription()
+                revision.getEntity().getTitle(),
+                revision.getEntity().getDescription(),
+                revision.getEntity().getCategory()
         );
     }
 
