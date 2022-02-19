@@ -17,6 +17,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.gistpetition.api.petition.domain.Petition.REQUIRED_AGREEMENT;
+
 @Service
 @RequiredArgsConstructor
 public class PetitionService {
@@ -65,6 +67,12 @@ public class PetitionService {
     @Transactional(readOnly = true)
     public Page<PetitionPreviewResponse> retrievePetitionsByUserId(Long userId, Pageable pageable) {
         return PetitionPreviewResponse.pageOf(petitionRepository.findByUserId(userId, pageable));
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PetitionPreviewResponse> retrievePetitionsWaitingForCheck(Pageable pageable) {
+        Page<Petition> petitions = petitionRepository.findPetitionByAgreeCountIsGreaterThanEqualAndReleasedFalse(REQUIRED_AGREEMENT, pageable);
+        return PetitionPreviewResponse.pageOf(petitions);
     }
 
     @Transactional(readOnly = true)

@@ -18,7 +18,7 @@ import java.util.List;
 @Entity
 public class Petition extends BaseEntity {
 
-    public static final int REQUIRED_AGREMMENT = 5;
+    public static final int REQUIRED_AGREEMENT = 5;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -31,7 +31,7 @@ public class Petition extends BaseEntity {
     private Boolean released = false;
     private Long userId;
     @NotAudited
-    private Long agreeCount = 0L;
+    private Integer agreeCount = 0;
     @NotAudited
     @BatchSize(size = 10)
     @OneToMany(mappedBy = "petition", orphanRemoval = true)
@@ -70,7 +70,7 @@ public class Petition extends BaseEntity {
         if (released) {
             throw new AlreadyReleasedPetitionException();
         }
-        if (agreements.size() < REQUIRED_AGREMMENT) {
+        if (agreements.size() < REQUIRED_AGREEMENT) {
             throw new NotEnoughAgreementException();
         }
         this.released = true;
