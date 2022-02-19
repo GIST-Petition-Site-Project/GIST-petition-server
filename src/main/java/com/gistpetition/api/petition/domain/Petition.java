@@ -10,6 +10,7 @@ import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -102,5 +103,10 @@ public class Petition extends BaseEntity {
 
     public boolean isAnswered() {
         return answered;
+    }
+
+    public boolean isExpiredAt(LocalDateTime time) {
+        LocalDateTime expirationDate = this.createdAt.plusDays(POSTING_PERIOD);
+        return expirationDate.isBefore(time);
     }
 }

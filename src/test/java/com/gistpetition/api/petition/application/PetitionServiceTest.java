@@ -239,6 +239,21 @@ public class PetitionServiceTest extends ServiceTest {
     }
 
     @Test
+    void retrieveOngoingPetition() {
+        petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
+        petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
+        Page<PetitionPreviewResponse> petitions = petitionService.retrieveOngoingPetition(PageRequest.of(0, 10));
+        petitions.getContent().forEach(petitionPreviewResponse -> assertFalse(petitionPreviewResponse.getExpired()));
+    }
+
+    @Test
+    void retrieveExpiredPetition() {
+        Long petitionId = petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
+        Petition petition = petitionRepository.findById(petitionId).orElseThrow();
+        assertFalse(petition.isExpiredAt(LocalDateTime.now().minusDays(31)));
+    }
+
+    @Test
     void getStateOfAgreement() {
         Long petitionId = petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
         assertThat(petitionService.retrieveStateOfAgreement(petitionId, petitionOwner.getId())).isFalse();
