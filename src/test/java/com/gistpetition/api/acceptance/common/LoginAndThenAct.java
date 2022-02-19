@@ -60,6 +60,13 @@ public class LoginAndThenAct {
                 get("/v1/petitions/temp/" + tempUrl);
     }
 
+    public Response retrieveReleasedPetition(Long petitionId) {
+        return given().
+                cookie("JSESSIONID", tUser.getJSessionId()).
+                when().
+                get("/v1/petitions/" + petitionId);
+    }
+
     public Response agreePetition(AgreementRequest agreementRequest, Long petitionId) {
         return given().
                 contentType(ContentType.JSON).

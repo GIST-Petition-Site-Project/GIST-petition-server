@@ -17,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 
+import java.util.List;
+
 import static com.gistpetition.api.acceptance.common.TUser.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -29,17 +31,7 @@ public class ReleasePetitionAcceptanceTest extends AcceptanceTest {
     AgreementRepository agreementRepository;
 
     @Test
-    void test() {
-        for (TUser tUser : values()) {
-            if (!tUser.name().equals("T_ADMIN")) {
-                tUser.doSignUp();
-                System.out.println(tUser.getId());
-            }
-        }
-    }
-
-    @Test
-    @DisplayName("청원을 만들고")
+    @DisplayName("청원을 만들고 5명이 동의해서 Manager가 release하는 테스트")
     void ReleasePetition() {
         EUNGI.doSignUp();
 
@@ -51,24 +43,28 @@ public class ReleasePetitionAcceptanceTest extends AcceptanceTest {
         String[] locationHeader = createdPetition.header(HttpHeaders.LOCATION).split("/");
         String tmpUrl = locationHeader[locationHeader.length - 1];
 
-        for (TUser tUser : willAgreeUserArray()) {
+        agreePetitionByFiveUsers(tmpUrl);
+
+        GUNE.doSignUp();
+        Response petition = T_ADMIN.doLoginAndThen().updateUserRoleAndThen(GUNE, UserRole.MANAGER).retrieveTempPetition(tmpUrl);
+        TempPetitionResponse willBeReleasedPetition = petition.as(TempPetitionResponse.class);
+
+        GUNE.doLoginAndThen().releasePetition(willBeReleasedPetition.getId());
+
+        Response releasedPetition = EUNGI.doLoginAndThen().retrieveReleasedPetition(willBeReleasedPetition.getId());
+        assertThat(releasedPetition.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
+    private void agreePetitionByFiveUsers(String tmpUrl) {
+        List<TUser> agreeUsers = List.of(AGREE_USER1, AGREE_USER2, AGREE_USER3, AGREE_USER4, AGREE_USER5);
+        for (TUser tUser : agreeUsers) {
             tUser.doSignUp();
             Response petition = tUser.doLoginAndThen().retrieveTempPetition(tmpUrl);
             TempPetitionResponse petitionResponse = petition.as(TempPetitionResponse.class);
             Long petitionId = petitionResponse.getId();
-
             AgreementRequest agreementRequest = new AgreementRequest("동의합니다. ");
-            Response response = tUser.doLoginAndThen().agreePetition(agreementRequest, petitionId);
+            tUser.doLoginAndThen().agreePetition(agreementRequest, petitionId);
         }
-
-        Response petition = T_ADMIN.doLoginAndThen().updateUserRoleAndThen(EUNGI, UserRole.MANAGER).retrieveTempPetition(tmpUrl);
-        TempPetitionResponse response = petition.as(TempPetitionResponse.class);
-
-        Response releasedPetition = T_ADMIN.doLoginAndThen().releasePetition(response.getId());
-
-        EUNGI.doLoginAndThen().retrieveTempPetition(tmpUrl).as(TempPetitionResponse.class);
-
-
     }
 
     @AfterEach

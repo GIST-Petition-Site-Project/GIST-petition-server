@@ -140,9 +140,4 @@ public enum TUser {
     public String getJSessionId() {
         return this.jSessionId;
     }
-
-    public static TUser[] willAgreeUserArray() {
-        return new TUser[]{AGREE_USER1, AGREE_USER2, AGREE_USER3, AGREE_USER4, AGREE_USER5};
-    }
-
 }
