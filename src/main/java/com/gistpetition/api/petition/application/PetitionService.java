@@ -35,11 +35,12 @@ public class PetitionService {
     public Long createPetition(PetitionRequest petitionRequest, Long userId) {
         String tempUrl = urlGenerator.generate(TEMP_URL_LENGTH);
         Petition created = petitionRepository.save(
-                new Petition(petitionRequest.getTitle(),
+                new Petition(
+                        petitionRequest.getTitle(),
                         petitionRequest.getDescription(),
                         Category.of(petitionRequest.getCategoryId()),
-                        userId, tempUrl)
-        );
+                        userId,
+                        tempUrl));
         return created.getId();
     }
 
