@@ -19,6 +19,11 @@ public enum TUser {
     EUNGI("handsomeGuy@gm.gist.ac.kr", "It's me!"),
     WANNTE("wannte@gm.gist.ac.kr", "wannte"),
     KOSE("kose@gist.ac.kr", "kose"),
+    AGREE_USER1("agree1@gist.ac.kr", "agree1"),
+    AGREE_USER2("agree2@gist.ac.kr", "agree2"),
+    AGREE_USER3("agree3@gist.ac.kr", "agree3"),
+    AGREE_USER4("agree4@gist.ac.kr", "agree4"),
+    AGREE_USER5("agree5@gist.ac.kr", "agree5"),
     ;
 
     private final String username;
@@ -85,7 +90,7 @@ public enum TUser {
                 statusCode(HttpStatus.CREATED.value()).
                 header(HttpHeaders.LOCATION, containsString("/users/")).
                 extract().header(HttpHeaders.LOCATION).split("/");
-        id = Long.valueOf(location[location.length - 1]);
+        id = Long.parseLong(location[location.length - 1]);
     }
 
 
@@ -134,6 +139,10 @@ public enum TUser {
 
     public String getJSessionId() {
         return this.jSessionId;
+    }
+
+    public static TUser[] willAgreeUserArray() {
+        return new TUser[]{AGREE_USER1, AGREE_USER2, AGREE_USER3, AGREE_USER4, AGREE_USER5};
     }
 
 }
