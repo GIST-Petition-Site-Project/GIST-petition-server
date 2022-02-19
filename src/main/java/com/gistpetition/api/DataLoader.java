@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static com.gistpetition.api.petition.domain.Petition.REQUIRED_AGREEMENT_FOR_RELEASE;
+import static com.gistpetition.api.petition.domain.Petition.REQUIRED_AGREEMENT_FOR_ANSWER;
 
 @Profile("dev")
 @RequiredArgsConstructor
@@ -111,17 +111,23 @@ public class DataLoader {
 
         Random random = new Random();
         int waitingForCheckReleaseCount = 3;
+        int waitingForCheckAnswerCount = 2;
 
         for (Long petitionId : petitionIds) {
-            int agreeCount = random.nextInt(alphabetUsers.size() - REQUIRED_AGREEMENT_FOR_RELEASE) + REQUIRED_AGREEMENT_FOR_RELEASE;
+            int agreeCount = random.nextInt(alphabetUsers.size() - REQUIRED_AGREEMENT_FOR_ANSWER) + REQUIRED_AGREEMENT_FOR_ANSWER;
             for (int j = 0; j < agreeCount; j++) {
                 User user = alphabetUsers.get(j);
                 petitionService.agree(AGREEMENT_REQUEST, petitionId, user.getId());
             }
+
             if (petitionId < petitionIds.get(0) + waitingForCheckReleaseCount) {
                 continue;
             }
             petitionService.releasePetition(petitionId);
+
+            if (petitionId < petitionIds.get(0) + waitingForCheckReleaseCount + waitingForCheckAnswerCount) {
+                continue;
+            }
             answerService.createAnswer(petitionId, new AnswerRequest(ANSWER_CONTENT));
         }
     }
