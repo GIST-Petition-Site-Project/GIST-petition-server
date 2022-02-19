@@ -18,6 +18,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 import static com.gistpetition.api.petition.domain.Petition.REQUIRED_AGREEMENT;
 
 @Service
@@ -62,6 +64,26 @@ public class PetitionService {
     @Transactional(readOnly = true)
     public Page<PetitionPreviewResponse> retrieveReleasedPetitionByCategoryId(Long categoryId, Pageable pageable) {
         return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCategoryAndReleasedTrue(Category.of(categoryId), pageable));
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PetitionPreviewResponse> retrieveReleasedAndExpiredPetition(Pageable pageable) {
+        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCreatedAtBeforeAndReleasedTrue(LocalDateTime.now().minusDays(31), pageable));
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PetitionPreviewResponse> retrieveReleasedAndExpiredPetitionByCategoryId(Long categoryId, Pageable pageable) {
+        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCategoryAndCreatedAtBeforeAndReleasedTrue(Category.of(categoryId), LocalDateTime.now().minusDays(31), pageable));
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PetitionPreviewResponse> retrieveReleasedAndNotExpiredPetition(Pageable pageable) {
+        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCreatedAtAfterAndReleasedTrue(LocalDateTime.now().minusDays(30), pageable));
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PetitionPreviewResponse> retrieveReleasedAndNotExpiredPetitionByCategoryId(Long categoryId, Pageable pageable) {
+        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCategoryAndCreatedAtAfterAndReleasedTrue(Category.of(categoryId), LocalDateTime.now().minusDays(30), pageable));
     }
 
     @Transactional(readOnly = true)
@@ -183,4 +205,6 @@ public class PetitionService {
     private Petition findPetitionById(Long petitionId) {
         return petitionRepository.findById(petitionId).orElseThrow(NoSuchPetitionException::new);
     }
+
+
 }

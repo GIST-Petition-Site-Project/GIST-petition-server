@@ -19,6 +19,7 @@ import java.util.List;
 public class Petition extends BaseEntity {
 
     public static final int REQUIRED_AGREEMENT = 5;
+    public static final int POSTING_PERIOD = 30;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
