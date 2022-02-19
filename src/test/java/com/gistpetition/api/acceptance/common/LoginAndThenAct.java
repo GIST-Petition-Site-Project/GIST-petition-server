@@ -1,6 +1,7 @@
 package com.gistpetition.api.acceptance.common;
 
 import com.gistpetition.api.answer.dto.AnswerRequest;
+import com.gistpetition.api.petition.dto.AgreementRequest;
 import com.gistpetition.api.petition.dto.PetitionRequest;
 import com.gistpetition.api.user.domain.UserRole;
 import com.gistpetition.api.user.dto.request.UpdateUserRoleRequest;
@@ -58,6 +59,28 @@ public class LoginAndThenAct {
                 when().
                 get("/v1/petitions/temp/" + tempUrl);
     }
+
+    public Response agreePetition(AgreementRequest agreementRequest, Long petitionId) {
+        return given().
+                contentType(ContentType.JSON).
+                cookie("JSESSIONID", tUser.getJSessionId()).
+                body(agreementRequest).
+                when().
+                post("/v1/petitions/" + petitionId + "/agreements").
+                then().
+                statusCode(HttpStatus.OK.value()).extract().response();
+    }
+
+    public Response releasePetition(Long petitionId) {
+        return given().
+                contentType(ContentType.JSON).
+                cookie("JSESSIONID", tUser.getJSessionId()).
+                when().
+                post("/v1/petitions/" + petitionId + "/release").
+                then().
+                statusCode(HttpStatus.NO_CONTENT.value()).extract().response();
+    }
+
 
     public LoginAndThenAct updateUserRoleAndThen(TUser target, UserRole userRole) {
         UpdateUserRoleRequest updateUserRoleRequest = new UpdateUserRoleRequest(userRole.name());
