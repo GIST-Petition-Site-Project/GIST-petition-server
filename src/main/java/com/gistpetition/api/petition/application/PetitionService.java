@@ -57,32 +57,22 @@ public class PetitionService {
     }
 
     @Transactional(readOnly = true)
-    public Page<PetitionPreviewResponse> retrieveReleasedPetition(Pageable pageable) {
-        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByReleasedTrue(pageable));
-    }
-
-    @Transactional(readOnly = true)
-    public Page<PetitionPreviewResponse> retrieveReleasedPetitionByCategoryId(Long categoryId, Pageable pageable) {
-        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCategoryAndReleasedTrue(Category.of(categoryId), pageable));
-    }
-
-    @Transactional(readOnly = true)
-    public Page<PetitionPreviewResponse> retrieveReleasedAndExpiredPetition(Pageable pageable) {
+    public Page<PetitionPreviewResponse> retrieveExpiredPetition(Pageable pageable) {
         return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCreatedAtBeforeAndReleasedTrue(LocalDateTime.now().minusDays(31), pageable));
     }
 
     @Transactional(readOnly = true)
-    public Page<PetitionPreviewResponse> retrieveReleasedAndExpiredPetitionByCategoryId(Long categoryId, Pageable pageable) {
+    public Page<PetitionPreviewResponse> retrieveExpiredPetitionByCategoryId(Long categoryId, Pageable pageable) {
         return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCategoryAndCreatedAtBeforeAndReleasedTrue(Category.of(categoryId), LocalDateTime.now().minusDays(31), pageable));
     }
 
     @Transactional(readOnly = true)
-    public Page<PetitionPreviewResponse> retrieveReleasedAndNotExpiredPetition(Pageable pageable) {
+    public Page<PetitionPreviewResponse> retrieveOngoingPetition(Pageable pageable) {
         return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCreatedAtAfterAndReleasedTrue(LocalDateTime.now().minusDays(30), pageable));
     }
 
     @Transactional(readOnly = true)
-    public Page<PetitionPreviewResponse> retrieveReleasedAndNotExpiredPetitionByCategoryId(Long categoryId, Pageable pageable) {
+    public Page<PetitionPreviewResponse> retrieveOngoingPetitionByCategoryId(Long categoryId, Pageable pageable) {
         return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCategoryAndCreatedAtAfterAndReleasedTrue(Category.of(categoryId), LocalDateTime.now().minusDays(30), pageable));
     }
 
