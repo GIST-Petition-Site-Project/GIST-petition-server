@@ -12,15 +12,21 @@ import org.springframework.stereotype.Repository;
 public interface PetitionRepository extends RevisionRepository<Petition, Long, Long>, JpaRepository<Petition, Long> {
     Page<Petition> findByUserId(Long userId, Pageable pageable);
 
-    Page<Petition> findByCategory(Category category, Pageable pageable);
+    Page<Petition> findAllByCategory(Category category, Pageable pageable);
+
+    Page<Petition> findAllByCategoryAndReleasedTrue(Category category, Pageable pageable);
 
     Page<Petition> findAll(Pageable pageable);
+
+    Page<Petition> findAllByReleasedTrue(Pageable pageable);
 
     Page<Petition> findByTitleContains(String keyword, Pageable pageable);
 
     Page<Petition> findByAnsweredTrue(Pageable pageable);
 
     Page<Petition> findAllByOrderByAgreeCountDesc(Pageable pageable);
+
+    Page<Petition> findPetitionByAgreeCountIsGreaterThanEqualAndReleasedFalse(int requiredAgreeCount, Pageable pageable);
 
     @Query("SELECT p FROM Petition AS p LEFT JOIN FETCH p.agreements WHERE p.id=:petitionId")
     Petition findPetitionByWithEagerMode(@Param("petitionId") Long petitionId);

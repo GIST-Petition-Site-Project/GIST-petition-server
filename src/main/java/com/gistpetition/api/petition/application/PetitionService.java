@@ -3,6 +3,7 @@ package com.gistpetition.api.petition.application;
 
 import com.gistpetition.api.exception.petition.DuplicatedAgreementException;
 import com.gistpetition.api.exception.petition.NoSuchPetitionException;
+import com.gistpetition.api.exception.petition.NotReleasedPetitionException;
 import com.gistpetition.api.exception.user.NoSuchUserException;
 import com.gistpetition.api.petition.domain.*;
 import com.gistpetition.api.petition.dto.*;
@@ -15,6 +16,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static com.gistpetition.api.petition.domain.Petition.REQUIRED_AGREEMENT;
 
 @Service
 @RequiredArgsConstructor
@@ -43,7 +46,17 @@ public class PetitionService {
 
     @Transactional(readOnly = true)
     public Page<PetitionPreviewResponse> retrievePetitionByCategoryId(Long categoryId, Pageable pageable) {
-        return PetitionPreviewResponse.pageOf(petitionRepository.findByCategory(Category.of(categoryId), pageable));
+        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCategory(Category.of(categoryId), pageable));
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PetitionPreviewResponse> retrieveReleasedPetition(Pageable pageable) {
+        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByReleasedTrue(pageable));
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PetitionPreviewResponse> retrieveReleasedPetitionByCategoryId(Long categoryId, Pageable pageable) {
+        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCategoryAndReleasedTrue(Category.of(categoryId), pageable));
     }
 
     @Transactional(readOnly = true)
@@ -57,8 +70,18 @@ public class PetitionService {
     }
 
     @Transactional(readOnly = true)
-    public PetitionResponse retrievePetitionById(Long petitionId) {
-        return PetitionResponse.of(findPetitionById(petitionId));
+    public Page<PetitionPreviewResponse> retrievePetitionsWaitingForCheck(Pageable pageable) {
+        Page<Petition> petitions = petitionRepository.findPetitionByAgreeCountIsGreaterThanEqualAndReleasedFalse(REQUIRED_AGREEMENT, pageable);
+        return PetitionPreviewResponse.pageOf(petitions);
+    }
+
+    @Transactional(readOnly = true)
+    public PetitionResponse retrieveReleasedPetitionById(Long petitionId) {
+        Petition petition = findPetitionById(petitionId);
+        if (!petition.isReleased()) {
+            throw new NotReleasedPetitionException();
+        }
+        return PetitionResponse.of(petition);
     }
 
     @Transactional(readOnly = true)
@@ -120,7 +143,7 @@ public class PetitionService {
     @Transactional(readOnly = true)
     public int retrieveNumberOfAgreements(Long petitionId) {
         Petition petition = findPetitionById(petitionId);
-        return petition.getAgreements().size();
+        return petition.getAgreeCount();
     }
 
     @Transactional(readOnly = true)

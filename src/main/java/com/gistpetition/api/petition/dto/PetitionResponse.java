@@ -25,7 +25,7 @@ public class PetitionResponse {
                 petition.getCategory().getName(),
                 petition.isAnswered(),
                 petition.getUserId(),
-                petition.getAgreements().size(),
+                petition.getAgreeCount(),
                 petition.getCreatedAt(),
                 petition.getUpdatedAt()
         );

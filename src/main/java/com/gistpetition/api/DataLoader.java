@@ -19,8 +19,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
+
+import static com.gistpetition.api.petition.domain.Petition.REQUIRED_AGREEMENT;
 
 @Profile("dev")
 @RequiredArgsConstructor
@@ -58,6 +60,7 @@ public class DataLoader {
     private final PetitionService petitionService;
     private final AnswerService answerService;
     private final AgreementRepository agreementRepository;
+    private int anInt;
 
     @Transactional
     public void loadData() {
@@ -75,29 +78,48 @@ public class DataLoader {
             alphabetUsers.add(userRepository.save(new User(alphabet + "@gist.ac.kr", PASSWORD, UserRole.USER)));
         }
 
-        Petition petition1 = savePetition("국민 청원에 글을 써버렸다.", normal);
-        Petition petition2 = savePetition("방송 촬영을 위해 안전과 생존을 위협당하는 동물의 대책 마련이 필요합니다", manager);
-        Petition petition3 = savePetition("길고양이를 학대하는 갤러리를 폐쇄하고 엄중한 수사를 해주십시오.", admin);
-        Petition petition4 = savePetition("코로나19로 부터 우리 아이들을 지켜주세요.", normal);
-        Petition petition5 = savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal);
-        Petition petition6 = savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal);
-        Petition petition7 = savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal);
-        Petition petition8 = savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal);
-        Petition petition9 = savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal);
-        Petition petition10 = savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal);
-        Petition petition11 = savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal);
-        Petition petition12 = savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal);
-        savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal);
-        savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal);
-        savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal);
-        List<Petition> petitions = Arrays.asList(petition1, petition2, petition3, petition4, petition5, petition6, petition7, petition8, petition9, petition10, petition11, petition12);
+        List<Petition> petitions = List.of(
+                savePetition("국민 청원에 글을 써버렸다.", normal),
+                savePetition("국민 청원에 글을 써버렸다.", normal),
+                savePetition("국민 청원에 글을 써버렸다.", normal),
+                savePetition("국민 청원에 글을 써버렸다.", normal),
+                savePetition("국민 청원에 글을 써버렸다.", normal),
+                savePetition("국민 청원에 글을 써버렸다.", normal),
+                savePetition("국민 청원에 글을 써버렸다.", normal),
+                savePetition("국민 청원에 글을 써버렸다.", normal),
+                savePetition("국민 청원에 글을 써버렸다.", normal),
+                savePetition("국민 청원에 글을 써버렸다.", normal),
+                savePetition("국민 청원에 글을 써버렸다.", normal),
+                savePetition("국민 청원에 글을 써버렸다.", normal),
+                savePetition("국민 청원에 글을 써버렸다.", normal),
+                savePetition("국민 청원에 글을 써버렸다.", normal),
+                savePetition("국민 청원에 글을 써버렸다.", normal),
+                savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal),
+                savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal),
+                savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal),
+                savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal),
+                savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal),
+                savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal),
+                savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal),
+                savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal),
+                savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal),
+                savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal)
+        );
+        savePetition("Temp 2차방역지원금 지금 자영업분들 농락하시나요?", normal);
+        savePetition("Temp 2차방역지원금 지금 자영업분들 농락하시나요?", normal);
+        savePetition("Temp 2차방역지원금 지금 자영업분들 농락하시나요?", normal);
 
-        List<Integer> numOfAgree = List.of(26, 13, 16, 21, 6, 9, 8, 5, 5, 21, 17, 16);
+        Random random = new Random();
+        int waitingForCheckPetitionCount = 3;
         for (int i = 0; i < petitions.size(); i++) {
             Petition petition = petitions.get(i);
-            for (int j = 0; j < numOfAgree.get(i); j++) {
+            int agreeCount = random.nextInt(alphabetUsers.size() - REQUIRED_AGREEMENT) + REQUIRED_AGREEMENT;
+            for (int j = 0; j < agreeCount; j++) {
                 User user = alphabetUsers.get(j);
                 petitionService.agree(AGREEMENT_REQUEST, petition.getId(), user.getId());
+            }
+            if (i < waitingForCheckPetitionCount) {
+                continue;
             }
             petitionService.releasePetition(petition.getId());
             answerService.createAnswer(petition.getId(), new AnswerRequest(ANSWER_CONTENT));
