@@ -60,6 +60,7 @@ public class DataLoader {
     private final PetitionService petitionService;
     private final AnswerService answerService;
     private final AgreementRepository agreementRepository;
+    private int anInt;
 
     @Transactional
     public void loadData() {
@@ -109,6 +110,7 @@ public class DataLoader {
         savePetition("Temp 2차방역지원금 지금 자영업분들 농락하시나요?", normal);
 
         Random random = new Random();
+        int waitingForCheckPetitionCount = 3;
         for (int i = 0; i < petitions.size(); i++) {
             Petition petition = petitions.get(i);
             int agreeCount = random.nextInt(alphabetUsers.size() - REQUIRED_AGREEMENT) + REQUIRED_AGREEMENT;
@@ -116,7 +118,7 @@ public class DataLoader {
                 User user = alphabetUsers.get(j);
                 petitionService.agree(AGREEMENT_REQUEST, petition.getId(), user.getId());
             }
-            if (i < 3) {
+            if (i < waitingForCheckPetitionCount) {
                 continue;
             }
             petitionService.releasePetition(petition.getId());

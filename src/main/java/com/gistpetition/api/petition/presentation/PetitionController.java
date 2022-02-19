@@ -44,7 +44,6 @@ public class PetitionController {
         return ResponseEntity.ok().body(petitionService.retrieveReleasedPetitionByCategoryId(categoryId, pageable));
     }
 
-
     @GetMapping("/petitions/all")
     public ResponseEntity<Page<PetitionPreviewResponse>> retrieveAllPetitions(@RequestParam(defaultValue = "0") Long categoryId,
                                                                               @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
