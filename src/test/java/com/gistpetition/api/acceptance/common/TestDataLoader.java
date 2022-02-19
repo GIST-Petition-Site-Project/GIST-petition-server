@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import static com.gistpetition.api.acceptance.common.TUser.T_ADMIN;
+import static com.gistpetition.api.acceptance.common.TUser.T_MANAGER;
 
 @Profile("acceptance")
 @Component
@@ -24,5 +25,6 @@ public class TestDataLoader implements CommandLineRunner {
     @Override
     public void run(String... args) {
         userRepository.save(new User(T_ADMIN.getUsername(), encoder.hashPassword(T_ADMIN.getPassword()), UserRole.ADMIN));
+        userRepository.save(new User(T_MANAGER.getUsername(), encoder.hashPassword(T_MANAGER.getPassword()), UserRole.MANAGER));
     }
 }
