@@ -57,6 +57,13 @@ public class PetitionController {
         return ResponseEntity.ok().body(petitionService.retrievePetitionsWaitingForCheck(pageable));
     }
 
+
+    @ManagerPermissionRequired
+    @GetMapping("/petitions/waitingForAnswer")
+    public ResponseEntity<Page<PetitionPreviewResponse>> retrievePetitionsWaitingForAnswer(@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ResponseEntity.ok().body(petitionService.retrievePetitionsWaitingForAnswer(pageable));
+    }
+
     @GetMapping("/petitions/answered")
     public ResponseEntity<Page<PetitionPreviewResponse>> retrieveAnsweredPetitions(@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok().body(petitionService.retrieveAnsweredPetition(pageable));
