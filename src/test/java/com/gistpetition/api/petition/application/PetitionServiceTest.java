@@ -55,10 +55,15 @@ public class PetitionServiceTest extends ServiceTest {
     private HttpSession httpSession;
 
     private User petitionOwner;
+    private final List<User> users = new ArrayList<>();
 
     @BeforeEach
     void setUp() {
         petitionOwner = userRepository.save(new User(EMAIL, PASSWORD, UserRole.USER));
+        for (int i = 0; i < 5; i++) {
+            String email = String.format("email%2s@gist.ac.kr", i);
+            users.add(userRepository.save(new User(email, PASSWORD, UserRole.USER)));
+        }
     }
 
     @Test
@@ -251,6 +256,15 @@ public class PetitionServiceTest extends ServiceTest {
         Long petitionId = petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
         Petition petition = petitionRepository.findById(petitionId).orElseThrow();
         assertFalse(petition.isExpiredAt(LocalDateTime.now().minusDays(31)));
+    }
+
+    private void releasePetitionByIds(List<Long> ids) {
+        for (Long id : ids) {
+            for (int i = 0; i < 5; i++) {
+                petitionService.agree(AGREEMENT_REQUEST, id, users.get(i).getId());
+            }
+            petitionService.releasePetition(id);
+        }
     }
 
     @Test
