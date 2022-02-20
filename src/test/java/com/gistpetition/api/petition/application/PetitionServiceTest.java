@@ -15,6 +15,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.data.auditing.AuditingHandler;
+import org.springframework.data.auditing.DateTimeProvider;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -23,7 +27,9 @@ import org.springframework.data.history.RevisionMetadata;
 
 import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -35,6 +41,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
 public class PetitionServiceTest extends ServiceTest {
     private static final PetitionRequest DORM_PETITION_REQUEST = new PetitionRequest("title", "description", Category.DORMITORY.getId());
@@ -54,11 +61,21 @@ public class PetitionServiceTest extends ServiceTest {
     @Autowired
     private HttpSession httpSession;
 
+    @SpyBean
+    private AuditingHandler auditingHandler;
+    @MockBean
+    private DateTimeProvider dateTimeProvider;
+
     private User petitionOwner;
     private final List<User> users = new ArrayList<>();
 
     @BeforeEach
     void setUp() {
+        when(dateTimeProvider.getNow()).thenAnswer(
+                i -> Optional.of(LocalDateTime.now())
+        );
+        auditingHandler.setDateTimeProvider(dateTimeProvider);
+
         petitionOwner = userRepository.save(new User(EMAIL, PASSWORD, UserRole.USER));
         for (int i = 0; i < 5; i++) {
             String email = String.format("email%2s@gist.ac.kr", i);
@@ -245,17 +262,40 @@ public class PetitionServiceTest extends ServiceTest {
 
     @Test
     void retrieveOngoingPetition() {
-        petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
-        petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
-        Page<PetitionPreviewResponse> petitions = petitionService.retrieveOngoingPetition(PageRequest.of(0, 10));
-        petitions.getContent().forEach(petitionPreviewResponse -> assertFalse(petitionPreviewResponse.getExpired()));
+        int numOfPetition = 3;
+        List<Long> createdPetitionIds = new ArrayList<>();
+        for (int i = 0; i < numOfPetition; i++) {
+            createdPetitionIds.add(petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId()));
+        }
+        releasePetitionByIds(createdPetitionIds);
+
+        Page<PetitionPreviewResponse> ongoingPetitions = petitionService.retrieveOngoingPetition(PageRequest.of(0, 10));
+        assertThat(ongoingPetitions.getContent()).hasSize(numOfPetition);
+
+        for (PetitionPreviewResponse op : ongoingPetitions) {
+            assertFalse(op.getExpired());
+        }
     }
+
 
     @Test
     void retrieveExpiredPetition() {
-        Long petitionId = petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
-        Petition petition = petitionRepository.findById(petitionId).orElseThrow();
-        assertFalse(petition.isExpiredAt(LocalDateTime.now().minusDays(31)));
+        LocalDateTime pastTime = LocalDateTime.of(2020, 12, 1, 0, 0);
+        when(dateTimeProvider.getNow()).thenReturn(Optional.of(pastTime));
+
+        int numOfPetition = 3;
+        List<Long> createdPetitionIds = new ArrayList<>();
+        for (int i = 0; i < numOfPetition; i++) {
+            createdPetitionIds.add(petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId()));
+        }
+        releasePetitionByIds(createdPetitionIds);
+
+        Page<PetitionPreviewResponse> expiredPetitions = petitionService.retrieveExpiredPetition(PageRequest.of(0, 10));
+        assertThat(expiredPetitions.getContent()).hasSize(numOfPetition);
+
+        for (PetitionPreviewResponse ep : expiredPetitions) {
+            assertTrue(ep.getExpired());
+        }
     }
 
     private void releasePetitionByIds(List<Long> ids) {
