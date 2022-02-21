@@ -19,8 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import static com.gistpetition.api.petition.domain.Petition.REQUIRED_AGREEMENT_FOR_ANSWER;
-import static com.gistpetition.api.petition.domain.Petition.REQUIRED_AGREEMENT_FOR_RELEASE;
+
+import static com.gistpetition.api.petition.domain.Petition.*;
 
 @Service
 @RequiredArgsConstructor
@@ -58,22 +58,22 @@ public class PetitionService {
 
     @Transactional(readOnly = true)
     public Page<PetitionPreviewResponse> retrieveExpiredPetition(Pageable pageable) {
-        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCreatedAtBeforeAndReleasedTrue(LocalDateTime.now().minusDays(31), pageable));
+        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCreatedAtBeforeAndReleasedTrue(LocalDateTime.now().minusDays(POSTING_PERIOD), pageable));
     }
 
     @Transactional(readOnly = true)
     public Page<PetitionPreviewResponse> retrieveExpiredPetitionByCategoryId(Long categoryId, Pageable pageable) {
-        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCategoryAndCreatedAtBeforeAndReleasedTrue(Category.of(categoryId), LocalDateTime.now().minusDays(31), pageable));
+        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCategoryAndCreatedAtBeforeAndReleasedTrue(Category.of(categoryId), LocalDateTime.now().minusDays(POSTING_PERIOD), pageable));
     }
 
     @Transactional(readOnly = true)
     public Page<PetitionPreviewResponse> retrieveOngoingPetition(Pageable pageable) {
-        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCreatedAtAfterAndReleasedTrue(LocalDateTime.now().minusDays(30), pageable));
+        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCreatedAtAfterAndReleasedTrue(LocalDateTime.now().minusDays(POSTING_PERIOD), pageable));
     }
 
     @Transactional(readOnly = true)
     public Page<PetitionPreviewResponse> retrieveOngoingPetitionByCategoryId(Long categoryId, Pageable pageable) {
-        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCategoryAndCreatedAtAfterAndReleasedTrue(Category.of(categoryId), LocalDateTime.now().minusDays(30), pageable));
+        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCategoryAndCreatedAtAfterAndReleasedTrue(Category.of(categoryId), LocalDateTime.now().minusDays(POSTING_PERIOD), pageable));
     }
 
     @Transactional(readOnly = true)
