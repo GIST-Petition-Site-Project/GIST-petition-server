@@ -57,12 +57,12 @@ public class PetitionService {
     }
 
     @Transactional(readOnly = true)
-    public Page<PetitionPreviewResponse> retrieveExpiredPetition(Pageable pageable) {
+    public Page<PetitionPreviewResponse> retrieveReleasedAndExpiredPetition(Pageable pageable) {
         return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCreatedAtBeforeAndReleasedTrue(LocalDateTime.now().minusDays(POSTING_PERIOD), pageable));
     }
 
     @Transactional(readOnly = true)
-    public Page<PetitionPreviewResponse> retrieveExpiredPetitionByCategoryId(Long categoryId, Pageable pageable) {
+    public Page<PetitionPreviewResponse> retrieveReleasedAndExpiredPetitionByCategoryId(Long categoryId, Pageable pageable) {
         return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCategoryAndCreatedAtBeforeAndReleasedTrue(Category.of(categoryId), LocalDateTime.now().minusDays(POSTING_PERIOD), pageable));
     }
 

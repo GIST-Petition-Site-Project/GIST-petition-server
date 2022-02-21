@@ -290,7 +290,7 @@ public class PetitionServiceTest extends ServiceTest {
         }
         releasePetitionByIds(createdPetitionIds);
 
-        Page<PetitionPreviewResponse> expiredPetitions = petitionService.retrieveExpiredPetition(PageRequest.of(0, 10));
+        Page<PetitionPreviewResponse> expiredPetitions = petitionService.retrieveReleasedAndExpiredPetition(PageRequest.of(0, 10));
         assertThat(expiredPetitions.getContent()).hasSize(numOfPetition);
 
         for (PetitionPreviewResponse ep : expiredPetitions) {
