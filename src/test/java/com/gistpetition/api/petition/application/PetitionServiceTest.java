@@ -15,10 +15,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.data.auditing.AuditingHandler;
-import org.springframework.data.auditing.DateTimeProvider;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -41,7 +39,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
 
 public class PetitionServiceTest extends ServiceTest {
     private static final PetitionRequest DORM_PETITION_REQUEST = new PetitionRequest("title", "description", Category.DORMITORY.getId());
@@ -63,19 +60,12 @@ public class PetitionServiceTest extends ServiceTest {
 
     @SpyBean
     private AuditingHandler auditingHandler;
-    @MockBean
-    private DateTimeProvider dateTimeProvider;
 
     private User petitionOwner;
     private final List<User> users = new ArrayList<>();
 
     @BeforeEach
     void setUp() {
-        when(dateTimeProvider.getNow()).thenAnswer(
-                i -> Optional.of(LocalDateTime.now())
-        );
-        auditingHandler.setDateTimeProvider(dateTimeProvider);
-
         petitionOwner = userRepository.save(new User(EMAIL, PASSWORD, UserRole.USER));
         for (int i = 0; i < 5; i++) {
             String email = String.format("email%2s@gist.ac.kr", i);
@@ -281,7 +271,9 @@ public class PetitionServiceTest extends ServiceTest {
     @Test
     void retrieveExpiredPetition() {
         LocalDateTime pastTime = LocalDateTime.of(2020, 12, 1, 0, 0);
-        when(dateTimeProvider.getNow()).thenReturn(Optional.of(pastTime));
+        auditingHandler.setDateTimeProvider(
+                () -> Optional.of(pastTime)
+        );
 
         int numOfPetition = 3;
         List<Long> createdPetitionIds = new ArrayList<>();
