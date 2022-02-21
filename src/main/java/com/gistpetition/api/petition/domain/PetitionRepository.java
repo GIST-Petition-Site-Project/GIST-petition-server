@@ -8,6 +8,7 @@ import org.springframework.data.repository.history.RevisionRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Repository
@@ -30,8 +31,16 @@ public interface PetitionRepository extends RevisionRepository<Petition, Long, L
 
     Page<Petition> findPetitionByAgreeCountIsGreaterThanEqualAndReleasedFalse(int requiredAgreeCount, Pageable pageable);
 
-    Page<Petition> findPetitionByAgreeCountIsGreaterThanEqualAndReleasedTrueAndAnsweredFalse(int requiredAnswerCount, Pageable pageable);
+    Page<Petition> findAllByCreatedAtBeforeAndReleasedTrue(LocalDateTime time, Pageable pageable);
 
+    Page<Petition> findAllByCategoryAndCreatedAtBeforeAndReleasedTrue(Category category, LocalDateTime time, Pageable pageable);
+
+    Page<Petition> findAllByCreatedAtAfterAndReleasedTrue(LocalDateTime time, Pageable pageable);
+
+    Page<Petition> findAllByCategoryAndCreatedAtAfterAndReleasedTrue(Category category, LocalDateTime time, Pageable pageable);
+  
+    Page<Petition> findPetitionByAgreeCountIsGreaterThanEqualAndReleasedTrueAndAnsweredFalse(int requiredAnswerCount, Pageable pageable);
+    
     Long countByReleasedTrue();
 
     @Query("SELECT p FROM Petition AS p LEFT JOIN FETCH p.agreements WHERE p.id=:petitionId")

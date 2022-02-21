@@ -12,9 +12,9 @@ import java.time.LocalDateTime;
 @MappedSuperclass
 public abstract class BaseEntity {
     @CreatedDate
-    private LocalDateTime createdAt;
+    protected LocalDateTime createdAt;
     @LastModifiedDate
-    private LocalDateTime updatedAt;
+    protected LocalDateTime updatedAt;
 
     protected BaseEntity() {
     }

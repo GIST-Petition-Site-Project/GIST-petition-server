@@ -10,6 +10,7 @@ import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,8 +19,11 @@ import java.util.List;
 @Entity
 public class Petition extends BaseEntity {
 
+
     public static final int REQUIRED_AGREEMENT_FOR_RELEASE = 5;
     public static final int REQUIRED_AGREEMENT_FOR_ANSWER = 20;
+    public static final int POSTING_PERIOD = 30;
+  
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -102,5 +106,10 @@ public class Petition extends BaseEntity {
 
     public boolean isAnswered() {
         return answered;
+    }
+
+    public boolean isExpiredAt(LocalDateTime time) {
+        LocalDateTime expirationDate = this.createdAt.plusDays(POSTING_PERIOD);
+        return expirationDate.isBefore(time);
     }
 }

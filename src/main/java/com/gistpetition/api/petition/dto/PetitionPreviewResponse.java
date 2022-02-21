@@ -14,6 +14,7 @@ public class PetitionPreviewResponse {
     private final Integer agreements;
     private final LocalDateTime createdAt;
     private final String tempUrl;
+    private final Boolean expired;
 
     public static PetitionPreviewResponse of(Petition petition) {
         return new PetitionPreviewResponse(
@@ -22,7 +23,8 @@ public class PetitionPreviewResponse {
                 petition.getCategory().getName(),
                 petition.getAgreeCount(),
                 petition.getCreatedAt(),
-                petition.getTempUrl()
+                petition.getTempUrl(),
+                petition.isExpiredAt(LocalDateTime.now())
         );
     }
 

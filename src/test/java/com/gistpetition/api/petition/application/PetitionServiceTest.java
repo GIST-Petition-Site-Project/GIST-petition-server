@@ -15,6 +15,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.data.auditing.AuditingHandler;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -23,7 +25,9 @@ import org.springframework.data.history.RevisionMetadata;
 
 import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -54,11 +58,19 @@ public class PetitionServiceTest extends ServiceTest {
     @Autowired
     private HttpSession httpSession;
 
+    @SpyBean
+    private AuditingHandler auditingHandler;
+
     private User petitionOwner;
+    private final List<User> users = new ArrayList<>();
 
     @BeforeEach
     void setUp() {
         petitionOwner = userRepository.save(new User(EMAIL, PASSWORD, UserRole.USER));
+        for (int i = 0; i < 5; i++) {
+            String email = String.format("email%2s@gist.ac.kr", i);
+            users.add(userRepository.save(new User(email, PASSWORD, UserRole.USER)));
+        }
     }
 
     @Test
@@ -236,6 +248,55 @@ public class PetitionServiceTest extends ServiceTest {
         Page<PetitionPreviewResponse> petitionPreviewResponses = petitionService.retrievePetition(pageRequest);
 
         assertThat(petitionService.retrieveNumberOfAgreements(petitionId)).isEqualTo(3);
+    }
+
+    @Test
+    void retrieveOngoingPetition() {
+        int numOfPetition = 3;
+        List<Long> createdPetitionIds = new ArrayList<>();
+        for (int i = 0; i < numOfPetition; i++) {
+            createdPetitionIds.add(petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId()));
+        }
+        releasePetitionByIds(createdPetitionIds);
+
+        Page<PetitionPreviewResponse> ongoingPetitions = petitionService.retrieveOngoingPetition(PageRequest.of(0, 10));
+        assertThat(ongoingPetitions.getContent()).hasSize(numOfPetition);
+
+        for (PetitionPreviewResponse op : ongoingPetitions) {
+            assertFalse(op.getExpired());
+        }
+    }
+
+
+    @Test
+    void retrieveExpiredPetition() {
+        LocalDateTime pastTime = LocalDateTime.of(2020, 12, 1, 0, 0);
+        auditingHandler.setDateTimeProvider(
+                () -> Optional.of(pastTime)
+        );
+
+        int numOfPetition = 3;
+        List<Long> createdPetitionIds = new ArrayList<>();
+        for (int i = 0; i < numOfPetition; i++) {
+            createdPetitionIds.add(petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId()));
+        }
+        releasePetitionByIds(createdPetitionIds);
+
+        Page<PetitionPreviewResponse> expiredPetitions = petitionService.retrieveReleasedAndExpiredPetition(PageRequest.of(0, 10));
+        assertThat(expiredPetitions.getContent()).hasSize(numOfPetition);
+
+        for (PetitionPreviewResponse ep : expiredPetitions) {
+            assertTrue(ep.getExpired());
+        }
+    }
+
+    private void releasePetitionByIds(List<Long> ids) {
+        for (Long id : ids) {
+            for (int i = 0; i < 5; i++) {
+                petitionService.agree(AGREEMENT_REQUEST, id, users.get(i).getId());
+            }
+            petitionService.releasePetition(id);
+        }
     }
 
     @Test

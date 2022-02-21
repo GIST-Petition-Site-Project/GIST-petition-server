@@ -20,6 +20,7 @@ public class PetitionResponse {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String tempUrl;
+    private Boolean expired;
 
     public static PetitionResponse of(Petition petition) {
         return new PetitionResponse(
@@ -31,7 +32,8 @@ public class PetitionResponse {
                 petition.getAgreeCount(),
                 petition.getCreatedAt(),
                 petition.getUpdatedAt(),
-                petition.getTempUrl()
+                petition.getTempUrl(),
+                petition.isExpiredAt(LocalDateTime.now())
         );
     }
 }
