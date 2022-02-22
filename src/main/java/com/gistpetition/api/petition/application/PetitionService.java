@@ -41,6 +41,7 @@ public class PetitionService {
                         petitionRequest.getTitle(),
                         petitionRequest.getDescription(),
                         Category.of(petitionRequest.getCategoryId()),
+                        LocalDateTime.now().plusDays(POSTING_PERIOD),
                         userId,
                         tempUrl));
         return created.getId();
@@ -184,7 +185,7 @@ public class PetitionService {
     @Transactional
     public void releasePetition(Long petitionId) {
         Petition petition = findPetitionById(petitionId);
-        petition.release();
+        petition.release(LocalDateTime.now());
     }
 
     @Transactional(readOnly = true)

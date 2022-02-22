@@ -48,13 +48,6 @@ class PetitionTest {
 
     @Test
     void agreeExpiredPetition() {
-//        LocalDateTime past = LocalDateTime.MIN;
-//        LocalDateTime future = LocalDateTime.MAX;
-//        Petition expiredPetition = PetitionBuilder.aPetition().withExpiredAt(past).build();
-//        assertThatThrownBy(() ->
-//                expiredPetition.addAgreement(new Agreement(AGREEMENT_DESCRIPTION, 1L), future)
-//        ).isInstanceOf(ExpiredPetitionException.class);
-
         assertThatThrownBy(() ->
                 petition.addAgreement(new Agreement(AGREEMENT_DESCRIPTION, 1L), PETITION_EXPIRED_AT.plusDays(1))
         ).isInstanceOf(ExpiredPetitionException.class);
@@ -62,26 +55,37 @@ class PetitionTest {
 
     @Test
     void release() {
-        LongStream.range(0, 5)
-                .forEach(userId -> petition.addAgreement(new Agreement(AGREEMENT_DESCRIPTION, userId), PETITION_ONGOING_AT));
-
-        petition.release();
+        agreedUponBy(Petition.REQUIRED_AGREEMENT_FOR_RELEASE);
 
         assertTrue(petition.isReleased());
     }
 
     @Test
     void releaseAlreadyReleased() {
-        LongStream.range(0, 5)
-                .forEach(userId -> petition.addAgreement(new Agreement(AGREEMENT_DESCRIPTION, userId), PETITION_ONGOING_AT));
-        petition.release();
+        agreedUponBy(Petition.REQUIRED_AGREEMENT_FOR_RELEASE);
 
-        assertThatThrownBy(() -> petition.release()
+        assertThatThrownBy(() -> petition.release(PETITION_ONGOING_AT.plusSeconds(1))
         ).isInstanceOf(AlreadyReleasedPetitionException.class);
     }
 
     @Test
     void releaseNotEnoughAgreement() {
-        assertThatThrownBy(() -> petition.release()).isInstanceOf(NotEnoughAgreementException.class);
+        assertThatThrownBy(() -> petition.release(PETITION_ONGOING_AT)
+        ).isInstanceOf(NotEnoughAgreementException.class);
+    }
+
+    @Test
+    void releaseExpiredPetition() {
+        agreedUponBy(Petition.REQUIRED_AGREEMENT_FOR_RELEASE);
+
+        assertThatThrownBy(() ->
+                petition.release(PETITION_EXPIRED_AT.plusDays(1))
+        ).isInstanceOf(ExpiredPetitionException.class);
+    }
+
+    private void agreedUponBy(int numOfUsers) {
+        LongStream.range(0, numOfUsers)
+                .forEach(userId -> petition.addAgreement(new Agreement(AGREEMENT_DESCRIPTION, userId), PETITION_ONGOING_AT));
+        petition.release(PETITION_ONGOING_AT);
     }
 }

@@ -46,10 +46,6 @@ public class Petition extends BaseEntity {
     protected Petition() {
     }
 
-    public Petition(String title, String description, Category category, Long userId, String tempUrl) {
-        this(title, description, category, LocalDateTime.now().plusDays(POSTING_PERIOD), userId, tempUrl);
-    }
-
     public Petition(String title, String description, Category category, LocalDateTime expiredAt, Long userId, String tempUrl) {
         this.title = title;
         this.description = description;
@@ -79,7 +75,10 @@ public class Petition extends BaseEntity {
         return false;
     }
 
-    public void release() {
+    public void release(LocalDateTime at) {
+        if (at.isAfter(expiredAt)) {
+            throw new ExpiredPetitionException();
+        }
         if (released) {
             throw new AlreadyReleasedPetitionException();
         }
