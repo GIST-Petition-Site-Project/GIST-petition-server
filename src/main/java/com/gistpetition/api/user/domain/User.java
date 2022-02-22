@@ -2,13 +2,13 @@ package com.gistpetition.api.user.domain;
 
 import com.gistpetition.api.common.persistence.BaseEntity;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 
 @Entity
 public class User extends BaseEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
     @Column(unique = true)
     private String username;
     private String password;
@@ -19,22 +19,9 @@ public class User extends BaseEntity {
     }
 
     public User(String username, String password, UserRole userRole) {
-        this(null, username, password, userRole);
-    }
-
-    public User(String username, String password, UserRole userRole, Boolean enabled) {
-        this(null, username, password, userRole);
-    }
-
-    public User(Long id, String username, String password, UserRole userRole) {
-        this.id = id;
         this.username = username;
         this.password = password;
         this.userRole = userRole;
-    }
-
-    public Long getId() {
-        return id;
     }
 
     public String getUsername() {
@@ -56,5 +43,4 @@ public class User extends BaseEntity {
     public void setUserRole(UserRole userRole) {
         this.userRole = userRole;
     }
-
 }

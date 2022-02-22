@@ -15,23 +15,19 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PetitionTest {
     private static final String AGREEMENT_DESCRIPTION = "동의합니다.";
-    private static final String EMAIL = "email@gist.ac.kr";
-    private static final String PASSWORD = "password";
     private static final String TEMP_URL = "AAAAAA";
 
-    private User user;
     private Petition petition;
 
     @BeforeEach
     void setUp() {
-        user = new User(1L, EMAIL, PASSWORD, UserRole.USER);
-        petition = new Petition("title", "description", Category.DORMITORY, user.getId(), TEMP_URL);
+        petition = new Petition("title", "description", Category.DORMITORY, 1L, TEMP_URL);
     }
 
     @Test
     void agree() {
         assertThat(petition.getAgreements()).hasSize(0);
-        Agreement agreement = new Agreement(AGREEMENT_DESCRIPTION, user.getId());
+        Agreement agreement = new Agreement(AGREEMENT_DESCRIPTION, 1L);
         petition.addAgreement(agreement);
         assertThat(petition.getAgreements()).hasSize(1);
         assertThat(petition.getAgreeCount()).isEqualTo(1);
@@ -39,11 +35,9 @@ class PetitionTest {
 
     @Test
     void agreeByMultipleUser() {
-        User user1 = new User(2L, EMAIL, PASSWORD, UserRole.USER);
-        User user2 = new User(3L, EMAIL, PASSWORD, UserRole.USER);
-        petition.addAgreement(new Agreement(AGREEMENT_DESCRIPTION, user.getId()));
-        petition.addAgreement(new Agreement(AGREEMENT_DESCRIPTION, user1.getId()));
-        petition.addAgreement(new Agreement(AGREEMENT_DESCRIPTION, user2.getId()));
+        petition.addAgreement(new Agreement(AGREEMENT_DESCRIPTION, 1L));
+        petition.addAgreement(new Agreement(AGREEMENT_DESCRIPTION, 2L));
+        petition.addAgreement(new Agreement(AGREEMENT_DESCRIPTION, 3L));
         assertThat(petition.getAgreements()).hasSize(3);
         assertThat(petition.getAgreeCount()).isEqualTo(3);
     }
@@ -51,8 +45,7 @@ class PetitionTest {
     @Test
     void release() {
         LongStream.range(0, 5)
-                .mapToObj(i -> new User(i, i + EMAIL, PASSWORD, UserRole.USER))
-                .forEach(u -> petition.addAgreement(new Agreement(AGREEMENT_DESCRIPTION, u.getId())));
+                .forEach(userId -> petition.addAgreement(new Agreement(AGREEMENT_DESCRIPTION, userId)));
 
         petition.release();
 
@@ -62,8 +55,7 @@ class PetitionTest {
     @Test
     void releaseAlreadyReleased() {
         LongStream.range(0, 5)
-                .mapToObj(i -> new User(i, i + EMAIL, PASSWORD, UserRole.USER))
-                .forEach(u -> petition.addAgreement(new Agreement(AGREEMENT_DESCRIPTION, u.getId())));
+                .forEach(userId -> petition.addAgreement(new Agreement(AGREEMENT_DESCRIPTION, userId)));
         petition.release();
 
         assertThatThrownBy(() -> petition.release()).isInstanceOf(AlreadyReleasedPetitionException.class);

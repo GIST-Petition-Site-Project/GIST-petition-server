@@ -2,6 +2,8 @@ package com.gistpetition.api.petition.domain;
 
 import com.gistpetition.api.common.persistence.BaseEntity;
 import com.gistpetition.api.exception.petition.AlreadyReleasedPetitionException;
+import com.gistpetition.api.exception.petition.DuplicatedAgreementException;
+import com.gistpetition.api.exception.petition.DuplicatedAnswerException;
 import com.gistpetition.api.exception.petition.NotEnoughAgreementException;
 import com.gistpetition.api.user.domain.User;
 import lombok.Getter;
@@ -18,18 +20,12 @@ import java.util.List;
 @Getter
 @Entity
 public class Petition extends BaseEntity {
-
-
     public static final int REQUIRED_AGREEMENT_FOR_RELEASE = 5;
     public static final int REQUIRED_AGREEMENT_FOR_ANSWER = 20;
     public static final int POSTING_PERIOD = 30;
-  
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+
     private String title;
-    @Column(unique = true)
-    private String tempUrl;
+
     @Lob
     private String description;
     @Enumerated(EnumType.STRING)
@@ -37,6 +33,8 @@ public class Petition extends BaseEntity {
     private Boolean answered = false;
     private Boolean released = false;
     private Long userId;
+    @Column(unique = true)
+    private String tempUrl;
     @NotAudited
     private Integer agreeCount = 0;
     @NotAudited
@@ -48,19 +46,17 @@ public class Petition extends BaseEntity {
     }
 
     public Petition(String title, String description, Category category, Long userId, String tempUrl) {
-        this(null, title, tempUrl, description, category, userId);
-    }
-
-    private Petition(Long id, String title, String tempUrl, String description, Category category, Long userId) {
-        this.id = id;
         this.title = title;
-        this.tempUrl = tempUrl;
         this.description = description;
         this.category = category;
         this.userId = userId;
+        this.tempUrl = tempUrl;
     }
 
     public void addAgreement(Agreement newAgreement) {
+        if (agreements.contains(newAgreement)) {
+            throw new DuplicatedAgreementException();
+        }
         this.agreements.add(newAgreement);
         this.agreeCount += 1;
     }

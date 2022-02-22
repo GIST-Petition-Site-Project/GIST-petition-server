@@ -4,15 +4,14 @@ import com.gistpetition.api.common.persistence.BaseEntity;
 import lombok.Getter;
 import org.hibernate.envers.Audited;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Lob;
 
 @Audited
 @Entity
 @Getter
 public class Answer extends BaseEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
     @Lob
     private String content;
     @Column(unique = true)
@@ -22,11 +21,6 @@ public class Answer extends BaseEntity {
     }
 
     public Answer(String content, Long petitionId) {
-        this(null, content, petitionId);
-    }
-
-    public Answer(Long id, String content, Long petitionId) {
-        this.id = id;
         this.content = content;
         this.petitionId = petitionId;
     }
