@@ -1,12 +1,15 @@
 package com.gistpetition.api.petition.domain;
 
 import com.gistpetition.api.exception.petition.AlreadyReleasedPetitionException;
+import com.gistpetition.api.exception.petition.ExpiredPetitionException;
 import com.gistpetition.api.exception.petition.NotEnoughAgreementException;
+import com.gistpetition.api.petition.PetitionBuilder;
 import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRole;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDateTime;
 import java.util.stream.LongStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -40,6 +43,15 @@ class PetitionTest {
         petition.addAgreement(new Agreement(AGREEMENT_DESCRIPTION, 3L));
         assertThat(petition.getAgreements()).hasSize(3);
         assertThat(petition.getAgreeCount()).isEqualTo(3);
+    }
+
+    @Test
+    void agreeExpiredPetition() {
+        LocalDateTime past = LocalDateTime.MIN;
+        Petition expiredPetition = PetitionBuilder.aPetition().withExpiredAt(past).build();
+        assertThatThrownBy(() ->
+                expiredPetition.addAgreement(new Agreement(AGREEMENT_DESCRIPTION, 1L))
+        ).isInstanceOf(ExpiredPetitionException.class);
     }
 
     @Test

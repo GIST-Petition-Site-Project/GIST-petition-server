@@ -1,12 +1,10 @@
 package com.gistpetition.api.petition.domain;
 
 import com.gistpetition.api.common.persistence.BaseEntity;
-import com.gistpetition.api.exception.petition.AlreadyReleasedPetitionException;
-import com.gistpetition.api.exception.petition.DuplicatedAgreementException;
-import com.gistpetition.api.exception.petition.DuplicatedAnswerException;
-import com.gistpetition.api.exception.petition.NotEnoughAgreementException;
+import com.gistpetition.api.exception.petition.*;
 import com.gistpetition.api.user.domain.User;
 import lombok.Getter;
+import org.apache.tomcat.jni.Local;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
@@ -32,6 +30,7 @@ public class Petition extends BaseEntity {
     private Category category;
     private Boolean answered = false;
     private Boolean released = false;
+    private LocalDateTime expiredAt;
     private Long userId;
     @Column(unique = true)
     private String tempUrl;
@@ -46,9 +45,14 @@ public class Petition extends BaseEntity {
     }
 
     public Petition(String title, String description, Category category, Long userId, String tempUrl) {
+        this(title, description, category, LocalDateTime.now().plusDays(POSTING_PERIOD), userId, tempUrl);
+    }
+
+    public Petition(String title, String description, Category category, LocalDateTime expiredAt, Long userId, String tempUrl) {
         this.title = title;
         this.description = description;
         this.category = category;
+        this.expiredAt = expiredAt;
         this.userId = userId;
         this.tempUrl = tempUrl;
     }
@@ -56,6 +60,10 @@ public class Petition extends BaseEntity {
     public void addAgreement(Agreement newAgreement) {
         if (agreements.contains(newAgreement)) {
             throw new DuplicatedAgreementException();
+        }
+        LocalDateTime now = LocalDateTime.now();
+        if (now.isAfter(expiredAt)) {
+            throw new ExpiredPetitionException();
         }
         this.agreements.add(newAgreement);
         this.agreeCount += 1;
@@ -105,7 +113,6 @@ public class Petition extends BaseEntity {
     }
 
     public boolean isExpiredAt(LocalDateTime time) {
-        LocalDateTime expirationDate = this.createdAt.plusDays(POSTING_PERIOD);
-        return expirationDate.isBefore(time);
+        return expiredAt.isBefore(time);
     }
 }
