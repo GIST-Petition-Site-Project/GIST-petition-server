@@ -1,10 +1,12 @@
 package com.gistpetition.api.petition.domain;
 
 import com.gistpetition.api.common.persistence.BaseEntity;
-import com.gistpetition.api.exception.petition.*;
+import com.gistpetition.api.exception.petition.AlreadyReleasedPetitionException;
+import com.gistpetition.api.exception.petition.DuplicatedAgreementException;
+import com.gistpetition.api.exception.petition.ExpiredPetitionException;
+import com.gistpetition.api.exception.petition.NotEnoughAgreementException;
 import com.gistpetition.api.user.domain.User;
 import lombok.Getter;
-import org.apache.tomcat.jni.Local;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
@@ -57,12 +59,11 @@ public class Petition extends BaseEntity {
         this.tempUrl = tempUrl;
     }
 
-    public void addAgreement(Agreement newAgreement) {
+    public void addAgreement(Agreement newAgreement, LocalDateTime at) {
         if (agreements.contains(newAgreement)) {
             throw new DuplicatedAgreementException();
         }
-        LocalDateTime now = LocalDateTime.now();
-        if (now.isAfter(expiredAt)) {
+        if (at.isAfter(expiredAt)) {
             throw new ExpiredPetitionException();
         }
         this.agreements.add(newAgreement);

@@ -154,7 +154,7 @@ public class PetitionService {
         Petition petition = findPetitionById(petitionId);
         User user = findUserById(userId);
         Agreement agreement = new Agreement(request.getDescription(), user.getId());
-        agreement.setPetition(petition);
+        agreement.setPetition(petition, LocalDateTime.now());
         try {
             agreementRepository.save(agreement);
         } catch (DataIntegrityViolationException e) {
