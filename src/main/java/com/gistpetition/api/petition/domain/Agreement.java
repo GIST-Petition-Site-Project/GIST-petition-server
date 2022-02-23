@@ -4,15 +4,14 @@ import com.gistpetition.api.common.persistence.UnmodifiableEntity;
 import lombok.Getter;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Getter
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "petition_id"}))
 public class Agreement extends UnmodifiableEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
     @Lob
     private String description;
     @Column(name = "user_id")
@@ -26,28 +25,34 @@ public class Agreement extends UnmodifiableEntity {
     }
 
     public Agreement(String description, Long userId) {
-        this(null, description, userId, null);
+        this(description, userId, null);
     }
 
-    public Agreement(String description, Long userId, Petition petition) {
-        this(null, description, userId, petition);
-    }
-
-
-    private Agreement(Long id, String description, Long userId, Petition petition) {
-        this.id = id;
+    private Agreement(String description, Long userId, Petition petition) {
         this.description = description;
         this.userId = userId;
         this.petition = petition;
     }
 
-
     public boolean writtenBy(Long userId) {
         return this.userId.equals(userId);
     }
 
-    public void setPetition(Petition petition) {
+    public void setPetition(Petition petition, LocalDateTime at) {
         this.petition = petition;
-        petition.addAgreement(this);
+        petition.addAgreement(this, at);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Agreement agreement = (Agreement) o;
+        return Objects.equals(userId, agreement.userId) && Objects.equals(petition, agreement.petition);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(userId, petition);
     }
 }

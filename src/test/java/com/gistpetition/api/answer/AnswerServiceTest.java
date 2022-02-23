@@ -28,6 +28,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.history.RevisionMetadata;
 
 import javax.servlet.http.HttpSession;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -69,7 +70,7 @@ class AnswerServiceTest extends ServiceTest {
         user = userRepository.save(new User("normal@email.com", "password", UserRole.USER));
         manager = userRepository.save(new User("manager@email.com", "password", UserRole.MANAGER));
         httpSession.setAttribute("user", new SimpleUser(manager));
-        savedPetition = petitionRepository.save(new Petition("title", "description", Category.DORMITORY, user.getId(), TEMP_URL));
+        savedPetition = petitionRepository.save(new Petition("title", "description", Category.DORMITORY, LocalDateTime.now(), user.getId(), TEMP_URL));
     }
 
     @Test

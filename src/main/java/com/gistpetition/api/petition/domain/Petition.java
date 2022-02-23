@@ -2,6 +2,8 @@ package com.gistpetition.api.petition.domain;
 
 import com.gistpetition.api.common.persistence.BaseEntity;
 import com.gistpetition.api.exception.petition.AlreadyReleasedPetitionException;
+import com.gistpetition.api.exception.petition.DuplicatedAgreementException;
+import com.gistpetition.api.exception.petition.ExpiredPetitionException;
 import com.gistpetition.api.exception.petition.NotEnoughAgreementException;
 import com.gistpetition.api.user.domain.User;
 import lombok.Getter;
@@ -18,25 +20,22 @@ import java.util.List;
 @Getter
 @Entity
 public class Petition extends BaseEntity {
-
-
     public static final int REQUIRED_AGREEMENT_FOR_RELEASE = 5;
     public static final int REQUIRED_AGREEMENT_FOR_ANSWER = 20;
     public static final int POSTING_PERIOD = 30;
-  
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+
     private String title;
-    @Column(unique = true)
-    private String tempUrl;
+
     @Lob
     private String description;
     @Enumerated(EnumType.STRING)
     private Category category;
     private Boolean answered = false;
     private Boolean released = false;
+    private LocalDateTime expiredAt;
     private Long userId;
+    @Column(unique = true)
+    private String tempUrl;
     @NotAudited
     private Integer agreeCount = 0;
     @NotAudited
@@ -47,20 +46,22 @@ public class Petition extends BaseEntity {
     protected Petition() {
     }
 
-    public Petition(String title, String description, Category category, Long userId, String tempUrl) {
-        this(null, title, tempUrl, description, category, userId);
-    }
-
-    private Petition(Long id, String title, String tempUrl, String description, Category category, Long userId) {
-        this.id = id;
+    public Petition(String title, String description, Category category, LocalDateTime expiredAt, Long userId, String tempUrl) {
         this.title = title;
-        this.tempUrl = tempUrl;
         this.description = description;
         this.category = category;
+        this.expiredAt = expiredAt;
         this.userId = userId;
+        this.tempUrl = tempUrl;
     }
 
-    public void addAgreement(Agreement newAgreement) {
+    public void addAgreement(Agreement newAgreement, LocalDateTime at) {
+        if (agreements.contains(newAgreement)) {
+            throw new DuplicatedAgreementException();
+        }
+        if (isExpiredAt(at)) {
+            throw new ExpiredPetitionException();
+        }
         this.agreements.add(newAgreement);
         this.agreeCount += 1;
     }
@@ -74,7 +75,10 @@ public class Petition extends BaseEntity {
         return false;
     }
 
-    public void release() {
+    public void release(LocalDateTime at) {
+        if (isExpiredAt(at)) {
+            throw new ExpiredPetitionException();
+        }
         if (released) {
             throw new AlreadyReleasedPetitionException();
         }
@@ -109,7 +113,6 @@ public class Petition extends BaseEntity {
     }
 
     public boolean isExpiredAt(LocalDateTime time) {
-        LocalDateTime expirationDate = this.createdAt.plusDays(POSTING_PERIOD);
-        return expirationDate.isBefore(time);
+        return time.isAfter(expiredAt);
     }
 }

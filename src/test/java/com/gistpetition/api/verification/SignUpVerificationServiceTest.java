@@ -51,7 +51,7 @@ class SignUpVerificationServiceTest extends ServiceTest {
 
     @Test
     void createVerificationCodeFailedIfAlreadyExisted() {
-        userRepository.save(new User(GIST_EMAIL, PASSWORD, UserRole.USER, true));
+        userRepository.save(new User(GIST_EMAIL, PASSWORD, UserRole.USER));
         assertThatThrownBy(
                 () -> signUpVerificationService.createVerificationInfo(new VerificationEmailRequest(GIST_EMAIL))
         ).isInstanceOf(DuplicatedUserException.class);

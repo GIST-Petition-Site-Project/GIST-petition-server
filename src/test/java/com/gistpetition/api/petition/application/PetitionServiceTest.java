@@ -3,6 +3,7 @@ package com.gistpetition.api.petition.application;
 import com.gistpetition.api.ServiceTest;
 import com.gistpetition.api.exception.petition.DuplicatedAgreementException;
 import com.gistpetition.api.exception.petition.NoSuchPetitionException;
+import com.gistpetition.api.petition.PetitionBuilder;
 import com.gistpetition.api.petition.domain.*;
 import com.gistpetition.api.petition.dto.*;
 import com.gistpetition.api.user.domain.SimpleUser;
@@ -27,7 +28,6 @@ import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -41,9 +41,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PetitionServiceTest extends ServiceTest {
+    public static final LocalDateTime PETITION_CREATION_AT = LocalDateTime.now();
+    public static final LocalDateTime PETITION_EXPIRED_AT = PETITION_CREATION_AT.plusDays(Petition.POSTING_PERIOD);
     private static final PetitionRequest DORM_PETITION_REQUEST = new PetitionRequest("title", "description", Category.DORMITORY.getId());
     private static final AgreementRequest AGREEMENT_REQUEST = new AgreementRequest("동의합니다.");
-    private static final String TEMP_URL = "AAAAAA";
 
     public static final String EMAIL = "email@gist.ac.kr";
     public static final String PASSWORD = "password";
@@ -267,29 +268,6 @@ public class PetitionServiceTest extends ServiceTest {
         }
     }
 
-
-    @Test
-    void retrieveExpiredPetition() {
-        LocalDateTime pastTime = LocalDateTime.of(2020, 12, 1, 0, 0);
-        auditingHandler.setDateTimeProvider(
-                () -> Optional.of(pastTime)
-        );
-
-        int numOfPetition = 3;
-        List<Long> createdPetitionIds = new ArrayList<>();
-        for (int i = 0; i < numOfPetition; i++) {
-            createdPetitionIds.add(petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId()));
-        }
-        releasePetitionByIds(createdPetitionIds);
-
-        Page<PetitionPreviewResponse> expiredPetitions = petitionService.retrieveReleasedAndExpiredPetition(PageRequest.of(0, 10));
-        assertThat(expiredPetitions.getContent()).hasSize(numOfPetition);
-
-        for (PetitionPreviewResponse ep : expiredPetitions) {
-            assertTrue(ep.getExpired());
-        }
-    }
-
     private void releasePetitionByIds(List<Long> ids) {
         for (Long id : ids) {
             for (int i = 0; i < 5; i++) {
@@ -313,8 +291,13 @@ public class PetitionServiceTest extends ServiceTest {
 
     @Test
     void deletePetition() {
-        Petition petition = petitionRepository.save(new Petition("title", "description", Category.DORMITORY, petitionOwner.getId(), TEMP_URL));
+        Petition petition = petitionRepository.save(
+                PetitionBuilder.aPetition()
+                        .withExpiredAt(PETITION_EXPIRED_AT)
+                        .withUserId(petitionOwner.getId())
+                        .build());
         petitionService.agree(AGREEMENT_REQUEST, petition.getId(), petitionOwner.getId());
+
         petitionService.deletePetition(petition.getId());
         assertFalse(petitionRepository.existsById(petition.getId()));
         PageRequest pageRequest = PageRequest.of(0, 10);
@@ -330,7 +313,10 @@ public class PetitionServiceTest extends ServiceTest {
 
     @Test
     void retrieveAnsweredPetition() {
-        Petition petition = new Petition("title", "desc", Category.DORMITORY, petitionOwner.getId(), TEMP_URL);
+        Petition petition = PetitionBuilder.aPetition()
+                .withExpiredAt(PETITION_EXPIRED_AT)
+                .withUserId(petitionOwner.getId())
+                .build();
         petition.setAnswered(true);
         petitionRepository.save(petition);
 

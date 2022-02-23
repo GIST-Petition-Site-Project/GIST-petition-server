@@ -41,6 +41,7 @@ public class PetitionService {
                         petitionRequest.getTitle(),
                         petitionRequest.getDescription(),
                         Category.of(petitionRequest.getCategoryId()),
+                        LocalDateTime.now().plusDays(POSTING_PERIOD),
                         userId,
                         tempUrl));
         return created.getId();
@@ -58,22 +59,22 @@ public class PetitionService {
 
     @Transactional(readOnly = true)
     public Page<PetitionPreviewResponse> retrieveReleasedAndExpiredPetition(Pageable pageable) {
-        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCreatedAtBeforeAndReleasedTrue(LocalDateTime.now().minusDays(POSTING_PERIOD), pageable));
+        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByExpiredAtBeforeAndReleasedTrue(LocalDateTime.now(), pageable));
     }
 
     @Transactional(readOnly = true)
     public Page<PetitionPreviewResponse> retrieveReleasedAndExpiredPetitionByCategoryId(Long categoryId, Pageable pageable) {
-        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCategoryAndCreatedAtBeforeAndReleasedTrue(Category.of(categoryId), LocalDateTime.now().minusDays(POSTING_PERIOD), pageable));
+        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCategoryAndExpiredAtBeforeAndReleasedTrue(Category.of(categoryId), LocalDateTime.now(), pageable));
     }
 
     @Transactional(readOnly = true)
     public Page<PetitionPreviewResponse> retrieveOngoingPetition(Pageable pageable) {
-        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCreatedAtAfterAndReleasedTrue(LocalDateTime.now().minusDays(POSTING_PERIOD), pageable));
+        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByExpiredAtAfterAndReleasedTrueAndAnsweredFalse(LocalDateTime.now(), pageable));
     }
 
     @Transactional(readOnly = true)
     public Page<PetitionPreviewResponse> retrieveOngoingPetitionByCategoryId(Long categoryId, Pageable pageable) {
-        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCategoryAndCreatedAtAfterAndReleasedTrue(Category.of(categoryId), LocalDateTime.now().minusDays(POSTING_PERIOD), pageable));
+        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCategoryAndExpiredAtAfterAndReleasedTrueAndAnsweredFalse(Category.of(categoryId), LocalDateTime.now(), pageable));
     }
 
     @Transactional(readOnly = true)
@@ -155,7 +156,7 @@ public class PetitionService {
         Petition petition = findPetitionById(petitionId);
         User user = findUserById(userId);
         Agreement agreement = new Agreement(request.getDescription(), user.getId());
-        agreement.setPetition(petition);
+        agreement.setPetition(petition, LocalDateTime.now());
         agreementRepository.save(agreement);
     }
 
@@ -181,7 +182,7 @@ public class PetitionService {
     @Transactional
     public void releasePetition(Long petitionId) {
         Petition petition = findPetitionById(petitionId);
-        petition.release();
+        petition.release(LocalDateTime.now());
     }
 
     @Transactional(readOnly = true)
