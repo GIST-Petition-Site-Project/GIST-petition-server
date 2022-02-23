@@ -17,8 +17,8 @@ public class PetitionResponse {
     private String categoryName;
     private Boolean answered;
     private Integer agreements;
-    private Instant createdAt;
-    private Instant updatedAt;
+    private Long createdAt;
+    private Long updatedAt;
     private String tempUrl;
     private Boolean expired;
 
@@ -30,8 +30,8 @@ public class PetitionResponse {
                 petition.getCategory().getName(),
                 petition.isAnswered(),
                 petition.getAgreeCount(),
-                petition.getCreatedAt(),
-                petition.getUpdatedAt(),
+                petition.getCreatedAt().toEpochMilli(),
+                petition.getUpdatedAt().toEpochMilli(),
                 petition.getTempUrl(),
                 petition.isExpiredAt(Instant.now())
         );

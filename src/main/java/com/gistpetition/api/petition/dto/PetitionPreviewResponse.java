@@ -12,7 +12,7 @@ public class PetitionPreviewResponse {
     private final String title;
     private final String categoryName;
     private final Integer agreements;
-    private final Instant createdAt;
+    private final Long createdAt;
     private final String tempUrl;
     private final Boolean expired;
 
@@ -22,7 +22,7 @@ public class PetitionPreviewResponse {
                 petition.getTitle(),
                 petition.getCategory().getName(),
                 petition.getAgreeCount(),
-                petition.getCreatedAt(),
+                petition.getCreatedAt().toEpochMilli(),
                 petition.getTempUrl(),
                 petition.isExpiredAt(Instant.now())
         );
