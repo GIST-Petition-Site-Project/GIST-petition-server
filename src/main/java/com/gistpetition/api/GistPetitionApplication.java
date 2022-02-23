@@ -3,12 +3,14 @@ package com.gistpetition.api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
 import javax.annotation.PostConstruct;
 import java.time.ZonedDateTime;
 import java.util.TimeZone;
 
 @Slf4j
+@EnableAspectJAutoProxy
 @SpringBootApplication
 public class GistPetitionApplication {
 
