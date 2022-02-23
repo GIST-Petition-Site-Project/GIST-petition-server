@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Getter
 @NoArgsConstructor
@@ -17,8 +17,8 @@ public class PetitionResponse {
     private String categoryName;
     private Boolean answered;
     private Integer agreements;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private Long createdAt;
+    private Long updatedAt;
     private String tempUrl;
     private Boolean expired;
 
@@ -30,10 +30,10 @@ public class PetitionResponse {
                 petition.getCategory().getName(),
                 petition.isAnswered(),
                 petition.getAgreeCount(),
-                petition.getCreatedAt(),
-                petition.getUpdatedAt(),
+                petition.getCreatedAt().toEpochMilli(),
+                petition.getUpdatedAt().toEpochMilli(),
                 petition.getTempUrl(),
-                petition.isExpiredAt(LocalDateTime.now())
+                petition.isExpiredAt(Instant.now())
         );
     }
 }

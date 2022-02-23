@@ -7,12 +7,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.history.Revision;
 import org.springframework.data.history.RevisionMetadata;
 
-import java.time.Instant;
-
 @Data
 public class AnswerRevisionResponse {
     private final Long revisionId;
-    private final Instant revisionTime;
+    private final Long revisionTime;
     private final RevisionMetadata.RevisionType revisionType;
     private final Long workedBy;
     private final String answerContent;
@@ -20,7 +18,7 @@ public class AnswerRevisionResponse {
     public static AnswerRevisionResponse of(Revision<Long, Answer> revision) {
         return new AnswerRevisionResponse(
                 revision.getRequiredRevisionNumber(),
-                revision.getRequiredRevisionInstant(),
+                revision.getRequiredRevisionInstant().toEpochMilli(),
                 revision.getMetadata().getRevisionType(),
                 revision.getMetadata().<CustomRevisionEntity>getDelegate().getUserId(),
                 revision.getEntity().getContent()

@@ -7,7 +7,9 @@ import com.gistpetition.api.petition.PetitionBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.stream.LongStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -15,9 +17,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PetitionTest {
-    public static final LocalDateTime PETITION_CREATION_AT = LocalDateTime.of(2002, 2, 2, 2, 2);
-    public static final LocalDateTime PETITION_ONGOING_AT = PETITION_CREATION_AT.plusDays(Petition.POSTING_PERIOD / 2);
-    public static final LocalDateTime PETITION_EXPIRED_AT = PETITION_CREATION_AT.plusDays(Petition.POSTING_PERIOD);
+    public static final Instant PETITION_CREATION_AT = LocalDateTime.of(2002, 2, 2, 2, 2).toInstant(ZoneOffset.UTC);
+    public static final Instant PETITION_ONGOING_AT = PETITION_CREATION_AT.plusSeconds(Petition.POSTING_PERIOD_BY_SECONDS / 2);
+    public static final Instant PETITION_EXPIRED_AT = PETITION_CREATION_AT.plusSeconds(Petition.POSTING_PERIOD_BY_SECONDS);
     private static final String AGREEMENT_DESCRIPTION = "동의합니다.";
     private static final String TEMP_URL = "AAAAAA";
 
@@ -49,7 +51,7 @@ class PetitionTest {
     @Test
     void agreeExpiredPetition() {
         assertThatThrownBy(() ->
-                petition.addAgreement(new Agreement(AGREEMENT_DESCRIPTION, 1L), PETITION_EXPIRED_AT.plusDays(1))
+                petition.addAgreement(new Agreement(AGREEMENT_DESCRIPTION, 1L), PETITION_EXPIRED_AT.plusSeconds(1))
         ).isInstanceOf(ExpiredPetitionException.class);
     }
 
@@ -79,7 +81,7 @@ class PetitionTest {
         agreedUponBy(Petition.REQUIRED_AGREEMENT_FOR_RELEASE);
 
         assertThatThrownBy(() ->
-                petition.release(PETITION_EXPIRED_AT.plusDays(1))
+                petition.release(PETITION_EXPIRED_AT.plusSeconds(1))
         ).isInstanceOf(ExpiredPetitionException.class);
     }
 

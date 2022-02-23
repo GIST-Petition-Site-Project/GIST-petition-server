@@ -8,7 +8,7 @@ import org.springframework.data.repository.history.RevisionRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Optional;
 
 @Repository
@@ -27,13 +27,13 @@ public interface PetitionRepository extends RevisionRepository<Petition, Long, L
 
     Page<Petition> findPetitionByAgreeCountIsGreaterThanEqualAndReleasedFalse(int requiredAgreeCount, Pageable pageable);
 
-    Page<Petition> findAllByExpiredAtBeforeAndReleasedTrue(LocalDateTime at, Pageable pageable);
+    Page<Petition> findAllByExpiredAtBeforeAndReleasedTrue(Instant at, Pageable pageable);
 
-    Page<Petition> findAllByCategoryAndExpiredAtBeforeAndReleasedTrue(Category category, LocalDateTime at, Pageable pageable);
+    Page<Petition> findAllByCategoryAndExpiredAtBeforeAndReleasedTrue(Category category, Instant at, Pageable pageable);
 
-    Page<Petition> findAllByExpiredAtAfterAndReleasedTrueAndAnsweredFalse(LocalDateTime at, Pageable pageable);
+    Page<Petition> findAllByExpiredAtAfterAndReleasedTrueAndAnsweredFalse(Instant at, Pageable pageable);
 
-    Page<Petition> findAllByCategoryAndExpiredAtAfterAndReleasedTrueAndAnsweredFalse(Category category, LocalDateTime at, Pageable pageable);
+    Page<Petition> findAllByCategoryAndExpiredAtAfterAndReleasedTrueAndAnsweredFalse(Category category, Instant at, Pageable pageable);
   
     Page<Petition> findPetitionByAgreeCountIsGreaterThanEqualAndReleasedTrueAndAnsweredFalse(int requiredAnswerCount, Pageable pageable);
     

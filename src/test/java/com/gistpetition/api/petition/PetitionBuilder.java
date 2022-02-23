@@ -3,14 +3,14 @@ package com.gistpetition.api.petition;
 import com.gistpetition.api.petition.domain.Category;
 import com.gistpetition.api.petition.domain.Petition;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 public final class PetitionBuilder {
     private Boolean answered = false;
     private String title = "제목";
     private String description = "내용";
     private Category category = Category.DORMITORY;
-    private LocalDateTime expiredAt = LocalDateTime.now().plusDays(Petition.POSTING_PERIOD);
+    private Instant expiredAt = Instant.now().plusSeconds(Petition.POSTING_PERIOD_BY_SECONDS);
     private Long userId;
     private String tempUrl;
 
@@ -41,7 +41,7 @@ public final class PetitionBuilder {
         return this;
     }
 
-    public PetitionBuilder withExpiredAt(LocalDateTime expiredAt) {
+    public PetitionBuilder withExpiredAt(Instant expiredAt) {
         this.expiredAt = expiredAt;
         return this;
     }

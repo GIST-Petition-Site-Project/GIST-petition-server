@@ -10,14 +10,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.history.Revision;
 import org.springframework.data.history.RevisionMetadata;
 
-import java.time.Instant;
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 public class PetitionRevisionResponse {
     private Long revisionId;
-    private Instant revisionTime;
+    private Long revisionTime;
     private RevisionMetadata.RevisionType revisionType;
     private Long workedBy;
     private String petitionTitle;
@@ -28,7 +26,7 @@ public class PetitionRevisionResponse {
         CustomRevisionEntity customRevisionEntity = revision.getMetadata().getDelegate();
         return new PetitionRevisionResponse(
                 revision.getRequiredRevisionNumber(),
-                revision.getRequiredRevisionInstant(),
+                revision.getRequiredRevisionInstant().toEpochMilli(),
                 revision.getMetadata().getRevisionType(),
                 customRevisionEntity.getUserId(),
                 revision.getEntity().getTitle(),
