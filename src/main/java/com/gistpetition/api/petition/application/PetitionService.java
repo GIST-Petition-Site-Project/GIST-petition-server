@@ -59,22 +59,22 @@ public class PetitionService {
 
     @Transactional(readOnly = true)
     public Page<PetitionPreviewResponse> retrieveReleasedAndExpiredPetition(Pageable pageable) {
-        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCreatedAtBeforeAndReleasedTrue(LocalDateTime.now().minusDays(POSTING_PERIOD), pageable));
+        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByExpiredAtBeforeAndReleasedTrue(LocalDateTime.now(), pageable));
     }
 
     @Transactional(readOnly = true)
     public Page<PetitionPreviewResponse> retrieveReleasedAndExpiredPetitionByCategoryId(Long categoryId, Pageable pageable) {
-        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCategoryAndCreatedAtBeforeAndReleasedTrue(Category.of(categoryId), LocalDateTime.now().minusDays(POSTING_PERIOD), pageable));
+        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCategoryAndExpiredAtBeforeAndReleasedTrue(Category.of(categoryId), LocalDateTime.now(), pageable));
     }
 
     @Transactional(readOnly = true)
     public Page<PetitionPreviewResponse> retrieveOngoingPetition(Pageable pageable) {
-        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCreatedAtAfterAndReleasedTrue(LocalDateTime.now().minusDays(POSTING_PERIOD), pageable));
+        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByExpiredAtAfterAndReleasedTrueAndAnsweredFalse(LocalDateTime.now(), pageable));
     }
 
     @Transactional(readOnly = true)
     public Page<PetitionPreviewResponse> retrieveOngoingPetitionByCategoryId(Long categoryId, Pageable pageable) {
-        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCategoryAndCreatedAtAfterAndReleasedTrue(Category.of(categoryId), LocalDateTime.now().minusDays(POSTING_PERIOD), pageable));
+        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCategoryAndExpiredAtAfterAndReleasedTrueAndAnsweredFalse(Category.of(categoryId), LocalDateTime.now(), pageable));
     }
 
     @Transactional(readOnly = true)

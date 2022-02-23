@@ -17,11 +17,7 @@ public interface PetitionRepository extends RevisionRepository<Petition, Long, L
 
     Page<Petition> findAllByCategory(Category category, Pageable pageable);
 
-    Page<Petition> findAllByCategoryAndReleasedTrue(Category category, Pageable pageable);
-
     Page<Petition> findAll(Pageable pageable);
-
-    Page<Petition> findAllByReleasedTrue(Pageable pageable);
 
     Page<Petition> findByTitleContains(String keyword, Pageable pageable);
 
@@ -31,13 +27,13 @@ public interface PetitionRepository extends RevisionRepository<Petition, Long, L
 
     Page<Petition> findPetitionByAgreeCountIsGreaterThanEqualAndReleasedFalse(int requiredAgreeCount, Pageable pageable);
 
-    Page<Petition> findAllByCreatedAtBeforeAndReleasedTrue(LocalDateTime time, Pageable pageable);
+    Page<Petition> findAllByExpiredAtBeforeAndReleasedTrue(LocalDateTime at, Pageable pageable);
 
-    Page<Petition> findAllByCategoryAndCreatedAtBeforeAndReleasedTrue(Category category, LocalDateTime time, Pageable pageable);
+    Page<Petition> findAllByCategoryAndExpiredAtBeforeAndReleasedTrue(Category category, LocalDateTime at, Pageable pageable);
 
-    Page<Petition> findAllByCreatedAtAfterAndReleasedTrue(LocalDateTime time, Pageable pageable);
+    Page<Petition> findAllByExpiredAtAfterAndReleasedTrueAndAnsweredFalse(LocalDateTime at, Pageable pageable);
 
-    Page<Petition> findAllByCategoryAndCreatedAtAfterAndReleasedTrue(Category category, LocalDateTime time, Pageable pageable);
+    Page<Petition> findAllByCategoryAndExpiredAtAfterAndReleasedTrueAndAnsweredFalse(Category category, LocalDateTime at, Pageable pageable);
   
     Page<Petition> findPetitionByAgreeCountIsGreaterThanEqualAndReleasedTrueAndAnsweredFalse(int requiredAnswerCount, Pageable pageable);
     
