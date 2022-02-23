@@ -59,7 +59,7 @@ public class Petition extends BaseEntity {
         if (agreements.contains(newAgreement)) {
             throw new DuplicatedAgreementException();
         }
-        if (at.isAfter(expiredAt)) {
+        if (isExpiredAt(at)) {
             throw new ExpiredPetitionException();
         }
         this.agreements.add(newAgreement);
@@ -76,7 +76,7 @@ public class Petition extends BaseEntity {
     }
 
     public void release(LocalDateTime at) {
-        if (at.isAfter(expiredAt)) {
+        if (isExpiredAt(at)) {
             throw new ExpiredPetitionException();
         }
         if (released) {
@@ -113,6 +113,6 @@ public class Petition extends BaseEntity {
     }
 
     public boolean isExpiredAt(LocalDateTime time) {
-        return expiredAt.isBefore(time);
+        return time.isAfter(expiredAt);
     }
 }
