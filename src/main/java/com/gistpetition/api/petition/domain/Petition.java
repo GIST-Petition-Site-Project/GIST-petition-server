@@ -12,7 +12,7 @@ import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,17 +22,16 @@ import java.util.List;
 public class Petition extends BaseEntity {
     public static final int REQUIRED_AGREEMENT_FOR_RELEASE = 5;
     public static final int REQUIRED_AGREEMENT_FOR_ANSWER = 20;
-    public static final int POSTING_PERIOD = 30;
+    public static final int POSTING_PERIOD_BY_SECONDS = 30 * 24 * 60 * 60;
 
     private String title;
-
     @Lob
     private String description;
     @Enumerated(EnumType.STRING)
     private Category category;
     private Boolean answered = false;
     private Boolean released = false;
-    private LocalDateTime expiredAt;
+    private Instant expiredAt;
     private Long userId;
     @Column(unique = true)
     private String tempUrl;
@@ -46,7 +45,7 @@ public class Petition extends BaseEntity {
     protected Petition() {
     }
 
-    public Petition(String title, String description, Category category, LocalDateTime expiredAt, Long userId, String tempUrl) {
+    public Petition(String title, String description, Category category, Instant expiredAt, Long userId, String tempUrl) {
         this.title = title;
         this.description = description;
         this.category = category;
@@ -55,7 +54,7 @@ public class Petition extends BaseEntity {
         this.tempUrl = tempUrl;
     }
 
-    public void addAgreement(Agreement newAgreement, LocalDateTime at) {
+    public void addAgreement(Agreement newAgreement, Instant at) {
         if (agreements.contains(newAgreement)) {
             throw new DuplicatedAgreementException();
         }
@@ -75,7 +74,7 @@ public class Petition extends BaseEntity {
         return false;
     }
 
-    public void release(LocalDateTime at) {
+    public void release(Instant at) {
         if (isExpiredAt(at)) {
             throw new ExpiredPetitionException();
         }
@@ -112,7 +111,7 @@ public class Petition extends BaseEntity {
         return answered;
     }
 
-    public boolean isExpiredAt(LocalDateTime time) {
+    public boolean isExpiredAt(Instant time) {
         return time.isAfter(expiredAt);
     }
 }

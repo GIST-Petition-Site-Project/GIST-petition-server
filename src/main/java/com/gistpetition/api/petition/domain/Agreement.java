@@ -4,7 +4,7 @@ import com.gistpetition.api.common.persistence.UnmodifiableEntity;
 import lombok.Getter;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Objects;
 
 @Getter
@@ -38,7 +38,7 @@ public class Agreement extends UnmodifiableEntity {
         return this.userId.equals(userId);
     }
 
-    public void setPetition(Petition petition, LocalDateTime at) {
+    public void setPetition(Petition petition, Instant at) {
         this.petition = petition;
         petition.addAgreement(this, at);
     }

@@ -18,7 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 import static com.gistpetition.api.petition.domain.Petition.*;
 
@@ -41,7 +41,7 @@ public class PetitionService {
                         petitionRequest.getTitle(),
                         petitionRequest.getDescription(),
                         Category.of(petitionRequest.getCategoryId()),
-                        LocalDateTime.now().plusDays(POSTING_PERIOD),
+                        Instant.now().plusSeconds(POSTING_PERIOD_BY_SECONDS),
                         userId,
                         tempUrl));
         return created.getId();
@@ -59,22 +59,22 @@ public class PetitionService {
 
     @Transactional(readOnly = true)
     public Page<PetitionPreviewResponse> retrieveReleasedAndExpiredPetition(Pageable pageable) {
-        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCreatedAtBeforeAndReleasedTrue(LocalDateTime.now().minusDays(POSTING_PERIOD), pageable));
+        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCreatedAtBeforeAndReleasedTrue(Instant.now().minusSeconds(POSTING_PERIOD_BY_SECONDS), pageable));
     }
 
     @Transactional(readOnly = true)
     public Page<PetitionPreviewResponse> retrieveReleasedAndExpiredPetitionByCategoryId(Long categoryId, Pageable pageable) {
-        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCategoryAndCreatedAtBeforeAndReleasedTrue(Category.of(categoryId), LocalDateTime.now().minusDays(POSTING_PERIOD), pageable));
+        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCategoryAndCreatedAtBeforeAndReleasedTrue(Category.of(categoryId), Instant.now().minusSeconds(POSTING_PERIOD_BY_SECONDS), pageable));
     }
 
     @Transactional(readOnly = true)
     public Page<PetitionPreviewResponse> retrieveOngoingPetition(Pageable pageable) {
-        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCreatedAtAfterAndReleasedTrue(LocalDateTime.now().minusDays(POSTING_PERIOD), pageable));
+        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCreatedAtAfterAndReleasedTrue(Instant.now().minusSeconds(POSTING_PERIOD_BY_SECONDS), pageable));
     }
 
     @Transactional(readOnly = true)
     public Page<PetitionPreviewResponse> retrieveOngoingPetitionByCategoryId(Long categoryId, Pageable pageable) {
-        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCategoryAndCreatedAtAfterAndReleasedTrue(Category.of(categoryId), LocalDateTime.now().minusDays(POSTING_PERIOD), pageable));
+        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCategoryAndCreatedAtAfterAndReleasedTrue(Category.of(categoryId), Instant.now().minusSeconds(POSTING_PERIOD_BY_SECONDS), pageable));
     }
 
     @Transactional(readOnly = true)
@@ -155,7 +155,7 @@ public class PetitionService {
         Petition petition = findPetitionById(petitionId);
         User user = findUserById(userId);
         Agreement agreement = new Agreement(request.getDescription(), user.getId());
-        agreement.setPetition(petition, LocalDateTime.now());
+        agreement.setPetition(petition, Instant.now());
         try {
             agreementRepository.save(agreement);
         } catch (DataIntegrityViolationException e) {
@@ -185,7 +185,7 @@ public class PetitionService {
     @Transactional
     public void releasePetition(Long petitionId) {
         Petition petition = findPetitionById(petitionId);
-        petition.release(LocalDateTime.now());
+        petition.release(Instant.now());
     }
 
     @Transactional(readOnly = true)

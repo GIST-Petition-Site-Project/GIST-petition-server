@@ -25,7 +25,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.history.RevisionMetadata;
 
 import javax.servlet.http.HttpSession;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -41,8 +41,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PetitionServiceTest extends ServiceTest {
-    public static final LocalDateTime PETITION_CREATION_AT = LocalDateTime.now();
-    public static final LocalDateTime PETITION_EXPIRED_AT = PETITION_CREATION_AT.plusDays(Petition.POSTING_PERIOD);
+    public static final Instant PETITION_CREATION_AT = Instant.now();
+    public static final Instant PETITION_EXPIRED_AT = PETITION_CREATION_AT.plusSeconds(Petition.POSTING_PERIOD_BY_SECONDS);
     private static final PetitionRequest DORM_PETITION_REQUEST = new PetitionRequest("title", "description", Category.DORMITORY.getId());
     private static final AgreementRequest AGREEMENT_REQUEST = new AgreementRequest("동의합니다.");
 
@@ -102,7 +102,7 @@ public class PetitionServiceTest extends ServiceTest {
         Long petitionId = petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
         Petition petition = petitionRepository.findById(petitionId).orElseThrow(IllegalArgumentException::new);
 
-        LocalDateTime initialTime = petition.getUpdatedAt();
+        Instant initialTime = petition.getUpdatedAt();
         PetitionRequest updateRequest = new PetitionRequest("updateTitle", "updateDescription", Category.FACILITY.getId());
         petitionService.updatePetition(petition.getId(), updateRequest);
 
@@ -119,14 +119,14 @@ public class PetitionServiceTest extends ServiceTest {
         Long petitionId = petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
         Petition petition = petitionRepository.findById(petitionId).orElseThrow(IllegalArgumentException::new);
 
-        LocalDateTime initialTime = petition.getUpdatedAt();
+        Instant initialTime = petition.getUpdatedAt();
 
         PetitionRequest petitionUpdateRequest = new PetitionRequest("updateTitle", "updateDescription", Category.FACILITY.getId());
 
         assertThatThrownBy(() -> petitionService.updatePetition(Long.MAX_VALUE, petitionUpdateRequest)).isInstanceOf(NoSuchPetitionException.class);
 
         Petition updatedPetition = petitionRepository.findById(petitionId).orElseThrow(IllegalArgumentException::new);
-        assertTrue(updatedPetition.getUpdatedAt().isEqual(initialTime));
+        assertThat(updatedPetition.getUpdatedAt()).isEqualTo(initialTime);
     }
 
     @Test

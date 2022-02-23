@@ -6,31 +6,20 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @EntityListeners(AuditingEntityListener.class)
 @MappedSuperclass
+@Getter
 public abstract class BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @CreatedDate
-    protected LocalDateTime createdAt;
+    protected Instant createdAt;
     @LastModifiedDate
-    protected LocalDateTime updatedAt;
+    protected Instant updatedAt;
 
     protected BaseEntity() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
     }
 }

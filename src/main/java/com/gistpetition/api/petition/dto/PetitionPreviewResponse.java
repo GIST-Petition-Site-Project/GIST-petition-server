@@ -4,7 +4,7 @@ import com.gistpetition.api.petition.domain.Petition;
 import lombok.Data;
 import org.springframework.data.domain.Page;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Data
 public class PetitionPreviewResponse {
@@ -12,7 +12,7 @@ public class PetitionPreviewResponse {
     private final String title;
     private final String categoryName;
     private final Integer agreements;
-    private final LocalDateTime createdAt;
+    private final Instant createdAt;
     private final String tempUrl;
     private final Boolean expired;
 
@@ -24,7 +24,7 @@ public class PetitionPreviewResponse {
                 petition.getAgreeCount(),
                 petition.getCreatedAt(),
                 petition.getTempUrl(),
-                petition.isExpiredAt(LocalDateTime.now())
+                petition.isExpiredAt(Instant.now())
         );
     }
 
