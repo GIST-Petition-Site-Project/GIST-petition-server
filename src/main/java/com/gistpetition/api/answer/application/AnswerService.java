@@ -4,12 +4,12 @@ import com.gistpetition.api.answer.domain.Answer;
 import com.gistpetition.api.answer.domain.AnswerRepository;
 import com.gistpetition.api.answer.dto.AnswerRequest;
 import com.gistpetition.api.answer.dto.AnswerRevisionResponse;
+import com.gistpetition.api.config.annotation.DataIntegrityHandler;
 import com.gistpetition.api.exception.petition.DuplicatedAnswerException;
 import com.gistpetition.api.exception.petition.NoSuchPetitionException;
 import com.gistpetition.api.exception.petition.UnAnsweredPetitionException;
 import com.gistpetition.api.petition.domain.Petition;
 import com.gistpetition.api.petition.domain.PetitionRepository;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -28,6 +28,7 @@ public class AnswerService {
     }
 
     @Transactional
+    @DataIntegrityHandler(DuplicatedAnswerException.class)
     public Long createAnswer(Long petitionId, AnswerRequest answerRequest) {
         Petition petition = findPetitionById(petitionId);
         if (petition.isAnswered()) {
@@ -35,13 +36,7 @@ public class AnswerService {
         }
         Answer answer = new Answer(answerRequest.getContent(), petitionId);
         petition.setAnswered(true);
-        Answer saved;
-        try {
-            saved = answerRepository.save(answer);
-        } catch (DataIntegrityViolationException ex) {
-            throw new DuplicatedAnswerException();
-        }
-        return saved.getId();
+        return answerRepository.save(answer).getId();
     }
 
     @Transactional(readOnly = true)

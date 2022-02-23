@@ -1,5 +1,6 @@
 package com.gistpetition.api.user.application;
 
+import com.gistpetition.api.config.annotation.DataIntegrityHandler;
 import com.gistpetition.api.exception.user.DuplicatedUserException;
 import com.gistpetition.api.exception.user.InvalidEmailFormException;
 import com.gistpetition.api.exception.user.NoSuchUserException;
@@ -14,7 +15,6 @@ import com.gistpetition.api.utils.password.Encoder;
 import com.gistpetition.api.verification.application.password.FindPasswordValidator;
 import com.gistpetition.api.verification.application.signup.SignUpValidator;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -30,6 +30,7 @@ public class UserService {
 
 
     @Transactional
+    @DataIntegrityHandler(DuplicatedUserException.class)
     public Long signUp(SignUpRequest request) {
         String username = request.getUsername();
         String verificationCode = request.getVerificationCode();
@@ -40,15 +41,10 @@ public class UserService {
         if (!EmailDomain.has(EmailParser.parseDomainFrom(username))) {
             throw new InvalidEmailFormException();
         }
-
         signUpValidator.checkIsVerified(username, verificationCode);
 
         User user = new User(username, encoder.hashPassword(request.getPassword()), UserRole.USER);
-        try {
-            return userRepository.save(user).getId();
-        } catch (DataIntegrityViolationException ex) {
-            throw new DuplicatedUserException();
-        }
+        return userRepository.save(user).getId();
     }
 
     @Transactional(readOnly = true)

@@ -1,6 +1,7 @@
 package com.gistpetition.api.petition.application;
 
 
+import com.gistpetition.api.config.annotation.DataIntegrityHandler;
 import com.gistpetition.api.exception.petition.DuplicatedAgreementException;
 import com.gistpetition.api.exception.petition.NoSuchPetitionException;
 import com.gistpetition.api.exception.petition.NotReleasedPetitionException;
@@ -12,7 +13,6 @@ import com.gistpetition.api.user.domain.UserRepository;
 import com.gistpetition.api.utils.urlGenerator.UrlGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -59,22 +59,22 @@ public class PetitionService {
 
     @Transactional(readOnly = true)
     public Page<PetitionPreviewResponse> retrieveReleasedAndExpiredPetition(Pageable pageable) {
-        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCreatedAtBeforeAndReleasedTrue(Instant.now().minusSeconds(POSTING_PERIOD_BY_SECONDS), pageable));
+        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByExpiredAtBeforeAndReleasedTrue(Instant.now(), pageable));
     }
 
     @Transactional(readOnly = true)
     public Page<PetitionPreviewResponse> retrieveReleasedAndExpiredPetitionByCategoryId(Long categoryId, Pageable pageable) {
-        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCategoryAndCreatedAtBeforeAndReleasedTrue(Category.of(categoryId), Instant.now().minusSeconds(POSTING_PERIOD_BY_SECONDS), pageable));
+        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCategoryAndExpiredAtBeforeAndReleasedTrue(Category.of(categoryId), Instant.now(), pageable));
     }
 
     @Transactional(readOnly = true)
     public Page<PetitionPreviewResponse> retrieveOngoingPetition(Pageable pageable) {
-        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCreatedAtAfterAndReleasedTrue(Instant.now().minusSeconds(POSTING_PERIOD_BY_SECONDS), pageable));
+        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByExpiredAtAfterAndReleasedTrueAndAnsweredFalse(Instant.now(), pageable));
     }
 
     @Transactional(readOnly = true)
     public Page<PetitionPreviewResponse> retrieveOngoingPetitionByCategoryId(Long categoryId, Pageable pageable) {
-        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCategoryAndCreatedAtAfterAndReleasedTrue(Category.of(categoryId), Instant.now().minusSeconds(POSTING_PERIOD_BY_SECONDS), pageable));
+        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCategoryAndExpiredAtAfterAndReleasedTrueAndAnsweredFalse(Category.of(categoryId), Instant.now(), pageable));
     }
 
     @Transactional(readOnly = true)
@@ -151,16 +151,13 @@ public class PetitionService {
     }
 
     @Transactional
+    @DataIntegrityHandler(DuplicatedAgreementException.class)
     public void agree(AgreementRequest request, Long petitionId, Long userId) {
         Petition petition = findPetitionById(petitionId);
         User user = findUserById(userId);
         Agreement agreement = new Agreement(request.getDescription(), user.getId());
         agreement.setPetition(petition, Instant.now());
-        try {
-            agreementRepository.save(agreement);
-        } catch (DataIntegrityViolationException e) {
-            throw new DuplicatedAgreementException();
-        }
+        agreementRepository.save(agreement);
     }
 
     @Transactional(readOnly = true)
@@ -212,6 +209,4 @@ public class PetitionService {
     private Petition findPetitionById(Long petitionId) {
         return petitionRepository.findById(petitionId).orElseThrow(NoSuchPetitionException::new);
     }
-
-
 }

@@ -17,11 +17,7 @@ public interface PetitionRepository extends RevisionRepository<Petition, Long, L
 
     Page<Petition> findAllByCategory(Category category, Pageable pageable);
 
-    Page<Petition> findAllByCategoryAndReleasedTrue(Category category, Pageable pageable);
-
     Page<Petition> findAll(Pageable pageable);
-
-    Page<Petition> findAllByReleasedTrue(Pageable pageable);
 
     Page<Petition> findByTitleContains(String keyword, Pageable pageable);
 
@@ -31,16 +27,16 @@ public interface PetitionRepository extends RevisionRepository<Petition, Long, L
 
     Page<Petition> findPetitionByAgreeCountIsGreaterThanEqualAndReleasedFalse(int requiredAgreeCount, Pageable pageable);
 
-    Page<Petition> findAllByCreatedAtBeforeAndReleasedTrue(Instant time, Pageable pageable);
+    Page<Petition> findAllByExpiredAtBeforeAndReleasedTrue(Instant at, Pageable pageable);
 
-    Page<Petition> findAllByCategoryAndCreatedAtBeforeAndReleasedTrue(Category category, Instant time, Pageable pageable);
+    Page<Petition> findAllByCategoryAndExpiredAtBeforeAndReleasedTrue(Category category, Instant at, Pageable pageable);
 
-    Page<Petition> findAllByCreatedAtAfterAndReleasedTrue(Instant time, Pageable pageable);
+    Page<Petition> findAllByExpiredAtAfterAndReleasedTrueAndAnsweredFalse(Instant at, Pageable pageable);
 
-    Page<Petition> findAllByCategoryAndCreatedAtAfterAndReleasedTrue(Category category, Instant time, Pageable pageable);
-
+    Page<Petition> findAllByCategoryAndExpiredAtAfterAndReleasedTrueAndAnsweredFalse(Category category, Instant at, Pageable pageable);
+  
     Page<Petition> findPetitionByAgreeCountIsGreaterThanEqualAndReleasedTrueAndAnsweredFalse(int requiredAnswerCount, Pageable pageable);
-
+    
     Long countByReleasedTrue();
 
     @Query("SELECT p FROM Petition AS p LEFT JOIN FETCH p.agreements WHERE p.id=:petitionId")

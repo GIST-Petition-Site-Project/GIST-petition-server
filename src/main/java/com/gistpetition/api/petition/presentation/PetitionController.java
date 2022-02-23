@@ -33,8 +33,8 @@ public class PetitionController {
         return ResponseEntity.created(URI.create("/petitions/temp/" + tempUrl)).build();
     }
 
-    @GetMapping("/petitions")
-    public ResponseEntity<Page<PetitionPreviewResponse>> retrieveReleasedPetitions(@RequestParam(defaultValue = "0") Long categoryId,
+    @GetMapping("/petitions/ongoing")
+    public ResponseEntity<Page<PetitionPreviewResponse>> retrieveOngoingPetitions(@RequestParam(defaultValue = "0") Long categoryId,
                                                                                    @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         if (categoryId.equals(0L)) {
             return ResponseEntity.ok().body(petitionService.retrieveOngoingPetition(pageable));
@@ -51,6 +51,7 @@ public class PetitionController {
         return ResponseEntity.ok().body(petitionService.retrieveReleasedAndExpiredPetitionByCategoryId(categoryId, pageable));
     }
 
+    //@AdminPermissionRequired
     @GetMapping("/petitions/all")
     public ResponseEntity<Page<PetitionPreviewResponse>> retrieveAllPetitions(@RequestParam(defaultValue = "0") Long categoryId,
                                                                               @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
