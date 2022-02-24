@@ -90,6 +90,11 @@ public class PetitionController {
         return ResponseEntity.ok().body(petitionService.retrieveAnsweredPetition(pageable));
     }
 
+    @GetMapping("/petitions/answered/count")
+    public ResponseEntity<Long> retrieveAnsweredPetitionCount() {
+        return ResponseEntity.ok().body(petitionService.retrieveAnsweredPetitionCount());
+    }
+
     @GetMapping("/petitions/search")
     public ResponseEntity<Page<PetitionPreviewResponse>> retrievePetitionsByKeyword(@RequestParam(defaultValue = "") String keyword,
                                                                                     @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
@@ -122,6 +127,8 @@ public class PetitionController {
     public ResponseEntity<Long> retrieveReleasedPetitionCount() {
         return ResponseEntity.ok().body(petitionService.retrieveReleasedPetitionCount());
     }
+
+
 
     @ManagerPermissionRequired
     @PutMapping("/petitions/{petitionId}")

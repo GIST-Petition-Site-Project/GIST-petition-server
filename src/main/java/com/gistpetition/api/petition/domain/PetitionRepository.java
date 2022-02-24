@@ -39,6 +39,8 @@ public interface PetitionRepository extends RevisionRepository<Petition, Long, L
     
     Long countByReleasedTrue();
 
+    Long countByAnsweredTrue();
+
     @Query("SELECT p FROM Petition AS p LEFT JOIN FETCH p.agreements WHERE p.id=:petitionId")
     Petition findPetitionByWithEagerMode(@Param("petitionId") Long petitionId);
 
