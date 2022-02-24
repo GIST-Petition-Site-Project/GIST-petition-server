@@ -133,6 +133,11 @@ public class PetitionService {
         return petitionRepository.countByReleasedTrue();
     }
 
+    @Transactional(readOnly = true)
+    public Long retrieveAnsweredPetitionCount() {
+        return petitionRepository.countByAnsweredTrue();
+    }
+
     @Transactional
     public void updatePetition(Long petitionId, PetitionRequest petitionRequest) {
         Petition petition = findPetitionById(petitionId);

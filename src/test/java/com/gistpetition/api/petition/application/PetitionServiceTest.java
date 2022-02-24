@@ -324,6 +324,17 @@ public class PetitionServiceTest extends ServiceTest {
         assertThat(petitionService.retrieveAnsweredPetition(pageable).getContent()).hasSize(1);
     }
 
+    @Test
+    void retrieveAnsweredPetitionCount() {
+        Petition petition = PetitionBuilder.aPetition()
+                .withExpiredAt(PETITION_EXPIRED_AT)
+                .withUserId(petitionOwner.getId())
+                .build();
+        petition.setAnswered(true);
+        petitionRepository.save(petition);
+        assertThat(petitionService.retrieveAnsweredPetitionCount()).isEqualTo(1L);
+    }
+
 
     @DisplayName("Insert, Update 수행 후의 revisionResponse 검증")
     @Test
