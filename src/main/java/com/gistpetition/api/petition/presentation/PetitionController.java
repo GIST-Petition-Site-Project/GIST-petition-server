@@ -116,7 +116,7 @@ public class PetitionController {
         return ResponseEntity.ok().body(petitionService.retrievePetitionsByUserId(simpleUser.getId(), pageable));
     }
 
-    @AdminPermissionRequired
+    @ManagerPermissionRequired
     @GetMapping("/petitions/{petitionId}/revisions")
     public ResponseEntity<Page<PetitionRevisionResponse>> retrieveRevisionsOfPetition(@PathVariable Long petitionId,
                                                                                       @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
