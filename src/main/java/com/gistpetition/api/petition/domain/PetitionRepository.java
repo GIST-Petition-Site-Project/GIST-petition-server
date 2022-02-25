@@ -25,8 +25,6 @@ public interface PetitionRepository extends RevisionRepository<Petition, Long, L
 
     Page<Petition> findByAnsweredTrue(Pageable pageable);
 
-    Page<Petition> findAllByOrderByAgreeCountDesc(Pageable pageable);
-
     Page<Petition> findPetitionByAgreeCountIsGreaterThanEqualAndReleasedFalse(int requiredAgreeCount, Pageable pageable);
 
     Page<Petition> findAllByExpiredAtBeforeAndReleasedTrue(Instant at, Pageable pageable);
