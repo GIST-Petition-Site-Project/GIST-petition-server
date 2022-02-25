@@ -14,6 +14,8 @@ public class PetitionPreviewResponse {
     private final Integer agreements;
     private final Long createdAt;
     private final String tempUrl;
+    private final Boolean released;
+    private final Boolean answered;
     private final Boolean expired;
 
     public static PetitionPreviewResponse of(Petition petition) {
@@ -24,6 +26,8 @@ public class PetitionPreviewResponse {
                 petition.getAgreeCount(),
                 petition.getCreatedAt().toEpochMilli(),
                 petition.getTempUrl(),
+                petition.isReleased(),
+                petition.isAnswered(),
                 petition.isExpiredAt(Instant.now())
         );
     }
