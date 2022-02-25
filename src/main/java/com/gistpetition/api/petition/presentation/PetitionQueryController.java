@@ -23,6 +23,20 @@ import org.springframework.web.bind.annotation.*;
 public class PetitionQueryController {
     private final PetitionService petitionService;
 
+    @GetMapping("/petitions")
+    public ResponseEntity<Page<PetitionPreviewResponse>> retrieveReleasedPetitions(@RequestParam(defaultValue = "0") Long categoryId,
+                                                                                   @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        if (categoryId.equals(0L)) {
+            return ResponseEntity.ok().body(petitionService.retrieveReleasedPetition(pageable));
+        }
+        return ResponseEntity.ok().body(petitionService.retrieveReleasedPetitionByCategoryId(categoryId, pageable));
+    }
+
+    @GetMapping("/petitions/count")
+    public ResponseEntity<Long> retrieveReleasedPetitionCount() {
+        return ResponseEntity.ok().body(petitionService.retrieveReleasedPetitionCount());
+    }
+
     @GetMapping("/petitions/ongoing")
     public ResponseEntity<Page<PetitionPreviewResponse>> retrieveOngoingPetitions(@RequestParam(defaultValue = "0") Long categoryId,
                                                                                   @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
@@ -73,11 +87,6 @@ public class PetitionQueryController {
     @GetMapping("/petitions/waitingForAnswer/count")
     public ResponseEntity<Long> retrievePetitionsWaitingForAnswerCount() {
         return ResponseEntity.ok().body(petitionService.retrieveWaitingForAnswerPetitionCount());
-    }
-
-    @GetMapping("/petitions/count")
-    public ResponseEntity<Long> retrieveReleasedPetitionCount() {
-        return ResponseEntity.ok().body(petitionService.retrieveReleasedPetitionCount());
     }
 
     @GetMapping("/petitions/{petitionId}")

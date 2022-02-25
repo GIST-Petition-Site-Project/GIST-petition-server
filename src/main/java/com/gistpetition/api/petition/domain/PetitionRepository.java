@@ -15,9 +15,11 @@ import java.util.Optional;
 public interface PetitionRepository extends RevisionRepository<Petition, Long, Long>, JpaRepository<Petition, Long> {
     Page<Petition> findByUserId(Long userId, Pageable pageable);
 
-    Page<Petition> findAllByCategory(Category category, Pageable pageable);
-
     Page<Petition> findAll(Pageable pageable);
+
+    Page<Petition> findAllByReleasedTrue(Pageable pageable);
+
+    Page<Petition> findAllByCategoryAndReleasedTrue(Category category, Pageable pageable);
 
     Page<Petition> findByTitleContains(String keyword, Pageable pageable);
 
@@ -34,9 +36,9 @@ public interface PetitionRepository extends RevisionRepository<Petition, Long, L
     Page<Petition> findAllByExpiredAtAfterAndReleasedTrueAndAnsweredFalse(Instant at, Pageable pageable);
 
     Page<Petition> findAllByCategoryAndExpiredAtAfterAndReleasedTrueAndAnsweredFalse(Category category, Instant at, Pageable pageable);
-  
+
     Page<Petition> findPetitionByAgreeCountIsGreaterThanEqualAndReleasedTrueAndAnsweredFalse(int requiredAnswerCount, Pageable pageable);
-    
+
     Long countByReleasedTrue();
 
     Long countByAnsweredTrue();

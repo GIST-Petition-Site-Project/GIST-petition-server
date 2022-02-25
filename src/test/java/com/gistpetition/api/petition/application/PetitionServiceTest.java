@@ -246,7 +246,6 @@ public class PetitionServiceTest extends ServiceTest {
         petitionService.agree(AGREEMENT_REQUEST, petitionId3, user3.getId());
 
         PageRequest pageRequest = PageRequest.of(0, 10);
-        Page<PetitionPreviewResponse> petitionPreviewResponses = petitionService.retrievePetition(pageRequest);
 
         assertThat(petitionService.retrieveNumberOfAgreements(petitionId)).isEqualTo(3);
     }
