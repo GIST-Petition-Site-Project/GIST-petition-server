@@ -15,11 +15,12 @@ public class PetitionResponse {
     private String title;
     private String description;
     private String categoryName;
-    private Boolean answered;
     private Integer agreements;
     private Long createdAt;
     private Long updatedAt;
     private String tempUrl;
+    private Boolean released;
+    private Boolean answered;
     private Boolean expired;
 
     public static PetitionResponse of(Petition petition) {
@@ -28,11 +29,12 @@ public class PetitionResponse {
                 petition.getTitle(),
                 petition.getDescription(),
                 petition.getCategory().getName(),
-                petition.isAnswered(),
                 petition.getAgreeCount(),
                 petition.getCreatedAt().toEpochMilli(),
                 petition.getUpdatedAt().toEpochMilli(),
                 petition.getTempUrl(),
+                petition.isReleased(),
+                petition.isAnswered(),
                 petition.isExpiredAt(Instant.now())
         );
     }
