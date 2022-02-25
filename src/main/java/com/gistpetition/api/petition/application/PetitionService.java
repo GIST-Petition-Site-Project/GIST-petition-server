@@ -196,11 +196,6 @@ public class PetitionService {
     }
 
     @Transactional(readOnly = true)
-    public Page<PetitionPreviewResponse> retrievePetitionsOrderByAgreeCount(Pageable pageable) {
-        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByOrderByAgreeCountDesc(pageable));
-    }
-
-    @Transactional(readOnly = true)
     public PetitionResponse retrievePetitionByTempUrl(String tempUrl) {
         Petition petition = petitionRepository.findByTempUrl(tempUrl).orElseThrow(NoSuchPetitionException::new);
         return PetitionResponse.of(petition);
