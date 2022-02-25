@@ -30,7 +30,7 @@ public class PetitionCommandController {
                                                @LoginUser SimpleUser simpleUser) {
         Long createdPetitionId = petitionService.createPetition(petitionRequest, simpleUser.getId());
         String tempUrl = petitionService.retrieveTempUrlOf(createdPetitionId);
-        return ResponseEntity.created(URI.create("/petitions/temp/" + tempUrl)).build();
+        return ResponseEntity.created(URI.create("/v1/petitions/temp/" + tempUrl)).build();
     }
 
     @ManagerPermissionRequired

@@ -27,7 +27,7 @@ public class AnswerController {
     public ResponseEntity<Object> createAnswer(@PathVariable Long petitionId,
                                                @Validated @RequestBody AnswerRequest answerRequest) {
         Long answerId = answerService.createAnswer(petitionId, answerRequest);
-        return ResponseEntity.created(URI.create("/petitions/" + petitionId + "/answer/" + answerId)).build();
+        return ResponseEntity.created(URI.create("/v1/petitions/" + petitionId + "/answer/" + answerId)).build();
     }
 
     @GetMapping("/petitions/{petitionId}/answer")
