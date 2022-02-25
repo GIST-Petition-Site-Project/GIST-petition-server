@@ -40,7 +40,7 @@ public class AnswerController {
         return ResponseEntity.ok().body(answerService.getNumberOfAnswers());
     }
 
-    @AdminPermissionRequired
+    @ManagerPermissionRequired
     @GetMapping("/answers/{answerId}/revisions")
     public ResponseEntity<Page<AnswerRevisionResponse>> retrieveAnswerRevisions(@PathVariable Long answerId, Pageable pageable) {
         return ResponseEntity.ok().body(answerService.retrieveRevisionsOfAnswer(answerId, pageable));
