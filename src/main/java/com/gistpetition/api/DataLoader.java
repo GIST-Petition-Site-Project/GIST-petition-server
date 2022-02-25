@@ -6,6 +6,7 @@ import com.gistpetition.api.answer.dto.AnswerRequest;
 import com.gistpetition.api.petition.application.PetitionService;
 import com.gistpetition.api.petition.domain.AgreementRepository;
 import com.gistpetition.api.petition.domain.Category;
+import com.gistpetition.api.petition.domain.Petition;
 import com.gistpetition.api.petition.domain.PetitionRepository;
 import com.gistpetition.api.petition.dto.AgreementRequest;
 import com.gistpetition.api.petition.dto.PetitionRequest;
@@ -18,17 +19,27 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static com.gistpetition.api.petition.domain.Petition.REQUIRED_AGREEMENT_FOR_ANSWER;
+import static com.gistpetition.api.petition.domain.Petition.REQUIRED_AGREEMENT_FOR_RELEASE;
 
 @Profile("dev")
 @RequiredArgsConstructor
 @Component
 public class DataLoader {
+    public static final int PETITION_COUNT = 75;
+    public static final int WAITING_FOR_CHECK_RELEASE_COUNT = 25;
+    public static final int WAITING_FOR_CHECK_ANSWER_COUNT = 25;
+
     public static final String PASSWORD = new BcryptEncoder().hashPassword("test1234!");
+    public static final Random RANDOM = new Random();
+    public static final String PETITION_TITLE = "국민 청원에 글을 써버렸다.";
     private static final String CONTENT = "해당 드라마는 방영 전 이미 시놉시스 공개로 한차례 민주화운동을 폄훼하는 내용으로 큰 논란이 된 바 있으며 20만명 이상의 국민들이 해당 드라마의 방영 중지 청원에 동의하였습니다. 당시 제작진은 전혀 그럴 의도가 없으며 “남녀 주인공이 민주화 운동에 참여하거나 이끄는 설정은 대본 어디에도 존재하지 않는다.” 라고 주장했습니다. 그러나 1화가 방영된 현재 드라마에서 여주인공은 간첩인 남주인공을 운동권으로 오인해 구해주었습니다.\n" +
             "\n" +
             "민주화운동 당시 근거없이 간첩으로 몰려서 고문을 당하고 사망한 운동권 피해자들이 분명히 존재하며 이러한 역사적 사실에도 불구하고 저런 내용의 드라마를 만든 것은 분명히 민주화운동의 가치를 훼손시키는 일이라고 생각합니다. 뿐만 아니라 간첩인 남자주인공이 도망가며, 안기부인 서브 남주인공이 쫓아갈 때 배경음악으로 ‘솔아 푸르른 솔아’ 가 나왔습니다. 이 노래는 민주화운동 당시 학생운동 때 사용되었던 노래이며 민주화운동을 수행하는 사람들의 고통과 승리를 역설하는 노래입니다. 그런 노래를 1980년대 안기부를 연기한 사람과 간첩을 연기하는 사람의 배경음악으로 사용한 것 자체가 용인될 수 없는 행위입니다. 뿐만 아니라 해당 드라마는 ott서비스를 통해 세계 각 국에서 시청할 수 있으며 다수의 외국인에게 민주화운동에 대한 잘못된 역사관을 심어줄 수 있기에 더욱 방영을 강행해서는 안 된다고 생각합니다.\n" +
@@ -60,7 +71,6 @@ public class DataLoader {
     private final PetitionService petitionService;
     private final AnswerService answerService;
     private final AgreementRepository agreementRepository;
-    private int anInt;
 
     @Transactional
     public void loadData() {
@@ -78,61 +88,45 @@ public class DataLoader {
             alphabetUsers.add(userRepository.save(new User(alphabet + "@gist.ac.kr", PASSWORD, UserRole.USER)));
         }
 
-        List<Long> petitionIds = List.of(
-                savePetition("국민 청원에 글을 써버렸다.", normal),
-                savePetition("국민 청원에 글을 써버렸다.", normal),
-                savePetition("국민 청원에 글을 써버렸다.", normal),
-                savePetition("국민 청원에 글을 써버렸다.", normal),
-                savePetition("국민 청원에 글을 써버렸다.", normal),
-                savePetition("국민 청원에 글을 써버렸다.", normal),
-                savePetition("국민 청원에 글을 써버렸다.", normal),
-                savePetition("국민 청원에 글을 써버렸다.", normal),
-                savePetition("국민 청원에 글을 써버렸다.", normal),
-                savePetition("국민 청원에 글을 써버렸다.", normal),
-                savePetition("국민 청원에 글을 써버렸다.", normal),
-                savePetition("국민 청원에 글을 써버렸다.", normal),
-                savePetition("국민 청원에 글을 써버렸다.", normal),
-                savePetition("국민 청원에 글을 써버렸다.", normal),
-                savePetition("국민 청원에 글을 써버렸다.", normal),
-                savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal),
-                savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal),
-                savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal),
-                savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal),
-                savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal),
-                savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal),
-                savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal),
-                savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal),
-                savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal),
-                savePetition("2차방역지원금 지금 자영업분들 농락하시나요?", normal)
-        );
-        savePetition("Temp 2차방역지원금 지금 자영업분들 농락하시나요?", normal);
-        savePetition("Temp 2차방역지원금 지금 자영업분들 농락하시나요?", normal);
-        savePetition("Temp 2차방역지원금 지금 자영업분들 농락하시나요?", normal);
-
-        Random random = new Random();
-        int waitingForCheckReleaseCount = 3;
-        int waitingForCheckAnswerCount = 2;
+        List<Long> petitionIds = IntStream.range(0, PETITION_COUNT)
+                .mapToObj(i -> savePetition(PETITION_TITLE + i, normal))
+                .collect(Collectors.toList());
 
         for (Long petitionId : petitionIds) {
-            int agreeCount = random.nextInt(alphabetUsers.size() - REQUIRED_AGREEMENT_FOR_ANSWER) + REQUIRED_AGREEMENT_FOR_ANSWER;
-            for (int j = 0; j < agreeCount; j++) {
-                User user = alphabetUsers.get(j);
-                petitionService.agree(AGREEMENT_REQUEST, petitionId, user.getId());
-            }
+            randomlyAgreePetitionOverRequired(petitionId, alphabetUsers);
 
-            if (petitionId < petitionIds.get(0) + waitingForCheckReleaseCount) {
+            if (petitionId < petitionIds.get(0) + WAITING_FOR_CHECK_RELEASE_COUNT) {
                 continue;
             }
             petitionService.releasePetition(petitionId);
 
-            if (petitionId < petitionIds.get(0) + waitingForCheckReleaseCount + waitingForCheckAnswerCount) {
+            if (petitionId < petitionIds.get(0) + WAITING_FOR_CHECK_RELEASE_COUNT + WAITING_FOR_CHECK_ANSWER_COUNT) {
                 continue;
             }
             answerService.createAnswer(petitionId, new AnswerRequest(ANSWER_CONTENT));
+        }
+
+        IntStream.range(0, 25).forEach(i -> saveExpiredPetition(normal, "#AAAA" + i, alphabetUsers));
+    }
+
+    private void randomlyAgreePetitionOverRequired(Long petitionId, List<User> alphabetUsers) {
+        int agreeCount = RANDOM.nextInt(alphabetUsers.size() - REQUIRED_AGREEMENT_FOR_ANSWER) + REQUIRED_AGREEMENT_FOR_ANSWER;
+        for (int j = 0; j < agreeCount; j++) {
+            User user = alphabetUsers.get(j);
+            petitionService.agree(AGREEMENT_REQUEST, petitionId, user.getId());
         }
     }
 
     private Long savePetition(String title, User user) {
         return petitionService.createPetition(new PetitionRequest(title, CONTENT, Category.DORMITORY.getId()), user.getId());
+    }
+
+    private void saveExpiredPetition(User petitionOwner, String tempUrl, List<User> alphabetUsers) {
+        Petition saved = petitionRepository.save(new Petition(PETITION_TITLE, CONTENT, Category.DORMITORY, Instant.now().plusSeconds(30), petitionOwner.getId(), tempUrl));
+        for (int j = 0; j < REQUIRED_AGREEMENT_FOR_RELEASE; j++) {
+            User user = alphabetUsers.get(j);
+            petitionService.agree(AGREEMENT_REQUEST, saved.getId(), user.getId());
+        }
+        petitionService.releasePetition(saved.getId());
     }
 }
