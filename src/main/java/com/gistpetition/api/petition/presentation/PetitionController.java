@@ -35,7 +35,7 @@ public class PetitionController {
 
     @GetMapping("/petitions/ongoing")
     public ResponseEntity<Page<PetitionPreviewResponse>> retrieveOngoingPetitions(@RequestParam(defaultValue = "0") Long categoryId,
-                                                                                   @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+                                                                                  @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         if (categoryId.equals(0L)) {
             return ResponseEntity.ok().body(petitionService.retrieveOngoingPetition(pageable));
         }
@@ -128,8 +128,6 @@ public class PetitionController {
         return ResponseEntity.ok().body(petitionService.retrieveReleasedPetitionCount());
     }
 
-
-
     @ManagerPermissionRequired
     @PutMapping("/petitions/{petitionId}")
     public ResponseEntity<Void> updatePetition(@PathVariable Long petitionId,
@@ -160,11 +158,6 @@ public class PetitionController {
         return ResponseEntity.ok().body(petitionService.retrieveAgreements(petitionId, pageable));
     }
 
-    @GetMapping("/petitions/{petitionId}/agreements/number")
-    public ResponseEntity<Integer> retrieveNumberOfAgreement(@PathVariable Long petitionId) {
-        return ResponseEntity.ok().body(petitionService.retrieveNumberOfAgreements(petitionId));
-    }
-
     @LoginRequired
     @GetMapping("/petitions/{petitionId}/agreements/me")
     public ResponseEntity<Boolean> retrieveStateOfAgreement(@PathVariable Long petitionId,
@@ -175,11 +168,6 @@ public class PetitionController {
     @GetMapping("/petitions/temp/{tempUrl}")
     public ResponseEntity<PetitionResponse> retrieveTempPetition(@PathVariable String tempUrl) {
         return ResponseEntity.ok().body(petitionService.retrievePetitionByTempUrl(tempUrl));
-    }
-
-    @GetMapping("/petitions/best")
-    public ResponseEntity<Page<PetitionPreviewResponse>> retrieveBestPetition(Pageable pageable) {
-        return ResponseEntity.ok().body(petitionService.retrievePetitionsOrderByAgreeCount(pageable));
     }
 
     @ManagerPermissionRequired
