@@ -6,6 +6,7 @@ server.servlet.session.cookie:
   path: /
   secure: true
   sameSite: None
+
 ---
 spring:
   config:
@@ -31,9 +32,16 @@ spring:
     activate:
       on-profile: dev
     import: ./privates/application-dev-db.yml, ./privates/application-dev-mail.yml
+
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: validate
+    generate-ddl: false
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+
 swagger:
   host: dev-api.gist-petition.com
   protocol: https
