@@ -4,10 +4,7 @@ import com.gistpetition.api.answer.application.AnswerService;
 import com.gistpetition.api.answer.domain.AnswerRepository;
 import com.gistpetition.api.answer.dto.AnswerRequest;
 import com.gistpetition.api.petition.application.PetitionService;
-import com.gistpetition.api.petition.domain.AgreementRepository;
-import com.gistpetition.api.petition.domain.Category;
-import com.gistpetition.api.petition.domain.Petition;
-import com.gistpetition.api.petition.domain.PetitionRepository;
+import com.gistpetition.api.petition.domain.*;
 import com.gistpetition.api.petition.dto.AgreementRequest;
 import com.gistpetition.api.petition.dto.PetitionRequest;
 import com.gistpetition.api.user.domain.User;
@@ -107,6 +104,9 @@ public class DataLoader {
         }
 
         IntStream.range(0, 25).forEach(i -> saveExpiredPetition(normal, "#AAAA" + i, alphabetUsers));
+
+        //for 김건호
+        addTemporaryData();
     }
 
     private void randomlyAgreePetitionOverRequired(Long petitionId, List<User> alphabetUsers) {
@@ -115,6 +115,27 @@ public class DataLoader {
             User user = alphabetUsers.get(j);
             petitionService.agree(AGREEMENT_REQUEST, petitionId, user.getId());
         }
+    }
+
+    // for 김건호
+    private void addTemporaryData() {
+        User tempUser = userRepository.save(new User("tempUser", PASSWORD, UserRole.USER));
+        Long petitionId = savePetition("동의 300개 청원입니다", tempUser);
+
+        int numOfAgree = 300;
+        List<User> users = new ArrayList<>();
+        for (int i = 0; i < numOfAgree; i++) {
+            String username = String.format("%03d@gist.ac.kr", i);
+            users.add(new User(username, PASSWORD, UserRole.USER));
+        }
+        userRepository.saveAll(users);
+
+        for (User user : users) {
+            Long id = user.getId();
+            petitionService.agree(AGREEMENT_REQUEST, petitionId, id);
+        }
+
+        petitionService.releasePetition(petitionId);
     }
 
     private Long savePetition(String title, User user) {
