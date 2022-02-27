@@ -5,17 +5,19 @@
     <h3>학교에 나의 의견을 공식적으로 건의하자!</h3>
 </div>
 
+
 ## 배포 주소
 
 > 정식 버전 : [https://gist-petition.com/](https://gist-petition.com/)
 
 > 테스트 버전 : [https://dev.gist-petition.com/](https://dev.gist-petition.com/)
-    
+
 ## 백엔드 팀원 소개
-|고세연|김태완|이창하|최은기|
-|:---:|:---:|:---:|:---:|
-|<img src="https://github.com/koseyeon.png" width="300"/>|<img src="https://github.com/wannte.png" width="300"/>|<img src="https://github.com/GuruneLee.png" width="300"/>|<img src="https://github.com/ChoiEungi.png" width="300"/>|
-|[![Tech Blog Badge](http://img.shields.io/badge/-Tech%20blog-black?style=flat-square&logo=github&link=https://velog.io/@koseyeon)](https://velog.io/@koseyeon)|[![Tech Blog Badge](http://img.shields.io/badge/-Tech%20blog-black?style=flat-square&logo=github&link=https://wannte.tistory.com/)](https://wannte.tistory.com/)|[![Tech Blog Badge](http://img.shields.io/badge/-Tech%20blog-black?style=flat-square&logo=github&link=https://velog.io/@chlee4858)](https://velog.io/@chlee4858)|[![Tech Blog Badge](http://img.shields.io/badge/-Tech%20blog-black?style=flat-square&logo=github&link=https://choieungi.github.io/)](https://choieungi.github.io/)|
+
+|                            고세연                            |                            김태완                            |                            이창하                            |                            최은기                            |
+| :----------------------------------------------------------: | :----------------------------------------------------------: | :----------------------------------------------------------: | :----------------------------------------------------------: |
+|   <img src="https://github.com/koseyeon.png" width="300"/>   |    <img src="https://github.com/wannte.png" width="300"/>    |  <img src="https://github.com/GuruneLee.png" width="300"/>   |  <img src="https://github.com/ChoiEungi.png" width="300"/>   |
+| [![Github](http://img.shields.io/badge/Github-fc3465?style=flat&logo=github&logoColor=white&link=https://github.com/koseyeon)](https://github.com/koseyeon/) [![Tech Blog](http://img.shields.io/badge/-Tech%20Blog-important?style=flat&logo=dev.to&logoColor=white&link=https://velog.io/@koseyeon)](https://velog.io/@koseyeon)| [![Github](http://img.shields.io/badge/Github-fc3465?style=flat&logo=github&logoColor=white&link=https://github.com/wannte)](https://github.com/wannte) [![Tech Blog](http://img.shields.io/badge/-Tech%20Blog-important?style=flat&logo=dev.to&logoColor=white&link=https://wannte.tistory.com/)](https://wannte.tistory.com/) | [![Github](http://img.shields.io/badge/Github-fc3465?style=flat&logo=github&logoColor=white&link=https://github.com/GuruneLee)](https://github.com/GuruneLee)  [![Tech Blog](http://img.shields.io/badge/-Tech%20Blog-important?style=flat&logo=dev.to&logoColor=white&link=https://velog.io/@chlee4858)](https://velog.io/@chlee4858) | [![Github](http://img.shields.io/badge/Github-fc3465?style=flat&logo=github&logoColor=white&link=https://github.com/ChoiEungi)](https://github.com/ChoiEungi)  [![Tech Blog](http://img.shields.io/badge/-Tech%20Blog-important?style=flat&logo=dev.to&logoColor=white&link=https://choieungi.github.io/)](https://choieungi.github.io/) |
 
 
 ### 백엔드 기술 스택
