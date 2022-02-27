@@ -36,7 +36,6 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
-    generate-ddl: false
 
   flyway:
     enabled: true
