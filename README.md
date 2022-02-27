@@ -7,7 +7,7 @@
 
 ## 배포 주소
 
-> 정식 버전 : 배포 준비중
+> 정식 버전 : [https://gist-petition.com/](https://gist-petition.com/)
 
 > 테스트 버전 : [https://dev.gist-petition.com/](https://dev.gist-petition.com/)
     
@@ -15,7 +15,7 @@
 |고세연|김태완|이창하|최은기|
 |:---:|:---:|:---:|:---:|
 |<img src="https://github.com/koseyeon.png" width="300"/>|<img src="https://github.com/wannte.png" width="300"/>|<img src="https://github.com/GuruneLee.png" width="300"/>|<img src="https://github.com/ChoiEungi.png" width="300"/>|
-|[고세연](https://github.com/koseyeon)|[김태완](https://github.com/wannte)|[이창하](https://github.com/GuruneLee)|[최은기](https://github.com/ChoiEungi)|
+|[![Tech Blog Badge](http://img.shields.io/badge/-Tech%20blog-black?style=flat-square&logo=github&link=https://velog.io/@koseyeon)](https://velog.io/@koseyeon)|[![Tech Blog Badge](http://img.shields.io/badge/-Tech%20blog-black?style=flat-square&logo=github&link=https://wannte.tistory.com/)](https://wannte.tistory.com/)|[![Tech Blog Badge](http://img.shields.io/badge/-Tech%20blog-black?style=flat-square&logo=github&link=https://velog.io/@chlee4858)](https://velog.io/@chlee4858)|[![Tech Blog Badge](http://img.shields.io/badge/-Tech%20blog-black?style=flat-square&logo=github&link=https://choieungi.github.io/)](https://choieungi.github.io/)|
 
 
 ### 백엔드 기술 스택
