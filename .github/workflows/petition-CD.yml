@@ -34,7 +34,7 @@ jobs:
           username: ubuntu
           host: ${{ secrets.HOST }}
           key: ${{ secrets.PRIVATE_KEY }}
-          source: "dev-deploy.sh"
+          source: "depoy/dev-deploy.sh"
           target: "/home/ubuntu/deploy"
 
       - name: Execute Server Init Script
