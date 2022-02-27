@@ -1,6 +1,6 @@
 #!/bin/bash
 PROJECT_NAME=gist-petition-api
-PROFILE=dev
+PROFILE=prod
 
 echo "> now ing app pid find!"
 
