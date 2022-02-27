@@ -3,6 +3,7 @@ package com.gistpetition.api.petition.domain;
 import com.gistpetition.api.exception.petition.AlreadyReleasedPetitionException;
 import com.gistpetition.api.exception.petition.ExpiredPetitionException;
 import com.gistpetition.api.exception.petition.NotEnoughAgreementException;
+import com.gistpetition.api.exception.petition.NotReleasedPetitionException;
 import com.gistpetition.api.petition.PetitionBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,8 +13,10 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.stream.LongStream;
 
+import static com.gistpetition.api.petition.domain.Petition.REQUIRED_AGREEMENT_FOR_RELEASE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PetitionTest {
@@ -33,8 +36,10 @@ class PetitionTest {
     @Test
     void agree() {
         assertThat(petition.getAgreements()).hasSize(0);
+
         Agreement agreement = new Agreement(AGREEMENT_DESCRIPTION, 1L);
         petition.addAgreement(agreement, PETITION_ONGOING_AT);
+
         assertThat(petition.getAgreements()).hasSize(1);
         assertThat(petition.getAgreeCount()).isEqualTo(1);
     }
@@ -44,6 +49,7 @@ class PetitionTest {
         petition.addAgreement(new Agreement(AGREEMENT_DESCRIPTION, 1L), PETITION_ONGOING_AT);
         petition.addAgreement(new Agreement(AGREEMENT_DESCRIPTION, 2L), PETITION_ONGOING_AT);
         petition.addAgreement(new Agreement(AGREEMENT_DESCRIPTION, 3L), PETITION_ONGOING_AT);
+
         assertThat(petition.getAgreements()).hasSize(3);
         assertThat(petition.getAgreeCount()).isEqualTo(3);
     }
@@ -57,16 +63,20 @@ class PetitionTest {
 
     @Test
     void release() {
-        agreedUponBy(Petition.REQUIRED_AGREEMENT_FOR_RELEASE);
+        agreePetitionBy(petition, REQUIRED_AGREEMENT_FOR_RELEASE);
+
+        petition.release(PETITION_ONGOING_AT);
 
         assertTrue(petition.isReleased());
     }
 
     @Test
     void releaseAlreadyReleased() {
-        agreedUponBy(Petition.REQUIRED_AGREEMENT_FOR_RELEASE);
+        agreePetitionBy(petition, REQUIRED_AGREEMENT_FOR_RELEASE);
+        petition.release(PETITION_ONGOING_AT);
 
-        assertThatThrownBy(() -> petition.release(PETITION_ONGOING_AT.plusSeconds(1))
+        assertThatThrownBy(
+                () -> petition.release(PETITION_ONGOING_AT.plusSeconds(1))
         ).isInstanceOf(AlreadyReleasedPetitionException.class);
     }
 
@@ -78,16 +88,34 @@ class PetitionTest {
 
     @Test
     void releaseExpiredPetition() {
-        agreedUponBy(Petition.REQUIRED_AGREEMENT_FOR_RELEASE);
+        agreePetitionBy(petition, REQUIRED_AGREEMENT_FOR_RELEASE);
+
+        petition.release(PETITION_ONGOING_AT);
 
         assertThatThrownBy(() ->
                 petition.release(PETITION_EXPIRED_AT.plusSeconds(1))
         ).isInstanceOf(ExpiredPetitionException.class);
     }
 
-    private void agreedUponBy(int numOfUsers) {
-        LongStream.range(0, numOfUsers)
-                .forEach(userId -> petition.addAgreement(new Agreement(AGREEMENT_DESCRIPTION, userId), PETITION_ONGOING_AT));
+    @Test
+    void cancelRelease() {
+        agreePetitionBy(petition, REQUIRED_AGREEMENT_FOR_RELEASE);
         petition.release(PETITION_ONGOING_AT);
+
+        petition.cancelRelease();
+
+        assertFalse(petition.isReleased());
+    }
+
+    @Test
+    void cancelReleaseIfNotReleased() {
+        assertThatThrownBy(
+                () -> petition.cancelRelease()
+        ).isInstanceOf(NotReleasedPetitionException.class);
+    }
+
+    private void agreePetitionBy(Petition target, int numOfUsers) {
+        LongStream.range(0, numOfUsers)
+                .forEach(userId -> target.addAgreement(new Agreement(AGREEMENT_DESCRIPTION, userId), PETITION_ONGOING_AT));
     }
 }

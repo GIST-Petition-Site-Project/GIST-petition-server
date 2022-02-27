@@ -1,10 +1,7 @@
 package com.gistpetition.api.petition.domain;
 
 import com.gistpetition.api.common.persistence.BaseEntity;
-import com.gistpetition.api.exception.petition.AlreadyReleasedPetitionException;
-import com.gistpetition.api.exception.petition.DuplicatedAgreementException;
-import com.gistpetition.api.exception.petition.ExpiredPetitionException;
-import com.gistpetition.api.exception.petition.NotEnoughAgreementException;
+import com.gistpetition.api.exception.petition.*;
 import com.gistpetition.api.user.domain.User;
 import lombok.Getter;
 import org.hibernate.annotations.BatchSize;
@@ -85,6 +82,13 @@ public class Petition extends BaseEntity {
             throw new NotEnoughAgreementException();
         }
         this.released = true;
+    }
+
+    public void cancelRelease() {
+        if (!released) {
+            throw new NotReleasedPetitionException();
+        }
+        this.released = false;
     }
 
     public void setAnswered(boolean b) {

@@ -1,17 +1,13 @@
 package com.gistpetition.api.petition.presentation;
 
-import com.gistpetition.api.config.annotation.AdminPermissionRequired;
 import com.gistpetition.api.config.annotation.LoginRequired;
 import com.gistpetition.api.config.annotation.LoginUser;
 import com.gistpetition.api.config.annotation.ManagerPermissionRequired;
 import com.gistpetition.api.petition.application.PetitionService;
-import com.gistpetition.api.petition.dto.*;
+import com.gistpetition.api.petition.dto.AgreementRequest;
+import com.gistpetition.api.petition.dto.PetitionRequest;
 import com.gistpetition.api.user.domain.SimpleUser;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -52,6 +48,13 @@ public class PetitionCommandController {
     @PostMapping("/petitions/{petitionId}/release")
     public ResponseEntity<Void> releasePetition(@PathVariable Long petitionId) {
         petitionService.releasePetition(petitionId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @ManagerPermissionRequired
+    @DeleteMapping("/petitions/{petitionId}/release")
+    public ResponseEntity<Void> cancelReleasePetition(@PathVariable Long petitionId) {
+        petitionService.cancelReleasePetition(petitionId);
         return ResponseEntity.noContent().build();
     }
 

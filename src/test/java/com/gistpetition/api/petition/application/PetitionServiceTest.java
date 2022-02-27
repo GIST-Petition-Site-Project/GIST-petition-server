@@ -35,6 +35,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
+import static com.gistpetition.api.petition.domain.Petition.REQUIRED_AGREEMENT_FOR_RELEASE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -91,8 +92,8 @@ public class PetitionServiceTest extends ServiceTest {
         petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
         petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
         petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
-        Pageable pageable = PageRequest.of(0, 10, Sort.Direction.DESC, "createdAt");
 
+        Pageable pageable = PageRequest.of(0, 10, Sort.Direction.DESC, "createdAt");
         Page<PetitionPreviewResponse> petitionPreviewResponses = petitionService.retrievePetition(pageable);
         assertThat(petitionPreviewResponses).hasSize(3);
     }
@@ -122,7 +123,6 @@ public class PetitionServiceTest extends ServiceTest {
         Instant initialTime = petition.getUpdatedAt();
 
         PetitionRequest petitionUpdateRequest = new PetitionRequest("updateTitle", "updateDescription", Category.FACILITY.getId());
-
         assertThatThrownBy(() -> petitionService.updatePetition(Long.MAX_VALUE, petitionUpdateRequest)).isInstanceOf(NoSuchPetitionException.class);
 
         Petition updatedPetition = petitionRepository.findById(petitionId).orElseThrow(IllegalArgumentException::new);
@@ -132,11 +132,11 @@ public class PetitionServiceTest extends ServiceTest {
     @Test
     void agree() {
         Long petitionId = petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
-
         Petition petition = petitionRepository.findPetitionByWithEagerMode(petitionId);
-        Assertions.assertThat(petition.getAgreements()).hasSize(0);
+        assertThat(petition.getAgreements()).hasSize(0);
 
         petitionService.agree(AGREEMENT_REQUEST, petitionId, petitionOwner.getId());
+
         petition = petitionRepository.findPetitionByWithEagerMode(petitionId);
         assertThat(petition.getAgreements()).hasSize(1);
         assertThat(petition.getAgreements().get(0).getDescription()).isEqualTo(AGREEMENT_REQUEST.getDescription());
@@ -244,8 +244,6 @@ public class PetitionServiceTest extends ServiceTest {
         petitionService.agree(AGREEMENT_REQUEST, petitionId3, petitionOwner.getId());
         petitionService.agree(AGREEMENT_REQUEST, petitionId3, user.getId());
         petitionService.agree(AGREEMENT_REQUEST, petitionId3, user3.getId());
-
-        PageRequest pageRequest = PageRequest.of(0, 10);
 
         assertThat(petitionService.retrieveNumberOfAgreements(petitionId)).isEqualTo(3);
     }
@@ -355,12 +353,7 @@ public class PetitionServiceTest extends ServiceTest {
     @Test
     void release() {
         Long petitionId = petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
-        Petition newPetition = petitionRepository.findById(petitionId).orElseThrow(IllegalArgumentException::new);
-        assertFalse(newPetition.isReleased());
-
-        LongStream.range(0, 5)
-                .mapToObj(i -> userRepository.save(new User(i + EMAIL, PASSWORD, UserRole.USER)))
-                .forEach(user -> petitionService.agree(AGREEMENT_REQUEST, petitionId, user.getId()));
+        agreePetitionByNumberOfUsers(petitionId, REQUIRED_AGREEMENT_FOR_RELEASE);
 
         petitionService.releasePetition(petitionId);
 
@@ -375,6 +368,33 @@ public class PetitionServiceTest extends ServiceTest {
         assertThatThrownBy(
                 () -> petitionService.releasePetition(petitionId)
         ).isInstanceOf(NoSuchPetitionException.class);
+    }
+
+    @Test
+    void cancelRelease() {
+        Long petitionId = petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
+        agreePetitionByNumberOfUsers(petitionId, REQUIRED_AGREEMENT_FOR_RELEASE);
+        petitionService.releasePetition(petitionId);
+
+        petitionService.cancelReleasePetition(petitionId);
+
+        Petition cancelReleasedPetition = petitionRepository.findById(petitionId).orElseThrow(IllegalArgumentException::new);
+        assertFalse(cancelReleasedPetition.isReleased());
+    }
+
+    @Test
+    void cancelReleaseNotExistingPetition() {
+        Long petitionId = Long.MAX_VALUE;
+
+        assertThatThrownBy(
+                () -> petitionService.cancelReleasePetition(petitionId)
+        ).isInstanceOf(NoSuchPetitionException.class);
+    }
+
+    private void agreePetitionByNumberOfUsers(Long petitionId, int numberOfUsers) {
+        LongStream.range(0, numberOfUsers)
+                .mapToObj(i -> userRepository.save(new User(i + EMAIL, PASSWORD, UserRole.USER)))
+                .forEach(user -> petitionService.agree(AGREEMENT_REQUEST, petitionId, user.getId()));
     }
 
     @AfterEach

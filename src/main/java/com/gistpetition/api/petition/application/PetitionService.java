@@ -195,6 +195,12 @@ public class PetitionService {
         petition.release(Instant.now());
     }
 
+    @Transactional
+    public void cancelReleasePetition(Long petitionId) {
+        Petition petition = findPetitionById(petitionId);
+        petition.cancelRelease();
+    }
+
     @Transactional(readOnly = true)
     public PetitionResponse retrievePetitionByTempUrl(String tempUrl) {
         Petition petition = petitionRepository.findByTempUrl(tempUrl).orElseThrow(NoSuchPetitionException::new);
