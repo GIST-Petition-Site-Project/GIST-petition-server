@@ -36,6 +36,7 @@ jobs:
           key: ${{ secrets.PRIVATE_KEY }}
           source: "deploy/dev-deploy.sh"
           target: "/home/ubuntu/deploy"
+          strip_components: 1
 
       - name: Execute Server Init Script
         uses: appleboy/ssh-action@master
