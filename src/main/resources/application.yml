@@ -5,7 +5,6 @@ server.servlet.session.cookie:
   http-only: true
   path: /
   secure: true
-  sameSite: None
 
 ---
 spring:
@@ -32,7 +31,6 @@ spring:
     activate:
       on-profile: dev
     import: ./privates/application-dev-db.yml, ./privates/application-dev-mail.yml
-
   jpa:
     hibernate:
       ddl-auto: validate
@@ -54,6 +52,8 @@ spring:
     activate:
       on-profile: prod
     import: ./privates/application-prod-db.yml, ./privates/application-prod-mail.yml
+  server.servlet.session.cookie:
+    sameSite: Lax
   jpa:
     hibernate:
       ddl-auto: validate
