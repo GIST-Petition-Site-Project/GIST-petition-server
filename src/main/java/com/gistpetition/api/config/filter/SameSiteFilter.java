@@ -11,7 +11,7 @@ import java.util.Collection;
 
 @Component
 public class SameSiteFilter implements Filter {
-    @Value("${server.servlet.session.cookie.sameSite}:None")
+    @Value("${server.servlet.session.cookie.sameSite:None}")
     private String sameSitePolicy;
 
     @Override
