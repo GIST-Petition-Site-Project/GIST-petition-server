@@ -5,7 +5,6 @@ server.servlet.session.cookie:
   http-only: true
   path: /
   secure: true
-  sameSite: None
 
 ---
 spring:
@@ -32,7 +31,6 @@ spring:
     activate:
       on-profile: dev
     import: ./privates/application-dev-db.yml, ./privates/application-dev-mail.yml
-
   jpa:
     hibernate:
       ddl-auto: validate
@@ -47,3 +45,26 @@ swagger:
 
 request:
   origins: https://localhost:3000, https://localhost:3001, https://dev.gist-petition.com, https://dev-staff.gist-petition.com
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+    import: ./privates/application-prod-db.yml, ./privates/application-prod-mail.yml
+  server.servlet.session.cookie:
+    sameSite: Lax
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+
+swagger:
+  host: api.gist-petition.com
+  protocol: https
+
+request:
+  origins: https://www.gist-petition.com, https://staff.gist-petition.com

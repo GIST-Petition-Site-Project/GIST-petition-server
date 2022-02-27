@@ -1,7 +1,12 @@
 #!/bin/bash
+PROJECT_NAME=gist-petition-api
+PROFILE=dev
+
 echo "> now ing app pid find!"
-CURRENT_PID=$(pgrep -f gist-competition)
+
+CURRENT_PID=$(pgrep -f $PROJECT_NAME)
 echo "$CURRENT_PID"
+
 if [ -z $CURRENT_PID ]; then
         echo "> no ing app."
 else
@@ -12,8 +17,8 @@ fi
 echo "> new app deploy"
 
 cd /home/ubuntu/deploy
-JAR_NAME=$(ls | grep 'gist-competition' | tail -n 1)
+JAR_NAME=$(ls | grep $PROJECT_NAME | tail -n 1)
 echo "> JAR Name: $JAR_NAME"
 
-nohup java -jar -Dspring.profiles.active=dev $JAR_NAME 1>nohup/stdout.txt 2>nohup/stderr.txt &
+nohup java -jar -Dspring.profiles.active=$PROFILE $JAR_NAME 1>nohup/stdout.txt 2>nohup/stderr.txt &
 sleep 2
