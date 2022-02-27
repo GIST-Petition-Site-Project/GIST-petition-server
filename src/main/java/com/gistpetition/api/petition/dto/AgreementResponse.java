@@ -9,9 +9,10 @@ public class AgreementResponse {
 
     private final Long id;
     private final String description;
+    private final Long createdAt;
 
     public static AgreementResponse of(Agreement agreement) {
-        return new AgreementResponse(agreement.getId(), agreement.getDescription());
+        return new AgreementResponse(agreement.getId(), agreement.getDescription(), agreement.getCreatedAt().toEpochMilli());
     }
 
     public static Page<AgreementResponse> pageOf(Page<Agreement> agreements) {
