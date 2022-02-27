@@ -5,7 +5,7 @@ create table if not exists answer
     updated_at datetime(6) null,
     content longtext null,
     petition_id bigint null,
-    constraint UK_8o2ycrbsqgsqe35984pfkhhlg
+    constraint uk_answer_petition_id
         unique (petition_id)
 );
 
@@ -32,7 +32,7 @@ create table if not exists petition
     temp_url varchar(255) null,
     title varchar(255) null,
     user_id bigint null,
-    constraint UK_lbp7lx6brl567xxtwq9trc8t7
+    constraint uk_petition_temp_url
         unique (temp_url)
 );
 
@@ -43,9 +43,9 @@ create table if not exists agreement
     description longtext null,
     user_id bigint null,
     petition_id bigint null,
-    constraint UK6b2jp4145qyhk2hsvxoes773p
+    constraint uk_agreement_user_id_petition_id
         unique (user_id, petition_id),
-    constraint FK38mj0s6cdysv5aescp81w989v
+    constraint fk_agreement_petition_petition_id
         foreign key (petition_id) references petition (id)
 );
 
@@ -64,7 +64,7 @@ create table if not exists answer_aud
     content longtext null,
     petition_id bigint null,
     primary key (id, rev),
-    constraint FK93g4u12fhre47t3kpaag6r60c
+    constraint fk_answer_aud_revinfo_rev
         foreign key (rev) references revinfo (rev)
 );
 
@@ -82,7 +82,7 @@ create table if not exists petition_aud
     title varchar(255) null,
     user_id bigint null,
     primary key (id, rev),
-    constraint FKpubpwgg3epkfagt9psdcxdeeh
+    constraint fk_petition_aud_revinfo_rev
         foreign key (rev) references revinfo (rev)
 );
 
@@ -103,6 +103,6 @@ create table if not exists user
     password varchar(255) null,
     user_role varchar(255) null,
     username varchar(255) null,
-    constraint UK_sb8bbouer5wak8vyiiy4pf2bx
+    constraint uk_user_username
         unique (username)
 );
