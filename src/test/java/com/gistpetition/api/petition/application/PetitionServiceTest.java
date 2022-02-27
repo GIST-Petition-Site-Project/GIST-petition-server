@@ -377,6 +377,29 @@ public class PetitionServiceTest extends ServiceTest {
         ).isInstanceOf(NoSuchPetitionException.class);
     }
 
+    @Test
+    void cancelRelease() {
+        Long petitionId = petitionService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
+        LongStream.range(0, 5)
+                .mapToObj(i -> userRepository.save(new User(i + EMAIL, PASSWORD, UserRole.USER)))
+                .forEach(user -> petitionService.agree(AGREEMENT_REQUEST, petitionId, user.getId()));
+        petitionService.releasePetition(petitionId);
+
+        petitionService.cancelReleasePetition(petitionId);
+
+        Petition cancelReleasedPetition = petitionRepository.findById(petitionId).orElseThrow(IllegalArgumentException::new);
+        assertFalse(cancelReleasedPetition.isReleased());
+    }
+
+    @Test
+    void cancelReleaseNotExistingPetition() {
+        Long petitionId = Long.MAX_VALUE;
+
+        assertThatThrownBy(
+                () -> petitionService.cancelReleasePetition(petitionId)
+        ).isInstanceOf(NoSuchPetitionException.class);
+    }
+
     @AfterEach
     void tearDown() {
         userRepository.deleteAllInBatch();

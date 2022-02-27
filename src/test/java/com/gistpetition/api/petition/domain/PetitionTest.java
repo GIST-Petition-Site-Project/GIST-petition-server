@@ -3,6 +3,7 @@ package com.gistpetition.api.petition.domain;
 import com.gistpetition.api.exception.petition.AlreadyReleasedPetitionException;
 import com.gistpetition.api.exception.petition.ExpiredPetitionException;
 import com.gistpetition.api.exception.petition.NotEnoughAgreementException;
+import com.gistpetition.api.exception.petition.NotReleasedPetitionException;
 import com.gistpetition.api.petition.PetitionBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,6 +15,7 @@ import java.util.stream.LongStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PetitionTest {
@@ -83,6 +85,22 @@ class PetitionTest {
         assertThatThrownBy(() ->
                 petition.release(PETITION_EXPIRED_AT.plusSeconds(1))
         ).isInstanceOf(ExpiredPetitionException.class);
+    }
+
+    @Test
+    void cancelRelease() {
+        agreedUponBy(Petition.REQUIRED_AGREEMENT_FOR_RELEASE);
+
+        petition.cancelRelease();
+
+        assertFalse(petition.isReleased());
+    }
+
+    @Test
+    void cancelReleaseIfNotReleased() {
+        assertThatThrownBy(
+                () -> petition.cancelRelease()
+        ).isInstanceOf(NotReleasedPetitionException.class);
     }
 
     private void agreedUponBy(int numOfUsers) {
