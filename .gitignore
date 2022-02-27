@@ -17,6 +17,7 @@ bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
 
+
 ### IntelliJ IDEA ###
 .idea
 *.iws
@@ -25,6 +26,7 @@ bin/
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
+
 
 ### NetBeans ###
 /nbproject/private/
@@ -35,3 +37,8 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Custom ###
+/logs/
+/src/main/resources/privates/*
+

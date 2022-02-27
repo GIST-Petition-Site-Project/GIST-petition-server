@@ -1,5 +1,5 @@
 plugins {
-    id 'org.springframework.boot' version '2.5.2'
+    id 'org.springframework.boot' version '2.5.4'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
 }
@@ -19,21 +19,44 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-hateoas'
-    implementation 'org.springframework.boot:spring-boot-starter-mail'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-web-services'
-    compileOnly 'org.projectlombok:lombok'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.springframework.cloud:spring-cloud-aws-core:2.2.6.RELEASE'
+    implementation 'org.springframework.data:spring-data-envers:2.6.1'
+
+    implementation 'org.apache.logging.log4j:log4j-to-slf4j:2.17.1'
+    implementation 'org.apache.logging.log4j:log4j-api:2.17.1'
+
+    implementation "io.springfox:springfox-boot-starter:3.0.0"
+
+    implementation 'net.rakugakibox.spring.boot:logback-access-spring-boot-starter:2.7.1'
+
     runtimeOnly 'com.h2database:h2'
+    implementation 'org.flywaydb:flyway-core'
     runtimeOnly 'mysql:mysql-connector-java'
+
+    compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
+
+    implementation 'org.mindrot:jbcrypt:0.4'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'io.rest-assured:rest-assured:4.4.0'
 }
 
 test {
     useJUnitPlatform()
+}
+
+processResources.dependsOn('copyPrivate')
+
+task copyPrivate(type: Copy) {
+    copy {
+        from './server-privates'
+        include "*.yml"
+        into 'src/main/resources/privates'
+    }
 }
