@@ -12,7 +12,7 @@ import java.time.Instant;
 import java.util.Optional;
 
 @Repository
-public interface PetitionRepository extends RevisionRepository<Petition, Long, Long>, JpaRepository<Petition, Long> {
+public interface PetitionRepository extends RevisionRepository<Petition, Long, Long>, JpaRepository<Petition, Long>, PetitionRepositoryCustom {
     Page<Petition> findByUserId(Long userId, Pageable pageable);
 
     Page<Petition> findAll(Pageable pageable);
