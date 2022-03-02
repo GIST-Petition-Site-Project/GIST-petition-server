@@ -3,6 +3,7 @@ package com.gistpetition.api.petition.application;
 
 import com.gistpetition.api.config.annotation.DataIntegrityHandler;
 import com.gistpetition.api.exception.petition.DuplicatedAgreementException;
+import com.gistpetition.api.exception.petition.NoSuchCategoryException;
 import com.gistpetition.api.exception.petition.NoSuchPetitionException;
 import com.gistpetition.api.exception.petition.NotReleasedPetitionException;
 import com.gistpetition.api.exception.user.NoSuchUserException;
@@ -59,27 +60,25 @@ public class PetitionService {
 
     @Transactional(readOnly = true)
     public Page<PetitionPreviewResponse> retrieveReleasedPetitionByCategoryId(Long categoryId, Pageable pageable) {
-        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCategoryAndReleasedTrue(Category.of(categoryId), pageable));
-    }
-
-    @Transactional(readOnly = true)
-    public Page<PetitionPreviewResponse> retrieveReleasedAndExpiredPetition(Pageable pageable) {
-        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByExpiredAtBeforeAndReleasedTrue(Instant.now(), pageable));
+        Category category = getCategoryEnumById(categoryId);
+        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCategoryAndReleasedTrue(category, pageable));
     }
 
     @Transactional(readOnly = true)
     public Page<PetitionPreviewResponse> retrieveReleasedAndExpiredPetitionByCategoryId(Long categoryId, Pageable pageable) {
-        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCategoryAndExpiredAtBeforeAndReleasedTrue(Category.of(categoryId), Instant.now(), pageable));
+        Category category = getCategoryEnumById(categoryId);
+        return PetitionPreviewResponse.pageOf(petitionRepository.findReleasedAndExpiredPetition(category, Instant.now(), pageable));
     }
 
-    @Transactional(readOnly = true)
-    public Page<PetitionPreviewResponse> retrieveOngoingPetition(Pageable pageable) {
-        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByExpiredAtAfterAndReleasedTrueAndAnsweredFalse(Instant.now(), pageable));
-    }
+//    @Transactional(readOnly = true)
+//    public Page<PetitionPreviewResponse> retrieveOngoingPetition(Pageable pageable) {
+//        return PetitionPreviewResponse.pageOf(petitionRepository.findReleasedAndUnAnsweredAndUnExpiredPetition(null, Instant.now(), pageable));
+//    }
 
     @Transactional(readOnly = true)
     public Page<PetitionPreviewResponse> retrieveOngoingPetitionByCategoryId(Long categoryId, Pageable pageable) {
-        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCategoryAndExpiredAtAfterAndReleasedTrueAndAnsweredFalse(Category.of(categoryId), Instant.now(), pageable));
+        Category category = getCategoryEnumById(categoryId);
+        return PetitionPreviewResponse.pageOf(petitionRepository.findReleasedAndUnAnsweredAndUnExpiredPetition(category, Instant.now(), pageable));
     }
 
     @Transactional(readOnly = true)
@@ -219,5 +218,15 @@ public class PetitionService {
 
     private Petition findPetitionById(Long petitionId) {
         return petitionRepository.findById(petitionId).orElseThrow(NoSuchPetitionException::new);
+    }
+
+    private Category getCategoryEnumById(Long categoryId) {
+        Category category;
+        try {
+            category = Category.of(categoryId);
+        } catch (NoSuchCategoryException ex) {
+            category = null;
+        }
+        return category;
     }
 }

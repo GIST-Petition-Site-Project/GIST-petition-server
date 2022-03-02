@@ -10,7 +10,6 @@ import com.gistpetition.api.user.domain.SimpleUser;
 import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRepository;
 import com.gistpetition.api.user.domain.UserRole;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -257,7 +256,7 @@ public class PetitionServiceTest extends ServiceTest {
         }
         releasePetitionByIds(createdPetitionIds);
 
-        Page<PetitionPreviewResponse> ongoingPetitions = petitionService.retrieveOngoingPetition(PageRequest.of(0, 10));
+        Page<PetitionPreviewResponse> ongoingPetitions = petitionService.retrieveOngoingPetitionByCategoryId(0L, PageRequest.of(0, 10));
         assertThat(ongoingPetitions.getContent()).hasSize(numOfPetition);
 
         for (PetitionPreviewResponse op : ongoingPetitions) {
