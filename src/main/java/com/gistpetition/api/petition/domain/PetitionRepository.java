@@ -24,9 +24,6 @@ public interface PetitionRepository extends RevisionRepository<Petition, Long, L
 
     Page<Petition> findByAnsweredTrue(Pageable pageable);
 
-    Page<Petition> findPetitionByAgreeCountIsGreaterThanEqualAndReleasedFalse(int requiredAgreeCount, Pageable pageable);
-
-    //waitingforAnswer
     Page<Petition> findPetitionByAgreeCountIsGreaterThanEqualAndReleasedTrueAndAnsweredFalse(int requiredAnswerCount, Pageable pageable);
 
     Long countByReleasedTrue();
