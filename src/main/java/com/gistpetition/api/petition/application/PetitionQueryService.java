@@ -1,77 +1,169 @@
 package com.gistpetition.api.petition.application;
 
+import com.gistpetition.api.exception.petition.NoSuchCategoryException;
+import com.gistpetition.api.exception.petition.NoSuchPetitionException;
+import com.gistpetition.api.exception.petition.NotReleasedPetitionException;
+import com.gistpetition.api.exception.user.NoSuchUserException;
+import com.gistpetition.api.petition.domain.*;
 import com.gistpetition.api.petition.dto.AgreementResponse;
 import com.gistpetition.api.petition.dto.PetitionPreviewResponse;
 import com.gistpetition.api.petition.dto.PetitionResponse;
 import com.gistpetition.api.petition.dto.PetitionRevisionResponse;
+import com.gistpetition.api.user.domain.User;
+import com.gistpetition.api.user.domain.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
+
+import static com.gistpetition.api.petition.application.PetitionQueryCondition.*;
+
 @Service
-public interface PetitionQueryService {
+@RequiredArgsConstructor
+public class PetitionQueryService {
+
+    private final PetitionRepository petitionRepository;
+    private final AgreementRepository agreementRepository;
+    private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
-    Page<PetitionPreviewResponse> retrievePetition(Pageable pageable);
+    public Page<PetitionPreviewResponse> retrievePetition(Pageable pageable) {
+        return PetitionPreviewResponse.pageOf(petitionRepository.findAll(pageable));
+    }
 
     @Transactional(readOnly = true)
-    Page<PetitionPreviewResponse> retrieveReleasedPetition(Pageable pageable);
+    public Page<PetitionPreviewResponse> retrieveReleasedPetition(Pageable pageable) {
+        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByReleasedTrue(pageable));
+    }
 
     @Transactional(readOnly = true)
-    Page<PetitionPreviewResponse> retrieveReleasedPetitionByCategoryId(Long categoryId, Pageable pageable);
+    public Page<PetitionPreviewResponse> retrieveReleasedPetitionByCategoryId(Long categoryId, Pageable pageable) {
+        Category category = getCategoryEnumById(categoryId);
+        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCategoryAndReleasedTrue(category, pageable));
+    }
 
     @Transactional(readOnly = true)
-    Page<PetitionPreviewResponse> retrieveReleasedAndExpiredPetitionByCategoryId(Long categoryId, Pageable pageable);
+    public Page<PetitionPreviewResponse> retrieveReleasedAndExpiredPetitionByCategoryId(Long categoryId, Pageable pageable) {
+        Category category = getCategoryEnumById(categoryId);
+        return PetitionPreviewResponse.pageOf(petitionRepository.findPageByCategory(EXPIRED, Instant.now(), pageable, category));
+    }
 
     @Transactional(readOnly = true)
-    Page<PetitionPreviewResponse> retrieveOngoingPetitionByCategoryId(Long categoryId, Pageable pageable);
+    public Page<PetitionPreviewResponse> retrieveOngoingPetitionByCategoryId(Long categoryId, Pageable pageable) {
+        Category category = getCategoryEnumById(categoryId);
+        return PetitionPreviewResponse.pageOf(petitionRepository.findPageByCategory(ONGOING, Instant.now(), pageable, category));
+    }
 
     @Transactional(readOnly = true)
-    Page<PetitionPreviewResponse> retrievePetitionByKeyword(String keyword, Pageable pageable);
+    public Page<PetitionPreviewResponse> retrievePetitionByKeyword(String keyword, Pageable pageable) {
+        return PetitionPreviewResponse.pageOf(petitionRepository.findByTitleContains(keyword, pageable));
+    }
 
     @Transactional(readOnly = true)
-    Page<PetitionPreviewResponse> retrievePetitionsByUserId(Long userId, Pageable pageable);
+    public Page<PetitionPreviewResponse> retrievePetitionsByUserId(Long userId, Pageable pageable) {
+        return PetitionPreviewResponse.pageOf(petitionRepository.findByUserId(userId, pageable));
+    }
 
     @Transactional(readOnly = true)
-    Page<PetitionPreviewResponse> retrievePetitionsWaitingForRelease(Pageable pageable);
+    public Page<PetitionPreviewResponse> retrievePetitionsWaitingForRelease(Pageable pageable) {
+        Page<Petition> petitions = petitionRepository.findPage(WAITING_FOR_RELEASE, Instant.now(), pageable);
+        return PetitionPreviewResponse.pageOf(petitions);
+    }
 
     @Transactional(readOnly = true)
-    Page<PetitionPreviewResponse> retrievePetitionsWaitingForAnswer(Pageable pageable);
+    public Page<PetitionPreviewResponse> retrievePetitionsWaitingForAnswer(Pageable pageable) {
+        Page<Petition> petitions = petitionRepository.findPage(WAITING_FOR_ANSWER, Instant.now(), pageable);
+        return PetitionPreviewResponse.pageOf(petitions);
+    }
 
     @Transactional(readOnly = true)
-    Long retrieveWaitingForReleasePetitionCount();
+    public Long retrieveWaitingForReleasePetitionCount() {
+        return petitionRepository.count(WAITING_FOR_RELEASE, Instant.now());
+    }
 
     @Transactional(readOnly = true)
-    Long retrieveWaitingForAnswerPetitionCount();
+    public Long retrieveWaitingForAnswerPetitionCount() {
+        return petitionRepository.count(WAITING_FOR_ANSWER, Instant.now());
+    }
 
     @Transactional(readOnly = true)
-    PetitionResponse retrieveReleasedPetitionById(Long petitionId);
+    public PetitionResponse retrieveReleasedPetitionById(Long petitionId) {
+        Petition petition = findPetitionById(petitionId);
+        if (!petition.isReleased()) {
+            throw new NotReleasedPetitionException();
+        }
+        return PetitionResponse.of(petition);
+    }
 
     @Transactional(readOnly = true)
-    Page<PetitionPreviewResponse> retrieveAnsweredPetition(Pageable pageable);
+    public Page<PetitionPreviewResponse> retrieveAnsweredPetition(Pageable pageable) {
+        return PetitionPreviewResponse.pageOf(petitionRepository.findByAnsweredTrue(pageable));
+    }
 
     @Transactional(readOnly = true)
-    Page<PetitionRevisionResponse> retrieveRevisionsOfPetition(Long petitionId, Pageable pageable);
+    public Page<PetitionRevisionResponse> retrieveRevisionsOfPetition(Long petitionId, Pageable pageable) {
+        return PetitionRevisionResponse.pageOf(petitionRepository.findRevisions(petitionId, pageable));
+    }
 
     @Transactional(readOnly = true)
-    Long retrieveReleasedPetitionCount();
+    public Long retrieveReleasedPetitionCount() {
+        return petitionRepository.countByReleasedTrue();
+    }
 
     @Transactional(readOnly = true)
-    Long retrieveAnsweredPetitionCount();
+    public Long retrieveAnsweredPetitionCount() {
+        return petitionRepository.countByAnsweredTrue();
+    }
 
     @Transactional(readOnly = true)
-    Page<AgreementResponse> retrieveAgreements(Long petitionId, Pageable pageable);
+    public Page<AgreementResponse> retrieveAgreements(Long petitionId, Pageable pageable) {
+        Page<Agreement> agreements = agreementRepository.findAgreementsByPetitionId(pageable, petitionId);
+        return AgreementResponse.pageOf(agreements);
+    }
 
     @Transactional(readOnly = true)
-    int retrieveNumberOfAgreements(Long petitionId);
+    public int retrieveNumberOfAgreements(Long petitionId) {
+        Petition petition = findPetitionById(petitionId);
+        return petition.getAgreeCount();
+    }
 
     @Transactional(readOnly = true)
-    Boolean retrieveStateOfAgreement(Long petitionId, Long userId);
+    public Boolean retrieveStateOfAgreement(Long petitionId, Long userId) {
+        Petition petition = findPetitionById(petitionId);
+        User user = findUserById(userId);
+        return petition.isAgreedBy(user);
+    }
 
     @Transactional(readOnly = true)
-    PetitionResponse retrievePetitionByTempUrl(String tempUrl);
+    public PetitionResponse retrievePetitionByTempUrl(String tempUrl) {
+        Petition petition = petitionRepository.findByTempUrl(tempUrl).orElseThrow(NoSuchPetitionException::new);
+        return PetitionResponse.of(petition);
+    }
 
     @Transactional(readOnly = true)
-    String retrieveTempUrlOf(Long petitionId);
+    public String retrieveTempUrlOf(Long petitionId) {
+        Petition petition = findPetitionById(petitionId);
+        return petition.getTempUrl();
+    }
+
+    private User findUserById(Long userId) {
+        return userRepository.findById(userId).orElseThrow(NoSuchUserException::new);
+    }
+
+    private Petition findPetitionById(Long petitionId) {
+        return petitionRepository.findById(petitionId).orElseThrow(NoSuchPetitionException::new);
+    }
+
+    private Category getCategoryEnumById(Long categoryId) {
+        Category category;
+        try {
+            category = Category.of(categoryId);
+        } catch (NoSuchCategoryException ex) {
+            category = null;
+        }
+        return category;
+    }
 }
