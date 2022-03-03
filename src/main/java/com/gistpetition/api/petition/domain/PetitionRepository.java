@@ -24,8 +24,6 @@ public interface PetitionRepository extends RevisionRepository<Petition, Long, L
 
     Page<Petition> findByAnsweredTrue(Pageable pageable);
 
-    Page<Petition> findPetitionByAgreeCountIsGreaterThanEqualAndReleasedTrueAndAnsweredFalse(int requiredAnswerCount, Pageable pageable);
-
     Long countByReleasedTrue();
 
     Long countByAnsweredTrue();
@@ -35,7 +33,7 @@ public interface PetitionRepository extends RevisionRepository<Petition, Long, L
 
     Optional<Petition> findByTempUrl(String tempUrl);
 
-    Long countByAgreeCountIsGreaterThanEqualAndReleasedFalse(int requiredReleaseCount);
+//    Long countByAgreeCountIsGreaterThanEqualAndReleasedFalse(int requiredReleaseCount);
 
-    Long countByAgreeCountIsGreaterThanEqualAndReleasedTrueAndAnsweredFalse(int requiredAnswerCount);
+//    Long countByAgreeCountIsGreaterThanEqualAndReleasedTrueAndAnsweredFalse(int requiredAnswerCount);
 }

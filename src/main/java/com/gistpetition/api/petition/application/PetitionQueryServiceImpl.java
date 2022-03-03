@@ -19,8 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 
-import static com.gistpetition.api.petition.domain.Petition.REQUIRED_AGREEMENT_FOR_ANSWER;
-import static com.gistpetition.api.petition.domain.Petition.REQUIRED_AGREEMENT_FOR_RELEASE;
+import static com.gistpetition.api.petition.application.PetitionQueryCondition.*;
 
 @Service
 @RequiredArgsConstructor
@@ -53,14 +52,14 @@ public class PetitionQueryServiceImpl implements PetitionQueryService {
     @Transactional(readOnly = true)
     public Page<PetitionPreviewResponse> retrieveReleasedAndExpiredPetitionByCategoryId(Long categoryId, Pageable pageable) {
         Category category = getCategoryEnumById(categoryId);
-        return PetitionPreviewResponse.pageOf(petitionRepository.findReleasedAndExpiredPetition(category, Instant.now(), pageable));
+        return PetitionPreviewResponse.pageOf(petitionRepository.findPageByCategory(EXPIRED, Instant.now(), pageable, category));
     }
 
     @Override
     @Transactional(readOnly = true)
     public Page<PetitionPreviewResponse> retrieveOngoingPetitionByCategoryId(Long categoryId, Pageable pageable) {
         Category category = getCategoryEnumById(categoryId);
-        return PetitionPreviewResponse.pageOf(petitionRepository.findReleasedAndUnAnsweredAndUnExpiredPetition(category, Instant.now(), pageable));
+        return PetitionPreviewResponse.pageOf(petitionRepository.findPageByCategory(ONGOING, Instant.now(), pageable, category));
     }
 
     @Override
@@ -78,27 +77,27 @@ public class PetitionQueryServiceImpl implements PetitionQueryService {
     @Override
     @Transactional(readOnly = true)
     public Page<PetitionPreviewResponse> retrievePetitionsWaitingForRelease(Pageable pageable) {
-        Page<Petition> petitions = petitionRepository.findPetitionByAgreeCountIsGreaterThanEqualAndReleasedFalse(REQUIRED_AGREEMENT_FOR_RELEASE, pageable);
+        Page<Petition> petitions = petitionRepository.findPage(WAITING_FOR_RELEASE, Instant.now(), pageable);
         return PetitionPreviewResponse.pageOf(petitions);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Page<PetitionPreviewResponse> retrievePetitionsWaitingForAnswer(Pageable pageable) {
-        Page<Petition> petitions = petitionRepository.findPetitionByAgreeCountIsGreaterThanEqualAndReleasedTrueAndAnsweredFalse(REQUIRED_AGREEMENT_FOR_ANSWER, pageable);
+        Page<Petition> petitions = petitionRepository.findPage(WAITING_FOR_ANSWER, Instant.now(), pageable);
         return PetitionPreviewResponse.pageOf(petitions);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Long retrieveWaitingForReleasePetitionCount() {
-        return petitionRepository.countByAgreeCountIsGreaterThanEqualAndReleasedFalse(REQUIRED_AGREEMENT_FOR_RELEASE);
+        return petitionRepository.count(WAITING_FOR_RELEASE, Instant.now());
     }
 
     @Override
     @Transactional(readOnly = true)
     public Long retrieveWaitingForAnswerPetitionCount() {
-        return petitionRepository.countByAgreeCountIsGreaterThanEqualAndReleasedTrueAndAnsweredFalse(REQUIRED_AGREEMENT_FOR_ANSWER);
+        return petitionRepository.count(WAITING_FOR_ANSWER, Instant.now());
     }
 
     @Override
