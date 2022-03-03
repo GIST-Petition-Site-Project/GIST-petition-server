@@ -22,6 +22,7 @@ import java.time.Instant;
 import static com.gistpetition.api.petition.domain.Petition.REQUIRED_AGREEMENT_FOR_ANSWER;
 import static com.gistpetition.api.petition.domain.Petition.REQUIRED_AGREEMENT_FOR_RELEASE;
 
+@Service
 @RequiredArgsConstructor
 public class PetitionQueryServiceImpl implements PetitionQueryService {
 
@@ -154,13 +155,6 @@ public class PetitionQueryServiceImpl implements PetitionQueryService {
         Petition petition = findPetitionById(petitionId);
         User user = findUserById(userId);
         return petition.isAgreedBy(user);
-    }
-
-    @Override
-    @Transactional
-    public void releasePetition(Long petitionId) {
-        Petition petition = findPetitionById(petitionId);
-        petition.release(Instant.now());
     }
 
 

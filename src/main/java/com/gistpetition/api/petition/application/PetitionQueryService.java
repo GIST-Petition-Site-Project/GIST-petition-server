@@ -69,9 +69,6 @@ public interface PetitionQueryService {
     @Transactional(readOnly = true)
     Boolean retrieveStateOfAgreement(Long petitionId, Long userId);
 
-    @Transactional
-    void releasePetition(Long petitionId);
-
     @Transactional(readOnly = true)
     PetitionResponse retrievePetitionByTempUrl(String tempUrl);
 

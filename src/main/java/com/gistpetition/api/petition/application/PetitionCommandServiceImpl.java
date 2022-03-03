@@ -19,6 +19,7 @@ import java.time.Instant;
 
 import static com.gistpetition.api.petition.domain.Petition.POSTING_PERIOD_BY_SECONDS;
 
+@Service
 @RequiredArgsConstructor
 public class PetitionCommandServiceImpl implements PetitionCommandService {
 
@@ -79,6 +80,13 @@ public class PetitionCommandServiceImpl implements PetitionCommandService {
     public void cancelReleasePetition(Long petitionId) {
         Petition petition = findPetitionById(petitionId);
         petition.cancelRelease();
+    }
+
+    @Override
+    @Transactional
+    public void releasePetition(Long petitionId) {
+        Petition petition = findPetitionById(petitionId);
+        petition.release(Instant.now());
     }
 
     private User findUserById(Long userId) {

@@ -24,4 +24,7 @@ public interface PetitionCommandService {
 
     @Transactional
     void cancelReleasePetition(Long petitionId);
+
+    @Transactional
+    void releasePetition(Long petitionId);
 }
