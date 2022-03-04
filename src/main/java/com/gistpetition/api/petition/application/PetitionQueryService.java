@@ -1,6 +1,5 @@
 package com.gistpetition.api.petition.application;
 
-import com.gistpetition.api.exception.petition.NoSuchCategoryException;
 import com.gistpetition.api.exception.petition.NoSuchPetitionException;
 import com.gistpetition.api.exception.petition.NotReleasedPetitionException;
 import com.gistpetition.api.exception.user.NoSuchUserException;
@@ -18,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.Optional;
 
 import static com.gistpetition.api.petition.application.PetitionQueryCondition.*;
 
@@ -35,25 +35,17 @@ public class PetitionQueryService {
     }
 
     @Transactional(readOnly = true)
-    public Page<PetitionPreviewResponse> retrieveReleasedPetition(Pageable pageable) {
-        return PetitionPreviewResponse.pageOf(petitionRepository.findAll(RELEASED_NOT_EXPIRED, null, Instant.now(), pageable));
-    }
-
-    @Transactional(readOnly = true)
-    public Page<PetitionPreviewResponse> retrieveReleasedPetitionByCategoryId(Long categoryId, Pageable pageable) {
-        Category category = getCategoryEnumById(categoryId);
+    public Page<PetitionPreviewResponse> retrieveReleasedPetition(Optional<Category> category, Pageable pageable) {
         return PetitionPreviewResponse.pageOf(petitionRepository.findAll(RELEASED_NOT_EXPIRED, category, Instant.now(), pageable));
     }
 
     @Transactional(readOnly = true)
-    public Page<PetitionPreviewResponse> retrieveReleasedAndExpiredPetitionByCategoryId(Long categoryId, Pageable pageable) {
-        Category category = getCategoryEnumById(categoryId);
+    public Page<PetitionPreviewResponse> retrieveReleasedAndExpiredPetition(Optional<Category> category, Pageable pageable) {
         return PetitionPreviewResponse.pageOf(petitionRepository.findAll(RELEASED_EXPIRED, category, Instant.now(), pageable));
     }
 
     @Transactional(readOnly = true)
-    public Page<PetitionPreviewResponse> retrieveOngoingPetitionByCategoryId(Long categoryId, Pageable pageable) {
-        Category category = getCategoryEnumById(categoryId);
+    public Page<PetitionPreviewResponse> retrieveOngoingPetition(Optional<Category> category, Pageable pageable) {
         return PetitionPreviewResponse.pageOf(petitionRepository.findAll(ONGOING, category, Instant.now(), pageable));
     }
 
@@ -68,25 +60,25 @@ public class PetitionQueryService {
     }
 
     @Transactional(readOnly = true)
-    public Page<PetitionPreviewResponse> retrievePetitionsWaitingForRelease(Pageable pageable) {
-        Page<Petition> petitions = petitionRepository.findAll(WAITING_FOR_RELEASE, null, Instant.now(), pageable);
+    public Page<PetitionPreviewResponse> retrievePetitionsWaitingForRelease(Optional<Category> category, Pageable pageable) {
+        Page<Petition> petitions = petitionRepository.findAll(WAITING_FOR_RELEASE, category, Instant.now(), pageable);
         return PetitionPreviewResponse.pageOf(petitions);
     }
 
     @Transactional(readOnly = true)
-    public Page<PetitionPreviewResponse> retrievePetitionsWaitingForAnswer(Pageable pageable) {
-        Page<Petition> petitions = petitionRepository.findAll(WAITING_FOR_ANSWER, null, Instant.now(), pageable);
+    public Page<PetitionPreviewResponse> retrievePetitionsWaitingForAnswer(Optional<Category> category, Pageable pageable) {
+        Page<Petition> petitions = petitionRepository.findAll(WAITING_FOR_ANSWER, category, Instant.now(), pageable);
         return PetitionPreviewResponse.pageOf(petitions);
     }
 
     @Transactional(readOnly = true)
-    public Long retrieveWaitingForReleasePetitionCount() {
-        return petitionRepository.count(WAITING_FOR_RELEASE, null, Instant.now());
+    public Long retrieveWaitingForReleasePetitionCount(Optional<Category> category) {
+        return petitionRepository.count(WAITING_FOR_RELEASE, category, Instant.now());
     }
 
     @Transactional(readOnly = true)
-    public Long retrieveWaitingForAnswerPetitionCount() {
-        return petitionRepository.count(WAITING_FOR_ANSWER, null, Instant.now());
+    public Long retrieveWaitingForAnswerPetitionCount(Optional<Category> category) {
+        return petitionRepository.count(WAITING_FOR_ANSWER, category, Instant.now());
     }
 
     @Transactional(readOnly = true)
@@ -99,8 +91,8 @@ public class PetitionQueryService {
     }
 
     @Transactional(readOnly = true)
-    public Page<PetitionPreviewResponse> retrieveAnsweredPetition(Pageable pageable) {
-        return PetitionPreviewResponse.pageOf(petitionRepository.findAll(ANSWERED, null, Instant.now(), pageable));
+    public Page<PetitionPreviewResponse> retrieveAnsweredPetition(Optional<Category> category, Pageable pageable) {
+        return PetitionPreviewResponse.pageOf(petitionRepository.findAll(ANSWERED, category, Instant.now(), pageable));
     }
 
     @Transactional(readOnly = true)
@@ -109,13 +101,13 @@ public class PetitionQueryService {
     }
 
     @Transactional(readOnly = true)
-    public Long retrieveReleasedPetitionCount() {
-        return petitionRepository.count(RELEASED, null, Instant.now());
+    public Long retrieveReleasedPetitionCount(Optional<Category> category) {
+        return petitionRepository.count(RELEASED, category, Instant.now());
     }
 
     @Transactional(readOnly = true)
-    public Long retrieveAnsweredPetitionCount() {
-        return petitionRepository.count(ANSWERED, null, Instant.now());
+    public Long retrieveAnsweredPetitionCount(Optional<Category> category) {
+        return petitionRepository.count(ANSWERED, category, Instant.now());
     }
 
     @Transactional(readOnly = true)
@@ -155,15 +147,5 @@ public class PetitionQueryService {
 
     private Petition findPetitionById(Long petitionId) {
         return petitionRepository.findById(petitionId).orElseThrow(NoSuchPetitionException::new);
-    }
-
-    private Category getCategoryEnumById(Long categoryId) {
-        Category category;
-        try {
-            category = Category.of(categoryId);
-        } catch (NoSuchCategoryException ex) {
-            category = null;
-        }
-        return category;
     }
 }

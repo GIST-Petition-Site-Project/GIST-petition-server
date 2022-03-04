@@ -27,6 +27,7 @@ import javax.servlet.http.HttpSession;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -40,7 +41,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class petitionServiceTest extends ServiceTest {
+class PetitionServiceTest extends ServiceTest {
     public static final Instant PETITION_CREATION_AT = Instant.now();
     public static final Instant PETITION_EXPIRED_AT = PETITION_CREATION_AT.plusSeconds(Petition.POSTING_PERIOD_BY_SECONDS);
     private static final PetitionRequest DORM_PETITION_REQUEST = new PetitionRequest("title", "description", Category.DORMITORY.getId());
@@ -258,7 +259,7 @@ class petitionServiceTest extends ServiceTest {
         }
         releasePetitionByIds(createdPetitionIds);
 
-        Page<PetitionPreviewResponse> ongoingPetitions = petitionQueryService.retrieveOngoingPetitionByCategoryId(0L, PageRequest.of(0, 10));
+        Page<PetitionPreviewResponse> ongoingPetitions = petitionQueryService.retrieveOngoingPetition(Optional.empty(), PageRequest.of(0, 10));
         assertThat(ongoingPetitions.getContent()).hasSize(numOfPetition);
 
         for (PetitionPreviewResponse op : ongoingPetitions) {
@@ -319,7 +320,7 @@ class petitionServiceTest extends ServiceTest {
         petitionRepository.save(petition);
 
         Pageable pageable = PageRequest.of(0, 10);
-        assertThat(petitionQueryService.retrieveAnsweredPetition(pageable).getContent()).hasSize(1);
+        assertThat(petitionQueryService.retrieveAnsweredPetition(Optional.empty(),pageable).getContent()).hasSize(1);
     }
 
     @Test
@@ -330,7 +331,7 @@ class petitionServiceTest extends ServiceTest {
                 .build();
         petition.setAnswered(true);
         petitionRepository.save(petition);
-        assertThat(petitionQueryService.retrieveAnsweredPetitionCount()).isEqualTo(1L);
+        assertThat(petitionQueryService.retrieveAnsweredPetitionCount(Optional.empty())).isEqualTo(1L);
     }
 
 

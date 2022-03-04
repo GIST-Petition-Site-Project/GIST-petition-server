@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 import static com.gistpetition.api.petition.domain.QPetition.petition;
 
@@ -20,7 +21,7 @@ public class PetitionRepositoryCustomImpl implements PetitionRepositoryCustom {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public Page<Petition> findAll(PetitionQueryCondition condition, Category category, Instant at, Pageable pageable) {
+    public Page<Petition> findAll(PetitionQueryCondition condition, Optional<Category> category, Instant at, Pageable pageable) {
         QueryResults<Petition> results = jpaQueryFactory.select(petition)
                 .from(petition)
                 .where(condition.of(category, at))
@@ -33,7 +34,7 @@ public class PetitionRepositoryCustomImpl implements PetitionRepositoryCustom {
     }
 
     @Override
-    public Long count(PetitionQueryCondition condition, Category category, Instant at) {
+    public Long count(PetitionQueryCondition condition, Optional<Category> category, Instant at) {
         int count = jpaQueryFactory.select(petition)
                 .from(petition)
                 .where(condition.of(category, at))

@@ -5,6 +5,7 @@ import com.gistpetition.api.petition.domain.Petition;
 import com.querydsl.core.types.dsl.BooleanExpression;
 
 import java.time.Instant;
+import java.util.Optional;
 import java.util.function.Function;
 
 import static com.gistpetition.api.petition.domain.QPetition.petition;
@@ -39,9 +40,9 @@ public enum PetitionQueryCondition {
         this.expiration = expiration;
     }
 
-    public BooleanExpression of(Category category, Instant at) {
+    public BooleanExpression of(Optional<Category> category, Instant at) {
         BooleanExpression be = condition.and(expiration.at(at));
-        return category == null ? be : be.and(petition.category.eq(category));
+        return category.isEmpty() ? be : be.and(petition.category.eq(category.get()));
     }
 
     public enum Expiration {

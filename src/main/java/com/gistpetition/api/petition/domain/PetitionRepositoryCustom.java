@@ -5,10 +5,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.time.Instant;
+import java.util.Optional;
 
 public interface PetitionRepositoryCustom {
 
-    Page<Petition> findAll(PetitionQueryCondition condition, Category category, Instant at, Pageable pageable);
+    Page<Petition> findAll(PetitionQueryCondition condition, Optional<Category> category, Instant at, Pageable pageable);
 
-    Long count(PetitionQueryCondition condition, Category category, Instant at);
+    Long count(PetitionQueryCondition condition, Optional<Category> category, Instant at);
 }
