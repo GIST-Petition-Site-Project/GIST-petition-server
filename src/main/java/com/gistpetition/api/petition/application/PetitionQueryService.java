@@ -36,25 +36,25 @@ public class PetitionQueryService {
 
     @Transactional(readOnly = true)
     public Page<PetitionPreviewResponse> retrieveReleasedPetition(Pageable pageable) {
-        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByReleasedTrue(pageable));
+        return PetitionPreviewResponse.pageOf(petitionRepository.findAll(RELEASED_NOT_EXPIRED, null, Instant.now(), pageable));
     }
 
     @Transactional(readOnly = true)
     public Page<PetitionPreviewResponse> retrieveReleasedPetitionByCategoryId(Long categoryId, Pageable pageable) {
         Category category = getCategoryEnumById(categoryId);
-        return PetitionPreviewResponse.pageOf(petitionRepository.findAllByCategoryAndReleasedTrue(category, pageable));
+        return PetitionPreviewResponse.pageOf(petitionRepository.findAll(RELEASED_NOT_EXPIRED, category, Instant.now(), pageable));
     }
 
     @Transactional(readOnly = true)
     public Page<PetitionPreviewResponse> retrieveReleasedAndExpiredPetitionByCategoryId(Long categoryId, Pageable pageable) {
         Category category = getCategoryEnumById(categoryId);
-        return PetitionPreviewResponse.pageOf(petitionRepository.findPageByCategory(EXPIRED, Instant.now(), pageable, category));
+        return PetitionPreviewResponse.pageOf(petitionRepository.findAll(RELEASED_EXPIRED, category, Instant.now(), pageable));
     }
 
     @Transactional(readOnly = true)
     public Page<PetitionPreviewResponse> retrieveOngoingPetitionByCategoryId(Long categoryId, Pageable pageable) {
         Category category = getCategoryEnumById(categoryId);
-        return PetitionPreviewResponse.pageOf(petitionRepository.findPageByCategory(ONGOING, Instant.now(), pageable, category));
+        return PetitionPreviewResponse.pageOf(petitionRepository.findAll(ONGOING, category, Instant.now(), pageable));
     }
 
     @Transactional(readOnly = true)
@@ -69,24 +69,24 @@ public class PetitionQueryService {
 
     @Transactional(readOnly = true)
     public Page<PetitionPreviewResponse> retrievePetitionsWaitingForRelease(Pageable pageable) {
-        Page<Petition> petitions = petitionRepository.findPage(WAITING_FOR_RELEASE, Instant.now(), pageable);
+        Page<Petition> petitions = petitionRepository.findAll(WAITING_FOR_RELEASE, null, Instant.now(), pageable);
         return PetitionPreviewResponse.pageOf(petitions);
     }
 
     @Transactional(readOnly = true)
     public Page<PetitionPreviewResponse> retrievePetitionsWaitingForAnswer(Pageable pageable) {
-        Page<Petition> petitions = petitionRepository.findPage(WAITING_FOR_ANSWER, Instant.now(), pageable);
+        Page<Petition> petitions = petitionRepository.findAll(WAITING_FOR_ANSWER, null, Instant.now(), pageable);
         return PetitionPreviewResponse.pageOf(petitions);
     }
 
     @Transactional(readOnly = true)
     public Long retrieveWaitingForReleasePetitionCount() {
-        return petitionRepository.count(WAITING_FOR_RELEASE, Instant.now());
+        return petitionRepository.count(WAITING_FOR_RELEASE, null, Instant.now());
     }
 
     @Transactional(readOnly = true)
     public Long retrieveWaitingForAnswerPetitionCount() {
-        return petitionRepository.count(WAITING_FOR_ANSWER, Instant.now());
+        return petitionRepository.count(WAITING_FOR_ANSWER, null, Instant.now());
     }
 
     @Transactional(readOnly = true)
@@ -100,7 +100,7 @@ public class PetitionQueryService {
 
     @Transactional(readOnly = true)
     public Page<PetitionPreviewResponse> retrieveAnsweredPetition(Pageable pageable) {
-        return PetitionPreviewResponse.pageOf(petitionRepository.findByAnsweredTrue(pageable));
+        return PetitionPreviewResponse.pageOf(petitionRepository.findAll(ANSWERED, null, Instant.now(), pageable));
     }
 
     @Transactional(readOnly = true)
@@ -110,12 +110,12 @@ public class PetitionQueryService {
 
     @Transactional(readOnly = true)
     public Long retrieveReleasedPetitionCount() {
-        return petitionRepository.countByReleasedTrue();
+        return petitionRepository.count(RELEASED, null, Instant.now());
     }
 
     @Transactional(readOnly = true)
     public Long retrieveAnsweredPetitionCount() {
-        return petitionRepository.countByAnsweredTrue();
+        return petitionRepository.count(ANSWERED, null, Instant.now());
     }
 
     @Transactional(readOnly = true)

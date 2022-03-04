@@ -14,26 +14,10 @@ import java.util.Optional;
 public interface PetitionRepository extends RevisionRepository<Petition, Long, Long>, JpaRepository<Petition, Long>, PetitionRepositoryCustom {
     Page<Petition> findByUserId(Long userId, Pageable pageable);
 
-    Page<Petition> findAll(Pageable pageable);
-
-    Page<Petition> findAllByReleasedTrue(Pageable pageable);
-
-    Page<Petition> findAllByCategoryAndReleasedTrue(Category category, Pageable pageable);
-
     Page<Petition> findByTitleContains(String keyword, Pageable pageable);
-
-    Page<Petition> findByAnsweredTrue(Pageable pageable);
-
-    Long countByReleasedTrue();
-
-    Long countByAnsweredTrue();
-
-    @Query("SELECT p FROM Petition AS p LEFT JOIN FETCH p.agreements WHERE p.id=:petitionId")
-    Petition findPetitionByWithEagerMode(@Param("petitionId") Long petitionId);
 
     Optional<Petition> findByTempUrl(String tempUrl);
 
-//    Long countByAgreeCountIsGreaterThanEqualAndReleasedFalse(int requiredReleaseCount);
-
-//    Long countByAgreeCountIsGreaterThanEqualAndReleasedTrueAndAnsweredFalse(int requiredAnswerCount);
+    @Query("SELECT p FROM Petition AS p LEFT JOIN FETCH p.agreements WHERE p.id=:petitionId")
+    Petition findPetitionByWithEagerMode(@Param("petitionId") Long petitionId);
 }
