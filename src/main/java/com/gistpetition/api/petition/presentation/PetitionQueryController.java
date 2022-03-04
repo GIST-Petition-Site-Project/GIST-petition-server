@@ -13,8 +13,6 @@ import com.gistpetition.api.user.domain.SimpleUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,9 +25,7 @@ public class PetitionQueryController {
     private final PetitionQueryService petitionQueryService;
 
     @GetMapping("/petitions")
-    public ResponseEntity<Page<PetitionPreviewResponse>> retrieveReleasedPetitions(@RequestParam Optional<Long> categoryId,
-                                                                                   @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-
+    public ResponseEntity<Page<PetitionPreviewResponse>> retrieveReleasedPetitions(@RequestParam Optional<Long> categoryId, Pageable pageable) {
         return ResponseEntity.ok().body(petitionQueryService.retrieveReleasedPetition(Category.of(categoryId), pageable));
     }
 
@@ -39,34 +35,29 @@ public class PetitionQueryController {
     }
 
     @GetMapping("/petitions/ongoing")
-    public ResponseEntity<Page<PetitionPreviewResponse>> retrieveOngoingPetitions(@RequestParam Optional<Long> categoryId,
-                                                                                  @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+    public ResponseEntity<Page<PetitionPreviewResponse>> retrieveOngoingPetitions(@RequestParam Optional<Long> categoryId, Pageable pageable) {
         return ResponseEntity.ok().body(petitionQueryService.retrieveOngoingPetition(Category.of(categoryId), pageable));
     }
 
     @GetMapping("/petitions/expired")
-    public ResponseEntity<Page<PetitionPreviewResponse>> retrieveReleasedAndExpiredPetitions(@RequestParam Optional<Long> categoryId,
-                                                                                             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+    public ResponseEntity<Page<PetitionPreviewResponse>> retrieveReleasedAndExpiredPetitions(@RequestParam Optional<Long> categoryId, Pageable pageable) {
         return ResponseEntity.ok().body(petitionQueryService.retrieveReleasedAndExpiredPetition(Category.of(categoryId), pageable));
     }
 
     @ManagerPermissionRequired
     @GetMapping("/petitions/waitingForRelease")
-    public ResponseEntity<Page<PetitionPreviewResponse>> retrievePetitionsWaitingForCheck(@RequestParam Optional<Long> categoryId,
-                                                                                          @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+    public ResponseEntity<Page<PetitionPreviewResponse>> retrievePetitionsWaitingForCheck(@RequestParam Optional<Long> categoryId, Pageable pageable) {
         return ResponseEntity.ok().body(petitionQueryService.retrievePetitionsWaitingForRelease(Category.of(categoryId), pageable));
     }
 
     @ManagerPermissionRequired
     @GetMapping("/petitions/waitingForAnswer")
-    public ResponseEntity<Page<PetitionPreviewResponse>> retrievePetitionsWaitingForAnswer(@RequestParam Optional<Long> categoryId,
-                                                                                           @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+    public ResponseEntity<Page<PetitionPreviewResponse>> retrievePetitionsWaitingForAnswer(@RequestParam Optional<Long> categoryId, Pageable pageable) {
         return ResponseEntity.ok().body(petitionQueryService.retrievePetitionsWaitingForAnswer(Category.of(categoryId), pageable));
     }
 
     @GetMapping("/petitions/answered")
-    public ResponseEntity<Page<PetitionPreviewResponse>> retrieveAnsweredPetitions(@RequestParam Optional<Long> categoryId,
-                                                                                   @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+    public ResponseEntity<Page<PetitionPreviewResponse>> retrieveAnsweredPetitions(@RequestParam Optional<Long> categoryId, Pageable pageable) {
         return ResponseEntity.ok().body(petitionQueryService.retrieveAnsweredPetition(Category.of(categoryId), pageable));
     }
 
@@ -100,20 +91,18 @@ public class PetitionQueryController {
     @LoginRequired
     @GetMapping("/petitions/me")
     public ResponseEntity<Page<PetitionPreviewResponse>> retrievePetitionsOfMine(@LoginUser SimpleUser simpleUser,
-                                                                                 @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+                                                                                 Pageable pageable) {
         return ResponseEntity.ok().body(petitionQueryService.retrievePetitionsByUserId(simpleUser.getId(), pageable));
     }
 
     @ManagerPermissionRequired
     @GetMapping("/petitions/{petitionId}/revisions")
-    public ResponseEntity<Page<PetitionRevisionResponse>> retrieveRevisionsOfPetition(@PathVariable Long petitionId,
-                                                                                      @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+    public ResponseEntity<Page<PetitionRevisionResponse>> retrieveRevisionsOfPetition(@PathVariable Long petitionId, Pageable pageable) {
         return ResponseEntity.ok().body(petitionQueryService.retrieveRevisionsOfPetition(petitionId, pageable));
     }
 
     @GetMapping("/petitions/search")
-    public ResponseEntity<Page<PetitionPreviewResponse>> retrievePetitionsByKeyword(@RequestParam(defaultValue = "") String keyword,
-                                                                                    @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+    public ResponseEntity<Page<PetitionPreviewResponse>> retrievePetitionsByKeyword(@RequestParam(defaultValue = "") String keyword, Pageable pageable) {
         if (keyword.equals("")) {
             return ResponseEntity.ok().body(petitionQueryService.retrievePetition(pageable));
         }
@@ -121,8 +110,7 @@ public class PetitionQueryController {
     }
 
     @GetMapping("/petitions/{petitionId}/agreements")
-    public ResponseEntity<Page<AgreementResponse>> retrieveAgreements(@PathVariable Long petitionId,
-                                                                      @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+    public ResponseEntity<Page<AgreementResponse>> retrieveAgreements(@PathVariable Long petitionId, Pageable pageable) {
         return ResponseEntity.ok().body(petitionQueryService.retrieveAgreements(petitionId, pageable));
     }
 
