@@ -1,7 +1,13 @@
 package com.gistpetition.api.petition.dto;
 
+import com.gistpetition.api.petition.domain.Category;
+import com.gistpetition.api.petition.domain.Petition;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.time.Instant;
+
+import static com.gistpetition.api.petition.domain.Petition.POSTING_PERIOD_BY_SECONDS;
 
 public class PetitionRequest {
     @NotBlank
