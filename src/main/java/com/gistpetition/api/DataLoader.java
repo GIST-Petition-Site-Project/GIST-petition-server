@@ -3,7 +3,7 @@ package com.gistpetition.api;
 import com.gistpetition.api.answer.application.AnswerService;
 import com.gistpetition.api.answer.domain.AnswerRepository;
 import com.gistpetition.api.answer.dto.AnswerRequest;
-import com.gistpetition.api.petition.application.PetitionService;
+import com.gistpetition.api.petition.application.PetitionCommandService;
 import com.gistpetition.api.petition.domain.*;
 import com.gistpetition.api.petition.dto.AgreementRequest;
 import com.gistpetition.api.petition.dto.PetitionRequest;
@@ -65,7 +65,7 @@ public class DataLoader {
     private final UserRepository userRepository;
     private final PetitionRepository petitionRepository;
     private final AnswerRepository answerRepository;
-    private final PetitionService petitionService;
+    private final PetitionCommandService petitionCommandService;
     private final AnswerService answerService;
     private final AgreementRepository agreementRepository;
 
@@ -95,7 +95,7 @@ public class DataLoader {
             if (petitionId < petitionIds.get(0) + WAITING_FOR_CHECK_RELEASE_COUNT) {
                 continue;
             }
-            petitionService.releasePetition(petitionId);
+            petitionCommandService.releasePetition(petitionId);
 
             if (petitionId < petitionIds.get(0) + WAITING_FOR_CHECK_RELEASE_COUNT + WAITING_FOR_CHECK_ANSWER_COUNT) {
                 continue;
@@ -113,7 +113,7 @@ public class DataLoader {
         int agreeCount = RANDOM.nextInt(alphabetUsers.size() - REQUIRED_AGREEMENT_FOR_ANSWER) + REQUIRED_AGREEMENT_FOR_ANSWER;
         for (int j = 0; j < agreeCount; j++) {
             User user = alphabetUsers.get(j);
-            petitionService.agree(AGREEMENT_REQUEST, petitionId, user.getId());
+            petitionCommandService.agree(AGREEMENT_REQUEST, petitionId, user.getId());
         }
     }
 
@@ -132,22 +132,22 @@ public class DataLoader {
 
         for (User user : users) {
             Long id = user.getId();
-            petitionService.agree(AGREEMENT_REQUEST, petitionId, id);
+            petitionCommandService.agree(AGREEMENT_REQUEST, petitionId, id);
         }
 
-        petitionService.releasePetition(petitionId);
+        petitionCommandService.releasePetition(petitionId);
     }
 
     private Long savePetition(String title, User user) {
-        return petitionService.createPetition(new PetitionRequest(title, CONTENT, Category.DORMITORY.getId()), user.getId());
+        return petitionCommandService.createPetition(new PetitionRequest(title, CONTENT, Category.DORMITORY.getId()), user.getId());
     }
 
     private void saveExpiredPetition(User petitionOwner, String tempUrl, List<User> alphabetUsers) {
         Petition saved = petitionRepository.save(new Petition(PETITION_TITLE, CONTENT, Category.DORMITORY, Instant.now().plusSeconds(30), petitionOwner.getId(), tempUrl));
         for (int j = 0; j < REQUIRED_AGREEMENT_FOR_RELEASE; j++) {
             User user = alphabetUsers.get(j);
-            petitionService.agree(AGREEMENT_REQUEST, saved.getId(), user.getId());
+            petitionCommandService.agree(AGREEMENT_REQUEST, saved.getId(), user.getId());
         }
-        petitionService.releasePetition(saved.getId());
+        petitionCommandService.releasePetition(saved.getId());
     }
 }
