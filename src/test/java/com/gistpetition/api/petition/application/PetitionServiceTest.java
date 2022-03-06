@@ -73,8 +73,9 @@ class PetitionServiceTest extends ServiceTest {
         petitionOwner = userRepository.save(new User(EMAIL, PASSWORD, UserRole.USER));
         for (int i = 0; i < 5; i++) {
             String email = String.format("email%2s@gist.ac.kr", i);
-            users.add(userRepository.save(new User(email, PASSWORD, UserRole.USER)));
+            users.add(new User(email, PASSWORD, UserRole.USER));
         }
+        userRepository.saveAll(users);
     }
 
     @Test
@@ -134,14 +135,13 @@ class PetitionServiceTest extends ServiceTest {
     @Test
     void agree() {
         Long petitionId = petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
-        Petition petition = petitionRepository.findPetitionByWithEagerMode(petitionId);
-        assertThat(petition.getAgreements()).hasSize(0);
+        Petition petition = petitionRepository.findById(petitionId).orElseThrow();
+        assertThat(petition.getAgreeCount()).isEqualTo(0);
 
         petitionCommandService.agree(AGREEMENT_REQUEST, petitionId, petitionOwner.getId());
 
-        petition = petitionRepository.findPetitionByWithEagerMode(petitionId);
-        assertThat(petition.getAgreements()).hasSize(1);
-        assertThat(petition.getAgreements().get(0).getDescription()).isEqualTo(AGREEMENT_REQUEST.getDescription());
+        petition = petitionRepository.findById(petitionId).orElseThrow();
+        assertThat(petition.getAgreeCount()).isEqualTo(1);
     }
 
     @Test
