@@ -1,9 +1,6 @@
 package com.gistpetition.api.petition.domain;
 
-import com.gistpetition.api.exception.petition.AlreadyReleasedPetitionException;
-import com.gistpetition.api.exception.petition.ExpiredPetitionException;
-import com.gistpetition.api.exception.petition.NotEnoughAgreementException;
-import com.gistpetition.api.exception.petition.NotReleasedPetitionException;
+import com.gistpetition.api.exception.petition.*;
 import com.gistpetition.api.petition.PetitionBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,6 +24,7 @@ class PetitionTest {
     private static final String AGREEMENT_DESCRIPTION = "동의합니다.";
     public static final String ANSWER_CONTENT = "청원에 답변을 달겠소.";
     private static final String TEMP_URL = "AAAAAA";
+    public static final String UPDATE_ANSWER_CONTENT = "답변을 수정해버렸다. 기분이 좋다.";
 
     private Petition petition;
 
@@ -138,6 +136,27 @@ class PetitionTest {
 
         assertThatThrownBy(() -> petition.answer(ANSWER_CONTENT)).isInstanceOf(NotEnoughAgreementException.class);
         assertFalse(petition.isAnswered());
+    }
+
+    @Test
+    void updateAnswer() {
+        agreePetition(petition, REQUIRED_AGREEMENT_FOR_ANSWER);
+        petition.release(PETITION_ONGOING_AT);
+        petition.answer(ANSWER_CONTENT);
+
+        petition.updateAnswer(UPDATE_ANSWER_CONTENT);
+
+        assertThat(petition.getAnswer().getContent()).isEqualTo(UPDATE_ANSWER_CONTENT);
+    }
+
+    @Test
+    void updateAnswerNotAnswered() {
+        agreePetition(petition, REQUIRED_AGREEMENT_FOR_ANSWER);
+        petition.release(PETITION_ONGOING_AT);
+
+        assertThatThrownBy(
+                () -> petition.updateAnswer(UPDATE_ANSWER_CONTENT)
+        ).isInstanceOf(NotAnsweredPetitionException.class);
     }
 
     private void agreePetition(Petition target, int numOfUsers) {
