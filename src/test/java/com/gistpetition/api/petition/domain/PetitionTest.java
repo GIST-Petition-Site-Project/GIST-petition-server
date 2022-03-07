@@ -159,7 +159,6 @@ class PetitionTest {
         ).isInstanceOf(NotAnsweredPetitionException.class);
     }
 
-
     @Test
     void deleteAnswer() {
         agreePetition(petition, REQUIRED_AGREEMENT_FOR_ANSWER);

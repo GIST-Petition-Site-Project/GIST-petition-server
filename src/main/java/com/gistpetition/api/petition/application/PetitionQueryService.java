@@ -1,6 +1,7 @@
 package com.gistpetition.api.petition.application;
 
 import com.gistpetition.api.exception.petition.NoSuchPetitionException;
+import com.gistpetition.api.exception.petition.NotAnsweredPetitionException;
 import com.gistpetition.api.exception.petition.NotReleasedPetitionException;
 import com.gistpetition.api.exception.user.NoSuchUserException;
 import com.gistpetition.api.petition.domain.Agreement;
@@ -8,11 +9,9 @@ import com.gistpetition.api.petition.domain.Answer;
 import com.gistpetition.api.petition.domain.Category;
 import com.gistpetition.api.petition.domain.Petition;
 import com.gistpetition.api.petition.domain.repository.AgreementRepository;
+import com.gistpetition.api.petition.domain.repository.AnswerRepository;
 import com.gistpetition.api.petition.domain.repository.PetitionRepository;
-import com.gistpetition.api.petition.dto.response.AgreementResponse;
-import com.gistpetition.api.petition.dto.response.PetitionPreviewResponse;
-import com.gistpetition.api.petition.dto.response.PetitionResponse;
-import com.gistpetition.api.petition.dto.response.PetitionRevisionResponse;
+import com.gistpetition.api.petition.dto.response.*;
 import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +30,7 @@ import static com.gistpetition.api.petition.application.PetitionQueryCondition.*
 public class PetitionQueryService {
 
     private final PetitionRepository petitionRepository;
+    private final AnswerRepository answerRepository;
     private final AgreementRepository agreementRepository;
     private final UserRepository userRepository;
 
@@ -146,9 +146,25 @@ public class PetitionQueryService {
         return petition.getTempUrl();
     }
 
+    @Transactional(readOnly = true)
     public Answer retrieveAnswerByPetitionId(Long petitionId) {
         Petition petition = findPetitionById(petitionId);
         return petition.getAnswer();
+    }
+
+
+    @Transactional(readOnly = true)
+    public Page<AnswerRevisionResponse> retrieveRevisionsOfAnswer(Long petitionId, Pageable pageable) {
+        Long answerId = findAnswerIdOf(petitionId);
+        return AnswerRevisionResponse.pageOf(answerRepository.findRevisions(answerId, pageable));
+    }
+
+    private Long findAnswerIdOf(Long petitionId) {
+        Petition petition = findPetitionById(petitionId);
+        if (!petition.isAnswered()) {
+            throw new NotAnsweredPetitionException();
+        }
+        return petition.getAnswer().getId();
     }
 
     private User findUserById(Long userId) {

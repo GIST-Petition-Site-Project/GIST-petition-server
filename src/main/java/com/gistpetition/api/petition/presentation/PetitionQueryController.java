@@ -6,10 +6,7 @@ import com.gistpetition.api.config.annotation.ManagerPermissionRequired;
 import com.gistpetition.api.petition.application.PetitionQueryService;
 import com.gistpetition.api.petition.domain.Answer;
 import com.gistpetition.api.petition.domain.Category;
-import com.gistpetition.api.petition.dto.response.AgreementResponse;
-import com.gistpetition.api.petition.dto.response.PetitionPreviewResponse;
-import com.gistpetition.api.petition.dto.response.PetitionResponse;
-import com.gistpetition.api.petition.dto.response.PetitionRevisionResponse;
+import com.gistpetition.api.petition.dto.response.*;
 import com.gistpetition.api.user.domain.SimpleUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -125,5 +122,11 @@ public class PetitionQueryController {
     @GetMapping("/petitions/{petitionId}/answer")
     public ResponseEntity<Answer> retrieveAnswer(@PathVariable Long petitionId) {
         return ResponseEntity.ok().body(petitionQueryService.retrieveAnswerByPetitionId(petitionId));
+    }
+
+    @ManagerPermissionRequired
+    @GetMapping("/petitions/{petitionId}/answer/revisions")
+    public ResponseEntity<Page<AnswerRevisionResponse>> retrieveAnswerRevisions(@PathVariable Long petitionId, Pageable pageable) {
+        return ResponseEntity.ok().body(petitionQueryService.retrieveRevisionsOfAnswer(petitionId, pageable));
     }
 }
