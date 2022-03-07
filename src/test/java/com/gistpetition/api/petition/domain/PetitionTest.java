@@ -159,6 +159,28 @@ class PetitionTest {
         ).isInstanceOf(NotAnsweredPetitionException.class);
     }
 
+
+    @Test
+    void deleteAnswer() {
+        agreePetition(petition, REQUIRED_AGREEMENT_FOR_ANSWER);
+        petition.release(PETITION_ONGOING_AT);
+        petition.answer(ANSWER_CONTENT);
+
+        petition.deleteAnswer();
+
+        assertFalse(petition.isAnswered());
+    }
+
+    @Test
+    void deleteAnswerNotAnswered() {
+        agreePetition(petition, REQUIRED_AGREEMENT_FOR_ANSWER);
+        petition.release(PETITION_ONGOING_AT);
+
+        assertThatThrownBy(
+                () -> petition.deleteAnswer()
+        ).isInstanceOf(NotAnsweredPetitionException.class);
+    }
+
     private void agreePetition(Petition target, int numOfUsers) {
         LongStream.range(0, numOfUsers)
                 .forEach(userId -> target.addAgreement(new Agreement(AGREEMENT_DESCRIPTION, userId), PETITION_ONGOING_AT));

@@ -102,6 +102,13 @@ public class Petition extends BaseEntity {
         answer.updateContent(newContent);
     }
 
+    public void deleteAnswer() {
+        if (!isAnswered()) {
+            throw new NotAnsweredPetitionException();
+        }
+        this.answer = null;
+    }
+
     public void setAnswered(boolean b) {
         this.answered = b;
     }
