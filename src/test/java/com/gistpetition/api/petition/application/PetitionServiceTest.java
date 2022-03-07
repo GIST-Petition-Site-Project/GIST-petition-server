@@ -1,6 +1,7 @@
 package com.gistpetition.api.petition.application;
 
 import com.gistpetition.api.ServiceTest;
+import com.gistpetition.api.answer.dto.AnswerRequest;
 import com.gistpetition.api.exception.petition.DuplicatedAgreementException;
 import com.gistpetition.api.exception.petition.NoSuchPetitionException;
 import com.gistpetition.api.petition.PetitionBuilder;
@@ -35,6 +36,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
+import static com.gistpetition.api.petition.domain.Petition.REQUIRED_AGREEMENT_FOR_ANSWER;
 import static com.gistpetition.api.petition.domain.Petition.REQUIRED_AGREEMENT_FOR_RELEASE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -320,7 +322,7 @@ class PetitionServiceTest extends ServiceTest {
         petitionRepository.save(petition);
 
         Pageable pageable = PageRequest.of(0, 10);
-        assertThat(petitionQueryService.retrieveAnsweredPetition(Optional.empty(),pageable).getContent()).hasSize(1);
+        assertThat(petitionQueryService.retrieveAnsweredPetition(Optional.empty(), pageable).getContent()).hasSize(1);
     }
 
     @Test
@@ -393,6 +395,27 @@ class PetitionServiceTest extends ServiceTest {
         ).isInstanceOf(NoSuchPetitionException.class);
     }
 
+    @Test
+    void answer_petition_and_updateContent_and_delete() {
+        Long petitionId = petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
+        agreePetitionByNumberOfUsers(petitionId, REQUIRED_AGREEMENT_FOR_ANSWER);
+        petitionCommandService.releasePetition(petitionId);
+
+        AnswerRequest FIRST_ANSWER = new AnswerRequest("답변을 달다");
+        petitionCommandService.answerPetition(petitionId, FIRST_ANSWER);
+        Petition answeredPetition = petitionRepository.findById(petitionId).orElseThrow();
+        assertThat(answeredPetition.getAnswer().getContent()).isEqualTo(FIRST_ANSWER.getContent());
+
+        AnswerRequest UPDATE_ANSWER = new AnswerRequest("새로운 답변으로 수정한다.");
+        petitionCommandService.updateAnswer(petitionId, UPDATE_ANSWER);
+        Petition answerUpdatedPetition = petitionRepository.findById(petitionId).orElseThrow();
+        assertThat(answerUpdatedPetition.getAnswer().getContent()).isEqualTo(UPDATE_ANSWER.getContent());
+
+        petitionCommandService.deleteAnswer(petitionId);
+        Petition answerDeletedPetition = petitionRepository.findById(petitionId).orElseThrow();
+        assertFalse(answerDeletedPetition.isAnswered());
+    }
+
     private void agreePetitionByNumberOfUsers(Long petitionId, int numberOfUsers) {
         LongStream.range(0, numberOfUsers)
                 .mapToObj(i -> userRepository.save(new User(i + EMAIL, PASSWORD, UserRole.USER)))
@@ -403,6 +426,6 @@ class PetitionServiceTest extends ServiceTest {
     void tearDown() {
         userRepository.deleteAllInBatch();
         agreementRepository.deleteAllInBatch();
-        petitionRepository.deleteAllInBatch();
+        petitionRepository.deleteAll();
     }
 }

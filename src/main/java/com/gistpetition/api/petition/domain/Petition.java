@@ -35,7 +35,8 @@ public class Petition extends BaseEntity {
     @NotAudited
     @Embedded
     private final Agreements agreements = new Agreements();
-    @OneToOne(cascade = CascadeType.PERSIST, mappedBy = "petition")
+    @NotAudited
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "petition")
     private Answer2 answer;
 
     protected Petition() {
@@ -106,6 +107,7 @@ public class Petition extends BaseEntity {
         if (!isAnswered()) {
             throw new NotAnsweredPetitionException();
         }
+        answer.detach();
         this.answer = null;
     }
 
