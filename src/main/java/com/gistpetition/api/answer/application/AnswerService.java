@@ -5,7 +5,7 @@ import com.gistpetition.api.answer.domain.AnswerRepository;
 import com.gistpetition.api.answer.dto.AnswerRequest;
 import com.gistpetition.api.answer.dto.AnswerRevisionResponse;
 import com.gistpetition.api.config.annotation.DataIntegrityHandler;
-import com.gistpetition.api.exception.petition.DuplicatedAnswerException;
+import com.gistpetition.api.exception.petition.AlreadyAnsweredException;
 import com.gistpetition.api.exception.petition.NoSuchPetitionException;
 import com.gistpetition.api.exception.petition.UnAnsweredPetitionException;
 import com.gistpetition.api.petition.domain.Petition;
@@ -28,11 +28,11 @@ public class AnswerService {
     }
 
     @Transactional
-    @DataIntegrityHandler(DuplicatedAnswerException.class)
+    @DataIntegrityHandler(AlreadyAnsweredException.class)
     public Long createAnswer(Long petitionId, AnswerRequest answerRequest) {
         Petition petition = findPetitionById(petitionId);
         if (petition.isAnswered()) {
-            throw new DuplicatedAnswerException();
+            throw new AlreadyAnsweredException();
         }
         Answer answer = new Answer(answerRequest.getContent(), petitionId);
         petition.setAnswered(true);

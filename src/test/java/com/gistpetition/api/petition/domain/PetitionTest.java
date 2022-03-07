@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.stream.LongStream;
 
+import static com.gistpetition.api.petition.domain.Petition.REQUIRED_AGREEMENT_FOR_ANSWER;
 import static com.gistpetition.api.petition.domain.Petition.REQUIRED_AGREEMENT_FOR_RELEASE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -24,6 +25,7 @@ class PetitionTest {
     public static final Instant PETITION_ONGOING_AT = PETITION_CREATION_AT.plusSeconds(Petition.POSTING_PERIOD_BY_SECONDS / 2);
     public static final Instant PETITION_EXPIRED_AT = PETITION_CREATION_AT.plusSeconds(Petition.POSTING_PERIOD_BY_SECONDS);
     private static final String AGREEMENT_DESCRIPTION = "동의합니다.";
+    public static final String ANSWER_CONTENT = "청원에 답변을 달겠소.";
     private static final String TEMP_URL = "AAAAAA";
 
     private Petition petition;
@@ -108,6 +110,34 @@ class PetitionTest {
         assertThatThrownBy(
                 () -> petition.cancelRelease()
         ).isInstanceOf(NotReleasedPetitionException.class);
+    }
+
+    @Test
+    void answer() {
+        agreePetition(petition, REQUIRED_AGREEMENT_FOR_ANSWER);
+        petition.release(PETITION_ONGOING_AT);
+
+        petition.answer(ANSWER_CONTENT);
+
+        assertTrue(petition.isAnswered());
+    }
+
+    @Test
+    void answerNotReleased() {
+        agreePetition(petition, REQUIRED_AGREEMENT_FOR_ANSWER);
+
+        assertThatThrownBy(() -> petition.answer(ANSWER_CONTENT)).isInstanceOf(NotReleasedPetitionException.class);
+        assertFalse(petition.isAnswered());
+    }
+
+    @Test
+    void answerNotEnoughAgreement() {
+        int notEnoughAgreeCountForAnswer = REQUIRED_AGREEMENT_FOR_ANSWER - 1;
+        agreePetition(petition, notEnoughAgreeCountForAnswer);
+        petition.release(PETITION_ONGOING_AT);
+
+        assertThatThrownBy(() -> petition.answer(ANSWER_CONTENT)).isInstanceOf(NotEnoughAgreementException.class);
+        assertFalse(petition.isAnswered());
     }
 
     private void agreePetition(Petition target, int numOfUsers) {

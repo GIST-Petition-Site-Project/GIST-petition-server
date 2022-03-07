@@ -7,7 +7,7 @@ import com.gistpetition.api.answer.domain.AnswerRepository;
 import com.gistpetition.api.answer.dto.AnswerRequest;
 import com.gistpetition.api.answer.dto.AnswerRevisionResponse;
 import com.gistpetition.api.exception.WrappedException;
-import com.gistpetition.api.exception.petition.DuplicatedAnswerException;
+import com.gistpetition.api.exception.petition.AlreadyAnsweredException;
 import com.gistpetition.api.exception.petition.NoSuchPetitionException;
 import com.gistpetition.api.exception.petition.UnAnsweredPetitionException;
 import com.gistpetition.api.petition.domain.Category;
@@ -106,7 +106,7 @@ class AnswerServiceTest extends ServiceTest {
             service.execute(() -> {
                 try {
                     answerService.createAnswer(petitionId, ANSWER_REQUEST);
-                } catch (DuplicatedAnswerException ex) {
+                } catch (AlreadyAnsweredException ex) {
                     errorCount.incrementAndGet();
                 } finally {
                     latch.countDown();
