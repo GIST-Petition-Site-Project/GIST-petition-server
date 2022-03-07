@@ -1,4 +1,4 @@
-package com.gistpetition.api.petition.dto;
+package com.gistpetition.api.petition.dto.request;
 
 
 import javax.validation.constraints.NotBlank;

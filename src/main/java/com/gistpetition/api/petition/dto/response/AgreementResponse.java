@@ -1,4 +1,4 @@
-package com.gistpetition.api.petition.dto;
+package com.gistpetition.api.petition.dto.response;
 
 import com.gistpetition.api.petition.domain.Agreement;
 import lombok.Data;

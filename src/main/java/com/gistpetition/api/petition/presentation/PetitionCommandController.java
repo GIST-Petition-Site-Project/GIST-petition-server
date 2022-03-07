@@ -1,20 +1,15 @@
 package com.gistpetition.api.petition.presentation;
 
-import com.gistpetition.api.answer.application.AnswerService;
-import com.gistpetition.api.answer.domain.Answer;
 import com.gistpetition.api.answer.dto.AnswerRequest;
-import com.gistpetition.api.answer.dto.AnswerRevisionResponse;
 import com.gistpetition.api.config.annotation.LoginRequired;
 import com.gistpetition.api.config.annotation.LoginUser;
 import com.gistpetition.api.config.annotation.ManagerPermissionRequired;
 import com.gistpetition.api.petition.application.PetitionCommandService;
 import com.gistpetition.api.petition.application.PetitionQueryService;
-import com.gistpetition.api.petition.dto.AgreementRequest;
-import com.gistpetition.api.petition.dto.PetitionRequest;
+import com.gistpetition.api.petition.dto.request.AgreementRequest;
+import com.gistpetition.api.petition.dto.request.PetitionRequest;
 import com.gistpetition.api.user.domain.SimpleUser;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
