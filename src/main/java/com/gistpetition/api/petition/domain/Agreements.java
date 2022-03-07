@@ -16,7 +16,7 @@ public class Agreements {
     @OneToMany(mappedBy = "petition", orphanRemoval = true)
     private final List<Agreement> agreementList = new ArrayList<>();
 
-    public Agreements() {
+    protected Agreements() {
 
     }
 

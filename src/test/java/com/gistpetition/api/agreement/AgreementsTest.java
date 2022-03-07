@@ -15,14 +15,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class AgreementsTest {
+public class AgreementsTest extends Agreements {
     private final String DESCRIPTION = "description";
-
-    private Agreements agreements;
+    private AgreementsSupport agreements;
 
     @BeforeEach
     void setup() {
-        agreements = new Agreements();
+        agreements = new AgreementsSupport();
     }
 
     @Test
