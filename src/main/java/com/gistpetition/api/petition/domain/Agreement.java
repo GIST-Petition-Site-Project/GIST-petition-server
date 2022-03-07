@@ -16,9 +16,8 @@ public class Agreement extends UnmodifiableEntity {
     private String description;
     @Column(name = "user_id")
     private Long userId;
-
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "petition_id")
+    @JoinColumn(name = "petition_id", referencedColumnName = "id")
     private Petition petition;
 
     protected Agreement() {
@@ -28,7 +27,7 @@ public class Agreement extends UnmodifiableEntity {
         this(description, userId, null);
     }
 
-    private Agreement(String description, Long userId, Petition petition) {
+    public Agreement(String description, Long userId, Petition petition) {
         this.description = description;
         this.userId = userId;
         this.petition = petition;

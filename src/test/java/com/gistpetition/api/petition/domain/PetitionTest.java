@@ -35,17 +35,16 @@ class PetitionTest {
 
     @Test
     void agree() {
-        Agreement agreement = new Agreement(AGREEMENT_DESCRIPTION, 1L);
-        petition.addAgreement(agreement, PETITION_ONGOING_AT);
+        petition.agree(1L, AGREEMENT_DESCRIPTION, PETITION_ONGOING_AT);
 
         assertThat(petition.getAgreeCount()).isEqualTo(1);
     }
 
     @Test
     void agreeByMultipleUser() {
-        petition.addAgreement(new Agreement(AGREEMENT_DESCRIPTION, 1L), PETITION_ONGOING_AT);
-        petition.addAgreement(new Agreement(AGREEMENT_DESCRIPTION, 2L), PETITION_ONGOING_AT);
-        petition.addAgreement(new Agreement(AGREEMENT_DESCRIPTION, 3L), PETITION_ONGOING_AT);
+        petition.agree(1L, AGREEMENT_DESCRIPTION, PETITION_ONGOING_AT);
+        petition.agree(2L, AGREEMENT_DESCRIPTION, PETITION_ONGOING_AT);
+        petition.agree(3L, AGREEMENT_DESCRIPTION, PETITION_ONGOING_AT);
 
         assertThat(petition.getAgreeCount()).isEqualTo(3);
     }
@@ -53,13 +52,13 @@ class PetitionTest {
     @Test
     void agreeExpiredPetition() {
         assertThatThrownBy(() ->
-                petition.addAgreement(new Agreement(AGREEMENT_DESCRIPTION, 1L), PETITION_EXPIRED_AT.plusSeconds(1))
+                petition.agree(1L, AGREEMENT_DESCRIPTION, PETITION_EXPIRED_AT.plusSeconds(1))
         ).isInstanceOf(ExpiredPetitionException.class);
     }
 
     @Test
     void release() {
-        agreePetition(petition, REQUIRED_AGREEMENT_FOR_RELEASE);
+        agreePetitionByMultipleUsers(petition, REQUIRED_AGREEMENT_FOR_RELEASE);
 
         petition.release(PETITION_ONGOING_AT);
 
@@ -68,7 +67,7 @@ class PetitionTest {
 
     @Test
     void releaseAlreadyReleased() {
-        agreePetition(petition, REQUIRED_AGREEMENT_FOR_RELEASE);
+        agreePetitionByMultipleUsers(petition, REQUIRED_AGREEMENT_FOR_RELEASE);
         petition.release(PETITION_ONGOING_AT);
 
         assertThatThrownBy(
@@ -84,7 +83,7 @@ class PetitionTest {
 
     @Test
     void releaseExpiredPetition() {
-        agreePetition(petition, REQUIRED_AGREEMENT_FOR_RELEASE);
+        agreePetitionByMultipleUsers(petition, REQUIRED_AGREEMENT_FOR_RELEASE);
 
         petition.release(PETITION_ONGOING_AT);
 
@@ -95,7 +94,7 @@ class PetitionTest {
 
     @Test
     void cancelRelease() {
-        agreePetition(petition, REQUIRED_AGREEMENT_FOR_RELEASE);
+        agreePetitionByMultipleUsers(petition, REQUIRED_AGREEMENT_FOR_RELEASE);
         petition.release(PETITION_ONGOING_AT);
 
         petition.cancelRelease();
@@ -110,8 +109,8 @@ class PetitionTest {
         ).isInstanceOf(NotReleasedPetitionException.class);
     }
 
-    private void agreePetition(Petition target, int numOfUsers) {
-        LongStream.range(0, numOfUsers)
-                .forEach(userId -> target.addAgreement(new Agreement(AGREEMENT_DESCRIPTION, userId), PETITION_ONGOING_AT));
+    private void agreePetitionByMultipleUsers(Petition target, int numberOfUsers) {
+        LongStream.range(0, numberOfUsers)
+                .forEach(userId -> target.agree(userId, AGREEMENT_DESCRIPTION, PETITION_ONGOING_AT));
     }
 }
