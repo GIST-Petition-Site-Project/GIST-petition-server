@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AgreementsTest extends Agreements {
@@ -46,6 +47,6 @@ public class AgreementsTest extends Agreements {
     @Test
     public void isAgreedBy_fail() {
         Long fakeWriterId = Long.MAX_VALUE;
-        assertTrue(agreements.isAgreedBy(fakeWriterId));
+        assertFalse(agreements.isAgreedBy(fakeWriterId));
     }
 }
