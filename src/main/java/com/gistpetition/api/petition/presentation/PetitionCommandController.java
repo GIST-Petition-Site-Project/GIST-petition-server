@@ -1,5 +1,9 @@
 package com.gistpetition.api.petition.presentation;
 
+import com.gistpetition.api.answer.application.AnswerService;
+import com.gistpetition.api.answer.domain.Answer;
+import com.gistpetition.api.answer.dto.AnswerRequest;
+import com.gistpetition.api.answer.dto.AnswerRevisionResponse;
 import com.gistpetition.api.config.annotation.LoginRequired;
 import com.gistpetition.api.config.annotation.LoginUser;
 import com.gistpetition.api.config.annotation.ManagerPermissionRequired;
@@ -9,6 +13,8 @@ import com.gistpetition.api.petition.dto.AgreementRequest;
 import com.gistpetition.api.petition.dto.PetitionRequest;
 import com.gistpetition.api.user.domain.SimpleUser;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -67,5 +73,28 @@ public class PetitionCommandController {
                                               @LoginUser SimpleUser simpleUser) {
         petitionCommandService.agree(agreementRequest, petitionId, simpleUser.getId());
         return ResponseEntity.ok().build();
+    }
+
+    @ManagerPermissionRequired
+    @PostMapping("/petitions/{petitionId}/answer")
+    public ResponseEntity<Object> createAnswer(@PathVariable Long petitionId,
+                                               @Validated @RequestBody AnswerRequest answerRequest) {
+        petitionCommandService.answerPetition(petitionId, answerRequest);
+        return ResponseEntity.created(URI.create("/v1/petitions/" + petitionId + "/answer")).build();
+    }
+
+    @ManagerPermissionRequired
+    @PutMapping("/petitions/{petitionId}/answer")
+    public ResponseEntity<Void> updateAnswer(@PathVariable Long petitionId,
+                                             @Validated @RequestBody AnswerRequest changeRequest) {
+        petitionCommandService.updateAnswer(petitionId, changeRequest);
+        return ResponseEntity.ok().build();
+    }
+
+    @ManagerPermissionRequired
+    @DeleteMapping("/petitions/{petitionId}/answer")
+    public ResponseEntity<Object> deleteAnswer(@PathVariable Long petitionId) {
+        petitionCommandService.deleteAnswer(petitionId);
+        return ResponseEntity.noContent().build();
     }
 }
