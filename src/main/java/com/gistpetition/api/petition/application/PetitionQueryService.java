@@ -141,6 +141,11 @@ public class PetitionQueryService {
         return petition.getTempUrl();
     }
 
+    public Answer2 retrieveAnswerByPetitionId(Long petitionId) {
+        Petition petition = findPetitionById(petitionId);
+        return petition.getAnswer();
+    }
+
     private User findUserById(Long userId) {
         return userRepository.findById(userId).orElseThrow(NoSuchUserException::new);
     }

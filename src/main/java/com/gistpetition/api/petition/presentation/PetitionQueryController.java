@@ -4,6 +4,7 @@ import com.gistpetition.api.config.annotation.LoginRequired;
 import com.gistpetition.api.config.annotation.LoginUser;
 import com.gistpetition.api.config.annotation.ManagerPermissionRequired;
 import com.gistpetition.api.petition.application.PetitionQueryService;
+import com.gistpetition.api.petition.domain.Answer2;
 import com.gistpetition.api.petition.domain.Category;
 import com.gistpetition.api.petition.dto.AgreementResponse;
 import com.gistpetition.api.petition.dto.PetitionPreviewResponse;
@@ -119,5 +120,10 @@ public class PetitionQueryController {
     public ResponseEntity<Boolean> retrieveStateOfAgreement(@PathVariable Long petitionId,
                                                             @LoginUser SimpleUser simpleUser) {
         return ResponseEntity.ok().body(petitionQueryService.retrieveStateOfAgreement(petitionId, simpleUser.getId()));
+    }
+
+    @GetMapping("/petitions/{petitionId}/answer")
+    public ResponseEntity<Answer2> retrieveAnswer(@PathVariable Long petitionId) {
+        return ResponseEntity.ok().body(petitionQueryService.retrieveAnswerByPetitionId(petitionId));
     }
 }
