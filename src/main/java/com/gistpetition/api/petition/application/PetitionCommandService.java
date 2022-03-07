@@ -28,7 +28,6 @@ public class PetitionCommandService {
 
     private static final int TEMP_URL_LENGTH = 6;
     private final PetitionRepository petitionRepository;
-    private final AgreementRepository agreementRepository;
     private final UserRepository userRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final UrlGenerator urlGenerator;
