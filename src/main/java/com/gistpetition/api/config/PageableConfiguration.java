@@ -10,6 +10,6 @@ import org.springframework.data.web.config.PageableHandlerMethodArgumentResolver
 public class PageableConfiguration {
     @Bean
     public PageableHandlerMethodArgumentResolverCustomizer customize() {
-        return p -> p.setFallbackPageable(PageRequest.of(0, 20, Sort.Direction.DESC, "createdAt"));
+        return p -> p.setFallbackPageable(PageRequest.of(0, 10, Sort.Direction.DESC, "createdAt"));
     }
 }
