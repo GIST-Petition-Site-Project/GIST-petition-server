@@ -14,24 +14,24 @@ public class Agreements {
 
     @BatchSize(size = 10)
     @OneToMany(mappedBy = "petition", orphanRemoval = true)
-    private final List<Agreement> agreementList = new ArrayList<>();
+    private final List<Agreement> agreements = new ArrayList<>();
 
     protected Agreements() {
 
     }
 
     public void add(Agreement agreement) {
-        if (agreementList.contains(agreement)) {
+        if (agreements.contains(agreement)) {
             throw new DuplicatedAgreementException();
         }
-        this.agreementList.add(agreement);
+        this.agreements.add(agreement);
     }
 
     public boolean isAgreedBy(Long userId) {
-        return agreementList.stream().anyMatch(a -> a.writtenBy(userId));
+        return agreements.stream().anyMatch(a -> a.writtenBy(userId));
     }
 
-    public List<Agreement> getAgreementList() {
-        return Collections.unmodifiableList(agreementList);
+    public List<Agreement> getAgreements() {
+        return Collections.unmodifiableList(agreements);
     }
 }
