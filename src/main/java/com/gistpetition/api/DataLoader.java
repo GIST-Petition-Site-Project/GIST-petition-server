@@ -1,14 +1,9 @@
 package com.gistpetition.api;
 
-import com.gistpetition.api.answer.application.AnswerService;
-import com.gistpetition.api.answer.domain.AnswerRepository;
-import com.gistpetition.api.answer.dto.AnswerRequest;
 import com.gistpetition.api.petition.application.PetitionCommandService;
-import com.gistpetition.api.petition.domain.AgreementRepository;
-import com.gistpetition.api.petition.domain.Category;
-import com.gistpetition.api.petition.domain.Petition;
-import com.gistpetition.api.petition.domain.PetitionRepository;
+import com.gistpetition.api.petition.domain.*;
 import com.gistpetition.api.petition.dto.request.AgreementRequest;
+import com.gistpetition.api.petition.dto.request.AnswerRequest;
 import com.gistpetition.api.petition.dto.request.PetitionRequest;
 import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRepository;
@@ -67,10 +62,9 @@ public class DataLoader {
 
     private final UserRepository userRepository;
     private final PetitionRepository petitionRepository;
-    private final AnswerRepository answerRepository;
     private final PetitionCommandService petitionCommandService;
-    private final AnswerService answerService;
     private final AgreementRepository agreementRepository;
+    private final AnswerRepository answerRepository;
 
     @Transactional
     public void loadData() {
@@ -103,7 +97,7 @@ public class DataLoader {
             if (petitionId < petitionIds.get(0) + WAITING_FOR_CHECK_RELEASE_COUNT + WAITING_FOR_CHECK_ANSWER_COUNT) {
                 continue;
             }
-            answerService.createAnswer(petitionId, new AnswerRequest(ANSWER_CONTENT));
+            petitionCommandService.answerPetition(petitionId, new AnswerRequest(ANSWER_CONTENT));
         }
 
         IntStream.range(0, 25).forEach(i -> saveExpiredPetition(normal, "#AAAA" + i, alphabetUsers));

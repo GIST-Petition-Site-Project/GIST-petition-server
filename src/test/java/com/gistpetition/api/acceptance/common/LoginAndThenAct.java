@@ -1,7 +1,7 @@
 package com.gistpetition.api.acceptance.common;
 
-import com.gistpetition.api.answer.dto.AnswerRequest;
 import com.gistpetition.api.petition.dto.request.AgreementRequest;
+import com.gistpetition.api.petition.dto.request.AnswerRequest;
 import com.gistpetition.api.petition.dto.request.PetitionRequest;
 import com.gistpetition.api.user.domain.UserRole;
 import com.gistpetition.api.user.dto.request.UpdateUserRoleRequest;

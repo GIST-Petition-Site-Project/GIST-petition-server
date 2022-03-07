@@ -1,12 +1,12 @@
 package com.gistpetition.api.petition.application;
 
-import com.gistpetition.api.answer.dto.AnswerRequest;
 import com.gistpetition.api.config.annotation.DataIntegrityHandler;
 import com.gistpetition.api.exception.petition.DuplicatedAgreementException;
 import com.gistpetition.api.exception.petition.NoSuchPetitionException;
 import com.gistpetition.api.exception.user.NoSuchUserException;
 import com.gistpetition.api.petition.domain.*;
 import com.gistpetition.api.petition.dto.request.AgreementRequest;
+import com.gistpetition.api.petition.dto.request.AnswerRequest;
 import com.gistpetition.api.petition.dto.request.PetitionRequest;
 import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRepository;

@@ -37,7 +37,7 @@ public class Petition extends BaseEntity {
     private final Agreements agreements = new Agreements();
     @NotAudited
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "petition")
-    private Answer2 answer;
+    private Answer answer;
 
     protected Petition() {
     }
@@ -93,7 +93,7 @@ public class Petition extends BaseEntity {
         if (agreeCount < REQUIRED_AGREEMENT_FOR_ANSWER) {
             throw new NotEnoughAgreementException();
         }
-        this.answer = new Answer2(content, this);
+        this.answer = new Answer(content, this);
     }
 
     public void updateAnswer(String newContent) {

@@ -1,12 +1,12 @@
 package com.gistpetition.api.petition.application;
 
 import com.gistpetition.api.ServiceTest;
-import com.gistpetition.api.answer.dto.AnswerRequest;
 import com.gistpetition.api.exception.petition.DuplicatedAgreementException;
 import com.gistpetition.api.exception.petition.NoSuchPetitionException;
 import com.gistpetition.api.petition.PetitionBuilder;
 import com.gistpetition.api.petition.domain.*;
 import com.gistpetition.api.petition.dto.request.AgreementRequest;
+import com.gistpetition.api.petition.dto.request.AnswerRequest;
 import com.gistpetition.api.petition.dto.request.PetitionRequest;
 import com.gistpetition.api.petition.dto.response.AgreementResponse;
 import com.gistpetition.api.petition.dto.response.PetitionPreviewResponse;

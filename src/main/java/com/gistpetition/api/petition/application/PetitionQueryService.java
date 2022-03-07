@@ -141,7 +141,7 @@ public class PetitionQueryService {
         return petition.getTempUrl();
     }
 
-    public Answer2 retrieveAnswerByPetitionId(Long petitionId) {
+    public Answer retrieveAnswerByPetitionId(Long petitionId) {
         Petition petition = findPetitionById(petitionId);
         return petition.getAnswer();
     }
