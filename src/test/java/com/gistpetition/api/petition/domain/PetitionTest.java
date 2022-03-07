@@ -35,12 +35,9 @@ class PetitionTest {
 
     @Test
     void agree() {
-        assertThat(petition.getAgreements()).hasSize(0);
-
         Agreement agreement = new Agreement(AGREEMENT_DESCRIPTION, 1L);
         petition.addAgreement(agreement, PETITION_ONGOING_AT);
 
-        assertThat(petition.getAgreements()).hasSize(1);
         assertThat(petition.getAgreeCount()).isEqualTo(1);
     }
 
@@ -50,7 +47,6 @@ class PetitionTest {
         petition.addAgreement(new Agreement(AGREEMENT_DESCRIPTION, 2L), PETITION_ONGOING_AT);
         petition.addAgreement(new Agreement(AGREEMENT_DESCRIPTION, 3L), PETITION_ONGOING_AT);
 
-        assertThat(petition.getAgreements()).hasSize(3);
         assertThat(petition.getAgreeCount()).isEqualTo(3);
     }
 
@@ -63,7 +59,7 @@ class PetitionTest {
 
     @Test
     void release() {
-        agreePetitionBy(petition, REQUIRED_AGREEMENT_FOR_RELEASE);
+        agreePetition(petition, REQUIRED_AGREEMENT_FOR_RELEASE);
 
         petition.release(PETITION_ONGOING_AT);
 
@@ -72,7 +68,7 @@ class PetitionTest {
 
     @Test
     void releaseAlreadyReleased() {
-        agreePetitionBy(petition, REQUIRED_AGREEMENT_FOR_RELEASE);
+        agreePetition(petition, REQUIRED_AGREEMENT_FOR_RELEASE);
         petition.release(PETITION_ONGOING_AT);
 
         assertThatThrownBy(
@@ -88,7 +84,7 @@ class PetitionTest {
 
     @Test
     void releaseExpiredPetition() {
-        agreePetitionBy(petition, REQUIRED_AGREEMENT_FOR_RELEASE);
+        agreePetition(petition, REQUIRED_AGREEMENT_FOR_RELEASE);
 
         petition.release(PETITION_ONGOING_AT);
 
@@ -99,7 +95,7 @@ class PetitionTest {
 
     @Test
     void cancelRelease() {
-        agreePetitionBy(petition, REQUIRED_AGREEMENT_FOR_RELEASE);
+        agreePetition(petition, REQUIRED_AGREEMENT_FOR_RELEASE);
         petition.release(PETITION_ONGOING_AT);
 
         petition.cancelRelease();
@@ -114,7 +110,7 @@ class PetitionTest {
         ).isInstanceOf(NotReleasedPetitionException.class);
     }
 
-    private void agreePetitionBy(Petition target, int numOfUsers) {
+    private void agreePetition(Petition target, int numOfUsers) {
         LongStream.range(0, numOfUsers)
                 .forEach(userId -> target.addAgreement(new Agreement(AGREEMENT_DESCRIPTION, userId), PETITION_ONGOING_AT));
     }

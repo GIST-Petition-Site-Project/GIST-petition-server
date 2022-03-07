@@ -18,7 +18,4 @@ public interface PetitionRepository extends RevisionRepository<Petition, Long, L
     Page<Petition> findByTitleContains(String keyword, Pageable pageable);
 
     Optional<Petition> findByTempUrl(String tempUrl);
-
-    @Query("SELECT p FROM Petition AS p LEFT JOIN FETCH p.agreements WHERE p.id=:petitionId")
-    Petition findPetitionByWithEagerMode(@Param("petitionId") Long petitionId);
 }

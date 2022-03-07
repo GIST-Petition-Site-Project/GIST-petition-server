@@ -4,14 +4,11 @@ import com.gistpetition.api.common.persistence.BaseEntity;
 import com.gistpetition.api.exception.petition.*;
 import com.gistpetition.api.user.domain.User;
 import lombok.Getter;
-import org.hibernate.annotations.BatchSize;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
 
 import javax.persistence.*;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 
 @Audited
 @Getter
@@ -35,9 +32,10 @@ public class Petition extends BaseEntity {
     @NotAudited
     private Integer agreeCount = 0;
     @NotAudited
-    @BatchSize(size = 10)
-    @OneToMany(mappedBy = "petition", orphanRemoval = true)
-    private final List<Agreement> agreements = new ArrayList<>();
+    @Embedded
+    private final Agreements agreements = new Agreements();
+
+
 
     protected Petition() {
     }
@@ -52,9 +50,6 @@ public class Petition extends BaseEntity {
     }
 
     public void addAgreement(Agreement newAgreement, Instant at) {
-        if (agreements.contains(newAgreement)) {
-            throw new DuplicatedAgreementException();
-        }
         if (isExpiredAt(at)) {
             throw new ExpiredPetitionException();
         }
@@ -63,12 +58,7 @@ public class Petition extends BaseEntity {
     }
 
     public boolean isAgreedBy(User user) {
-        for (Agreement agreement : agreements) {
-            if (agreement.writtenBy(user.getId())) {
-                return true;
-            }
-        }
-        return false;
+        return agreements.isAgreedBy(user.getId());
     }
 
     public void release(Instant at) {
