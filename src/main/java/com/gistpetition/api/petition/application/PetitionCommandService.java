@@ -4,7 +4,10 @@ import com.gistpetition.api.config.annotation.DataIntegrityHandler;
 import com.gistpetition.api.exception.petition.DuplicatedAgreementException;
 import com.gistpetition.api.exception.petition.NoSuchPetitionException;
 import com.gistpetition.api.exception.user.NoSuchUserException;
-import com.gistpetition.api.petition.domain.*;
+import com.gistpetition.api.petition.domain.AgreementRepository;
+import com.gistpetition.api.petition.domain.Category;
+import com.gistpetition.api.petition.domain.Petition;
+import com.gistpetition.api.petition.domain.PetitionRepository;
 import com.gistpetition.api.petition.dto.AgreementRequest;
 import com.gistpetition.api.petition.dto.PetitionRequest;
 import com.gistpetition.api.user.domain.User;
@@ -25,7 +28,6 @@ public class PetitionCommandService {
 
     private static final int TEMP_URL_LENGTH = 6;
     private final PetitionRepository petitionRepository;
-    private final AgreementRepository agreementRepository;
     private final UserRepository userRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final UrlGenerator urlGenerator;
@@ -66,9 +68,7 @@ public class PetitionCommandService {
     public void agree(AgreementRequest request, Long petitionId, Long userId) {
         Petition petition = findPetitionById(petitionId);
         User user = findUserById(userId);
-        Agreement agreement = new Agreement(request.getDescription(), user.getId());
-        agreement.setPetition(petition, Instant.now());
-        agreementRepository.save(agreement);
+        petition.agree(user.getId(), request.getDescription(), Instant.now());
     }
 
     @Transactional
