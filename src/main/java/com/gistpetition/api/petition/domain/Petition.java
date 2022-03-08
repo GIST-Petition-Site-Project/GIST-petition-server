@@ -1,7 +1,10 @@
 package com.gistpetition.api.petition.domain;
 
 import com.gistpetition.api.common.persistence.BaseEntity;
-import com.gistpetition.api.exception.petition.*;
+import com.gistpetition.api.exception.petition.AlreadyReleasedPetitionException;
+import com.gistpetition.api.exception.petition.ExpiredPetitionException;
+import com.gistpetition.api.exception.petition.NotEnoughAgreementException;
+import com.gistpetition.api.exception.petition.NotReleasedPetitionException;
 import com.gistpetition.api.user.domain.User;
 import lombok.Getter;
 import org.hibernate.envers.Audited;
@@ -35,8 +38,6 @@ public class Petition extends BaseEntity {
     @Embedded
     private final Agreements agreements = new Agreements();
 
-
-
     protected Petition() {
     }
 
@@ -54,6 +55,14 @@ public class Petition extends BaseEntity {
             throw new ExpiredPetitionException();
         }
         this.agreements.add(newAgreement);
+        this.agreeCount += 1;
+    }
+
+    public void agree(Long userId, String description, Instant at) {
+        if (isExpiredAt(at)) {
+            throw new ExpiredPetitionException();
+        }
+        this.agreements.add(new Agreement(description, userId, this));
         this.agreeCount += 1;
     }
 
