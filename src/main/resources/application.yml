@@ -11,7 +11,7 @@ spring:
   config:
     activate:
       on-profile: local
-      import: ./privates/application-dev-db.yml
+    import: ./privates/application-dev-db.yml
   jpa:
     show-sql: true
     properties:

@@ -1,6 +1,6 @@
 package com.gistpetition.api.answer;
 
-import com.gistpetition.api.ServiceTest;
+import com.gistpetition.api.IntegrationTest;
 import com.gistpetition.api.answer.application.AnswerService;
 import com.gistpetition.api.answer.domain.Answer;
 import com.gistpetition.api.answer.domain.AnswerRepository;
@@ -17,7 +17,6 @@ import com.gistpetition.api.user.domain.SimpleUser;
 import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRepository;
 import com.gistpetition.api.user.domain.UserRole;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.BDDMockito.given;
 
-class AnswerServiceTest extends ServiceTest {
+class AnswerServiceTest extends IntegrationTest {
 
     public static final String ANSWER_CONTENT = "test contents";
     public static final AnswerRequest ANSWER_REQUEST = new AnswerRequest("test contents");
@@ -220,12 +219,5 @@ class AnswerServiceTest extends ServiceTest {
 
     private List<RevisionMetadata.RevisionType> extractRevisionType(List<AnswerRevisionResponse> revisionResponses) {
         return revisionResponses.stream().map(AnswerRevisionResponse::getRevisionType).collect(Collectors.toList());
-    }
-
-    @AfterEach
-    void tearDown() {
-        userRepository.deleteAllInBatch();
-        answerRepository.deleteAllInBatch();
-        petitionRepository.deleteAllInBatch();
     }
 }

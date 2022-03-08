@@ -1,13 +1,12 @@
 package com.gistpetition.api.verification;
 
-import com.gistpetition.api.ServiceTest;
+import com.gistpetition.api.IntegrationTest;
 import com.gistpetition.api.exception.verification.InvalidVerificationInfoException;
 import com.gistpetition.api.exception.verification.NoSuchVerificationCodeException;
 import com.gistpetition.api.exception.verification.NotConfirmedVerificationCodeException;
 import com.gistpetition.api.verification.application.signup.SignUpValidatorImpl;
 import com.gistpetition.api.verification.domain.SignUpVerificationInfo;
 import com.gistpetition.api.verification.domain.SignUpVerificationInfoRepository;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -17,7 +16,7 @@ import static com.gistpetition.api.verification.domain.VerificationInfo.CONFIRMA
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class SignUpValidatorImplTest extends ServiceTest {
+class SignUpValidatorImplTest extends IntegrationTest {
     private static final String GIST_EMAIL = "tester@gist.ac.kr";
     private static final String VERIFICATION_CODE = "AAAAAA";
 
@@ -57,7 +56,7 @@ class SignUpValidatorImplTest extends ServiceTest {
 
     @Test
     void checkIsVerifiedIfSignUpTimeOut() {
-        SignUpVerificationInfo timeOutInfo = new SignUpVerificationInfo(null, GIST_EMAIL, VERIFICATION_CODE, LocalDateTime.MIN, LocalDateTime.now().minusMinutes(CONFIRMATION_EXPIRE_MINUTE));
+        SignUpVerificationInfo timeOutInfo = new SignUpVerificationInfo(null, GIST_EMAIL, VERIFICATION_CODE, LocalDateTime.now().minusDays(1), LocalDateTime.now().minusMinutes(CONFIRMATION_EXPIRE_MINUTE));
         signUpVerificationInfoRepository.save(timeOutInfo);
 
         assertThatThrownBy(
@@ -65,8 +64,4 @@ class SignUpValidatorImplTest extends ServiceTest {
         ).isInstanceOf(InvalidVerificationInfoException.class);
     }
 
-    @AfterEach
-    void tearDown() {
-        signUpVerificationInfoRepository.deleteAllInBatch();
-    }
 }

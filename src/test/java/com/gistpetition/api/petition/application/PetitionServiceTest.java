@@ -1,6 +1,6 @@
 package com.gistpetition.api.petition.application;
 
-import com.gistpetition.api.ServiceTest;
+import com.gistpetition.api.IntegrationTest;
 import com.gistpetition.api.exception.petition.DuplicatedAgreementException;
 import com.gistpetition.api.exception.petition.NoSuchPetitionException;
 import com.gistpetition.api.petition.PetitionBuilder;
@@ -10,7 +10,6 @@ import com.gistpetition.api.user.domain.SimpleUser;
 import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRepository;
 import com.gistpetition.api.user.domain.UserRole;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -41,7 +40,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class PetitionServiceTest extends ServiceTest {
+class PetitionServiceTest extends IntegrationTest {
     public static final Instant PETITION_CREATION_AT = Instant.now();
     public static final Instant PETITION_EXPIRED_AT = PETITION_CREATION_AT.plusSeconds(Petition.POSTING_PERIOD_BY_SECONDS);
     private static final PetitionRequest DORM_PETITION_REQUEST = new PetitionRequest("title", "description", Category.DORMITORY.getId());
@@ -320,7 +319,7 @@ class PetitionServiceTest extends ServiceTest {
         petitionRepository.save(petition);
 
         Pageable pageable = PageRequest.of(0, 10);
-        assertThat(petitionQueryService.retrieveAnsweredPetition(Optional.empty(),pageable).getContent()).hasSize(1);
+        assertThat(petitionQueryService.retrieveAnsweredPetition(Optional.empty(), pageable).getContent()).hasSize(1);
     }
 
     @Test
@@ -334,6 +333,9 @@ class PetitionServiceTest extends ServiceTest {
         assertThat(petitionQueryService.retrieveAnsweredPetitionCount(Optional.empty())).isEqualTo(1L);
     }
 
+    @Test
+    void doNothing() {
+    }
 
     @DisplayName("Insert, Update 수행 후의 revisionResponse 검증")
     @Test
@@ -397,12 +399,5 @@ class PetitionServiceTest extends ServiceTest {
         LongStream.range(0, numberOfUsers)
                 .mapToObj(i -> userRepository.save(new User(i + EMAIL, PASSWORD, UserRole.USER)))
                 .forEach(user -> petitionCommandService.agree(AGREEMENT_REQUEST, petitionId, user.getId()));
-    }
-
-    @AfterEach
-    void tearDown() {
-        userRepository.deleteAllInBatch();
-        agreementRepository.deleteAllInBatch();
-        petitionRepository.deleteAllInBatch();
     }
 }

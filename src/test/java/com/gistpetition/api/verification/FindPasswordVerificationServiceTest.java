@@ -1,6 +1,6 @@
 package com.gistpetition.api.verification;
 
-import com.gistpetition.api.ServiceTest;
+import com.gistpetition.api.IntegrationTest;
 import com.gistpetition.api.exception.user.NoSuchUserException;
 import com.gistpetition.api.exception.verification.DuplicatedVerificationException;
 import com.gistpetition.api.exception.verification.ExpiredVerificationCodeException;
@@ -13,7 +13,6 @@ import com.gistpetition.api.verification.domain.PasswordVerificationInfo;
 import com.gistpetition.api.verification.domain.PasswordVerificationInfoRepository;
 import com.gistpetition.api.verification.dto.UsernameConfirmationRequest;
 import com.gistpetition.api.verification.dto.VerificationEmailRequest;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +23,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
-class FindPasswordVerificationServiceTest extends ServiceTest {
+class FindPasswordVerificationServiceTest extends IntegrationTest {
 
     private static final String GIST_EMAIL = "tester@gist.ac.kr";
     private static final String PASSWORD = "password!";
@@ -111,11 +110,5 @@ class FindPasswordVerificationServiceTest extends ServiceTest {
         assertThatThrownBy(
                 () -> findPasswordVerificationService.confirmUsername(new UsernameConfirmationRequest(GIST_EMAIL, VERIFICATION_CODE))
         ).isInstanceOf(DuplicatedVerificationException.class);
-    }
-
-    @AfterEach
-    void tearDown() {
-        passwordVerificationInfoRepository.deleteAllInBatch();
-        userRepository.deleteAllInBatch();
     }
 }

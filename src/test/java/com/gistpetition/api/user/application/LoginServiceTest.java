@@ -1,8 +1,8 @@
-package com.gistpetition.api.user;
+package com.gistpetition.api.user.application;
 
+import com.gistpetition.api.IntegrationTest;
 import com.gistpetition.api.exception.user.NoSuchUserException;
 import com.gistpetition.api.exception.user.NotMatchedPasswordException;
-import com.gistpetition.api.user.application.LoginService;
 import com.gistpetition.api.user.domain.SimpleUser;
 import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRepository;
@@ -10,7 +10,6 @@ import com.gistpetition.api.user.domain.UserRole;
 import com.gistpetition.api.user.dto.request.SignInRequest;
 import com.gistpetition.api.utils.password.Encoder;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
-class LoginServiceTest {
+class LoginServiceTest extends IntegrationTest {
     private static final String GIST_EMAIL = "tester@gist.ac.kr";
     private static final String PASSWORD = "password!";
 
@@ -64,10 +63,5 @@ class LoginServiceTest {
                 () -> loginService.login(signInRequest)
         ).isInstanceOf(NotMatchedPasswordException.class);
         assertThat(loginService.getLoginUser()).isNull();
-    }
-
-    @AfterEach
-    void tearDown() {
-        userRepository.deleteAllInBatch();
     }
 }
