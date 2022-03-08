@@ -69,7 +69,5 @@ public class CreateAnswerAcceptanceTest extends AcceptanceTest {
     @AfterEach
     void tearDown() {
         TUser.clearAll();
-        answerRepository.deleteAllInBatch();
-        petitionRepository.deleteAllInBatch();
     }
 }
