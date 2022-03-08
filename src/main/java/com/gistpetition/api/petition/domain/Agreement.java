@@ -37,11 +37,6 @@ public class Agreement extends UnmodifiableEntity {
         return this.userId.equals(userId);
     }
 
-    public void setPetition(Petition petition, Instant at) {
-        this.petition = petition;
-        petition.addAgreement(this, at);
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
