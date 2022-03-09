@@ -1,10 +1,7 @@
 package com.gistpetition.api.petition.domain;
 
 import com.gistpetition.api.common.persistence.BaseEntity;
-import com.gistpetition.api.exception.petition.AlreadyReleasedPetitionException;
-import com.gistpetition.api.exception.petition.ExpiredPetitionException;
-import com.gistpetition.api.exception.petition.NotEnoughAgreementException;
-import com.gistpetition.api.exception.petition.NotReleasedPetitionException;
+import com.gistpetition.api.exception.petition.*;
 import com.gistpetition.api.user.domain.User;
 import lombok.Getter;
 import org.hibernate.envers.Audited;
@@ -78,6 +75,13 @@ public class Petition extends BaseEntity {
         this.released = true;
     }
 
+    public void cancelRelease() {
+        if (!released) {
+            throw new NotReleasedPetitionException();
+        }
+        this.released = false;
+    }
+
     public void answer(String content) {
         if (!released) {
             throw new NotReleasedPetitionException();
@@ -88,11 +92,11 @@ public class Petition extends BaseEntity {
         this.answer2 = new Answer2(content, this);
     }
 
-    public void cancelRelease() {
-        if (!released) {
-            throw new NotReleasedPetitionException();
+    public void updateAnswer(String updateAnswerContent) {
+        if (!isAnswered()) {
+            throw new UnAnsweredPetitionException();
         }
-        this.released = false;
+        this.answer2.updateContent(updateAnswerContent);
     }
 
     public void setAnswered(boolean b) {

@@ -22,4 +22,8 @@ public class Answer2 extends BaseEntity {
         this.content = content;
         this.petition = petition;
     }
+
+    public void updateContent(String updateAnswerContent) {
+        this.content = updateAnswerContent;
+    }
 }
