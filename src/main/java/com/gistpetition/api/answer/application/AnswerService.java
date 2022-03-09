@@ -7,7 +7,7 @@ import com.gistpetition.api.answer.dto.AnswerRevisionResponse;
 import com.gistpetition.api.config.annotation.DataIntegrityHandler;
 import com.gistpetition.api.exception.petition.DuplicatedAnswerException;
 import com.gistpetition.api.exception.petition.NoSuchPetitionException;
-import com.gistpetition.api.exception.petition.UnAnsweredPetitionException;
+import com.gistpetition.api.exception.petition.NotAnsweredPetitionException;
 import com.gistpetition.api.petition.domain.Petition;
 import com.gistpetition.api.petition.domain.PetitionRepository;
 import org.springframework.data.domain.Page;
@@ -82,11 +82,11 @@ public class AnswerService {
 
     private void checkExistenceOfAnswerOf(Long petitionId) {
         if (!answerRepository.existsByPetitionId(petitionId)) {
-            throw new UnAnsweredPetitionException();
+            throw new NotAnsweredPetitionException();
         }
     }
 
     private Answer findAnswerByPetitionId(Long petitionId) {
-        return answerRepository.findByPetitionId(petitionId).orElseThrow(UnAnsweredPetitionException::new);
+        return answerRepository.findByPetitionId(petitionId).orElseThrow(NotAnsweredPetitionException::new);
     }
 }

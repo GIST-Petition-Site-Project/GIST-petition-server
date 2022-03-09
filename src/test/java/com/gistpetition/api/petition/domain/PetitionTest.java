@@ -162,7 +162,26 @@ class PetitionTest {
         String updateAnswerContent = "답변 수정을 진행했다.";
         assertThatThrownBy(
                 () -> petition.updateAnswer(updateAnswerContent)
-        ).isInstanceOf(UnAnsweredPetitionException.class);
+        ).isInstanceOf(NotAnsweredPetitionException.class);
+    }
+
+    @Test
+    void delete_answer() {
+        agreePetitionByMultipleUsers(petition, REQUIRED_AGREEMENT_FOR_ANSWER);
+        petition.release(PETITION_ONGOING_AT);
+        petition.answer(ANSWER_CONTENT);
+
+        petition.deleteAnswer();
+
+        assertFalse(petition.isAnswered());
+    }
+
+    @Test
+    void delete_answer_not_answered_petition() {
+        agreePetitionByMultipleUsers(petition, REQUIRED_AGREEMENT_FOR_ANSWER);
+        petition.release(PETITION_ONGOING_AT);
+
+        assertThatThrownBy(() -> petition.deleteAnswer()).isInstanceOf(NotAnsweredPetitionException.class);
     }
 
     private void agreePetitionByMultipleUsers(Petition target, int numberOfUsers) {

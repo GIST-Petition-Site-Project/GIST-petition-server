@@ -26,4 +26,8 @@ public class Answer2 extends BaseEntity {
     public void updateContent(String updateAnswerContent) {
         this.content = updateAnswerContent;
     }
+
+    public void detach() {
+        this.petition = null;
+    }
 }

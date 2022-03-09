@@ -9,7 +9,7 @@ import com.gistpetition.api.answer.dto.AnswerRevisionResponse;
 import com.gistpetition.api.exception.WrappedException;
 import com.gistpetition.api.exception.petition.DuplicatedAnswerException;
 import com.gistpetition.api.exception.petition.NoSuchPetitionException;
-import com.gistpetition.api.exception.petition.UnAnsweredPetitionException;
+import com.gistpetition.api.exception.petition.NotAnsweredPetitionException;
 import com.gistpetition.api.petition.domain.Category;
 import com.gistpetition.api.petition.domain.Petition;
 import com.gistpetition.api.petition.domain.PetitionRepository;
@@ -130,7 +130,7 @@ class AnswerServiceTest extends IntegrationTest {
     void retrieveAnswerFromNotExistingPetition() {
         assertThatThrownBy(
                 () -> answerService.retrieveAnswerByPetitionId(savedPetition.getId())
-        ).isInstanceOf(UnAnsweredPetitionException.class);
+        ).isInstanceOf(NotAnsweredPetitionException.class);
     }
 
     @Test
@@ -166,7 +166,7 @@ class AnswerServiceTest extends IntegrationTest {
     void updateAnswerFromNotAnsweredPetition() {
         assertThatThrownBy(
                 () -> answerService.updateAnswer(savedPetition.getId(), UPDATE_REQUEST)
-        ).isInstanceOf(UnAnsweredPetitionException.class);
+        ).isInstanceOf(NotAnsweredPetitionException.class);
     }
 
     @Test
@@ -193,7 +193,7 @@ class AnswerServiceTest extends IntegrationTest {
     void deleteAnswerFromNotAnsweredPetition() {
         assertThatThrownBy(
                 () -> answerService.deleteAnswer(savedPetition.getId())
-        ).isInstanceOf(UnAnsweredPetitionException.class);
+        ).isInstanceOf(NotAnsweredPetitionException.class);
     }
 
     @Test
