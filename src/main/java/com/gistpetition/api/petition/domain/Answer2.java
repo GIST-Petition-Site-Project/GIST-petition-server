@@ -4,18 +4,22 @@ import com.gistpetition.api.common.persistence.BaseEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.envers.Audited;
 
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
+import javax.persistence.MapsId;
 import javax.persistence.OneToOne;
 
 @Entity
 @Getter
+@Audited
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Answer2 extends BaseEntity {
     private String content;
     @OneToOne
     @JoinColumn(name = "petition_id", referencedColumnName = "id", unique = true)
+    @MapsId
     private Petition petition;
 
     public Answer2(String content, Petition petition) {

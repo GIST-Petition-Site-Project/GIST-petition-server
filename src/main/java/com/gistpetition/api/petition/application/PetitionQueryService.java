@@ -4,10 +4,7 @@ import com.gistpetition.api.exception.petition.NoSuchPetitionException;
 import com.gistpetition.api.exception.petition.NotReleasedPetitionException;
 import com.gistpetition.api.exception.user.NoSuchUserException;
 import com.gistpetition.api.petition.domain.*;
-import com.gistpetition.api.petition.dto.AgreementResponse;
-import com.gistpetition.api.petition.dto.PetitionPreviewResponse;
-import com.gistpetition.api.petition.dto.PetitionResponse;
-import com.gistpetition.api.petition.dto.PetitionRevisionResponse;
+import com.gistpetition.api.petition.dto.*;
 import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +23,7 @@ import static com.gistpetition.api.petition.application.PetitionQueryCondition.*
 public class PetitionQueryService {
 
     private final PetitionRepository petitionRepository;
+    private final Answer2Repository answer2Repository;
     private final AgreementRepository agreementRepository;
     private final UserRepository userRepository;
 
@@ -139,6 +137,18 @@ public class PetitionQueryService {
     public String retrieveTempUrlOf(Long petitionId) {
         Petition petition = findPetitionById(petitionId);
         return petition.getTempUrl();
+    }
+
+    @Transactional(readOnly = true)
+    public Answer2 retrieveAnswerByPetitionId(Long petitionId) {
+        Petition petition = findPetitionById(petitionId);
+        return petition.getAnswer2();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<AnswerRevisionResponse> retrieveRevisionsOfAnswer(Long petitionId, Pageable pageable) {
+        Petition petition = findPetitionById(petitionId);
+        return AnswerRevisionResponse.pageOf2(answer2Repository.findRevisions(petition.getAnswer2().getId(), pageable));
     }
 
     private User findUserById(Long userId) {

@@ -1,7 +1,6 @@
 package com.gistpetition.api.petition.application;
 
 import com.gistpetition.api.IntegrationTest;
-import com.gistpetition.api.answer.dto.AnswerRequest;
 import com.gistpetition.api.exception.petition.DuplicatedAgreementException;
 import com.gistpetition.api.exception.petition.NoSuchPetitionException;
 import com.gistpetition.api.petition.PetitionBuilder;

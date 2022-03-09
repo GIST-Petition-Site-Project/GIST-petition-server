@@ -1,12 +1,12 @@
 package com.gistpetition.api.petition.presentation;
 
-import com.gistpetition.api.answer.dto.AnswerRequest;
 import com.gistpetition.api.config.annotation.LoginRequired;
 import com.gistpetition.api.config.annotation.LoginUser;
 import com.gistpetition.api.config.annotation.ManagerPermissionRequired;
 import com.gistpetition.api.petition.application.PetitionCommandService;
 import com.gistpetition.api.petition.application.PetitionQueryService;
 import com.gistpetition.api.petition.dto.AgreementRequest;
+import com.gistpetition.api.petition.dto.AnswerRequest;
 import com.gistpetition.api.petition.dto.PetitionRequest;
 import com.gistpetition.api.user.domain.SimpleUser;
 import lombok.RequiredArgsConstructor;
