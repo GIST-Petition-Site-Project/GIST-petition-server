@@ -4,3 +4,8 @@ spring:
     url: jdbc:mysql://localhost:3306/petition?serverTimezone=Asia/Seoul
     username: admin
     password: gist1234!
+  hibernate:
+    ddl-auto: validate
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
