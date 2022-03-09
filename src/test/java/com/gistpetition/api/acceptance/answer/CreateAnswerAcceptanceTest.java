@@ -5,7 +5,6 @@ import com.gistpetition.api.acceptance.common.TUser;
 import com.gistpetition.api.answer.domain.AnswerRepository;
 import com.gistpetition.api.answer.dto.AnswerRequest;
 import com.gistpetition.api.petition.domain.Category;
-import com.gistpetition.api.petition.domain.PetitionRepository;
 import com.gistpetition.api.petition.dto.PetitionRequest;
 import com.gistpetition.api.petition.dto.PetitionResponse;
 import io.restassured.response.Response;
@@ -27,8 +26,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class CreateAnswerAcceptanceTest extends AcceptanceTest {
 
-    @Autowired
-    private PetitionRepository petitionRepository;
     @Autowired
     private AnswerRepository answerRepository;
 

@@ -11,13 +11,26 @@ spring:
   config:
     activate:
       on-profile: local
-    import: ./privates/application-dev-db.yml
   jpa:
     show-sql: true
+    hibernate:
+      ddl-auto: validate
     properties:
       hibernate:
         format_sql: true
-
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+    import: ./privates/application-dev-db.yml
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
 ---
 spring:
   config:
