@@ -12,6 +12,7 @@ import org.hibernate.envers.NotAudited;
 
 import javax.persistence.*;
 import java.time.Instant;
+import java.util.Objects;
 
 @Audited
 @Getter
@@ -37,6 +38,8 @@ public class Petition extends BaseEntity {
     @NotAudited
     @Embedded
     private final Agreements agreements = new Agreements();
+    @OneToOne(mappedBy = "petition", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    private Answer2 answer2;
 
     protected Petition() {
     }
@@ -75,6 +78,16 @@ public class Petition extends BaseEntity {
         this.released = true;
     }
 
+    public void answer(String content) {
+        if (!released) {
+            throw new NotReleasedPetitionException();
+        }
+        if (agreeCount < REQUIRED_AGREEMENT_FOR_ANSWER) {
+            throw new NotEnoughAgreementException();
+        }
+        this.answer2 = new Answer2(content, this);
+    }
+
     public void cancelRelease() {
         if (!released) {
             throw new NotReleasedPetitionException();
@@ -103,7 +116,7 @@ public class Petition extends BaseEntity {
     }
 
     public boolean isAnswered() {
-        return answered;
+        return !Objects.isNull(answer2);
     }
 
     public boolean isExpiredAt(Instant time) {
