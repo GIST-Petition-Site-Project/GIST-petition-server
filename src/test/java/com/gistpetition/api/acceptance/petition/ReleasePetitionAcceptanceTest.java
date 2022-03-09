@@ -68,9 +68,5 @@ public class ReleasePetitionAcceptanceTest extends AcceptanceTest {
     @AfterEach
     void tearDown() {
         TUser.clearAll();
-        agreementRepository.deleteAllInBatch();
-        petitionRepository.deleteAllInBatch();
     }
-
-
 }

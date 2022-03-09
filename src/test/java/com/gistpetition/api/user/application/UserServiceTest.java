@@ -1,10 +1,10 @@
-package com.gistpetition.api.user;
+package com.gistpetition.api.user.application;
 
+import com.gistpetition.api.IntegrationTest;
 import com.gistpetition.api.exception.user.DuplicatedUserException;
 import com.gistpetition.api.exception.user.InvalidEmailFormException;
 import com.gistpetition.api.exception.user.NoSuchUserException;
 import com.gistpetition.api.exception.user.NotMatchedPasswordException;
-import com.gistpetition.api.user.application.UserService;
 import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRepository;
 import com.gistpetition.api.user.domain.UserRole;
@@ -13,15 +13,12 @@ import com.gistpetition.api.utils.password.Encoder;
 import com.gistpetition.api.verification.application.password.FindPasswordValidator;
 import com.gistpetition.api.verification.application.signup.SignUpValidator;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
@@ -38,8 +35,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 
-@SpringBootTest
-class UserServiceTest {
+class UserServiceTest extends IntegrationTest {
     private static final String GIST_EMAIL = "tester@gist.ac.kr";
     private static final String PASSWORD = "password!";
     private static final String VERIFICATION_CODE = "AAAAAA";
@@ -232,10 +228,5 @@ class UserServiceTest {
         userService.deleteUserOfUsername(DEFAULT_SIGN_UP_REQUEST.getUsername());
 
         assertFalse(userRepository.existsById(userId));
-    }
-
-    @AfterEach
-    void tearDown() {
-        userRepository.deleteAllInBatch();
     }
 }
