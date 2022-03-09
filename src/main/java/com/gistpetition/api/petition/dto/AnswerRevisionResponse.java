@@ -15,7 +15,7 @@ public class AnswerRevisionResponse {
     private final Long workedBy;
     private final String answerContent;
 
-    public static AnswerRevisionResponse of2(Revision<Long, Answer> revision) {
+    public static AnswerRevisionResponse of(Revision<Long, Answer> revision) {
         return new AnswerRevisionResponse(
                 revision.getRequiredRevisionNumber(),
                 revision.getRequiredRevisionInstant().toEpochMilli(),
@@ -25,7 +25,7 @@ public class AnswerRevisionResponse {
         );
     }
 
-    public static Page<AnswerRevisionResponse> pageOf2(Page<Revision<Long, Answer>> revisions) {
-        return revisions.map(AnswerRevisionResponse::of2);
+    public static Page<AnswerRevisionResponse> pageOf(Page<Revision<Long, Answer>> revisions) {
+        return revisions.map(AnswerRevisionResponse::of);
     }
 }

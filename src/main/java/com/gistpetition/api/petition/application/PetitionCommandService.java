@@ -15,7 +15,6 @@ import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRepository;
 import com.gistpetition.api.utils.urlGenerator.UrlGenerator;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,7 +29,6 @@ public class PetitionCommandService {
     private static final int TEMP_URL_LENGTH = 6;
     private final PetitionRepository petitionRepository;
     private final UserRepository userRepository;
-    private final ApplicationEventPublisher eventPublisher;
     private final UrlGenerator urlGenerator;
 
     @Transactional

@@ -8,7 +8,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import java.time.Instant;
 import java.util.function.Function;
 
-import static com.gistpetition.api.petition.application.PetitionQueryCondition.Expiration.*;
+import static com.gistpetition.api.petition.application.PetitionQueryCondition.ExpirationCondition.*;
 import static com.gistpetition.api.petition.application.PetitionQueryCondition.PetitionStatus.*;
 import static com.gistpetition.api.petition.domain.QPetition.petition;
 
@@ -25,31 +25,31 @@ public enum PetitionQueryCondition {
     RELEASED_NOT_EXPIRED(notExpired, released),
     RELEASED_EXPIRED(expired, released);
 
-    private final Expiration expiration;
+    private final ExpirationCondition expirationCondition;
     private final PetitionStatus[] conditions;
 
-    PetitionQueryCondition(Expiration expiration, PetitionStatus... conditions) {
-        this.expiration = expiration;
+    PetitionQueryCondition(ExpirationCondition expirationCondition, PetitionStatus... conditions) {
+        this.expirationCondition = expirationCondition;
         this.conditions = conditions;
     }
 
     public Predicate at(Instant at) {
         BooleanBuilder booleanBuilder = new BooleanBuilder();
-        booleanBuilder.and(this.expiration.at(at));
         for (PetitionStatus qc : conditions) {
             booleanBuilder.and(qc.condition);
         }
+        booleanBuilder.and(this.expirationCondition.at(at));
         return booleanBuilder;
     }
 
-    enum Expiration {
+    enum ExpirationCondition {
         notExpired(i -> petition.expiredAt.after(i)),
         expired(i -> petition.expiredAt.before(i)),
         none(i -> null);
 
         final Function<Instant, BooleanExpression> function;
 
-        Expiration(Function<Instant, BooleanExpression> function) {
+        ExpirationCondition(Function<Instant, BooleanExpression> function) {
             this.function = function;
         }
 
