@@ -13,8 +13,8 @@ import static com.gistpetition.api.petition.domain.QPetition.petition;
 public enum PetitionQueryCondition {
     RELEASED(petition.released.isTrue(), Expiration.NONE),
     NOT_RELEASED(petition.released.isFalse(), Expiration.NONE),
-    ANSWERED(petition.answered.isTrue(), Expiration.NONE),
-    NOT_ANSWERED(petition.answered.isFalse(), Expiration.NONE),
+    ANSWERED(petition.answer.isNotNull(), Expiration.NONE),
+    NOT_ANSWERED(petition.answer.isNull(), Expiration.NONE),
 
     WAITING_FOR_RELEASE(
             NOT_RELEASED.condition.and(petition.agreeCount.goe(Petition.REQUIRED_AGREEMENT_FOR_RELEASE)),

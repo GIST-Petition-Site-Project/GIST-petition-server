@@ -26,7 +26,6 @@ import javax.servlet.http.HttpSession;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -260,12 +259,26 @@ class PetitionServiceTest extends IntegrationTest {
             petitionCommandService.releasePetition(i);
         });
 
-        Page<PetitionPreviewResponse> ongoingPetitions = petitionQueryService.retrieveOngoingPetition(Optional.empty(), PageRequest.of(0, 10));
-        assertThat(ongoingPetitions.getContent()).hasSize(numOfPetition);
+        Page<PetitionPreviewResponse> petitions = petitionRepository.findOngoingPetition(Instant.now(), null, PageRequest.of(0, 10));
+        assertThat(petitions.getContent()).hasSize(numOfPetition);
+    }
 
-        for (PetitionPreviewResponse op : ongoingPetitions) {
-            assertFalse(op.getExpired());
+    @Test
+    void retrieveAnsweredPetition() {
+        int numOfPetition = 3;
+        List<Long> createdPetitionIds = new ArrayList<>();
+        for (int i = 0; i < numOfPetition; i++) {
+            createdPetitionIds.add(petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId()));
         }
+        List<User> users = saveUsersNumberOf(REQUIRED_AGREEMENT_FOR_ANSWER);
+        createdPetitionIds.forEach(i -> {
+            agreePetitionBy(i, users);
+            petitionCommandService.releasePetition(i);
+            petitionCommandService.answerPetition(i, ANSWER_REQUEST);
+        });
+
+        Page<PetitionPreviewResponse> byAnswerIsNotNull = petitionRepository.findAnsweredPetition(null, PageRequest.of(0, 10));
+        assertThat(byAnswerIsNotNull).hasSize(numOfPetition);
     }
 
     @Test
@@ -300,30 +313,6 @@ class PetitionServiceTest extends IntegrationTest {
         assertThatThrownBy(
                 () -> petitionCommandService.deletePetition(Long.MAX_VALUE)
         ).isInstanceOf(NoSuchPetitionException.class);
-    }
-
-    @Test
-    void retrieveAnsweredPetition() {
-        Petition petition = PetitionBuilder.aPetition()
-                .withExpiredAt(PETITION_EXPIRED_AT)
-                .withUserId(petitionOwner.getId())
-                .build();
-        petition.setAnswered(true);
-        petitionRepository.save(petition);
-
-        Pageable pageable = PageRequest.of(0, 10);
-        assertThat(petitionQueryService.retrieveAnsweredPetition(Optional.empty(), pageable).getContent()).hasSize(1);
-    }
-
-    @Test
-    void retrieveAnsweredPetitionCount() {
-        Petition petition = PetitionBuilder.aPetition()
-                .withExpiredAt(PETITION_EXPIRED_AT)
-                .withUserId(petitionOwner.getId())
-                .build();
-        petition.setAnswered(true);
-        petitionRepository.save(petition);
-        assertThat(petitionQueryService.retrieveAnsweredPetitionCount(Optional.empty())).isEqualTo(1L);
     }
 
     @DisplayName("Insert, Update 수행 후의 revisionResponse 검증")

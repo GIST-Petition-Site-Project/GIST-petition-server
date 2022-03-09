@@ -9,7 +9,6 @@ import org.hibernate.envers.NotAudited;
 
 import javax.persistence.*;
 import java.time.Instant;
-import java.util.Objects;
 
 @Audited
 @Getter
@@ -24,8 +23,8 @@ public class Petition extends BaseEntity {
     private String description;
     @Enumerated(EnumType.STRING)
     private Category category;
-    private Boolean answered = false;
     private Boolean released = false;
+    private Boolean answered = false;
     private Instant expiredAt;
     private Long userId;
     @Column(unique = true)
@@ -91,6 +90,7 @@ public class Petition extends BaseEntity {
             throw new NotEnoughAgreementException();
         }
         this.answer = new Answer(content, this);
+        this.answered = true;
     }
 
     public void updateAnswer(String updateAnswerContent) {
@@ -106,10 +106,7 @@ public class Petition extends BaseEntity {
         }
         answer.detach();
         this.answer = null;
-    }
-
-    public void setAnswered(boolean b) {
-        this.answered = b;
+        this.answered = false;
     }
 
     public void setTitle(String title) {
@@ -129,7 +126,7 @@ public class Petition extends BaseEntity {
     }
 
     public boolean isAnswered() {
-        return !Objects.isNull(answer);
+        return answered;
     }
 
     public boolean isExpiredAt(Instant time) {
