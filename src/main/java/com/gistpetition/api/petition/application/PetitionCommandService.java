@@ -61,7 +61,6 @@ public class PetitionCommandService {
             throw new NoSuchPetitionException();
         }
         petitionRepository.deleteById(petitionId);
-        eventPublisher.publishEvent(new PetitionDeleteEvent(petitionId));
     }
 
     @Transactional

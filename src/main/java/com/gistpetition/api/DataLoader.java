@@ -1,6 +1,5 @@
 package com.gistpetition.api;
 
-import com.gistpetition.api.answer.application.AnswerService;
 import com.gistpetition.api.answer.domain.AnswerRepository;
 import com.gistpetition.api.petition.application.PetitionCommandService;
 import com.gistpetition.api.petition.domain.AgreementRepository;
@@ -69,7 +68,6 @@ public class DataLoader {
     private final PetitionRepository petitionRepository;
     private final AnswerRepository answerRepository;
     private final PetitionCommandService petitionCommandService;
-    private final AnswerService answerService;
     private final AgreementRepository agreementRepository;
 
     @Transactional
@@ -103,7 +101,7 @@ public class DataLoader {
             if (petitionId < petitionIds.get(0) + WAITING_FOR_CHECK_RELEASE_COUNT + WAITING_FOR_CHECK_ANSWER_COUNT) {
                 continue;
             }
-            answerService.createAnswer(petitionId, new AnswerRequest(ANSWER_CONTENT));
+            petitionCommandService.answerPetition(petitionId, new AnswerRequest(ANSWER_CONTENT));
         }
 
         IntStream.range(0, 25).forEach(i -> saveExpiredPetition(normal, "#AAAA" + i, alphabetUsers));
