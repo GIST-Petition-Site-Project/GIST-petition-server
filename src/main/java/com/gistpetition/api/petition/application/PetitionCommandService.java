@@ -1,10 +1,10 @@
 package com.gistpetition.api.petition.application;
 
+import com.gistpetition.api.answer.dto.AnswerRequest;
 import com.gistpetition.api.config.annotation.DataIntegrityHandler;
 import com.gistpetition.api.exception.petition.DuplicatedAgreementException;
 import com.gistpetition.api.exception.petition.NoSuchPetitionException;
 import com.gistpetition.api.exception.user.NoSuchUserException;
-import com.gistpetition.api.petition.domain.AgreementRepository;
 import com.gistpetition.api.petition.domain.Category;
 import com.gistpetition.api.petition.domain.Petition;
 import com.gistpetition.api.petition.domain.PetitionRepository;
@@ -81,6 +81,24 @@ public class PetitionCommandService {
     public void releasePetition(Long petitionId) {
         Petition petition = findPetitionById(petitionId);
         petition.release(Instant.now());
+    }
+
+    @Transactional
+    public void answerPetition(Long petitionId, AnswerRequest answerRequest) {
+        Petition petition = findPetitionById(petitionId);
+        petition.answer(answerRequest.getContent());
+    }
+
+    @Transactional
+    public void updateAnswer(Long petitionId, AnswerRequest updateAnswerRequest) {
+        Petition petition = findPetitionById(petitionId);
+        petition.updateAnswer(updateAnswerRequest.getContent());
+    }
+
+    @Transactional
+    public void deleteAnswer(Long petitionId) {
+        Petition petition = findPetitionById(petitionId);
+        petition.deleteAnswer();
     }
 
     private User findUserById(Long userId) {

@@ -1,6 +1,7 @@
 package com.gistpetition.api.petition.application;
 
 import com.gistpetition.api.IntegrationTest;
+import com.gistpetition.api.answer.dto.AnswerRequest;
 import com.gistpetition.api.exception.petition.DuplicatedAgreementException;
 import com.gistpetition.api.exception.petition.NoSuchPetitionException;
 import com.gistpetition.api.petition.PetitionBuilder;
@@ -32,6 +33,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
+import static com.gistpetition.api.petition.domain.Petition.REQUIRED_AGREEMENT_FOR_ANSWER;
 import static com.gistpetition.api.petition.domain.Petition.REQUIRED_AGREEMENT_FOR_RELEASE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -46,6 +48,7 @@ class PetitionServiceTest extends IntegrationTest {
 
     public static final String EMAIL = "email@gist.ac.kr";
     public static final String PASSWORD = "password";
+    public static final AnswerRequest ANSWER_REQUEST = new AnswerRequest("답변을 달았다");
     @Autowired
     private PetitionQueryService petitionQueryService;
     @Autowired
@@ -377,9 +380,54 @@ class PetitionServiceTest extends IntegrationTest {
         ).isInstanceOf(NoSuchPetitionException.class);
     }
 
+    @Test
+    void answer_petition() {
+        Long petitionId = petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
+        List<User> users = saveUsersNumberOf(REQUIRED_AGREEMENT_FOR_ANSWER);
+        agreePetitionBy(petitionId, users);
+        petitionCommandService.releasePetition(petitionId);
+
+        petitionCommandService.answerPetition(petitionId, ANSWER_REQUEST);
+
+        Petition petition = petitionRepository.findById(petitionId).orElseThrow();
+        assertTrue(petition.isAnswered());
+        assertThat(petition.getAnswer2().getContent()).isEqualTo(ANSWER_REQUEST.getContent());
+    }
+
+    @Test
+    void update_answer_of_petition() {
+        Long petitionId = petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
+        List<User> users = saveUsersNumberOf(REQUIRED_AGREEMENT_FOR_ANSWER);
+        agreePetitionBy(petitionId, users);
+        petitionCommandService.releasePetition(petitionId);
+        petitionCommandService.answerPetition(petitionId, ANSWER_REQUEST);
+
+        AnswerRequest updateAnswerRequest = new AnswerRequest("답변 수정을 진행했다.");
+        petitionCommandService.updateAnswer(petitionId, updateAnswerRequest);
+
+        Petition petition = petitionRepository.findById(petitionId).orElseThrow();
+        assertTrue(petition.isAnswered());
+        assertThat(petition.getAnswer2().getContent()).isEqualTo(updateAnswerRequest.getContent());
+    }
+
+    @Test
+    void delete_answer_of_petition() {
+        Long petitionId = petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
+        List<User> users = saveUsersNumberOf(REQUIRED_AGREEMENT_FOR_ANSWER);
+        agreePetitionBy(petitionId, users);
+        petitionCommandService.releasePetition(petitionId);
+        petitionCommandService.answerPetition(petitionId, ANSWER_REQUEST);
+
+        petitionCommandService.deleteAnswer(petitionId);
+
+        Petition petition = petitionRepository.findById(petitionId).orElseThrow();
+        assertFalse(petition.isAnswered());
+    }
+
     private List<User> saveUsersNumberOf(int numberOfUsers) {
-        return LongStream.range(0, numberOfUsers)
-                .mapToObj(i -> userRepository.save(new User(i + EMAIL, PASSWORD, UserRole.USER))).collect(Collectors.toList());
+        List<User> users = LongStream.range(0, numberOfUsers)
+                .mapToObj(i -> new User(i + EMAIL, PASSWORD, UserRole.USER)).collect(Collectors.toList());
+        return userRepository.saveAll(users);
     }
 
     private void agreePetitionBy(Long petitionId, List<User> users) {
