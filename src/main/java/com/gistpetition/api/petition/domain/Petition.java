@@ -35,6 +35,7 @@ public class Petition extends BaseEntity {
     @NotAudited
     @Embedded
     private final Agreements agreements = new Agreements();
+    @NotAudited
     @OneToOne(mappedBy = "petition", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private Answer2 answer2;
 
