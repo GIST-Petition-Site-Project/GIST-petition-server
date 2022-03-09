@@ -1,5 +1,7 @@
-package com.gistpetition.api.petition.domain;
+package com.gistpetition.api.petition.domain.repository;
 
+import com.gistpetition.api.petition.domain.Category;
+import com.gistpetition.api.petition.domain.Petition;
 import com.gistpetition.api.petition.dto.PetitionPreviewResponse;
 import com.gistpetition.api.petition.dto.QPetitionPreviewResponse;
 import com.querydsl.core.types.Order;

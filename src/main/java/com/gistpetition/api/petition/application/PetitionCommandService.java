@@ -7,7 +7,7 @@ import com.gistpetition.api.exception.petition.NoSuchPetitionException;
 import com.gistpetition.api.exception.user.NoSuchUserException;
 import com.gistpetition.api.petition.domain.Category;
 import com.gistpetition.api.petition.domain.Petition;
-import com.gistpetition.api.petition.domain.PetitionRepository;
+import com.gistpetition.api.petition.domain.repository.PetitionRepository;
 import com.gistpetition.api.petition.dto.AgreementRequest;
 import com.gistpetition.api.petition.dto.AnswerRequest;
 import com.gistpetition.api.petition.dto.PetitionRequest;

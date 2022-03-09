@@ -1,5 +1,6 @@
-package com.gistpetition.api.petition.domain;
+package com.gistpetition.api.petition.domain.repository;
 
+import com.gistpetition.api.petition.domain.Category;
 import com.gistpetition.api.petition.dto.PetitionPreviewResponse;
 import com.querydsl.core.types.Predicate;
 import org.springframework.data.domain.Page;

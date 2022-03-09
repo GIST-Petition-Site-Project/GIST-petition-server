@@ -2,9 +2,9 @@ package com.gistpetition.api.acceptance.petition;
 
 import com.gistpetition.api.acceptance.AcceptanceTest;
 import com.gistpetition.api.acceptance.common.TUser;
-import com.gistpetition.api.petition.domain.AgreementRepository;
 import com.gistpetition.api.petition.domain.Category;
-import com.gistpetition.api.petition.domain.PetitionRepository;
+import com.gistpetition.api.petition.domain.repository.AgreementRepository;
+import com.gistpetition.api.petition.domain.repository.PetitionRepository;
 import com.gistpetition.api.petition.dto.AgreementRequest;
 import com.gistpetition.api.petition.dto.PetitionRequest;
 import com.gistpetition.api.petition.dto.PetitionResponse;
