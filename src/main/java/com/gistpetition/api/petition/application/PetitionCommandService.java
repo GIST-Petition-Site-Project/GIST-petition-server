@@ -49,9 +49,7 @@ public class PetitionCommandService {
     @Transactional
     public void updatePetition(Long petitionId, PetitionRequest petitionRequest) {
         Petition petition = findPetitionById(petitionId);
-        petition.setTitle(petitionRequest.getTitle());
-        petition.setCategory(Category.of(petitionRequest.getCategoryId()));
-        petition.setDescription(petitionRequest.getDescription());
+        petition.update(petitionRequest.getTitle(),petitionRequest.getDescription(),petitionRequest.getCategoryId());
     }
 
     @Transactional

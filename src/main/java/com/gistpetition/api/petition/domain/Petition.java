@@ -21,9 +21,10 @@ public class Petition extends BaseEntity {
     public static final int REQUIRED_AGREEMENT_FOR_ANSWER = 20;
     public static final int POSTING_PERIOD_BY_SECONDS = 30 * 24 * 60 * 60;
 
-    private String title;
-    @Lob
-    private String description;
+    @Embedded
+    private Title title;
+    @Embedded
+    private Description description;
     @Enumerated(EnumType.STRING)
     private Category category;
     private Boolean answered = false;
@@ -42,8 +43,8 @@ public class Petition extends BaseEntity {
     }
 
     public Petition(String title, String description, Category category, Instant expiredAt, Long userId, String tempUrl) {
-        this.title = title;
-        this.description = description;
+        this.title = new Title(title);
+        this.description = new Description(description);
         this.category = category;
         this.expiredAt = expiredAt;
         this.userId = userId;
@@ -86,16 +87,10 @@ public class Petition extends BaseEntity {
         this.answered = b;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public void setCategory(Category category) {
-        this.category = category;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
+    public void update(String title, String description, Long categoryId){
+        this.title = new Title(title);
+        this.description = new Description(description);
+        this.category = Category.of(categoryId);
     }
 
     public boolean isReleased() {
