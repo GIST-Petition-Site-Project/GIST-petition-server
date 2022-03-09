@@ -50,14 +50,6 @@ public class Petition extends BaseEntity {
         this.tempUrl = tempUrl;
     }
 
-    public void addAgreement(Agreement newAgreement, Instant at) {
-        if (isExpiredAt(at)) {
-            throw new ExpiredPetitionException();
-        }
-        this.agreements.add(newAgreement);
-        this.agreeCount += 1;
-    }
-
     public void agree(Long userId, String description, Instant at) {
         if (isExpiredAt(at)) {
             throw new ExpiredPetitionException();
