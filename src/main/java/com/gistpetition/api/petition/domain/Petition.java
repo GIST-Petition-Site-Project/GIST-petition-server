@@ -87,7 +87,7 @@ public class Petition extends BaseEntity {
         this.answered = b;
     }
 
-    public void update(String title, String description, Long categoryId){
+    public void update(String title, String description, Long categoryId) {
         this.title = new Title(title);
         this.description = new Description(description);
         this.category = Category.of(categoryId);
@@ -103,5 +103,14 @@ public class Petition extends BaseEntity {
 
     public boolean isExpiredAt(Instant time) {
         return time.isAfter(expiredAt);
+    }
+
+
+    public String getTitle() {
+        return this.title.getTitle();
+    }
+
+    public String getDescription() {
+        return this.description.getDescription();
     }
 }
