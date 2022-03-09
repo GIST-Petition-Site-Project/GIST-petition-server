@@ -14,8 +14,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.data.auditing.AuditingHandler;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -61,20 +59,11 @@ class PetitionServiceTest extends IntegrationTest {
     @Autowired
     private HttpSession httpSession;
 
-    @SpyBean
-    private AuditingHandler auditingHandler;
-
     private User petitionOwner;
-    private final List<User> users = new ArrayList<>();
 
     @BeforeEach
     void setUp() {
         petitionOwner = userRepository.save(new User(EMAIL, PASSWORD, UserRole.USER));
-        for (int i = 0; i < 5; i++) {
-            String email = String.format("email%2s@gist.ac.kr", i);
-            users.add(new User(email, PASSWORD, UserRole.USER));
-        }
-        userRepository.saveAll(users);
     }
 
     @Test
@@ -256,22 +245,17 @@ class PetitionServiceTest extends IntegrationTest {
         for (int i = 0; i < numOfPetition; i++) {
             createdPetitionIds.add(petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId()));
         }
-        releasePetitionByIds(createdPetitionIds);
+        List<User> users = saveUsersNumberOf(REQUIRED_AGREEMENT_FOR_RELEASE);
+        createdPetitionIds.forEach(i -> {
+            agreePetitionBy(i, users);
+            petitionCommandService.releasePetition(i);
+        });
 
         Page<PetitionPreviewResponse> ongoingPetitions = petitionQueryService.retrieveOngoingPetition(Optional.empty(), PageRequest.of(0, 10));
         assertThat(ongoingPetitions.getContent()).hasSize(numOfPetition);
 
         for (PetitionPreviewResponse op : ongoingPetitions) {
             assertFalse(op.getExpired());
-        }
-    }
-
-    private void releasePetitionByIds(List<Long> ids) {
-        for (Long id : ids) {
-            for (int i = 0; i < 5; i++) {
-                petitionCommandService.agree(AGREEMENT_REQUEST, id, users.get(i).getId());
-            }
-            petitionCommandService.releasePetition(id);
         }
     }
 
@@ -333,10 +317,6 @@ class PetitionServiceTest extends IntegrationTest {
         assertThat(petitionQueryService.retrieveAnsweredPetitionCount(Optional.empty())).isEqualTo(1L);
     }
 
-    @Test
-    void doNothing() {
-    }
-
     @DisplayName("Insert, Update 수행 후의 revisionResponse 검증")
     @Test
     void retrieveRevisionsOfPetition() {
@@ -357,7 +337,8 @@ class PetitionServiceTest extends IntegrationTest {
     @Test
     void release() {
         Long petitionId = petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
-        agreePetitionByNumberOfUsers(petitionId, REQUIRED_AGREEMENT_FOR_RELEASE);
+        List<User> users = saveUsersNumberOf(REQUIRED_AGREEMENT_FOR_RELEASE);
+        agreePetitionBy(petitionId, users);
 
         petitionCommandService.releasePetition(petitionId);
 
@@ -377,7 +358,8 @@ class PetitionServiceTest extends IntegrationTest {
     @Test
     void cancelRelease() {
         Long petitionId = petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
-        agreePetitionByNumberOfUsers(petitionId, REQUIRED_AGREEMENT_FOR_RELEASE);
+        List<User> users = saveUsersNumberOf(REQUIRED_AGREEMENT_FOR_RELEASE);
+        agreePetitionBy(petitionId, users);
         petitionCommandService.releasePetition(petitionId);
 
         petitionCommandService.cancelReleasePetition(petitionId);
@@ -395,9 +377,12 @@ class PetitionServiceTest extends IntegrationTest {
         ).isInstanceOf(NoSuchPetitionException.class);
     }
 
-    private void agreePetitionByNumberOfUsers(Long petitionId, int numberOfUsers) {
-        LongStream.range(0, numberOfUsers)
-                .mapToObj(i -> userRepository.save(new User(i + EMAIL, PASSWORD, UserRole.USER)))
-                .forEach(user -> petitionCommandService.agree(AGREEMENT_REQUEST, petitionId, user.getId()));
+    private List<User> saveUsersNumberOf(int numberOfUsers) {
+        return LongStream.range(0, numberOfUsers)
+                .mapToObj(i -> userRepository.save(new User(i + EMAIL, PASSWORD, UserRole.USER))).collect(Collectors.toList());
+    }
+
+    private void agreePetitionBy(Long petitionId, List<User> users) {
+        users.forEach(user -> petitionCommandService.agree(AGREEMENT_REQUEST, petitionId, user.getId()));
     }
 }
