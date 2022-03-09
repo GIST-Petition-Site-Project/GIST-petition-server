@@ -24,7 +24,7 @@ import java.util.stream.IntStream;
 import static com.gistpetition.api.petition.domain.Petition.REQUIRED_AGREEMENT_FOR_ANSWER;
 import static com.gistpetition.api.petition.domain.Petition.REQUIRED_AGREEMENT_FOR_RELEASE;
 
-@Profile("dev")
+@Profile("local | dev")
 @RequiredArgsConstructor
 @Component
 public class DataLoader {

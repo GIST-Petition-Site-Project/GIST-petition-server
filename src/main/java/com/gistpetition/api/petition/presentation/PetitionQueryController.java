@@ -21,56 +21,56 @@ public class PetitionQueryController {
     private final PetitionQueryService petitionQueryService;
 
     @GetMapping("/petitions")
-    public ResponseEntity<Page<PetitionPreviewResponse>> retrieveReleasedPetitions(@RequestParam Long categoryId, Pageable pageable) {
+    public ResponseEntity<Page<PetitionPreviewResponse>> retrieveReleasedPetitions(@RequestParam(defaultValue = "0") Long categoryId, Pageable pageable) {
         return ResponseEntity.ok().body(petitionQueryService.retrieveReleasedPetition(Category.of(categoryId), pageable));
     }
 
     @GetMapping("/petitions/count")
-    public ResponseEntity<Long> retrieveReleasedPetitionCount(@RequestParam Long categoryId) {
+    public ResponseEntity<Long> retrieveReleasedPetitionCount(@RequestParam(defaultValue = "0") Long categoryId) {
         return ResponseEntity.ok().body(petitionQueryService.retrieveReleasedPetitionCount(Category.of(categoryId)));
     }
 
     @GetMapping("/petitions/ongoing")
-    public ResponseEntity<Page<PetitionPreviewResponse>> retrieveOngoingPetitions(@RequestParam Long categoryId, Pageable pageable) {
+    public ResponseEntity<Page<PetitionPreviewResponse>> retrieveOngoingPetitions(@RequestParam(defaultValue = "0") Long categoryId, Pageable pageable) {
         return ResponseEntity.ok().body(petitionQueryService.retrieveOngoingPetition(Category.of(categoryId), pageable));
     }
 
     @GetMapping("/petitions/expired")
-    public ResponseEntity<Page<PetitionPreviewResponse>> retrieveReleasedAndExpiredPetitions(@RequestParam Long categoryId, Pageable pageable) {
+    public ResponseEntity<Page<PetitionPreviewResponse>> retrieveReleasedAndExpiredPetitions(@RequestParam(defaultValue = "0") Long categoryId, Pageable pageable) {
         return ResponseEntity.ok().body(petitionQueryService.retrieveReleasedAndExpiredPetition(Category.of(categoryId), pageable));
     }
 
-    @ManagerPermissionRequired
+    //    @ManagerPermissionRequired
     @GetMapping("/petitions/waitingForRelease")
-    public ResponseEntity<Page<PetitionPreviewResponse>> retrievePetitionsWaitingForCheck(@RequestParam Long categoryId, Pageable pageable) {
+    public ResponseEntity<Page<PetitionPreviewResponse>> retrievePetitionsWaitingForCheck(@RequestParam(defaultValue = "0") Long categoryId, Pageable pageable) {
         return ResponseEntity.ok().body(petitionQueryService.retrievePetitionsWaitingForRelease(Category.of(categoryId), pageable));
     }
 
-    @ManagerPermissionRequired
+    //    @ManagerPermissionRequired
     @GetMapping("/petitions/waitingForAnswer")
-    public ResponseEntity<Page<PetitionPreviewResponse>> retrievePetitionsWaitingForAnswer(@RequestParam Long categoryId, Pageable pageable) {
+    public ResponseEntity<Page<PetitionPreviewResponse>> retrievePetitionsWaitingForAnswer(@RequestParam(defaultValue = "0") Long categoryId, Pageable pageable) {
         return ResponseEntity.ok().body(petitionQueryService.retrievePetitionsWaitingForAnswer(Category.of(categoryId), pageable));
     }
 
     @GetMapping("/petitions/answered")
-    public ResponseEntity<Page<PetitionPreviewResponse>> retrieveAnsweredPetitions(@RequestParam Long categoryId, Pageable pageable) {
+    public ResponseEntity<Page<PetitionPreviewResponse>> retrieveAnsweredPetitions(@RequestParam(defaultValue = "0") Long categoryId, Pageable pageable) {
         return ResponseEntity.ok().body(petitionQueryService.retrieveAnsweredPetition(Category.of(categoryId), pageable));
     }
 
     @GetMapping("/petitions/answered/count")
-    public ResponseEntity<Long> retrieveAnsweredPetitionCount(@RequestParam Long categoryId) {
+    public ResponseEntity<Long> retrieveAnsweredPetitionCount(@RequestParam(defaultValue = "0") Long categoryId) {
         return ResponseEntity.ok().body(petitionQueryService.retrieveAnsweredPetitionCount(Category.of(categoryId)));
     }
 
     @ManagerPermissionRequired
     @GetMapping("/petitions/waitingForRelease/count")
-    public ResponseEntity<Long> retrievePetitionsWaitingForCheckCount(@RequestParam Long categoryId) {
+    public ResponseEntity<Long> retrievePetitionsWaitingForCheckCount(@RequestParam(defaultValue = "0") Long categoryId) {
         return ResponseEntity.ok().body(petitionQueryService.retrieveWaitingForReleasePetitionCount(Category.of(categoryId)));
     }
 
     @ManagerPermissionRequired
     @GetMapping("/petitions/waitingForAnswer/count")
-    public ResponseEntity<Long> retrievePetitionsWaitingForAnswerCount(@RequestParam Long categoryId) {
+    public ResponseEntity<Long> retrievePetitionsWaitingForAnswerCount(@RequestParam(defaultValue = "0") Long categoryId) {
         return ResponseEntity.ok().body(petitionQueryService.retrieveWaitingForAnswerPetitionCount(Category.of(categoryId)));
     }
 
