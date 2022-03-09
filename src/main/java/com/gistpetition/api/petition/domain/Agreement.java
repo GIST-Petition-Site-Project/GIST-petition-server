@@ -12,6 +12,7 @@ import java.util.Objects;
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "petition_id"}))
 public class Agreement extends UnmodifiableEntity {
 
+    @Column
     @Lob
     private String description;
     @Column(name = "user_id")
