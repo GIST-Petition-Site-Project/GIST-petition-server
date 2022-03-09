@@ -259,7 +259,7 @@ class PetitionServiceTest extends IntegrationTest {
             petitionCommandService.releasePetition(i);
         });
 
-        Page<PetitionPreviewResponse> petitions = petitionRepository.findOngoingPetition(Instant.now(), null, PageRequest.of(0, 10));
+        Page<PetitionPreviewResponse> petitions = petitionQueryService.retrieveOngoingPetition(null, PageRequest.of(0, 10));
         assertThat(petitions.getContent()).hasSize(numOfPetition);
     }
 
@@ -277,8 +277,8 @@ class PetitionServiceTest extends IntegrationTest {
             petitionCommandService.answerPetition(i, ANSWER_REQUEST);
         });
 
-        Page<PetitionPreviewResponse> byAnswerIsNotNull = petitionRepository.findAnsweredPetition(null, PageRequest.of(0, 10));
-        assertThat(byAnswerIsNotNull).hasSize(numOfPetition);
+        Page<PetitionPreviewResponse> petitions = petitionQueryService.retrieveAnsweredPetition(null, PageRequest.of(0, 10));
+        assertThat(petitions).hasSize(numOfPetition);
     }
 
     @Test

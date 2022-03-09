@@ -1,54 +1,51 @@
 package com.gistpetition.api.petition.application;
 
-import com.gistpetition.api.petition.domain.Category;
 import com.gistpetition.api.petition.domain.Petition;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 
 import java.time.Instant;
-import java.util.Optional;
 import java.util.function.Function;
 
+import static com.gistpetition.api.petition.application.PetitionQueryCondition.Expiration.*;
+import static com.gistpetition.api.petition.application.PetitionQueryCondition.PetitionStatus.*;
 import static com.gistpetition.api.petition.domain.QPetition.petition;
 
 public enum PetitionQueryCondition {
-    RELEASED(petition.released.isTrue(), Expiration.NONE),
-    NOT_RELEASED(petition.released.isFalse(), Expiration.NONE),
-    ANSWERED(petition.answer.isNotNull(), Expiration.NONE),
-    NOT_ANSWERED(petition.answer.isNull(), Expiration.NONE),
+    RELEASED(none, released),
+    NOT_RELEASED(none, notReleased),
+    ANSWERED(none, answered),
+    NOT_ANSWERED(none, notAnswered),
 
-    WAITING_FOR_RELEASE(
-            NOT_RELEASED.condition.and(petition.agreeCount.goe(Petition.REQUIRED_AGREEMENT_FOR_RELEASE)),
-            Expiration.NOT_EXPIRED),
-    WAITING_FOR_ANSWER(
-            RELEASED.condition.and(NOT_ANSWERED.condition).and(petition.agreeCount.goe(Petition.REQUIRED_AGREEMENT_FOR_ANSWER)),
-            Expiration.NONE),
-    ONGOING(
-            RELEASED.condition.and(NOT_ANSWERED.condition),
-            Expiration.NOT_EXPIRED),
-    RELEASED_NOT_EXPIRED(
-            RELEASED.condition,
-            Expiration.NOT_EXPIRED),
-    RELEASED_EXPIRED(
-            RELEASED.condition,
-            Expiration.IS_EXPIRED);
+    WAITING_FOR_RELEASE(notExpired, notReleased, agreeEnoughToRelease),
+    WAITING_FOR_ANSWER(none, released, agreeEnoughToAnswer),
+    ONGOING(notExpired, released, notAnswered),
 
-    private final BooleanExpression condition;
+    RELEASED_NOT_EXPIRED(notExpired, released),
+    RELEASED_EXPIRED(expired, released);
+
     private final Expiration expiration;
+    private final PetitionStatus[] conditions;
 
-    PetitionQueryCondition(BooleanExpression condition, Expiration expiration) {
-        this.condition = condition;
+    PetitionQueryCondition(Expiration expiration, PetitionStatus... conditions) {
         this.expiration = expiration;
+        this.conditions = conditions;
     }
 
-    public BooleanExpression of(Optional<Category> category, Instant at) {
-        BooleanExpression be = condition.and(expiration.at(at));
-        return category.isEmpty() ? be : be.and(petition.category.eq(category.get()));
+    public Predicate at(Instant at) {
+        BooleanBuilder booleanBuilder = new BooleanBuilder();
+        booleanBuilder.and(this.expiration.at(at));
+        for (PetitionStatus qc : conditions) {
+            booleanBuilder.and(qc.condition);
+        }
+        return booleanBuilder;
     }
 
-    public enum Expiration {
-        NOT_EXPIRED(i -> petition.expiredAt.after(i)),
-        IS_EXPIRED(i -> petition.expiredAt.before(i)),
-        NONE(i -> null);
+    enum Expiration {
+        notExpired(i -> petition.expiredAt.after(i)),
+        expired(i -> petition.expiredAt.before(i)),
+        none(i -> null);
 
         final Function<Instant, BooleanExpression> function;
 
@@ -58,6 +55,21 @@ public enum PetitionQueryCondition {
 
         public BooleanExpression at(Instant time) {
             return function.apply(time);
+        }
+    }
+
+    enum PetitionStatus {
+        released(petition.released.isTrue()),
+        notReleased(petition.released.isFalse()),
+        answered(petition.answered.isTrue()),
+        notAnswered(petition.answered.isFalse()),
+        agreeEnoughToRelease(petition.agreeCount.goe(Petition.REQUIRED_AGREEMENT_FOR_RELEASE)),
+        agreeEnoughToAnswer(petition.agreeCount.goe(Petition.REQUIRED_AGREEMENT_FOR_ANSWER));
+
+        private final BooleanExpression condition;
+
+        PetitionStatus(BooleanExpression condition) {
+            this.condition = condition;
         }
     }
 }

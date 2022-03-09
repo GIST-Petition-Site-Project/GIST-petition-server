@@ -2,64 +2,50 @@ package com.gistpetition.api.petition.domain;
 
 import com.gistpetition.api.petition.dto.PetitionPreviewResponse;
 import com.gistpetition.api.petition.dto.QPetitionPreviewResponse;
-import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.PathBuilder;
-import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.JPQLQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 
-import java.time.Instant;
 import java.util.List;
 
-import static com.gistpetition.api.petition.domain.QAnswer.answer;
 import static com.gistpetition.api.petition.domain.QPetition.petition;
 
-@RequiredArgsConstructor
 @Repository
+@RequiredArgsConstructor
 public class CustomPetitionRepositoryImpl implements CustomPetitionRepository {
     private final JPQLQueryFactory jpqlQueryFactory;
 
-    public Page<PetitionPreviewResponse> findAnsweredPetition(Category category, Pageable pageable) {
-        List<PetitionPreviewResponse> results = jpqlQueryFactory.select(petitionPreviewResponse())
+    @Override
+    public Page<PetitionPreviewResponse> findAll(Category category, Predicate predicate, Pageable pageable) {
+        List<PetitionPreviewResponse> results = jpqlQueryFactory.select(buildPetitionPreviewResponse())
                 .from(petition)
-                .innerJoin(petition.answer, answer)
-                .where(categoryEq(category))
+                .where(categoryEq(category), predicate)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(orderCondition(pageable)).fetch();
 
         JPQLQuery<Petition> petitionJPQLQuery = jpqlQueryFactory.selectFrom(petition)
-                .innerJoin(petition.answer, answer)
-                .where()
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .orderBy(orderCondition(pageable));
-        return PageableExecutionUtils.getPage(results, pageable, () -> petitionJPQLQuery.fetchCount());
+                .where(categoryEq(category), predicate);
+
+        return PageableExecutionUtils.getPage(results, pageable, petitionJPQLQuery::fetchCount);
     }
 
-    public Page<PetitionPreviewResponse> findOngoingPetition(Instant at, Category category, Pageable pageable) {
-        QueryResults<PetitionPreviewResponse> results = jpqlQueryFactory.select(petitionPreviewResponse())
-                .from(petition)
-                .where(categoryEq(category),
-                        petition.released.isTrue(),
-                        petition.expiredAt.after(at),
-                        petition.id.notIn(JPAExpressions.select(answer.petition.id).from(answer)))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .orderBy(orderCondition(pageable)).fetchResults();
-        return new PageImpl<>(results.getResults(), pageable, results.getTotal());
+    @Override
+    public Long count(Category category, Predicate predicate) {
+        return jpqlQueryFactory.selectFrom(petition)
+                .where(categoryEq(category), predicate).fetchCount();
     }
 
-    private QPetitionPreviewResponse petitionPreviewResponse() {
+    private QPetitionPreviewResponse buildPetitionPreviewResponse() {
         return new QPetitionPreviewResponse(petition.id, petition.title, petition.category, petition.createdAt, petition.expiredAt, petition.agreeCount, petition.tempUrl, petition.released, petition.answered);
     }
 

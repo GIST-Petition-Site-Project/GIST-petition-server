@@ -14,8 +14,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1")
@@ -23,56 +21,56 @@ public class PetitionQueryController {
     private final PetitionQueryService petitionQueryService;
 
     @GetMapping("/petitions")
-    public ResponseEntity<Page<PetitionPreviewResponse>> retrieveReleasedPetitions(@RequestParam Optional<Long> categoryId, Pageable pageable) {
+    public ResponseEntity<Page<PetitionPreviewResponse>> retrieveReleasedPetitions(@RequestParam Long categoryId, Pageable pageable) {
         return ResponseEntity.ok().body(petitionQueryService.retrieveReleasedPetition(Category.of(categoryId), pageable));
     }
 
     @GetMapping("/petitions/count")
-    public ResponseEntity<Long> retrieveReleasedPetitionCount(@RequestParam Optional<Long> categoryId) {
+    public ResponseEntity<Long> retrieveReleasedPetitionCount(@RequestParam Long categoryId) {
         return ResponseEntity.ok().body(petitionQueryService.retrieveReleasedPetitionCount(Category.of(categoryId)));
     }
 
     @GetMapping("/petitions/ongoing")
-    public ResponseEntity<Page<PetitionPreviewResponse>> retrieveOngoingPetitions(@RequestParam Optional<Long> categoryId, Pageable pageable) {
+    public ResponseEntity<Page<PetitionPreviewResponse>> retrieveOngoingPetitions(@RequestParam Long categoryId, Pageable pageable) {
         return ResponseEntity.ok().body(petitionQueryService.retrieveOngoingPetition(Category.of(categoryId), pageable));
     }
 
     @GetMapping("/petitions/expired")
-    public ResponseEntity<Page<PetitionPreviewResponse>> retrieveReleasedAndExpiredPetitions(@RequestParam Optional<Long> categoryId, Pageable pageable) {
+    public ResponseEntity<Page<PetitionPreviewResponse>> retrieveReleasedAndExpiredPetitions(@RequestParam Long categoryId, Pageable pageable) {
         return ResponseEntity.ok().body(petitionQueryService.retrieveReleasedAndExpiredPetition(Category.of(categoryId), pageable));
     }
 
     @ManagerPermissionRequired
     @GetMapping("/petitions/waitingForRelease")
-    public ResponseEntity<Page<PetitionPreviewResponse>> retrievePetitionsWaitingForCheck(@RequestParam Optional<Long> categoryId, Pageable pageable) {
+    public ResponseEntity<Page<PetitionPreviewResponse>> retrievePetitionsWaitingForCheck(@RequestParam Long categoryId, Pageable pageable) {
         return ResponseEntity.ok().body(petitionQueryService.retrievePetitionsWaitingForRelease(Category.of(categoryId), pageable));
     }
 
     @ManagerPermissionRequired
     @GetMapping("/petitions/waitingForAnswer")
-    public ResponseEntity<Page<PetitionPreviewResponse>> retrievePetitionsWaitingForAnswer(@RequestParam Optional<Long> categoryId, Pageable pageable) {
+    public ResponseEntity<Page<PetitionPreviewResponse>> retrievePetitionsWaitingForAnswer(@RequestParam Long categoryId, Pageable pageable) {
         return ResponseEntity.ok().body(petitionQueryService.retrievePetitionsWaitingForAnswer(Category.of(categoryId), pageable));
     }
 
     @GetMapping("/petitions/answered")
-    public ResponseEntity<Page<PetitionPreviewResponse>> retrieveAnsweredPetitions(@RequestParam Optional<Long> categoryId, Pageable pageable) {
+    public ResponseEntity<Page<PetitionPreviewResponse>> retrieveAnsweredPetitions(@RequestParam Long categoryId, Pageable pageable) {
         return ResponseEntity.ok().body(petitionQueryService.retrieveAnsweredPetition(Category.of(categoryId), pageable));
     }
 
     @GetMapping("/petitions/answered/count")
-    public ResponseEntity<Long> retrieveAnsweredPetitionCount(@RequestParam Optional<Long> categoryId) {
+    public ResponseEntity<Long> retrieveAnsweredPetitionCount(@RequestParam Long categoryId) {
         return ResponseEntity.ok().body(petitionQueryService.retrieveAnsweredPetitionCount(Category.of(categoryId)));
     }
 
     @ManagerPermissionRequired
     @GetMapping("/petitions/waitingForRelease/count")
-    public ResponseEntity<Long> retrievePetitionsWaitingForCheckCount(@RequestParam Optional<Long> categoryId) {
+    public ResponseEntity<Long> retrievePetitionsWaitingForCheckCount(@RequestParam Long categoryId) {
         return ResponseEntity.ok().body(petitionQueryService.retrieveWaitingForReleasePetitionCount(Category.of(categoryId)));
     }
 
     @ManagerPermissionRequired
     @GetMapping("/petitions/waitingForAnswer/count")
-    public ResponseEntity<Long> retrievePetitionsWaitingForAnswerCount(@RequestParam Optional<Long> categoryId) {
+    public ResponseEntity<Long> retrievePetitionsWaitingForAnswerCount(@RequestParam Long categoryId) {
         return ResponseEntity.ok().body(petitionQueryService.retrieveWaitingForAnswerPetitionCount(Category.of(categoryId)));
     }
 
@@ -88,8 +86,7 @@ public class PetitionQueryController {
 
     @LoginRequired
     @GetMapping("/petitions/me")
-    public ResponseEntity<Page<PetitionPreviewResponse>> retrievePetitionsOfMine(@LoginUser SimpleUser simpleUser,
-                                                                                 Pageable pageable) {
+    public ResponseEntity<Page<PetitionPreviewResponse>> retrievePetitionsOfMine(@LoginUser SimpleUser simpleUser, Pageable pageable) {
         return ResponseEntity.ok().body(petitionQueryService.retrievePetitionsByUserId(simpleUser.getId(), pageable));
     }
 
