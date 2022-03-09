@@ -1,8 +1,6 @@
-package com.gistpetition.api.agreement;
+package com.gistpetition.api.petition.domain;
 
 import com.gistpetition.api.exception.petition.DuplicatedAgreementException;
-import com.gistpetition.api.petition.domain.Agreement;
-import com.gistpetition.api.petition.domain.Agreements;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -11,13 +9,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class AgreementsTest extends Agreements {
-    private final String DESCRIPTION = "description";
-    private AgreementsSupport agreements;
+public class AgreementsTest {
+    private static final String DESCRIPTION = "description";
+    private Agreements agreements;
 
     @BeforeEach
     void setup() {
-        agreements = new AgreementsSupport();
+        agreements = new Agreements();
     }
 
     @Test
@@ -39,14 +37,17 @@ public class AgreementsTest extends Agreements {
 
     @Test
     public void isAgreedBy() {
-        Long writerId = 1L;
-        agreements.add(new Agreement(DESCRIPTION, writerId));
-        assertTrue(agreements.isAgreedBy(writerId));
+        Long userId = 1L;
+
+        agreements.add(new Agreement(DESCRIPTION, userId));
+
+        assertTrue(agreements.isAgreedBy(userId));
     }
 
     @Test
     public void isAgreedBy_fail() {
-        Long fakeWriterId = Long.MAX_VALUE;
-        assertFalse(agreements.isAgreedBy(fakeWriterId));
+        Long notAgreedUserId = Long.MAX_VALUE;
+
+        assertFalse(agreements.isAgreedBy(notAgreedUserId));
     }
 }

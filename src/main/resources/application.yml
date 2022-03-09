@@ -1,44 +1,61 @@
 spring:
   profiles:
     active: local
+
 server.servlet.session.cookie:
   http-only: true
   path: /
   secure: true
 
 ---
+
 spring:
   config:
     activate:
       on-profile: local
-  datasource:
-    url: jdbc:h2:mem:testdb
-    driverClassName: org.h2.Driver
-    username: sa
-    password:
-  h2:
-    console:
-      enabled: true
+    import: datasoruce/application-docker-mysql.yml
   jpa:
     show-sql: true
     properties:
       hibernate:
         format_sql: true
-
----
-spring:
-  config:
-    activate:
-      on-profile: dev
-    import: ./privates/application-dev-db.yml, ./privates/application-dev-mail.yml
-  jpa:
     hibernate:
       ddl-auto: validate
-
   flyway:
     enabled: true
     baseline-on-migrate: true
 
+---
+
+spring:
+  config:
+    activate:
+      on-profile: test
+    import: datasoruce/application-docker-mysql.yml
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: dev
+    import: datasoruce/application-docker-mysql.yml, ./privates/application-dev-mail.yml
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
 swagger:
   host: dev-api.gist-petition.com
   protocol: https
@@ -47,20 +64,21 @@ request:
   origins: https://localhost:3000, https://localhost:3001, https://dev.gist-petition.com, https://dev-staff.gist-petition.com
 
 ---
+
 spring:
   config:
     activate:
       on-profile: prod
     import: ./privates/application-prod-db.yml, ./privates/application-prod-mail.yml
-  server.servlet.session.cookie:
-    sameSite: Lax
   jpa:
     hibernate:
       ddl-auto: validate
-
   flyway:
     enabled: true
     baseline-on-migrate: true
+
+  server.servlet.session.cookie:
+    sameSite: Lax
 
 swagger:
   host: api.gist-petition.com
