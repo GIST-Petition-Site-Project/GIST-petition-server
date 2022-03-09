@@ -17,7 +17,7 @@ public class Agreements {
     @OneToMany(mappedBy = "petition", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private final List<Agreement> agreements = new ArrayList<>();
 
-    protected Agreements() {
+    public Agreements() {
     }
 
     public void add(Agreement agreement) {

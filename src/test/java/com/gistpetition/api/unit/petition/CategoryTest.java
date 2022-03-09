@@ -1,6 +1,7 @@
-package com.gistpetition.api.petition.domain;
+package com.gistpetition.api.unit.petition;
 
 import com.gistpetition.api.exception.petition.NoSuchCategoryException;
+import com.gistpetition.api.petition.domain.Category;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

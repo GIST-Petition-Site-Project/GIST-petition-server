@@ -1,4 +1,4 @@
-package com.gistpetition.api;
+package com.gistpetition.api.integration;
 
 import com.gistpetition.api.utils.emailsender.EmailSender;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,4 +12,5 @@ import org.springframework.test.context.jdbc.Sql;
 public abstract class IntegrationTest {
     @MockBean
     EmailSender emailSender;
+
 }

@@ -1,10 +1,10 @@
-package com.gistpetition.api.verification;
+package com.gistpetition.api.integration.verification;
 
-import com.gistpetition.api.IntegrationTest;
 import com.gistpetition.api.exception.user.NoSuchUserException;
 import com.gistpetition.api.exception.verification.DuplicatedVerificationException;
 import com.gistpetition.api.exception.verification.ExpiredVerificationCodeException;
 import com.gistpetition.api.exception.verification.NoSuchVerificationInfoException;
+import com.gistpetition.api.integration.IntegrationTest;
 import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRepository;
 import com.gistpetition.api.user.domain.UserRole;

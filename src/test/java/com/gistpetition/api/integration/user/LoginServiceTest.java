@@ -1,8 +1,9 @@
-package com.gistpetition.api.user.application;
+package com.gistpetition.api.integration.user;
 
-import com.gistpetition.api.IntegrationTest;
 import com.gistpetition.api.exception.user.NoSuchUserException;
 import com.gistpetition.api.exception.user.NotMatchedPasswordException;
+import com.gistpetition.api.integration.IntegrationTest;
+import com.gistpetition.api.user.application.LoginService;
 import com.gistpetition.api.user.domain.SimpleUser;
 import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRepository;

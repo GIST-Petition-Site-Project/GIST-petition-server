@@ -1,5 +1,6 @@
-package com.gistpetition.api.utils.urlGenerator;
+package com.gistpetition.api.unit.utils;
 
+import com.gistpetition.api.utils.urlGenerator.RandomUrlGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
