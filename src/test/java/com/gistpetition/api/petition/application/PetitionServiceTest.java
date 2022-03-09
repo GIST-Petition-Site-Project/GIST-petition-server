@@ -1,6 +1,7 @@
 package com.gistpetition.api.petition.application;
 
 import com.gistpetition.api.IntegrationTest;
+import com.gistpetition.api.exception.petition.AlreadyAnswerException;
 import com.gistpetition.api.exception.petition.DuplicatedAgreementException;
 import com.gistpetition.api.exception.petition.NoSuchPetitionException;
 import com.gistpetition.api.petition.PetitionBuilder;
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -34,14 +36,17 @@ import java.util.stream.LongStream;
 
 import static com.gistpetition.api.petition.domain.Petition.REQUIRED_AGREEMENT_FOR_ANSWER;
 import static com.gistpetition.api.petition.domain.Petition.REQUIRED_AGREEMENT_FOR_RELEASE;
+import static com.gistpetition.api.user.application.SessionLoginService.SESSION_KEY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.BDDMockito.given;
 
 class PetitionServiceTest extends IntegrationTest {
     public static final Instant PETITION_CREATION_AT = Instant.now();
     public static final Instant PETITION_EXPIRED_AT = PETITION_CREATION_AT.plusSeconds(Petition.POSTING_PERIOD_BY_SECONDS);
+    public static final AnswerRequest UPDATE_ANSWER_REQUEST = new AnswerRequest("답변 수정을 진행했다.");
     private static final PetitionRequest DORM_PETITION_REQUEST = new PetitionRequest("title", "description", Category.DORMITORY.getId());
     private static final AgreementRequest AGREEMENT_REQUEST = new AgreementRequest("동의합니다.");
 
@@ -59,6 +64,8 @@ class PetitionServiceTest extends IntegrationTest {
     @Autowired
     private AgreementRepository agreementRepository;
     @Autowired
+    private Answer2Repository answer2Repository;
+    @MockBean(name = "httpSession")
     private HttpSession httpSession;
 
     private User petitionOwner;
@@ -322,18 +329,19 @@ class PetitionServiceTest extends IntegrationTest {
     @DisplayName("Insert, Update 수행 후의 revisionResponse 검증")
     @Test
     void retrieveRevisionsOfPetition() {
-        httpSession.setAttribute("user", new SimpleUser(petitionOwner));
+        given(httpSession.getAttribute(SESSION_KEY)).willReturn(new SimpleUser(petitionOwner));
+
         PetitionRequest petitionRequest = new PetitionRequest("title", "desc", Category.DORMITORY.getId());
         Long petitionId = petitionCommandService.createPetition(petitionRequest, petitionOwner.getId());
 
         petitionCommandService.updatePetition(petitionId, new PetitionRequest("updateTitle", "updateDesc", Category.FACILITY.getId()));
         PageRequest pageRequest = PageRequest.of(0, 10);
         Page<PetitionRevisionResponse> revisionResponses = petitionQueryService.retrieveRevisionsOfPetition(petitionId, pageRequest);
-        assertThat(revisionResponses.getContent()).hasSize(2);
-        assertThat(revisionResponses.getContent()).allMatch(content -> content.getWorkedBy().equals(petitionOwner.getId()));
-        List<PetitionRevisionResponse> content = revisionResponses.getContent();
-        List<RevisionMetadata.RevisionType> revisionTypes = content.stream().map(PetitionRevisionResponse::getRevisionType).collect(Collectors.toList());
-        assertThat(revisionTypes).containsExactly(RevisionMetadata.RevisionType.INSERT, RevisionMetadata.RevisionType.UPDATE);
+        List<PetitionRevisionResponse> revisionResponsesContent = revisionResponses.getContent();
+        assertThat(revisionResponsesContent).hasSize(2);
+        assertThat(revisionResponsesContent).allMatch(content -> content.getWorkedBy().equals(petitionOwner.getId()));
+        List<RevisionMetadata.RevisionType> revisionTypes = revisionResponses.stream().map(PetitionRevisionResponse::getRevisionType).collect(Collectors.toList());
+        assertThat(revisionTypes).containsSequence(RevisionMetadata.RevisionType.INSERT, RevisionMetadata.RevisionType.UPDATE);
     }
 
     @Test
@@ -401,12 +409,11 @@ class PetitionServiceTest extends IntegrationTest {
         petitionCommandService.releasePetition(petitionId);
         petitionCommandService.answerPetition(petitionId, ANSWER_REQUEST);
 
-        AnswerRequest updateAnswerRequest = new AnswerRequest("답변 수정을 진행했다.");
-        petitionCommandService.updateAnswer(petitionId, updateAnswerRequest);
+        petitionCommandService.updateAnswer(petitionId, UPDATE_ANSWER_REQUEST);
 
         Petition petition = petitionRepository.findById(petitionId).orElseThrow();
         assertTrue(petition.isAnswered());
-        assertThat(petition.getAnswer2().getContent()).isEqualTo(updateAnswerRequest.getContent());
+        assertThat(petition.getAnswer2().getContent()).isEqualTo(UPDATE_ANSWER_REQUEST.getContent());
     }
 
     @Test
@@ -421,6 +428,54 @@ class PetitionServiceTest extends IntegrationTest {
 
         Petition petition = petitionRepository.findById(petitionId).orElseThrow();
         assertFalse(petition.isAnswered());
+    }
+
+    @Test
+    public void createAnswerWithConcurrency() throws InterruptedException {
+        Long petitionId = petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
+        List<User> users = saveUsersNumberOf(REQUIRED_AGREEMENT_FOR_ANSWER);
+        agreePetitionBy(petitionId, users);
+        petitionCommandService.releasePetition(petitionId);
+
+        int numberOfThreads = 3;
+        ExecutorService service = Executors.newFixedThreadPool(numberOfThreads);
+        CountDownLatch latch = new CountDownLatch(numberOfThreads);
+        AtomicInteger errorCount = new AtomicInteger(0);
+        for (int i = 0; i < numberOfThreads; i++) {
+            service.execute(() -> {
+                try {
+                    petitionCommandService.answerPetition(petitionId, ANSWER_REQUEST);
+                } catch (AlreadyAnswerException ex) {
+                    errorCount.incrementAndGet();
+                } finally {
+                    latch.countDown();
+                }
+            });
+        }
+        latch.await();
+        assertThat(errorCount.get()).isEqualTo(numberOfThreads - 1);
+        assertThat(answer2Repository.findByPetitionId(petitionId)).hasSize(1);
+    }
+
+    @Test
+    void retrieve_revisions_of_answer() {
+        Long petitionId = petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
+        List<User> users = saveUsersNumberOf(REQUIRED_AGREEMENT_FOR_ANSWER);
+        agreePetitionBy(petitionId, users);
+        petitionCommandService.releasePetition(petitionId);
+
+        given(httpSession.getAttribute(SESSION_KEY)).willReturn(new SimpleUser(petitionOwner));
+
+        petitionCommandService.answerPetition(petitionId, ANSWER_REQUEST);
+        petitionCommandService.updateAnswer(petitionId, UPDATE_ANSWER_REQUEST);
+
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<AnswerRevisionResponse> answerRevisionResponses = petitionQueryService.retrieveRevisionsOfAnswer(petitionId, pageable);
+
+        List<AnswerRevisionResponse> revisionResponses = answerRevisionResponses.getContent();
+        assertThat(revisionResponses).hasSize(2);
+        List<RevisionMetadata.RevisionType> revisionTypes = revisionResponses.stream().map(AnswerRevisionResponse::getRevisionType).collect(Collectors.toList());
+        assertThat(revisionTypes).containsSequence(RevisionMetadata.RevisionType.INSERT, RevisionMetadata.RevisionType.UPDATE);
     }
 
     private List<User> saveUsersNumberOf(int numberOfUsers) {

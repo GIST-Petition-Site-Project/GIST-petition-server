@@ -17,6 +17,8 @@ from user;
 DELETE
 from answer_aud;
 DELETE
+from answer2_aud;
+DELETE
 from petition_aud;
 DELETE
 from revinfo;

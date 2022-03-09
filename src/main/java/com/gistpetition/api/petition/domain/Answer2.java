@@ -8,7 +8,7 @@ import org.hibernate.envers.Audited;
 
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
-import javax.persistence.MapsId;
+import javax.persistence.Lob;
 import javax.persistence.OneToOne;
 
 @Entity
@@ -16,10 +16,10 @@ import javax.persistence.OneToOne;
 @Audited
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Answer2 extends BaseEntity {
+    @Lob
     private String content;
     @OneToOne
     @JoinColumn(name = "petition_id", referencedColumnName = "id", unique = true)
-    @MapsId
     private Petition petition;
 
     public Answer2(String content, Petition petition) {
