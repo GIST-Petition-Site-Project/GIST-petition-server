@@ -1,4 +1,4 @@
-package com.gistpetition.api.common;
+package com.gistpetition.api.petition;
 
 import com.gistpetition.api.petition.domain.Category;
 import com.gistpetition.api.petition.domain.Petition;

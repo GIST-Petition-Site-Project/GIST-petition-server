@@ -1,9 +1,9 @@
-package com.gistpetition.api.integration.verification;
+package com.gistpetition.api.verification;
 
+import com.gistpetition.api.IntegrationTest;
 import com.gistpetition.api.exception.verification.InvalidVerificationInfoException;
 import com.gistpetition.api.exception.verification.NoSuchVerificationCodeException;
 import com.gistpetition.api.exception.verification.NotConfirmedVerificationCodeException;
-import com.gistpetition.api.integration.IntegrationTest;
 import com.gistpetition.api.verification.application.signup.SignUpValidatorImpl;
 import com.gistpetition.api.verification.domain.SignUpVerificationInfo;
 import com.gistpetition.api.verification.domain.SignUpVerificationInfoRepository;

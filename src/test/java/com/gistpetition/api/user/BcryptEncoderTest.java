@@ -1,4 +1,4 @@
-package com.gistpetition.api.unit.utils;
+package com.gistpetition.api.user;
 
 import com.gistpetition.api.utils.password.BcryptEncoder;
 import org.junit.jupiter.api.Test;

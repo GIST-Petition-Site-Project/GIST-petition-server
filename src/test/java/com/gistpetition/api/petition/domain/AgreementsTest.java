@@ -1,8 +1,6 @@
-package com.gistpetition.api.unit.petition;
+package com.gistpetition.api.petition.domain;
 
 import com.gistpetition.api.exception.petition.DuplicatedAgreementException;
-import com.gistpetition.api.petition.domain.Agreement;
-import com.gistpetition.api.petition.domain.Agreements;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

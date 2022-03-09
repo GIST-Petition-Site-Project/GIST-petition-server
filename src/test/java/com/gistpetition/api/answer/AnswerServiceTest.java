@@ -1,5 +1,6 @@
-package com.gistpetition.api.integration.answer;
+package com.gistpetition.api.answer;
 
+import com.gistpetition.api.IntegrationTest;
 import com.gistpetition.api.answer.application.AnswerService;
 import com.gistpetition.api.answer.domain.Answer;
 import com.gistpetition.api.answer.domain.AnswerRepository;
@@ -9,7 +10,6 @@ import com.gistpetition.api.exception.WrappedException;
 import com.gistpetition.api.exception.petition.DuplicatedAnswerException;
 import com.gistpetition.api.exception.petition.NoSuchPetitionException;
 import com.gistpetition.api.exception.petition.UnAnsweredPetitionException;
-import com.gistpetition.api.integration.IntegrationTest;
 import com.gistpetition.api.petition.domain.Category;
 import com.gistpetition.api.petition.domain.Petition;
 import com.gistpetition.api.petition.domain.PetitionRepository;

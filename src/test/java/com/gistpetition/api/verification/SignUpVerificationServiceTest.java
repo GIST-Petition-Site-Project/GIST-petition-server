@@ -1,11 +1,11 @@
-package com.gistpetition.api.integration.verification;
+package com.gistpetition.api.verification;
 
+import com.gistpetition.api.IntegrationTest;
 import com.gistpetition.api.exception.user.DuplicatedUserException;
 import com.gistpetition.api.exception.user.InvalidEmailFormException;
 import com.gistpetition.api.exception.verification.DuplicatedVerificationException;
 import com.gistpetition.api.exception.verification.ExpiredVerificationCodeException;
 import com.gistpetition.api.exception.verification.NoSuchVerificationInfoException;
-import com.gistpetition.api.integration.IntegrationTest;
 import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRepository;
 import com.gistpetition.api.user.domain.UserRole;

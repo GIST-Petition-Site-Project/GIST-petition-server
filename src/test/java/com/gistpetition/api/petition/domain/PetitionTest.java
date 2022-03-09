@@ -1,11 +1,10 @@
-package com.gistpetition.api.unit.petition;
+package com.gistpetition.api.petition.domain;
 
-import com.gistpetition.api.common.PetitionBuilder;
 import com.gistpetition.api.exception.petition.AlreadyReleasedPetitionException;
 import com.gistpetition.api.exception.petition.ExpiredPetitionException;
 import com.gistpetition.api.exception.petition.NotEnoughAgreementException;
 import com.gistpetition.api.exception.petition.NotReleasedPetitionException;
-import com.gistpetition.api.petition.domain.Petition;
+import com.gistpetition.api.petition.PetitionBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
