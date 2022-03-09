@@ -1,11 +1,7 @@
 package com.gistpetition.api;
 
-import com.gistpetition.api.answer.domain.AnswerRepository;
 import com.gistpetition.api.petition.application.PetitionCommandService;
-import com.gistpetition.api.petition.domain.AgreementRepository;
-import com.gistpetition.api.petition.domain.Category;
-import com.gistpetition.api.petition.domain.Petition;
-import com.gistpetition.api.petition.domain.PetitionRepository;
+import com.gistpetition.api.petition.domain.*;
 import com.gistpetition.api.petition.dto.AgreementRequest;
 import com.gistpetition.api.petition.dto.AnswerRequest;
 import com.gistpetition.api.petition.dto.PetitionRequest;
@@ -72,8 +68,8 @@ public class DataLoader {
 
     @Transactional
     public void loadData() {
-        answerRepository.deleteAllInBatch();
         agreementRepository.deleteAllInBatch();
+        answerRepository.deleteAllInBatch();
         petitionRepository.deleteAllInBatch();
         userRepository.deleteAllInBatch();
 

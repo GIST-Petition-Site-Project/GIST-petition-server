@@ -37,7 +37,7 @@ public class Petition extends BaseEntity {
     private final Agreements agreements = new Agreements();
     @NotAudited
     @OneToOne(mappedBy = "petition", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, orphanRemoval = true)
-    private Answer2 answer2;
+    private Answer answer;
 
     protected Petition() {
     }
@@ -90,22 +90,22 @@ public class Petition extends BaseEntity {
         if (agreeCount < REQUIRED_AGREEMENT_FOR_ANSWER) {
             throw new NotEnoughAgreementException();
         }
-        this.answer2 = new Answer2(content, this);
+        this.answer = new Answer(content, this);
     }
 
     public void updateAnswer(String updateAnswerContent) {
         if (!isAnswered()) {
             throw new NotAnsweredPetitionException();
         }
-        this.answer2.updateContent(updateAnswerContent);
+        this.answer.updateContent(updateAnswerContent);
     }
 
     public void deleteAnswer() {
         if (!isAnswered()) {
             throw new NotAnsweredPetitionException();
         }
-        answer2.detach();
-        this.answer2 = null;
+        answer.detach();
+        this.answer = null;
     }
 
     public void setAnswered(boolean b) {
@@ -129,7 +129,7 @@ public class Petition extends BaseEntity {
     }
 
     public boolean isAnswered() {
-        return !Objects.isNull(answer2);
+        return !Objects.isNull(answer);
     }
 
     public boolean isExpiredAt(Instant time) {

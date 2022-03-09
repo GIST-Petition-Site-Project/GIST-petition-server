@@ -4,7 +4,7 @@ import com.gistpetition.api.config.annotation.LoginRequired;
 import com.gistpetition.api.config.annotation.LoginUser;
 import com.gistpetition.api.config.annotation.ManagerPermissionRequired;
 import com.gistpetition.api.petition.application.PetitionQueryService;
-import com.gistpetition.api.petition.domain.Answer2;
+import com.gistpetition.api.petition.domain.Answer;
 import com.gistpetition.api.petition.domain.Category;
 import com.gistpetition.api.petition.dto.*;
 import com.gistpetition.api.user.domain.SimpleUser;
@@ -120,7 +120,7 @@ public class PetitionQueryController {
     }
 
     @GetMapping("/petitions/{petitionId}/answer")
-    public ResponseEntity<Answer2> retrieveAnswer(@PathVariable Long petitionId) {
+    public ResponseEntity<Answer> retrieveAnswer(@PathVariable Long petitionId) {
         return ResponseEntity.ok().body(petitionQueryService.retrieveAnswerByPetitionId(petitionId));
     }
 

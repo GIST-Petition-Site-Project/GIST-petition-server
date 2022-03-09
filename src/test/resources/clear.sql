@@ -1,8 +1,6 @@
 DELETE
 from answer;
 DELETE
-from answer2;
-DELETE
 from agreement;
 DELETE
 from petition;
@@ -16,8 +14,6 @@ from user;
 
 DELETE
 from answer_aud;
-DELETE
-from answer2_aud;
 DELETE
 from petition_aud;
 DELETE

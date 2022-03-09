@@ -64,7 +64,7 @@ class PetitionServiceTest extends IntegrationTest {
     @Autowired
     private AgreementRepository agreementRepository;
     @Autowired
-    private Answer2Repository answer2Repository;
+    private AnswerRepository answerRepository;
     @MockBean(name = "httpSession")
     private HttpSession httpSession;
 
@@ -398,7 +398,7 @@ class PetitionServiceTest extends IntegrationTest {
 
         Petition petition = petitionRepository.findById(petitionId).orElseThrow();
         assertTrue(petition.isAnswered());
-        assertThat(petition.getAnswer2().getContent()).isEqualTo(ANSWER_REQUEST.getContent());
+        assertThat(petition.getAnswer().getContent()).isEqualTo(ANSWER_REQUEST.getContent());
     }
 
     @Test
@@ -413,7 +413,7 @@ class PetitionServiceTest extends IntegrationTest {
 
         Petition petition = petitionRepository.findById(petitionId).orElseThrow();
         assertTrue(petition.isAnswered());
-        assertThat(petition.getAnswer2().getContent()).isEqualTo(UPDATE_ANSWER_REQUEST.getContent());
+        assertThat(petition.getAnswer().getContent()).isEqualTo(UPDATE_ANSWER_REQUEST.getContent());
     }
 
     @Test
@@ -454,7 +454,7 @@ class PetitionServiceTest extends IntegrationTest {
         }
         latch.await();
         assertThat(errorCount.get()).isEqualTo(numberOfThreads - 1);
-        assertThat(answer2Repository.findByPetitionId(petitionId)).hasSize(1);
+        assertThat(answerRepository.findByPetitionId(petitionId)).hasSize(1);
     }
 
     @Test

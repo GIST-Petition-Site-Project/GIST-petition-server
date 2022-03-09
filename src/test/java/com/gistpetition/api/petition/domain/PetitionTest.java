@@ -116,7 +116,7 @@ class PetitionTest {
         petition.answer(ANSWER_CONTENT);
 
         assertTrue(petition.isAnswered());
-        assertThat(petition.getAnswer2().getContent()).isEqualTo(ANSWER_CONTENT);
+        assertThat(petition.getAnswer().getContent()).isEqualTo(ANSWER_CONTENT);
     }
 
     @Test
@@ -151,7 +151,7 @@ class PetitionTest {
         String updateAnswerContent = "답변 수정을 진행했다.";
         petition.updateAnswer(updateAnswerContent);
 
-        assertThat(petition.getAnswer2().getContent()).isEqualTo(updateAnswerContent);
+        assertThat(petition.getAnswer().getContent()).isEqualTo(updateAnswerContent);
     }
 
     @Test

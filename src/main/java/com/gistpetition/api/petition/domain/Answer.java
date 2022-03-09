@@ -15,14 +15,14 @@ import javax.persistence.OneToOne;
 @Getter
 @Audited
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Answer2 extends BaseEntity {
+public class Answer extends BaseEntity {
     @Lob
     private String content;
     @OneToOne
     @JoinColumn(name = "petition_id", referencedColumnName = "id", unique = true)
     private Petition petition;
 
-    public Answer2(String content, Petition petition) {
+    public Answer(String content, Petition petition) {
         this.content = content;
         this.petition = petition;
     }

@@ -23,7 +23,7 @@ import static com.gistpetition.api.petition.application.PetitionQueryCondition.*
 public class PetitionQueryService {
 
     private final PetitionRepository petitionRepository;
-    private final Answer2Repository answer2Repository;
+    private final AnswerRepository answerRepository;
     private final AgreementRepository agreementRepository;
     private final UserRepository userRepository;
 
@@ -140,15 +140,15 @@ public class PetitionQueryService {
     }
 
     @Transactional(readOnly = true)
-    public Answer2 retrieveAnswerByPetitionId(Long petitionId) {
+    public Answer retrieveAnswerByPetitionId(Long petitionId) {
         Petition petition = findPetitionById(petitionId);
-        return petition.getAnswer2();
+        return petition.getAnswer();
     }
 
     @Transactional(readOnly = true)
     public Page<AnswerRevisionResponse> retrieveRevisionsOfAnswer(Long petitionId, Pageable pageable) {
         Petition petition = findPetitionById(petitionId);
-        return AnswerRevisionResponse.pageOf2(answer2Repository.findRevisions(petition.getAnswer2().getId(), pageable));
+        return AnswerRevisionResponse.pageOf2(answerRepository.findRevisions(petition.getAnswer().getId(), pageable));
     }
 
     private User findUserById(Long userId) {
