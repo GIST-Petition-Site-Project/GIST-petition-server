@@ -246,6 +246,17 @@ class PetitionServiceTest extends IntegrationTest {
     }
 
     @Test
+    void retrievePetitionOfMine() {
+        int numOfPetition = 3;
+        for (int i = 0; i < numOfPetition; i++) {
+            petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
+        }
+
+        Page<PetitionPreviewResponse> petitions = petitionQueryService.retrievePetitionsByUserId(petitionOwner.getId(), PageRequest.of(0, 10));
+        assertThat(petitions).hasSize(numOfPetition);
+    }
+
+    @Test
     void getStateOfAgreement() {
         Long petitionId = petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
         assertThat(petitionQueryService.retrieveStateOfAgreement(petitionId, petitionOwner.getId())).isFalse();

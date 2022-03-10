@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 
 import static com.gistpetition.api.petition.application.PetitionQueryCondition.*;
+import static com.gistpetition.api.petition.domain.QPetition.petition;
 
 @Service
 @RequiredArgsConstructor
@@ -84,6 +85,10 @@ public class PetitionQueryService {
         return petitionRepository.findAll(category, ANSWERED.at(Instant.now()), pageable);
     }
 
+    public Page<PetitionPreviewResponse> retrievePetitionsByUserId(Long userId, Pageable pageable) {
+        return petitionRepository.findAll(null, petition.userId.eq(userId), pageable);
+    }
+
     public Long retrieveReleasedPetitionCount() {
         return petitionRepository.count(null, RELEASED.at(Instant.now()));
     }
@@ -114,11 +119,6 @@ public class PetitionQueryService {
 
     public Long retrieveAnsweredPetitionCount(Category category) {
         return petitionRepository.count(category, ANSWERED.at(Instant.now()));
-    }
-
-    @Transactional(readOnly = true)
-    public Page<PetitionPreviewResponse> retrievePetitionsByUserId(Long userId, Pageable pageable) {
-        return PetitionPreviewResponse.pageOf(petitionRepository.findByUserId(userId, pageable));
     }
 
     @Transactional(readOnly = true)

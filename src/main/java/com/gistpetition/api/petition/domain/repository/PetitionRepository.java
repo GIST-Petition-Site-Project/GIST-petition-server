@@ -11,8 +11,6 @@ import java.util.Optional;
 
 @Repository
 public interface PetitionRepository extends RevisionRepository<Petition, Long, Long>, JpaRepository<Petition, Long>, CustomPetitionRepository {
-    Page<Petition> findByUserId(Long userId, Pageable pageable);
-
     Page<Petition> findByTitleContains(String keyword, Pageable pageable);
 
     Optional<Petition> findByTempUrl(String tempUrl);
