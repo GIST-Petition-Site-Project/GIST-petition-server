@@ -40,13 +40,13 @@ public class PetitionQueryController {
         return ResponseEntity.ok().body(petitionQueryService.retrieveReleasedAndExpiredPetition(Category.of(categoryId), pageable));
     }
 
-    //    @ManagerPermissionRequired
+    @ManagerPermissionRequired
     @GetMapping("/petitions/waitingForRelease")
     public ResponseEntity<Page<PetitionPreviewResponse>> retrievePetitionsWaitingForCheck(@RequestParam(defaultValue = "0") Long categoryId, Pageable pageable) {
         return ResponseEntity.ok().body(petitionQueryService.retrievePetitionsWaitingForRelease(Category.of(categoryId), pageable));
     }
 
-    //    @ManagerPermissionRequired
+    @ManagerPermissionRequired
     @GetMapping("/petitions/waitingForAnswer")
     public ResponseEntity<Page<PetitionPreviewResponse>> retrievePetitionsWaitingForAnswer(@RequestParam(defaultValue = "0") Long categoryId, Pageable pageable) {
         return ResponseEntity.ok().body(petitionQueryService.retrievePetitionsWaitingForAnswer(Category.of(categoryId), pageable));
