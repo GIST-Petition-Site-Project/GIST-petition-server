@@ -185,8 +185,9 @@ class PetitionServiceTest extends IntegrationTest {
             });
         }
         latch.await();
+        Petition petition = petitionRepository.findById(petitionId).orElseThrow();
+        assertThat(petition.getAgreeCount()).isEqualTo(1);
         assertThat(errorCount.get()).isEqualTo(numberOfThreads - 1);
-        assertThat(petitionQueryService.retrieveNumberOfAgreements(petitionId)).isEqualTo(1);
     }
 
     @Test
@@ -210,48 +211,6 @@ class PetitionServiceTest extends IntegrationTest {
     }
 
     @Test
-    void numberOfAgreements() {
-        Long petitionId = petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
-
-        User user = userRepository.save(new User("email@email.com", "password", UserRole.USER));
-        User user3 = userRepository.save(new User("email3@email.com", "password", UserRole.USER));
-
-        assertThat(petitionQueryService.retrieveNumberOfAgreements(petitionId)).isEqualTo(0);
-
-        petitionCommandService.agree(AGREEMENT_REQUEST, petitionId, petitionOwner.getId());
-        petitionCommandService.agree(AGREEMENT_REQUEST, petitionId, user.getId());
-        petitionCommandService.agree(AGREEMENT_REQUEST, petitionId, user3.getId());
-
-        assertThat(petitionQueryService.retrieveNumberOfAgreements(petitionId)).isEqualTo(3);
-    }
-
-    @Test
-    void retrieveAgreedPetitions() {
-        Long petitionId = petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
-        Long petitionId2 = petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
-        Long petitionId3 = petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
-
-        User user = userRepository.save(new User("email@email.com", "password", UserRole.USER));
-        User user3 = userRepository.save(new User("email3@email.com", "password", UserRole.USER));
-
-        assertThat(petitionQueryService.retrieveNumberOfAgreements(petitionId)).isEqualTo(0);
-
-        petitionCommandService.agree(AGREEMENT_REQUEST, petitionId, petitionOwner.getId());
-        petitionCommandService.agree(AGREEMENT_REQUEST, petitionId, user.getId());
-        petitionCommandService.agree(AGREEMENT_REQUEST, petitionId, user3.getId());
-
-        petitionCommandService.agree(AGREEMENT_REQUEST, petitionId2, petitionOwner.getId());
-        petitionCommandService.agree(AGREEMENT_REQUEST, petitionId2, user.getId());
-        petitionCommandService.agree(AGREEMENT_REQUEST, petitionId2, user3.getId());
-
-        petitionCommandService.agree(AGREEMENT_REQUEST, petitionId3, petitionOwner.getId());
-        petitionCommandService.agree(AGREEMENT_REQUEST, petitionId3, user.getId());
-        petitionCommandService.agree(AGREEMENT_REQUEST, petitionId3, user3.getId());
-
-        assertThat(petitionQueryService.retrieveNumberOfAgreements(petitionId)).isEqualTo(3);
-    }
-
-    @Test
     void retrieveOngoingPetition() {
         int numOfPetition = 3;
         List<Long> createdPetitionIds = new ArrayList<>();
@@ -264,7 +223,7 @@ class PetitionServiceTest extends IntegrationTest {
             petitionCommandService.releasePetition(i);
         });
 
-        Page<PetitionPreviewResponse> petitions = petitionQueryService.retrieveOngoingPetition(null, PageRequest.of(0, 10));
+        Page<PetitionPreviewResponse> petitions = petitionQueryService.retrieveOngoingPetition(PageRequest.of(0, 10));
         assertThat(petitions.getContent()).hasSize(numOfPetition);
     }
 
@@ -282,7 +241,7 @@ class PetitionServiceTest extends IntegrationTest {
             petitionCommandService.answerPetition(i, ANSWER_REQUEST);
         });
 
-        Page<PetitionPreviewResponse> petitions = petitionQueryService.retrieveAnsweredPetition(null, PageRequest.of(0, 10));
+        Page<PetitionPreviewResponse> petitions = petitionQueryService.retrieveAnsweredPetition(PageRequest.of(0, 10));
         assertThat(petitions).hasSize(numOfPetition);
     }
 
