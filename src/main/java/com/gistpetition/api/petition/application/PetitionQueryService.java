@@ -38,8 +38,18 @@ public class PetitionQueryService {
     }
 
     @Transactional(readOnly = true)
+    public Page<PetitionPreviewResponse> retrieveReleasedPetition(Pageable pageable) {
+        return petitionRepository.findAll(null, RELEASED_NOT_EXPIRED.at(Instant.now()), pageable);
+    }
+
+    @Transactional(readOnly = true)
     public Page<PetitionPreviewResponse> retrieveReleasedPetition(Category category, Pageable pageable) {
         return petitionRepository.findAll(category, RELEASED_NOT_EXPIRED.at(Instant.now()), pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PetitionPreviewResponse> retrieveReleasedAndExpiredPetition(Pageable pageable) {
+        return petitionRepository.findAll(null, RELEASED_EXPIRED.at(Instant.now()), pageable);
     }
 
     @Transactional(readOnly = true)
@@ -48,8 +58,18 @@ public class PetitionQueryService {
     }
 
     @Transactional(readOnly = true)
+    public Page<PetitionPreviewResponse> retrieveOngoingPetition(Pageable pageable) {
+        return petitionRepository.findAll(null, ONGOING.at(Instant.now()), pageable);
+    }
+
+    @Transactional(readOnly = true)
     public Page<PetitionPreviewResponse> retrieveOngoingPetition(Category category, Pageable pageable) {
         return petitionRepository.findAll(category, ONGOING.at(Instant.now()), pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PetitionPreviewResponse> retrievePetitionsWaitingForRelease(Pageable pageable) {
+        return petitionRepository.findAll(null, WAITING_FOR_RELEASE.at(Instant.now()), pageable);
     }
 
     @Transactional(readOnly = true)
@@ -58,8 +78,20 @@ public class PetitionQueryService {
     }
 
     @Transactional(readOnly = true)
+    public Page<PetitionPreviewResponse> retrievePetitionsWaitingForAnswer(Pageable pageable) {
+        return petitionRepository.findAll(null, WAITING_FOR_ANSWER.at(Instant.now()), pageable);
+    }
+
+
+    @Transactional(readOnly = true)
     public Page<PetitionPreviewResponse> retrievePetitionsWaitingForAnswer(Category category, Pageable pageable) {
         return petitionRepository.findAll(category, WAITING_FOR_ANSWER.at(Instant.now()), pageable);
+    }
+
+
+    @Transactional(readOnly = true)
+    public Page<PetitionPreviewResponse> retrieveAnsweredPetition(Pageable pageable) {
+        return petitionRepository.findAll(null, ANSWERED.at(Instant.now()), pageable);
     }
 
     @Transactional(readOnly = true)
@@ -68,8 +100,18 @@ public class PetitionQueryService {
     }
 
     @Transactional(readOnly = true)
+    public Long retrieveReleasedPetitionCount() {
+        return petitionRepository.count(null, RELEASED.at(Instant.now()));
+    }
+
+    @Transactional(readOnly = true)
     public Long retrieveReleasedPetitionCount(Category category) {
         return petitionRepository.count(category, RELEASED.at(Instant.now()));
+    }
+
+    @Transactional(readOnly = true)
+    public Long retrieveWaitingForReleasePetitionCount() {
+        return petitionRepository.count(null, WAITING_FOR_RELEASE.at(Instant.now()));
     }
 
     @Transactional(readOnly = true)
@@ -78,8 +120,18 @@ public class PetitionQueryService {
     }
 
     @Transactional(readOnly = true)
+    public Long retrieveWaitingForAnswerPetitionCount() {
+        return petitionRepository.count(null, WAITING_FOR_ANSWER.at(Instant.now()));
+    }
+
+    @Transactional(readOnly = true)
     public Long retrieveWaitingForAnswerPetitionCount(Category category) {
         return petitionRepository.count(category, WAITING_FOR_ANSWER.at(Instant.now()));
+    }
+
+    @Transactional(readOnly = true)
+    public Long retrieveAnsweredPetitionCount() {
+        return petitionRepository.count(null, ANSWERED.at(Instant.now()));
     }
 
     @Transactional(readOnly = true)

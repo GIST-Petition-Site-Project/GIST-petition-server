@@ -17,7 +17,6 @@ public enum Category {
     COMMUNICATION(8L, "권익소통"),
     ETC(9L, "기타");
 
-    private static final long SEARCH_ALL_CATEGORY_ID = 0L;
     private final Long id;
     private final String name;
 
@@ -35,9 +34,6 @@ public enum Category {
     }
 
     public static Category of(Long categoryId) {
-        if (categoryId.equals(SEARCH_ALL_CATEGORY_ID)) {
-            return null;
-        }
         if (!lookup.containsKey(categoryId)) {
             throw new NoSuchCategoryException();
         }
