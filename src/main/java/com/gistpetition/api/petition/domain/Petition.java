@@ -20,8 +20,10 @@ public class Petition extends BaseEntity {
     public static final int REQUIRED_AGREEMENT_FOR_ANSWER = 20;
     public static final int POSTING_PERIOD_BY_SECONDS = 30 * 24 * 60 * 60;
 
+    @Column(name = "title", nullable = false)
     private String title;
     @Lob
+    @Column(name = "description", nullable = false)
     private String description;
     @Enumerated(EnumType.STRING)
     private Category category;
@@ -36,7 +38,7 @@ public class Petition extends BaseEntity {
     @NotAudited
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST, orphanRemoval = true)
     @JoinColumn(name = "agree_count_id", referencedColumnName = "id", nullable = false)
-    private AgreeCount agreeCount = new AgreeCount(0);
+    private final AgreeCount agreeCount = new AgreeCount(0);
     @NotAudited
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST, orphanRemoval = true)
     @JoinColumn(name = "answer_id", referencedColumnName = "id")

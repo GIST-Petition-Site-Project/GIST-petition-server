@@ -1,0 +1,8 @@
+ALTER TABLE petition
+    MODIFY title LONGTEXT NOT NULL;
+ALTER TABLE petition
+    MODIFY description LONGTEXT NOT NULL;
+ALTER TABLE answer
+    MODIFY content LONGTEXT NOT NULL;
+ALTER TABLE agreement
+    MODIFY description LONGTEXT NOT NULL;
