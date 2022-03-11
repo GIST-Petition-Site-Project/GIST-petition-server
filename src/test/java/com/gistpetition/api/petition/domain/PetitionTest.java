@@ -120,6 +120,15 @@ class PetitionTest {
     }
 
     @Test
+    void answer_for_already_answered_petition() {
+        agreePetitionByMultipleUsers(petition, REQUIRED_AGREEMENT_FOR_ANSWER);
+        petition.release(PETITION_ONGOING_AT);
+        petition.answer(ANSWER_CONTENT);
+
+        assertThatThrownBy(() -> petition.answer(ANSWER_CONTENT)).isInstanceOf(AlreadyAnswerException.class);
+    }
+
+    @Test
     void answer_for_not_released_petition() {
         agreePetitionByMultipleUsers(petition, REQUIRED_AGREEMENT_FOR_ANSWER);
 

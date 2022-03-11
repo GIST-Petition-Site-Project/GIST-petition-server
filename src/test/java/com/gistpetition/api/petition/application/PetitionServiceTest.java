@@ -26,7 +26,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.history.RevisionMetadata;
-import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
 import javax.servlet.http.HttpSession;
 import java.time.Instant;
@@ -439,7 +438,7 @@ class PetitionServiceTest extends IntegrationTest {
             service.execute(() -> {
                 try {
                     petitionCommandService.answerPetition(petitionId, ANSWER_REQUEST);
-                } catch (ObjectOptimisticLockingFailureException ex) {
+                } catch (Exception ex) {
                     errorCount.incrementAndGet();
                 } finally {
                     latch.countDown();

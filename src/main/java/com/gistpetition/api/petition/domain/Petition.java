@@ -91,6 +91,9 @@ public class Petition extends BaseEntity {
     }
 
     public void answer(String content) {
+        if (isAnswered()) {
+            throw new AlreadyAnswerException();
+        }
         if (!released) {
             throw new NotReleasedPetitionException();
         }
