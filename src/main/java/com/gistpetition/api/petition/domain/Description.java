@@ -1,7 +1,6 @@
 package com.gistpetition.api.petition.domain;
 
-import com.gistpetition.api.exception.petition.InvalidDescriptionException;
-import com.gistpetition.api.exception.petition.InvalidTitleException;
+import com.gistpetition.api.exception.petition.InvalidDescriptionLengthException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,14 +14,22 @@ import java.util.Objects;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class Description {
+    public static final int DESCRIPTION_MAX_LENGTH = 10000;
+
     @Column
     @Lob
     private String description;
-    public static final int DESCRIPTION_MAX_LENGTH = 10000;
 
-    public Description(String description){
-        if (Objects.isNull(description) || description.isBlank() || description.length()>DESCRIPTION_MAX_LENGTH) {
-            throw new InvalidDescriptionException();
+    public Description(String description) {
+        if (Objects.isNull(description) || description.isBlank() || description.length() > DESCRIPTION_MAX_LENGTH) {
+            throw new InvalidDescriptionLengthException();
+        }
+        this.description = description;
+    }
+
+    public void update(String description) {
+        if (Objects.isNull(description) || description.isBlank() || description.length() > DESCRIPTION_MAX_LENGTH) {
+            throw new InvalidDescriptionLengthException();
         }
         this.description = description;
     }

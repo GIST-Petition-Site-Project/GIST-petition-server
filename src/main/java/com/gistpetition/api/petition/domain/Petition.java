@@ -88,8 +88,8 @@ public class Petition extends BaseEntity {
     }
 
     public void update(String title, String description, Long categoryId) {
-        this.title = new Title(title);
-        this.description = new Description(description);
+        this.title.update(title);
+        this.description.update(description);
         this.category = Category.of(categoryId);
     }
 

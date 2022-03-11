@@ -2,8 +2,8 @@ package com.gistpetition.api.petition.application;
 
 import com.gistpetition.api.IntegrationTest;
 import com.gistpetition.api.exception.petition.DuplicatedAgreementException;
-import com.gistpetition.api.exception.petition.InvalidDescriptionException;
-import com.gistpetition.api.exception.petition.InvalidTitleException;
+import com.gistpetition.api.exception.petition.InvalidDescriptionLengthException;
+import com.gistpetition.api.exception.petition.InvalidTitleLengthException;
 import com.gistpetition.api.exception.petition.NoSuchPetitionException;
 import com.gistpetition.api.petition.PetitionBuilder;
 import com.gistpetition.api.petition.domain.*;
@@ -93,10 +93,10 @@ class PetitionServiceTest extends IntegrationTest {
 
     @Test
     void createPetitionWithInvalidTitleAndDescription() {
-        assertThatThrownBy(() -> petitionCommandService.createPetition( new PetitionRequest("", "description", Category.DORMITORY.getId()), petitionOwner.getId())).isInstanceOf(InvalidTitleException.class);
-        assertThatThrownBy(() -> petitionCommandService.createPetition( new PetitionRequest("a".repeat(Title.TITLE_MAX_LENGTH+1), "description", Category.DORMITORY.getId()), petitionOwner.getId())).isInstanceOf(InvalidTitleException.class);
-        assertThatThrownBy(() -> petitionCommandService.createPetition( new PetitionRequest("title", "", Category.DORMITORY.getId()), petitionOwner.getId())).isInstanceOf(InvalidDescriptionException.class);
-        assertThatThrownBy(() -> petitionCommandService.createPetition( new PetitionRequest("title", "a".repeat(Description.DESCRIPTION_MAX_LENGTH+1), Category.DORMITORY.getId()), petitionOwner.getId())).isInstanceOf(InvalidDescriptionException.class);
+        assertThatThrownBy(() -> petitionCommandService.createPetition( new PetitionRequest("", "description", Category.DORMITORY.getId()), petitionOwner.getId())).isInstanceOf(InvalidTitleLengthException.class);
+        assertThatThrownBy(() -> petitionCommandService.createPetition( new PetitionRequest("a".repeat(Title.TITLE_MAX_LENGTH+1), "description", Category.DORMITORY.getId()), petitionOwner.getId())).isInstanceOf(InvalidTitleLengthException.class);
+        assertThatThrownBy(() -> petitionCommandService.createPetition( new PetitionRequest("title", "", Category.DORMITORY.getId()), petitionOwner.getId())).isInstanceOf(InvalidDescriptionLengthException.class);
+        assertThatThrownBy(() -> petitionCommandService.createPetition( new PetitionRequest("title", "a".repeat(Description.DESCRIPTION_MAX_LENGTH+1), Category.DORMITORY.getId()), petitionOwner.getId())).isInstanceOf(InvalidDescriptionLengthException.class);
 
     }
 
