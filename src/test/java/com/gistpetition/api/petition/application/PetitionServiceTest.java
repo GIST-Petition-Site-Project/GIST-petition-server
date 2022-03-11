@@ -168,7 +168,7 @@ class PetitionServiceTest extends IntegrationTest {
     @Test
     public void applyAgreementWithConcurrency() throws InterruptedException {
         Long petitionId = petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
-        int numberOfThreads = 10;
+        int numberOfThreads = 3;
 
         ExecutorService service = Executors.newFixedThreadPool(numberOfThreads);
         CountDownLatch latch = new CountDownLatch(numberOfThreads);
@@ -194,7 +194,7 @@ class PetitionServiceTest extends IntegrationTest {
     @Test
     public void applyAgreementByManyWithConcurrency() throws InterruptedException {
         Long petitionId = petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
-        int numberOfThreads = 10;
+        int numberOfThreads = 3;
 
         List<User> users = saveUsersNumberOf(numberOfThreads);
 
