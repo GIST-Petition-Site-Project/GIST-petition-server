@@ -35,8 +35,8 @@ public enum PetitionQueryCondition {
 
     public Predicate at(Instant at) {
         BooleanBuilder booleanBuilder = new BooleanBuilder();
-        for (PetitionStatus qc : conditions) {
-            booleanBuilder.and(qc.condition);
+        for (PetitionStatus ps : conditions) {
+            booleanBuilder.and(ps.condition);
         }
         booleanBuilder.and(this.expirationCondition.at(at));
         return booleanBuilder;
@@ -61,10 +61,10 @@ public enum PetitionQueryCondition {
     enum PetitionStatus {
         released(petition.released.isTrue()),
         notReleased(petition.released.isFalse()),
-        answered(petition.answered.isTrue()),
-        notAnswered(petition.answered.isFalse()),
-        agreeEnoughToRelease(petition.agreeCount.goe(Petition.REQUIRED_AGREEMENT_FOR_RELEASE)),
-        agreeEnoughToAnswer(petition.agreeCount.goe(Petition.REQUIRED_AGREEMENT_FOR_ANSWER));
+        answered(petition.answer.isNotNull()),
+        notAnswered(petition.answer.isNull()),
+        agreeEnoughToRelease(petition.agreeCount.count.goe(Petition.REQUIRED_AGREEMENT_FOR_RELEASE)),
+        agreeEnoughToAnswer(petition.agreeCount.count.goe(Petition.REQUIRED_AGREEMENT_FOR_ANSWER));
 
         private final BooleanExpression condition;
 

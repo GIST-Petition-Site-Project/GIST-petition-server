@@ -174,7 +174,8 @@ public class PetitionQueryService {
     @Transactional(readOnly = true)
     public Page<AnswerRevisionResponse> retrieveRevisionsOfAnswer(Long petitionId, Pageable pageable) {
         Petition petition = findPetitionById(petitionId);
-        return AnswerRevisionResponse.pageOf(answerRepository.findRevisions(petition.getAnswer().getId(), pageable));
+        Long answerId = petition.getAnswer().getId();
+        return AnswerRevisionResponse.pageOf(answerRepository.findRevisions(answerId, pageable));
     }
 
     private User findUserById(Long userId) {

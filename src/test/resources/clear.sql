@@ -1,9 +1,9 @@
 DELETE
-from answer;
-DELETE
 from agreement;
 DELETE
 from petition;
+DELETE
+from answer;
 
 DELETE
 from sign_up_verification_info;

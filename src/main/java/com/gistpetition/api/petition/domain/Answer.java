@@ -5,9 +5,10 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.OneToOne;
 
@@ -17,9 +18,10 @@ import javax.persistence.OneToOne;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Answer extends BaseEntity {
     @Lob
+    @Column(name = "content", nullable = false)
     private String content;
-    @OneToOne
-    @JoinColumn(name = "petition_id", referencedColumnName = "id", unique = true)
+    @NotAudited
+    @OneToOne(mappedBy = "answer")
     private Petition petition;
 
     public Answer(String content, Petition petition) {
@@ -29,9 +31,5 @@ public class Answer extends BaseEntity {
 
     public void updateContent(String updateAnswerContent) {
         this.content = updateAnswerContent;
-    }
-
-    public void detach() {
-        this.petition = null;
     }
 }

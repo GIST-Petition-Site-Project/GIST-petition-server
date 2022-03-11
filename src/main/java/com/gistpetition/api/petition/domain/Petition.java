@@ -4,11 +4,13 @@ import com.gistpetition.api.common.persistence.BaseEntity;
 import com.gistpetition.api.exception.petition.*;
 import com.gistpetition.api.user.domain.User;
 import lombok.Getter;
+import org.hibernate.annotations.OptimisticLock;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
 
 import javax.persistence.*;
 import java.time.Instant;
+import java.util.Objects;
 
 @Audited
 @Getter
@@ -24,19 +26,23 @@ public class Petition extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Category category;
     private Boolean released = false;
-    private Boolean answered = false;
     private Instant expiredAt;
     private Long userId;
     @Column(unique = true)
     private String tempUrl;
-    @NotAudited
-    private Integer agreeCount = 0;
-    @NotAudited
     @Embedded
+    @OptimisticLock(excluded = true)
     private final Agreements agreements = new Agreements();
     @NotAudited
-    @OneToOne(mappedBy = "petition", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @JoinColumn(name = "agree_count_id", referencedColumnName = "id", nullable = false)
+    private AgreeCount agreeCount = new AgreeCount(0);
+    @NotAudited
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @JoinColumn(name = "answer_id", referencedColumnName = "id")
     private Answer answer;
+    @Version
+    private Long version;
 
     protected Petition() {
     }
@@ -55,7 +61,7 @@ public class Petition extends BaseEntity {
             throw new ExpiredPetitionException();
         }
         this.agreements.add(new Agreement(description, userId, this));
-        this.agreeCount += 1;
+        this.agreeCount.increment();
     }
 
     public boolean isAgreedBy(User user) {
@@ -69,7 +75,7 @@ public class Petition extends BaseEntity {
         if (released) {
             throw new AlreadyReleasedPetitionException();
         }
-        if (agreeCount < REQUIRED_AGREEMENT_FOR_RELEASE) {
+        if (agreeCount.isLessThan(REQUIRED_AGREEMENT_FOR_RELEASE)) {
             throw new NotEnoughAgreementException();
         }
         this.released = true;
@@ -86,11 +92,10 @@ public class Petition extends BaseEntity {
         if (!released) {
             throw new NotReleasedPetitionException();
         }
-        if (agreeCount < REQUIRED_AGREEMENT_FOR_ANSWER) {
+        if (agreeCount.isLessThan(REQUIRED_AGREEMENT_FOR_ANSWER)) {
             throw new NotEnoughAgreementException();
         }
         this.answer = new Answer(content, this);
-        this.answered = true;
     }
 
     public void updateAnswer(String updateAnswerContent) {
@@ -104,9 +109,7 @@ public class Petition extends BaseEntity {
         if (!isAnswered()) {
             throw new NotAnsweredPetitionException();
         }
-        answer.detach();
         this.answer = null;
-        this.answered = false;
     }
 
     public void setTitle(String title) {
@@ -126,10 +129,14 @@ public class Petition extends BaseEntity {
     }
 
     public boolean isAnswered() {
-        return answered;
+        return !Objects.isNull(answer);
     }
 
     public boolean isExpiredAt(Instant time) {
         return time.isAfter(expiredAt);
+    }
+
+    public int getAgreeCount() {
+        return agreeCount.getCount();
     }
 }

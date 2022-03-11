@@ -1,11 +1,11 @@
 package com.gistpetition.api.petition.application;
 
 import com.gistpetition.api.IntegrationTest;
-import com.gistpetition.api.exception.petition.AlreadyAnswerException;
 import com.gistpetition.api.exception.petition.DuplicatedAgreementException;
 import com.gistpetition.api.exception.petition.NoSuchPetitionException;
 import com.gistpetition.api.petition.PetitionBuilder;
 import com.gistpetition.api.petition.domain.Agreement;
+import com.gistpetition.api.petition.domain.Answer;
 import com.gistpetition.api.petition.domain.Category;
 import com.gistpetition.api.petition.domain.Petition;
 import com.gistpetition.api.petition.domain.repository.AgreementRepository;
@@ -26,6 +26,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.history.RevisionMetadata;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
 import javax.servlet.http.HttpSession;
 import java.time.Instant;
@@ -188,6 +189,33 @@ class PetitionServiceTest extends IntegrationTest {
         Petition petition = petitionRepository.findById(petitionId).orElseThrow();
         assertThat(petition.getAgreeCount()).isEqualTo(1);
         assertThat(errorCount.get()).isEqualTo(numberOfThreads - 1);
+    }
+
+    @Test
+    public void applyAgreementByManyWithConcurrency() throws InterruptedException {
+        Long petitionId = petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
+        int numberOfThreads = 10;
+
+        List<User> users = saveUsersNumberOf(numberOfThreads);
+
+        ExecutorService service = Executors.newFixedThreadPool(numberOfThreads);
+        CountDownLatch latch = new CountDownLatch(numberOfThreads);
+        for (int i = 0; i < numberOfThreads; i++) {
+            AgreementRequest agreementRequest = new AgreementRequest("description" + i);
+            User user = users.get(i);
+            service.execute(() -> {
+                try {
+                    petitionCommandService.agree(agreementRequest, petitionId, user.getId());
+                } finally {
+                    latch.countDown();
+                }
+            });
+        }
+        latch.await();
+        Petition petition = petitionRepository.findById(petitionId).orElseThrow();
+        List<Agreement> agreements = agreementRepository.findAll();
+        assertThat(petition.getAgreeCount()).isEqualTo(numberOfThreads);
+        assertThat(agreements).hasSize(numberOfThreads);
     }
 
     @Test
@@ -392,6 +420,8 @@ class PetitionServiceTest extends IntegrationTest {
 
         Petition petition = petitionRepository.findById(petitionId).orElseThrow();
         assertFalse(petition.isAnswered());
+        List<Answer> answers = answerRepository.findAll();
+        assertThat(answers).hasSize(0);
     }
 
     @Test
@@ -409,7 +439,7 @@ class PetitionServiceTest extends IntegrationTest {
             service.execute(() -> {
                 try {
                     petitionCommandService.answerPetition(petitionId, ANSWER_REQUEST);
-                } catch (AlreadyAnswerException ex) {
+                } catch (ObjectOptimisticLockingFailureException ex) {
                     errorCount.incrementAndGet();
                 } finally {
                     latch.countDown();
