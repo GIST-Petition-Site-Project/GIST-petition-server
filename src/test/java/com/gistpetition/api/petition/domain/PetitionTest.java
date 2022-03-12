@@ -4,11 +4,15 @@ import com.gistpetition.api.exception.petition.*;
 import com.gistpetition.api.petition.PetitionBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.stream.LongStream;
+import java.util.stream.Stream;
 
 import static com.gistpetition.api.petition.domain.Petition.REQUIRED_AGREEMENT_FOR_ANSWER;
 import static com.gistpetition.api.petition.domain.Petition.REQUIRED_AGREEMENT_FOR_RELEASE;
@@ -30,6 +34,23 @@ class PetitionTest {
     @BeforeEach
     void setUp() {
         petition = PetitionBuilder.aPetition().withExpiredAt(PETITION_EXPIRED_AT).withTempUrl(TEMP_URL).build();
+    }
+
+    private static Stream<Arguments> create_petition_invalid_condition() {
+        return Stream.of(
+                Arguments.arguments("", "description", InvalidTitleLengthException.class),
+                Arguments.arguments("A".repeat(Title.TITLE_MAX_LENGTH + 1), "description", InvalidTitleLengthException.class),
+                Arguments.arguments("title", "", InvalidDescriptionLengthException.class),
+                Arguments.arguments("title", "A".repeat(Description.DESCRIPTION_MAX_LENGTH + 1), InvalidDescriptionLengthException.class)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("create_petition_invalid_condition")
+    void create_petition_invalid_condition(String title, String description, Class<Exception> exceptionClass) {
+        assertThatThrownBy(
+                () -> new Petition(title, description, Category.DORMITORY, Instant.now(), 1L, "AAAAAA")
+        ).isInstanceOf(exceptionClass);
     }
 
     @Test
