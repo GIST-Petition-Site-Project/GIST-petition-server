@@ -6,7 +6,13 @@ import com.gistpetition.api.exception.petition.InvalidDescriptionLengthException
 import com.gistpetition.api.exception.petition.InvalidTitleLengthException;
 import com.gistpetition.api.exception.petition.NoSuchPetitionException;
 import com.gistpetition.api.petition.PetitionBuilder;
-import com.gistpetition.api.petition.domain.*;
+import com.gistpetition.api.petition.domain.Agreement;
+import com.gistpetition.api.petition.domain.Answer;
+import com.gistpetition.api.petition.domain.Category;
+import com.gistpetition.api.petition.domain.Petition;
+import com.gistpetition.api.petition.domain.repository.AgreementRepository;
+import com.gistpetition.api.petition.domain.repository.AnswerRepository;
+import com.gistpetition.api.petition.domain.repository.PetitionRepository;
 import com.gistpetition.api.petition.dto.*;
 import com.gistpetition.api.user.domain.SimpleUser;
 import com.gistpetition.api.user.domain.User;
@@ -16,8 +22,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.data.auditing.AuditingHandler;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -28,7 +33,6 @@ import javax.servlet.http.HttpSession;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -36,20 +40,25 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
+import static com.gistpetition.api.petition.domain.Petition.REQUIRED_AGREEMENT_FOR_ANSWER;
 import static com.gistpetition.api.petition.domain.Petition.REQUIRED_AGREEMENT_FOR_RELEASE;
+import static com.gistpetition.api.user.application.SessionLoginService.SESSION_KEY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.BDDMockito.given;
 
 class PetitionServiceTest extends IntegrationTest {
     public static final Instant PETITION_CREATION_AT = Instant.now();
     public static final Instant PETITION_EXPIRED_AT = PETITION_CREATION_AT.plusSeconds(Petition.POSTING_PERIOD_BY_SECONDS);
+    public static final AnswerRequest UPDATE_ANSWER_REQUEST = new AnswerRequest("답변 수정을 진행했다.");
     private static final PetitionRequest DORM_PETITION_REQUEST = new PetitionRequest("title", "description", Category.DORMITORY.getId());
     private static final AgreementRequest AGREEMENT_REQUEST = new AgreementRequest("동의합니다.");
 
     public static final String EMAIL = "email@gist.ac.kr";
     public static final String PASSWORD = "password";
+    public static final AnswerRequest ANSWER_REQUEST = new AnswerRequest("답변을 달았다");
     @Autowired
     private PetitionQueryService petitionQueryService;
     @Autowired
@@ -61,22 +70,15 @@ class PetitionServiceTest extends IntegrationTest {
     @Autowired
     private AgreementRepository agreementRepository;
     @Autowired
+    private AnswerRepository answerRepository;
+    @MockBean(name = "httpSession")
     private HttpSession httpSession;
 
-    @SpyBean
-    private AuditingHandler auditingHandler;
-
     private User petitionOwner;
-    private final List<User> users = new ArrayList<>();
 
     @BeforeEach
     void setUp() {
         petitionOwner = userRepository.save(new User(EMAIL, PASSWORD, UserRole.USER));
-        for (int i = 0; i < 5; i++) {
-            String email = String.format("email%2s@gist.ac.kr", i);
-            users.add(new User(email, PASSWORD, UserRole.USER));
-        }
-        userRepository.saveAll(users);
     }
 
     @Test
@@ -167,7 +169,7 @@ class PetitionServiceTest extends IntegrationTest {
     @Test
     public void applyAgreementWithConcurrency() throws InterruptedException {
         Long petitionId = petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
-        int numberOfThreads = 10;
+        int numberOfThreads = 3;
 
         ExecutorService service = Executors.newFixedThreadPool(numberOfThreads);
         CountDownLatch latch = new CountDownLatch(numberOfThreads);
@@ -185,8 +187,36 @@ class PetitionServiceTest extends IntegrationTest {
             });
         }
         latch.await();
+        Petition petition = petitionRepository.findById(petitionId).orElseThrow();
+        assertThat(petition.getAgreeCount()).isEqualTo(1);
         assertThat(errorCount.get()).isEqualTo(numberOfThreads - 1);
-        assertThat(petitionQueryService.retrieveNumberOfAgreements(petitionId)).isEqualTo(1);
+    }
+
+    @Test
+    public void applyAgreementByManyWithConcurrency() throws InterruptedException {
+        Long petitionId = petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
+        int numberOfThreads = 3;
+
+        List<User> users = saveUsersNumberOf(numberOfThreads);
+
+        ExecutorService service = Executors.newFixedThreadPool(numberOfThreads);
+        CountDownLatch latch = new CountDownLatch(numberOfThreads);
+        for (int i = 0; i < numberOfThreads; i++) {
+            AgreementRequest agreementRequest = new AgreementRequest("description" + i);
+            User user = users.get(i);
+            service.execute(() -> {
+                try {
+                    petitionCommandService.agree(agreementRequest, petitionId, user.getId());
+                } finally {
+                    latch.countDown();
+                }
+            });
+        }
+        latch.await();
+        Petition petition = petitionRepository.findById(petitionId).orElseThrow();
+        List<Agreement> agreements = agreementRepository.findAll();
+        assertThat(petition.getAgreeCount()).isEqualTo(numberOfThreads);
+        assertThat(agreements).hasSize(numberOfThreads);
     }
 
     @Test
@@ -210,71 +240,49 @@ class PetitionServiceTest extends IntegrationTest {
     }
 
     @Test
-    void numberOfAgreements() {
-        Long petitionId = petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
-
-        User user = userRepository.save(new User("email@email.com", "password", UserRole.USER));
-        User user3 = userRepository.save(new User("email3@email.com", "password", UserRole.USER));
-
-        assertThat(petitionQueryService.retrieveNumberOfAgreements(petitionId)).isEqualTo(0);
-
-        petitionCommandService.agree(AGREEMENT_REQUEST, petitionId, petitionOwner.getId());
-        petitionCommandService.agree(AGREEMENT_REQUEST, petitionId, user.getId());
-        petitionCommandService.agree(AGREEMENT_REQUEST, petitionId, user3.getId());
-
-        assertThat(petitionQueryService.retrieveNumberOfAgreements(petitionId)).isEqualTo(3);
-    }
-
-    @Test
-    void retrieveAgreedPetitions() {
-        Long petitionId = petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
-        Long petitionId2 = petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
-        Long petitionId3 = petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
-
-        User user = userRepository.save(new User("email@email.com", "password", UserRole.USER));
-        User user3 = userRepository.save(new User("email3@email.com", "password", UserRole.USER));
-
-        assertThat(petitionQueryService.retrieveNumberOfAgreements(petitionId)).isEqualTo(0);
-
-        petitionCommandService.agree(AGREEMENT_REQUEST, petitionId, petitionOwner.getId());
-        petitionCommandService.agree(AGREEMENT_REQUEST, petitionId, user.getId());
-        petitionCommandService.agree(AGREEMENT_REQUEST, petitionId, user3.getId());
-
-        petitionCommandService.agree(AGREEMENT_REQUEST, petitionId2, petitionOwner.getId());
-        petitionCommandService.agree(AGREEMENT_REQUEST, petitionId2, user.getId());
-        petitionCommandService.agree(AGREEMENT_REQUEST, petitionId2, user3.getId());
-
-        petitionCommandService.agree(AGREEMENT_REQUEST, petitionId3, petitionOwner.getId());
-        petitionCommandService.agree(AGREEMENT_REQUEST, petitionId3, user.getId());
-        petitionCommandService.agree(AGREEMENT_REQUEST, petitionId3, user3.getId());
-
-        assertThat(petitionQueryService.retrieveNumberOfAgreements(petitionId)).isEqualTo(3);
-    }
-
-    @Test
     void retrieveOngoingPetition() {
         int numOfPetition = 3;
         List<Long> createdPetitionIds = new ArrayList<>();
         for (int i = 0; i < numOfPetition; i++) {
             createdPetitionIds.add(petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId()));
         }
-        releasePetitionByIds(createdPetitionIds);
+        List<User> users = saveUsersNumberOf(REQUIRED_AGREEMENT_FOR_RELEASE);
+        createdPetitionIds.forEach(i -> {
+            agreePetitionBy(i, users);
+            petitionCommandService.releasePetition(i);
+        });
 
-        Page<PetitionPreviewResponse> ongoingPetitions = petitionQueryService.retrieveOngoingPetition(Optional.empty(), PageRequest.of(0, 10));
-        assertThat(ongoingPetitions.getContent()).hasSize(numOfPetition);
-
-        for (PetitionPreviewResponse op : ongoingPetitions) {
-            assertFalse(op.getExpired());
-        }
+        Page<PetitionPreviewResponse> petitions = petitionQueryService.retrieveOngoingPetition(PageRequest.of(0, 10));
+        assertThat(petitions.getContent()).hasSize(numOfPetition);
     }
 
-    private void releasePetitionByIds(List<Long> ids) {
-        for (Long id : ids) {
-            for (int i = 0; i < 5; i++) {
-                petitionCommandService.agree(AGREEMENT_REQUEST, id, users.get(i).getId());
-            }
-            petitionCommandService.releasePetition(id);
+    @Test
+    void retrieveAnsweredPetition() {
+        int numOfPetition = 3;
+        List<Long> createdPetitionIds = new ArrayList<>();
+        for (int i = 0; i < numOfPetition; i++) {
+            createdPetitionIds.add(petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId()));
         }
+        List<User> users = saveUsersNumberOf(REQUIRED_AGREEMENT_FOR_ANSWER);
+        createdPetitionIds.forEach(i -> {
+            agreePetitionBy(i, users);
+            petitionCommandService.releasePetition(i);
+            petitionCommandService.answerPetition(i, ANSWER_REQUEST);
+        });
+
+        Page<PetitionPreviewResponse> petitions = petitionQueryService.retrieveAnsweredPetition(PageRequest.of(0, 10));
+        assertThat(petitions).hasSize(numOfPetition);
+    }
+
+    @Test
+    void retrievePetitionOfMine() {
+        int numOfPetition = 3;
+        for (int i = 0; i < numOfPetition; i++) {
+            petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
+        }
+
+        Page<PetitionPreviewResponse> petitions = petitionQueryService.retrievePetitionsByUserId(petitionOwner.getId(), PageRequest.of(0, 10));
+        assertThat(petitions).hasSize(numOfPetition);
     }
 
     @Test
@@ -311,55 +319,29 @@ class PetitionServiceTest extends IntegrationTest {
         ).isInstanceOf(NoSuchPetitionException.class);
     }
 
-    @Test
-    void retrieveAnsweredPetition() {
-        Petition petition = PetitionBuilder.aPetition()
-                .withExpiredAt(PETITION_EXPIRED_AT)
-                .withUserId(petitionOwner.getId())
-                .build();
-        petition.setAnswered(true);
-        petitionRepository.save(petition);
-
-        Pageable pageable = PageRequest.of(0, 10);
-        assertThat(petitionQueryService.retrieveAnsweredPetition(Optional.empty(), pageable).getContent()).hasSize(1);
-    }
-
-    @Test
-    void retrieveAnsweredPetitionCount() {
-        Petition petition = PetitionBuilder.aPetition()
-                .withExpiredAt(PETITION_EXPIRED_AT)
-                .withUserId(petitionOwner.getId())
-                .build();
-        petition.setAnswered(true);
-        petitionRepository.save(petition);
-        assertThat(petitionQueryService.retrieveAnsweredPetitionCount(Optional.empty())).isEqualTo(1L);
-    }
-
-    @Test
-    void doNothing() {
-    }
-
     @DisplayName("Insert, Update 수행 후의 revisionResponse 검증")
     @Test
     void retrieveRevisionsOfPetition() {
-        httpSession.setAttribute("user", new SimpleUser(petitionOwner));
+        given(httpSession.getAttribute(SESSION_KEY)).willReturn(new SimpleUser(petitionOwner));
+
         PetitionRequest petitionRequest = new PetitionRequest("title", "desc", Category.DORMITORY.getId());
         Long petitionId = petitionCommandService.createPetition(petitionRequest, petitionOwner.getId());
 
         petitionCommandService.updatePetition(petitionId, new PetitionRequest("updateTitle", "updateDesc", Category.FACILITY.getId()));
         PageRequest pageRequest = PageRequest.of(0, 10);
         Page<PetitionRevisionResponse> revisionResponses = petitionQueryService.retrieveRevisionsOfPetition(petitionId, pageRequest);
-        assertThat(revisionResponses.getContent()).hasSize(2);
-        assertThat(revisionResponses.getContent()).allMatch(content -> content.getWorkedBy().equals(petitionOwner.getId()));
-        List<PetitionRevisionResponse> content = revisionResponses.getContent();
-        List<RevisionMetadata.RevisionType> revisionTypes = content.stream().map(PetitionRevisionResponse::getRevisionType).collect(Collectors.toList());
-        assertThat(revisionTypes).containsExactly(RevisionMetadata.RevisionType.INSERT, RevisionMetadata.RevisionType.UPDATE);
+        List<PetitionRevisionResponse> revisionResponsesContent = revisionResponses.getContent();
+        assertThat(revisionResponsesContent).hasSize(2);
+        assertThat(revisionResponsesContent).allMatch(content -> content.getWorkedBy().equals(petitionOwner.getId()));
+        List<RevisionMetadata.RevisionType> revisionTypes = revisionResponses.stream().map(PetitionRevisionResponse::getRevisionType).collect(Collectors.toList());
+        assertThat(revisionTypes).containsSequence(RevisionMetadata.RevisionType.INSERT, RevisionMetadata.RevisionType.UPDATE);
     }
 
     @Test
     void release() {
         Long petitionId = petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
-        agreePetitionByNumberOfUsers(petitionId, REQUIRED_AGREEMENT_FOR_RELEASE);
+        List<User> users = saveUsersNumberOf(REQUIRED_AGREEMENT_FOR_RELEASE);
+        agreePetitionBy(petitionId, users);
 
         petitionCommandService.releasePetition(petitionId);
 
@@ -379,7 +361,8 @@ class PetitionServiceTest extends IntegrationTest {
     @Test
     void cancelRelease() {
         Long petitionId = petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
-        agreePetitionByNumberOfUsers(petitionId, REQUIRED_AGREEMENT_FOR_RELEASE);
+        List<User> users = saveUsersNumberOf(REQUIRED_AGREEMENT_FOR_RELEASE);
+        agreePetitionBy(petitionId, users);
         petitionCommandService.releasePetition(petitionId);
 
         petitionCommandService.cancelReleasePetition(petitionId);
@@ -397,9 +380,106 @@ class PetitionServiceTest extends IntegrationTest {
         ).isInstanceOf(NoSuchPetitionException.class);
     }
 
-    private void agreePetitionByNumberOfUsers(Long petitionId, int numberOfUsers) {
-        LongStream.range(0, numberOfUsers)
-                .mapToObj(i -> userRepository.save(new User(i + EMAIL, PASSWORD, UserRole.USER)))
-                .forEach(user -> petitionCommandService.agree(AGREEMENT_REQUEST, petitionId, user.getId()));
+    @Test
+    void answer_petition() {
+        Long petitionId = petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
+        List<User> users = saveUsersNumberOf(REQUIRED_AGREEMENT_FOR_ANSWER);
+        agreePetitionBy(petitionId, users);
+        petitionCommandService.releasePetition(petitionId);
+
+        petitionCommandService.answerPetition(petitionId, ANSWER_REQUEST);
+
+        Petition petition = petitionRepository.findById(petitionId).orElseThrow();
+        assertTrue(petition.isAnswered());
+        assertThat(petition.getAnswer().getContent()).isEqualTo(ANSWER_REQUEST.getContent());
+    }
+
+    @Test
+    void update_answer_of_petition() {
+        Long petitionId = petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
+        List<User> users = saveUsersNumberOf(REQUIRED_AGREEMENT_FOR_ANSWER);
+        agreePetitionBy(petitionId, users);
+        petitionCommandService.releasePetition(petitionId);
+        petitionCommandService.answerPetition(petitionId, ANSWER_REQUEST);
+
+        petitionCommandService.updateAnswer(petitionId, UPDATE_ANSWER_REQUEST);
+
+        Petition petition = petitionRepository.findById(petitionId).orElseThrow();
+        assertTrue(petition.isAnswered());
+        assertThat(petition.getAnswer().getContent()).isEqualTo(UPDATE_ANSWER_REQUEST.getContent());
+    }
+
+    @Test
+    void delete_answer_of_petition() {
+        Long petitionId = petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
+        List<User> users = saveUsersNumberOf(REQUIRED_AGREEMENT_FOR_ANSWER);
+        agreePetitionBy(petitionId, users);
+        petitionCommandService.releasePetition(petitionId);
+        petitionCommandService.answerPetition(petitionId, ANSWER_REQUEST);
+
+        petitionCommandService.deleteAnswer(petitionId);
+
+        Petition petition = petitionRepository.findById(petitionId).orElseThrow();
+        assertFalse(petition.isAnswered());
+        List<Answer> answers = answerRepository.findAll();
+        assertThat(answers).hasSize(0);
+    }
+
+    @Test
+    public void createAnswerWithConcurrency() throws InterruptedException {
+        Long petitionId = petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
+        List<User> users = saveUsersNumberOf(REQUIRED_AGREEMENT_FOR_ANSWER);
+        agreePetitionBy(petitionId, users);
+        petitionCommandService.releasePetition(petitionId);
+
+        int numberOfThreads = 3;
+        ExecutorService service = Executors.newFixedThreadPool(numberOfThreads);
+        CountDownLatch latch = new CountDownLatch(numberOfThreads);
+        AtomicInteger errorCount = new AtomicInteger(0);
+        for (int i = 0; i < numberOfThreads; i++) {
+            service.execute(() -> {
+                try {
+                    petitionCommandService.answerPetition(petitionId, ANSWER_REQUEST);
+                } catch (Exception ex) {
+                    errorCount.incrementAndGet();
+                } finally {
+                    latch.countDown();
+                }
+            });
+        }
+        latch.await();
+        assertThat(errorCount.get()).isEqualTo(numberOfThreads - 1);
+        assertThat(answerRepository.findByPetitionId(petitionId)).hasSize(1);
+    }
+
+    @Test
+    void retrieve_revisions_of_answer() {
+        Long petitionId = petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
+        List<User> users = saveUsersNumberOf(REQUIRED_AGREEMENT_FOR_ANSWER);
+        agreePetitionBy(petitionId, users);
+        petitionCommandService.releasePetition(petitionId);
+
+        given(httpSession.getAttribute(SESSION_KEY)).willReturn(new SimpleUser(petitionOwner));
+
+        petitionCommandService.answerPetition(petitionId, ANSWER_REQUEST);
+        petitionCommandService.updateAnswer(petitionId, UPDATE_ANSWER_REQUEST);
+
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<AnswerRevisionResponse> answerRevisionResponses = petitionQueryService.retrieveRevisionsOfAnswer(petitionId, pageable);
+
+        List<AnswerRevisionResponse> revisionResponses = answerRevisionResponses.getContent();
+        assertThat(revisionResponses).hasSize(2);
+        List<RevisionMetadata.RevisionType> revisionTypes = revisionResponses.stream().map(AnswerRevisionResponse::getRevisionType).collect(Collectors.toList());
+        assertThat(revisionTypes).containsSequence(RevisionMetadata.RevisionType.INSERT, RevisionMetadata.RevisionType.UPDATE);
+    }
+
+    private List<User> saveUsersNumberOf(int numberOfUsers) {
+        List<User> users = LongStream.range(0, numberOfUsers)
+                .mapToObj(i -> new User(i + EMAIL, PASSWORD, UserRole.USER)).collect(Collectors.toList());
+        return userRepository.saveAll(users);
+    }
+
+    private void agreePetitionBy(Long petitionId, List<User> users) {
+        users.forEach(user -> petitionCommandService.agree(AGREEMENT_REQUEST, petitionId, user.getId()));
     }
 }

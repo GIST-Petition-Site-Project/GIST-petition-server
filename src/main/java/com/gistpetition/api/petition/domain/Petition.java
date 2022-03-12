@@ -1,17 +1,16 @@
 package com.gistpetition.api.petition.domain;
 
 import com.gistpetition.api.common.persistence.BaseEntity;
-import com.gistpetition.api.exception.petition.AlreadyReleasedPetitionException;
-import com.gistpetition.api.exception.petition.ExpiredPetitionException;
-import com.gistpetition.api.exception.petition.NotEnoughAgreementException;
-import com.gistpetition.api.exception.petition.NotReleasedPetitionException;
+import com.gistpetition.api.exception.petition.*;
 import com.gistpetition.api.user.domain.User;
 import lombok.Getter;
+import org.hibernate.annotations.OptimisticLock;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
 
 import javax.persistence.*;
 import java.time.Instant;
+import java.util.Objects;
 
 @Audited
 @Getter
@@ -27,17 +26,24 @@ public class Petition extends BaseEntity {
     private Description description;
     @Enumerated(EnumType.STRING)
     private Category category;
-    private Boolean answered = false;
     private Boolean released = false;
     private Instant expiredAt;
     private Long userId;
     @Column(unique = true)
     private String tempUrl;
-    @NotAudited
-    private Integer agreeCount = 0;
-    @NotAudited
     @Embedded
+    @OptimisticLock(excluded = true)
     private final Agreements agreements = new Agreements();
+    @NotAudited
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @JoinColumn(name = "agree_count_id", referencedColumnName = "id", nullable = false)
+    private final AgreeCount agreeCount = new AgreeCount(0);
+    @NotAudited
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @JoinColumn(name = "answer_id", referencedColumnName = "id")
+    private Answer answer;
+    @Version
+    private Long version;
 
     protected Petition() {
     }
@@ -56,7 +62,7 @@ public class Petition extends BaseEntity {
             throw new ExpiredPetitionException();
         }
         this.agreements.add(new Agreement(description, userId, this));
-        this.agreeCount += 1;
+        this.agreeCount.increment();
     }
 
     public boolean isAgreedBy(User user) {
@@ -70,7 +76,7 @@ public class Petition extends BaseEntity {
         if (released) {
             throw new AlreadyReleasedPetitionException();
         }
-        if (agreeCount < REQUIRED_AGREEMENT_FOR_RELEASE) {
+        if (agreeCount.isLessThan(REQUIRED_AGREEMENT_FOR_RELEASE)) {
             throw new NotEnoughAgreementException();
         }
         this.released = true;
@@ -83,8 +89,31 @@ public class Petition extends BaseEntity {
         this.released = false;
     }
 
-    public void setAnswered(boolean b) {
-        this.answered = b;
+    public void answer(String content) {
+        if (isAnswered()) {
+            throw new AlreadyAnswerException();
+        }
+        if (!released) {
+            throw new NotReleasedPetitionException();
+        }
+        if (agreeCount.isLessThan(REQUIRED_AGREEMENT_FOR_ANSWER)) {
+            throw new NotEnoughAgreementException();
+        }
+        this.answer = new Answer(content, this);
+    }
+
+    public void updateAnswer(String updateAnswerContent) {
+        if (!isAnswered()) {
+            throw new NotAnsweredPetitionException();
+        }
+        this.answer.updateContent(updateAnswerContent);
+    }
+
+    public void deleteAnswer() {
+        if (!isAnswered()) {
+            throw new NotAnsweredPetitionException();
+        }
+        this.answer = null;
     }
 
     public void update(String title, String description, Long categoryId) {
@@ -98,7 +127,7 @@ public class Petition extends BaseEntity {
     }
 
     public boolean isAnswered() {
-        return answered;
+        return !Objects.isNull(answer);
     }
 
     public boolean isExpiredAt(Instant time) {
@@ -112,5 +141,9 @@ public class Petition extends BaseEntity {
 
     public String getDescription() {
         return this.description.getDescription();
+    }
+
+    public int getAgreeCount() {
+        return agreeCount.getCount();
     }
 }

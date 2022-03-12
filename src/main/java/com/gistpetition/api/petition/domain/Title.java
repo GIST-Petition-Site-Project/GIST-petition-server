@@ -13,7 +13,8 @@ import java.util.Objects;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class Title {
-    @Column
+
+    @Column(name = "title", nullable = false)
     private String title;
     public static final int TITLE_MAX_LENGTH = 100;
 

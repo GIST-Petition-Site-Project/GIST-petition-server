@@ -16,8 +16,8 @@ import java.util.Objects;
 public class Description {
     public static final int DESCRIPTION_MAX_LENGTH = 10000;
 
-    @Column
     @Lob
+    @Column(name = "description", nullable = false)
     private String description;
 
     public Description(String description) {

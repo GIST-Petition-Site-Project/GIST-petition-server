@@ -1,63 +1,75 @@
 package com.gistpetition.api.petition.application;
 
-import com.gistpetition.api.petition.domain.Category;
 import com.gistpetition.api.petition.domain.Petition;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 
 import java.time.Instant;
-import java.util.Optional;
 import java.util.function.Function;
 
+import static com.gistpetition.api.petition.application.PetitionQueryCondition.ExpirationCondition.*;
+import static com.gistpetition.api.petition.application.PetitionQueryCondition.PetitionStatus.*;
 import static com.gistpetition.api.petition.domain.QPetition.petition;
 
 public enum PetitionQueryCondition {
-    RELEASED(petition.released.isTrue(), Expiration.NONE),
-    NOT_RELEASED(petition.released.isFalse(), Expiration.NONE),
-    ANSWERED(petition.answered.isTrue(), Expiration.NONE),
-    NOT_ANSWERED(petition.answered.isFalse(), Expiration.NONE),
+    RELEASED(none, released),
+    NOT_RELEASED(none, notReleased),
+    ANSWERED(none, answered),
+    NOT_ANSWERED(none, notAnswered),
 
-    WAITING_FOR_RELEASE(
-            NOT_RELEASED.condition.and(petition.agreeCount.goe(Petition.REQUIRED_AGREEMENT_FOR_RELEASE)),
-            Expiration.NOT_EXPIRED),
-    WAITING_FOR_ANSWER(
-            RELEASED.condition.and(NOT_ANSWERED.condition).and(petition.agreeCount.goe(Petition.REQUIRED_AGREEMENT_FOR_ANSWER)),
-            Expiration.NONE),
-    ONGOING(
-            RELEASED.condition.and(NOT_ANSWERED.condition),
-            Expiration.NOT_EXPIRED),
-    RELEASED_NOT_EXPIRED(
-            RELEASED.condition,
-            Expiration.NOT_EXPIRED),
-    RELEASED_EXPIRED(
-            RELEASED.condition,
-            Expiration.IS_EXPIRED);
+    WAITING_FOR_RELEASE(notExpired, notReleased, agreeEnoughToRelease),
+    ONGOING(notExpired, released, notAnswered),
+    WAITING_FOR_ANSWER(none, released, notAnswered, agreeEnoughToAnswer),
 
-    private final BooleanExpression condition;
-    private final Expiration expiration;
+    RELEASED_NOT_EXPIRED(notExpired, released),
+    RELEASED_EXPIRED(expired, released);
 
-    PetitionQueryCondition(BooleanExpression condition, Expiration expiration) {
-        this.condition = condition;
-        this.expiration = expiration;
+    private final ExpirationCondition expirationCondition;
+    private final PetitionStatus[] conditions;
+
+    PetitionQueryCondition(ExpirationCondition expirationCondition, PetitionStatus... conditions) {
+        this.expirationCondition = expirationCondition;
+        this.conditions = conditions;
     }
 
-    public BooleanExpression of(Optional<Category> category, Instant at) {
-        BooleanExpression be = condition.and(expiration.at(at));
-        return category.isEmpty() ? be : be.and(petition.category.eq(category.get()));
+    public Predicate at(Instant at) {
+        BooleanBuilder booleanBuilder = new BooleanBuilder();
+        for (PetitionStatus ps : conditions) {
+            booleanBuilder.and(ps.condition);
+        }
+        booleanBuilder.and(this.expirationCondition.at(at));
+        return booleanBuilder;
     }
 
-    public enum Expiration {
-        NOT_EXPIRED(i -> petition.expiredAt.after(i)),
-        IS_EXPIRED(i -> petition.expiredAt.before(i)),
-        NONE(i -> null);
+    enum ExpirationCondition {
+        notExpired(i -> petition.expiredAt.after(i)),
+        expired(i -> petition.expiredAt.before(i)),
+        none(i -> null);
 
         final Function<Instant, BooleanExpression> function;
 
-        Expiration(Function<Instant, BooleanExpression> function) {
+        ExpirationCondition(Function<Instant, BooleanExpression> function) {
             this.function = function;
         }
 
         public BooleanExpression at(Instant time) {
             return function.apply(time);
+        }
+    }
+
+    enum PetitionStatus {
+        released(petition.released.isTrue()),
+        notReleased(petition.released.isFalse()),
+        answered(petition.answer.isNotNull()),
+        notAnswered(petition.answer.isNull()),
+        agreeEnoughToRelease(petition.agreeCount.count.goe(Petition.REQUIRED_AGREEMENT_FOR_RELEASE)),
+        agreeEnoughToAnswer(petition.agreeCount.count.goe(Petition.REQUIRED_AGREEMENT_FOR_ANSWER));
+
+        private final BooleanExpression condition;
+
+        PetitionStatus(BooleanExpression condition) {
+            this.condition = condition;
         }
     }
 }

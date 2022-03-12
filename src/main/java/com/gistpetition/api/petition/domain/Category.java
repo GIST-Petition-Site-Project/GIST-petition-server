@@ -5,7 +5,6 @@ import com.gistpetition.api.exception.petition.NoSuchCategoryException;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 public enum Category {
     DORMITORY(1L, "기숙사"),
@@ -39,13 +38,6 @@ public enum Category {
             throw new NoSuchCategoryException();
         }
         return lookup.get(categoryId);
-    }
-
-    public static Optional<Category> of(Optional<Long> categoryId) {
-        if (categoryId.isPresent() && categoryId.get().equals(0L)) {
-            return Optional.empty();
-        }
-        return categoryId.map(Category::of);
     }
 
     private static final Map<Long, Category> lookup = new HashMap<>();
