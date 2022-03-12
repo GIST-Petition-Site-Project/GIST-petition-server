@@ -21,16 +21,18 @@ public class Description {
     private String description;
 
     public Description(String description) {
-        if (Objects.isNull(description) || description.isBlank() || description.length() > DESCRIPTION_MAX_LENGTH) {
-            throw new InvalidDescriptionLengthException();
-        }
+        validateDescription(description);
         this.description = description;
     }
 
     public void update(String description) {
+        validateDescription(description);
+        this.description = description;
+    }
+
+    private void validateDescription(String description) {
         if (Objects.isNull(description) || description.isBlank() || description.length() > DESCRIPTION_MAX_LENGTH) {
             throw new InvalidDescriptionLengthException();
         }
-        this.description = description;
     }
 }

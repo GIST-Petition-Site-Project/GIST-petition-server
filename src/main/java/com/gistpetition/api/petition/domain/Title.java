@@ -17,17 +17,19 @@ public class Title {
     private String title;
     public static final int TITLE_MAX_LENGTH = 100;
 
-    public Title(String title){
-        if (Objects.isNull(title) || title.isBlank() || title.length()>TITLE_MAX_LENGTH) {
-            throw new InvalidTitleLengthException();
-        }
+    public Title(String title) {
+        validateTitle(title);
         this.title = title;
     }
 
     public void update(String title) {
-        if (Objects.isNull(title) || title.isBlank() || title.length()>TITLE_MAX_LENGTH) {
+        validateTitle(title);
+        this.title = title;
+    }
+
+    private void validateTitle(String title) {
+        if (Objects.isNull(title) || title.isBlank() || title.length() > TITLE_MAX_LENGTH) {
             throw new InvalidTitleLengthException();
         }
-        this.title = title;
     }
 }
