@@ -14,6 +14,7 @@ import com.querydsl.jpa.JPQLQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 
@@ -67,7 +68,14 @@ public class PetitionQueryDslRepository {
         PathBuilder<Petition> entityPath = new PathBuilder<>(Petition.class, "petition");
         return pageable.getSort()
                 .stream()
-                .map(order -> new OrderSpecifier(Order.valueOf(order.getDirection().name()), entityPath.get(order.getProperty())))
+                .map(order -> getOrderSpecifier(entityPath, order))
                 .toArray(OrderSpecifier[]::new);
+    }
+
+    private OrderSpecifier getOrderSpecifier(PathBuilder<Petition> entityPath, Sort.Order order) {
+        if ("agreeCount".equals(order.getProperty())) {
+            return new OrderSpecifier(Order.valueOf(order.getDirection().name()), agreeCount.count);
+        }
+        return new OrderSpecifier(Order.valueOf(order.getDirection().name()), entityPath.get(order.getProperty()));
     }
 }
