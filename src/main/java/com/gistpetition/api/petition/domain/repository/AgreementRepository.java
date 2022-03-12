@@ -1,5 +1,6 @@
-package com.gistpetition.api.petition.domain;
+package com.gistpetition.api.petition.domain.repository;
 
+import com.gistpetition.api.petition.domain.Agreement;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

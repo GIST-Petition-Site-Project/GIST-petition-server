@@ -4,7 +4,6 @@ import com.gistpetition.api.common.persistence.UnmodifiableEntity;
 import lombok.Getter;
 
 import javax.persistence.*;
-import java.time.Instant;
 import java.util.Objects;
 
 @Getter
@@ -13,6 +12,7 @@ import java.util.Objects;
 public class Agreement extends UnmodifiableEntity {
 
     @Lob
+    @Column(name = "description", nullable = false)
     private String description;
     @Column(name = "user_id")
     private Long userId;
