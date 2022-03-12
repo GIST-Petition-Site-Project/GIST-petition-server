@@ -184,7 +184,7 @@ class PetitionServiceTest extends IntegrationTest {
     @Test
     public void applyAgreementByManyWithConcurrency() throws InterruptedException {
         Long petitionId = petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
-        int numberOfThreads = 3000;
+        int numberOfThreads = 3;
 
         List<User> users = saveUsersNumberOf(numberOfThreads);
 
@@ -196,8 +196,6 @@ class PetitionServiceTest extends IntegrationTest {
             service.execute(() -> {
                 try {
                     petitionCommandService.agree(agreementRequest, petitionId, user.getId());
-                } catch (Exception e) {
-                    e.printStackTrace();
                 } finally {
                     latch.countDown();
                 }

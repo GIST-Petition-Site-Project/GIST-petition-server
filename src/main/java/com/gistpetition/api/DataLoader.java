@@ -87,7 +87,7 @@ public class DataLoader {
         List<Long> petitionIds = IntStream.range(0, PETITION_COUNT)
                 .mapToObj(i -> savePetition(PETITION_TITLE + i, normal))
                 .collect(Collectors.toList());
-//
+
         for (Long petitionId : petitionIds) {
             randomlyAgreePetitionOverRequired(petitionId, alphabetUsers);
 
