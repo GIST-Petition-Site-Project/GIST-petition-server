@@ -70,6 +70,7 @@ public class PetitionCommandController {
         return ResponseEntity.ok().build();
     }
 
+    @ManagerPermissionRequired
     @PostMapping("/petitions/{petitionId}/answer")
     public ResponseEntity<Object> createAnswer(@PathVariable Long petitionId,
                                                @Validated @RequestBody AnswerRequest answerRequest) {
