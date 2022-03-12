@@ -13,10 +13,10 @@ import java.util.Objects;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class Title {
+    public static final int TITLE_MAX_LENGTH = 100;
 
     @Column(name = "title", nullable = false)
     private String title;
-    public static final int TITLE_MAX_LENGTH = 100;
 
     public Title(String title) {
         validateTitle(title);

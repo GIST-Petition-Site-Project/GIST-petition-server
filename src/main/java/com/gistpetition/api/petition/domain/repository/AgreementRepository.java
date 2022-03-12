@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Repository
 public interface AgreementRepository extends JpaRepository<Agreement, Long> {
-    Page<Agreement> findAgreementsByPetitionId(Pageable pageable, Long petitionId);
+    Page<Agreement> findAgreementsByPetitionId(Long petitionId, Pageable pageable);
 
     Optional<Agreement> findByUserId(Long userId);
 }
