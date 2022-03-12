@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/v1")
 public class PetitionQueryController {
-    private static final String SEARCH_ALL = "O";
+    private static final String SEARCH_ALL = "0";
     private final PetitionQueryService petitionQueryService;
 
     @GetMapping("/petitions")
@@ -47,7 +47,7 @@ public class PetitionQueryController {
 
     @ManagerPermissionRequired
     @GetMapping("/petitions/waitingForRelease")
-    public ResponseEntity<Page<PetitionPreviewResponse>> retrievePetitionsWaitingForCheck(@RequestParam(defaultValue = SEARCH_ALL) Long categoryId, Pageable pageable) {
+    public ResponseEntity<Page<PetitionPreviewResponse>> retrievePetitionsWaitingForRelease(@RequestParam(defaultValue = SEARCH_ALL) Long categoryId, Pageable pageable) {
         if (categoryId.equals(Long.valueOf(SEARCH_ALL))) {
             return ResponseEntity.ok().body(petitionQueryService.retrievePetitionsWaitingForRelease(pageable));
         }
@@ -125,14 +125,6 @@ public class PetitionQueryController {
     @GetMapping("/petitions/{petitionId}/revisions")
     public ResponseEntity<Page<PetitionRevisionResponse>> retrieveRevisionsOfPetition(@PathVariable Long petitionId, Pageable pageable) {
         return ResponseEntity.ok().body(petitionQueryService.retrieveRevisionsOfPetition(petitionId, pageable));
-    }
-
-    @GetMapping("/petitions/search")
-    public ResponseEntity<Page<PetitionPreviewResponse>> retrievePetitionsByKeyword(@RequestParam(defaultValue = "") String keyword, Pageable pageable) {
-        if (keyword.equals("")) {
-            return ResponseEntity.ok().body(petitionQueryService.retrievePetition(pageable));
-        }
-        return ResponseEntity.ok().body(petitionQueryService.retrievePetitionByKeyword(keyword, pageable));
     }
 
     @GetMapping("/petitions/{petitionId}/agreements")

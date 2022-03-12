@@ -8,6 +8,7 @@ import javax.persistence.*;
 
 @Getter
 @Entity
+@Table(name = "agree_count")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class AgreeCount {
     @Id
@@ -18,13 +19,17 @@ public class AgreeCount {
     @Column(name = "count", nullable = false)
     private Integer count;
 
-    public AgreeCount(Integer count) {
-        this(null, count);
+    @Column(name = "petition_id", unique = true, nullable = false)
+    private Long petitionId;
+
+    public AgreeCount(Long petitionId) {
+        this(null, 0, petitionId);
     }
 
-    private AgreeCount(Long id, Integer count) {
+    private AgreeCount(Long id, Integer count, Long petitionId) {
         this.id = id;
         this.count = count;
+        this.petitionId = petitionId;
     }
 
     public void increment() {

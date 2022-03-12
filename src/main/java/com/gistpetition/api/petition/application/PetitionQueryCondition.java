@@ -10,6 +10,7 @@ import java.util.function.Function;
 
 import static com.gistpetition.api.petition.application.PetitionQueryCondition.ExpirationCondition.*;
 import static com.gistpetition.api.petition.application.PetitionQueryCondition.PetitionStatus.*;
+import static com.gistpetition.api.petition.domain.QAgreeCount.agreeCount;
 import static com.gistpetition.api.petition.domain.QPetition.petition;
 
 public enum PetitionQueryCondition {
@@ -63,8 +64,8 @@ public enum PetitionQueryCondition {
         notReleased(petition.released.isFalse()),
         answered(petition.answer.isNotNull()),
         notAnswered(petition.answer.isNull()),
-        agreeEnoughToRelease(petition.agreeCount.count.goe(Petition.REQUIRED_AGREEMENT_FOR_RELEASE)),
-        agreeEnoughToAnswer(petition.agreeCount.count.goe(Petition.REQUIRED_AGREEMENT_FOR_ANSWER));
+        agreeEnoughToRelease(agreeCount.count.goe(Petition.REQUIRED_AGREEMENT_FOR_RELEASE)),
+        agreeEnoughToAnswer(agreeCount.count.goe(Petition.REQUIRED_AGREEMENT_FOR_ANSWER));
 
         private final BooleanExpression condition;
 
