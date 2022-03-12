@@ -4,6 +4,8 @@ DELETE
 from petition;
 DELETE
 from answer;
+DELETE
+from agree_count;
 
 DELETE
 from sign_up_verification_info;

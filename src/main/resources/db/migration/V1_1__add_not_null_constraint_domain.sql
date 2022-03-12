@@ -3,6 +3,6 @@ ALTER TABLE petition
 ALTER TABLE petition
     MODIFY description LONGTEXT NOT NULL;
 ALTER TABLE answer
-    MODIFY content LONGTEXT NOT NULL;
+    MODIFY content VARCHAR(255) NOT NULL;
 ALTER TABLE agreement
     MODIFY description LONGTEXT NOT NULL;
