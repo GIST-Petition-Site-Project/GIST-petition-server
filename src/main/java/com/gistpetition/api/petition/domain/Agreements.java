@@ -28,11 +28,19 @@ public class Agreements {
         this.agreements.add(agreement);
     }
 
+    public boolean agreeLessThan(int agreeCount) {
+        return this.agreements.size() < agreeCount;
+    }
+
     public boolean isAgreedBy(Long userId) {
         return agreements.stream().anyMatch(a -> a.writtenBy(userId));
     }
 
     public List<Agreement> getAgreements() {
         return Collections.unmodifiableList(agreements);
+    }
+
+    public int size() {
+        return agreements.size();
     }
 }

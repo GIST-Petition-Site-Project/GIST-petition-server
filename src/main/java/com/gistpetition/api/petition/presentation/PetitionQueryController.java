@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/v1")
 public class PetitionQueryController {
-    private static final String SEARCH_ALL = "O";
+    private static final String SEARCH_ALL = "0";
     private final PetitionQueryService petitionQueryService;
 
     @GetMapping("/petitions")
@@ -45,16 +45,16 @@ public class PetitionQueryController {
         return ResponseEntity.ok().body(petitionQueryService.retrieveReleasedAndExpiredPetition(Category.of(categoryId), pageable));
     }
 
-    @ManagerPermissionRequired
+    //    @ManagerPermissionRequired
     @GetMapping("/petitions/waitingForRelease")
-    public ResponseEntity<Page<PetitionPreviewResponse>> retrievePetitionsWaitingForCheck(@RequestParam(defaultValue = SEARCH_ALL) Long categoryId, Pageable pageable) {
+    public ResponseEntity<Page<PetitionPreviewResponse>> retrievePetitionsWaitingForRelease(@RequestParam(defaultValue = SEARCH_ALL) Long categoryId, Pageable pageable) {
         if (categoryId.equals(Long.valueOf(SEARCH_ALL))) {
             return ResponseEntity.ok().body(petitionQueryService.retrievePetitionsWaitingForRelease(pageable));
         }
         return ResponseEntity.ok().body(petitionQueryService.retrievePetitionsWaitingForRelease(Category.of(categoryId), pageable));
     }
 
-    @ManagerPermissionRequired
+    //    @ManagerPermissionRequired
     @GetMapping("/petitions/waitingForAnswer")
     public ResponseEntity<Page<PetitionPreviewResponse>> retrievePetitionsWaitingForAnswer(@RequestParam(defaultValue = SEARCH_ALL) Long categoryId, Pageable pageable) {
         if (categoryId.equals(Long.valueOf(SEARCH_ALL))) {

@@ -13,7 +13,7 @@ import javax.persistence.LockModeType;
 import java.util.Optional;
 
 @Repository
-public interface PetitionRepository extends RevisionRepository<Petition, Long, Long>, JpaRepository<Petition, Long>, CustomPetitionRepository {
+public interface PetitionRepository extends RevisionRepository<Petition, Long, Long>, JpaRepository<Petition, Long> {
     Page<Petition> findByTitleContains(String keyword, Pageable pageable);
 
     Optional<Petition> findByTempUrl(String tempUrl);

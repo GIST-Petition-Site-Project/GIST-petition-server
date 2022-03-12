@@ -2,14 +2,10 @@ package com.gistpetition.api.petition.application;
 
 import com.gistpetition.api.IntegrationTest;
 import com.gistpetition.api.exception.petition.DuplicatedAgreementException;
-import com.gistpetition.api.exception.petition.InvalidDescriptionLengthException;
-import com.gistpetition.api.exception.petition.InvalidTitleLengthException;
 import com.gistpetition.api.exception.petition.NoSuchPetitionException;
 import com.gistpetition.api.petition.PetitionBuilder;
-import com.gistpetition.api.petition.domain.Agreement;
-import com.gistpetition.api.petition.domain.Answer;
-import com.gistpetition.api.petition.domain.Category;
-import com.gistpetition.api.petition.domain.Petition;
+import com.gistpetition.api.petition.domain.*;
+import com.gistpetition.api.petition.domain.repository.AgreeCountRepository;
 import com.gistpetition.api.petition.domain.repository.AgreementRepository;
 import com.gistpetition.api.petition.domain.repository.AnswerRepository;
 import com.gistpetition.api.petition.domain.repository.PetitionRepository;
@@ -71,6 +67,8 @@ class PetitionServiceTest extends IntegrationTest {
     private AgreementRepository agreementRepository;
     @Autowired
     private AnswerRepository answerRepository;
+    @Autowired
+    private AgreeCountRepository agreeCountRepository;
     @MockBean(name = "httpSession")
     private HttpSession httpSession;
 
@@ -138,13 +136,13 @@ class PetitionServiceTest extends IntegrationTest {
     @Test
     void agree() {
         Long petitionId = petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
-        Petition petition = petitionRepository.findById(petitionId).orElseThrow();
-        assertThat(petition.getAgreeCount()).isEqualTo(0);
 
         petitionCommandService.agree(AGREEMENT_REQUEST, petitionId, petitionOwner.getId());
 
-        petition = petitionRepository.findById(petitionId).orElseThrow();
-        assertThat(petition.getAgreeCount()).isEqualTo(1);
+        Page<Agreement> agreements = agreementRepository.findAgreementsByPetitionId(petitionId, PageRequest.of(0, 10));
+        assertThat(agreements.getTotalElements()).isEqualTo(1);
+        AgreeCount agreeCount = agreeCountRepository.findByPetitionId(petitionId).orElseThrow();
+        assertThat(agreeCount.getCount()).isEqualTo(1);
     }
 
     @Test
@@ -187,9 +185,11 @@ class PetitionServiceTest extends IntegrationTest {
             });
         }
         latch.await();
-        Petition petition = petitionRepository.findById(petitionId).orElseThrow();
-        assertThat(petition.getAgreeCount()).isEqualTo(1);
-        assertThat(errorCount.get()).isEqualTo(numberOfThreads - 1);
+
+        Page<Agreement> agreements = agreementRepository.findAgreementsByPetitionId(petitionId, PageRequest.of(0, 10));
+        assertThat(agreements.getTotalElements()).isEqualTo(1);
+        AgreeCount agreeCount = agreeCountRepository.findByPetitionId(petitionId).orElseThrow();
+        assertThat(agreeCount.getCount()).isEqualTo(1);
     }
 
     @Test
@@ -213,10 +213,11 @@ class PetitionServiceTest extends IntegrationTest {
             });
         }
         latch.await();
-        Petition petition = petitionRepository.findById(petitionId).orElseThrow();
-        List<Agreement> agreements = agreementRepository.findAll();
-        assertThat(petition.getAgreeCount()).isEqualTo(numberOfThreads);
-        assertThat(agreements).hasSize(numberOfThreads);
+
+        Page<Agreement> agreements = agreementRepository.findAgreementsByPetitionId(petitionId, PageRequest.of(0, 10));
+        assertThat(agreements.getTotalElements()).isEqualTo(numberOfThreads);
+        AgreeCount agreeCount = agreeCountRepository.findByPetitionId(petitionId).orElseThrow();
+        assertThat(agreeCount.getCount()).isEqualTo(numberOfThreads);
     }
 
     @Test
@@ -304,12 +305,13 @@ class PetitionServiceTest extends IntegrationTest {
                         .withExpiredAt(PETITION_EXPIRED_AT)
                         .withUserId(petitionOwner.getId())
                         .build());
+        agreeCountRepository.save(new AgreeCount(petition.getId()));
         petitionCommandService.agree(AGREEMENT_REQUEST, petition.getId(), petitionOwner.getId());
 
         petitionCommandService.deletePetition(petition.getId());
         assertFalse(petitionRepository.existsById(petition.getId()));
         PageRequest pageRequest = PageRequest.of(0, 10);
-        assertThat(agreementRepository.findAgreementsByPetitionId(pageRequest, petition.getId())).hasSize(0);
+        assertThat(agreementRepository.findAgreementsByPetitionId(petition.getId(), pageRequest)).hasSize(0);
     }
 
     @Test

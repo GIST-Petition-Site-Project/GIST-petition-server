@@ -5,8 +5,10 @@ import com.gistpetition.api.exception.petition.AlreadyAnswerException;
 import com.gistpetition.api.exception.petition.DuplicatedAgreementException;
 import com.gistpetition.api.exception.petition.NoSuchPetitionException;
 import com.gistpetition.api.exception.user.NoSuchUserException;
+import com.gistpetition.api.petition.domain.AgreeCount;
 import com.gistpetition.api.petition.domain.Category;
 import com.gistpetition.api.petition.domain.Petition;
+import com.gistpetition.api.petition.domain.repository.AgreeCountRepository;
 import com.gistpetition.api.petition.domain.repository.PetitionRepository;
 import com.gistpetition.api.petition.dto.AgreementRequest;
 import com.gistpetition.api.petition.dto.AnswerRequest;
@@ -28,6 +30,7 @@ public class PetitionCommandService {
 
     private static final int TEMP_URL_LENGTH = 6;
     private final PetitionRepository petitionRepository;
+    private final AgreeCountRepository agreeCountRepository;
     private final UserRepository userRepository;
     private final UrlGenerator urlGenerator;
 
@@ -42,13 +45,14 @@ public class PetitionCommandService {
                         Instant.now().plusSeconds(POSTING_PERIOD_BY_SECONDS),
                         userId,
                         tempUrl));
+        agreeCountRepository.save(new AgreeCount(created.getId()));
         return created.getId();
     }
 
     @Transactional
     public void updatePetition(Long petitionId, PetitionRequest petitionRequest) {
         Petition petition = findPetitionById(petitionId);
-        petition.update(petitionRequest.getTitle(),petitionRequest.getDescription(),petitionRequest.getCategoryId());
+        petition.update(petitionRequest.getTitle(), petitionRequest.getDescription(), petitionRequest.getCategoryId());
     }
 
     @Transactional
@@ -65,6 +69,9 @@ public class PetitionCommandService {
         Petition petition = findPetitionByIdWithLock(petitionId);
         User user = findUserById(userId);
         petition.agree(user.getId(), request.getDescription(), Instant.now());
+
+        AgreeCount agreeCount = agreeCountRepository.findByPetitionId(petitionId).orElseThrow();
+        agreeCount.increment();
     }
 
     @Transactional

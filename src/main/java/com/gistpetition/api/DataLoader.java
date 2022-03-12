@@ -2,7 +2,6 @@ package com.gistpetition.api;
 
 import com.gistpetition.api.petition.application.PetitionCommandService;
 import com.gistpetition.api.petition.domain.Category;
-import com.gistpetition.api.petition.domain.Petition;
 import com.gistpetition.api.petition.domain.repository.AgreementRepository;
 import com.gistpetition.api.petition.domain.repository.AnswerRepository;
 import com.gistpetition.api.petition.domain.repository.PetitionRepository;
@@ -16,9 +15,8 @@ import com.gistpetition.api.utils.password.BcryptEncoder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -89,7 +87,7 @@ public class DataLoader {
         List<Long> petitionIds = IntStream.range(0, PETITION_COUNT)
                 .mapToObj(i -> savePetition(PETITION_TITLE + i, normal))
                 .collect(Collectors.toList());
-
+//
         for (Long petitionId : petitionIds) {
             randomlyAgreePetitionOverRequired(petitionId, alphabetUsers);
 
@@ -104,10 +102,7 @@ public class DataLoader {
             petitionCommandService.answerPetition(petitionId, new AnswerRequest(ANSWER_CONTENT));
         }
 
-        IntStream.range(0, 25).forEach(i -> saveExpiredPetition(normal, "#AAAA" + i, alphabetUsers));
-
-        //for 김건호
-        addTemporaryData();
+        IntStream.range(0, 25).forEach(i -> saveExpiredPetition(normal, alphabetUsers));
     }
 
     private void randomlyAgreePetitionOverRequired(Long petitionId, List<User> alphabetUsers) {
@@ -118,37 +113,16 @@ public class DataLoader {
         }
     }
 
-    // for 김건호
-    private void addTemporaryData() {
-        User tempUser = userRepository.save(new User("tempUser", PASSWORD, UserRole.USER));
-        Long petitionId = savePetition("동의 300개 청원입니다", tempUser);
-
-        int numOfAgree = 300;
-        List<User> users = new ArrayList<>();
-        for (int i = 0; i < numOfAgree; i++) {
-            String username = String.format("%03d@gist.ac.kr", i);
-            users.add(new User(username, PASSWORD, UserRole.USER));
-        }
-        userRepository.saveAll(users);
-
-        for (User user : users) {
-            Long id = user.getId();
-            petitionCommandService.agree(AGREEMENT_REQUEST, petitionId, id);
-        }
-
-        petitionCommandService.releasePetition(petitionId);
-    }
-
     private Long savePetition(String title, User user) {
         return petitionCommandService.createPetition(new PetitionRequest(title, CONTENT, Category.DORMITORY.getId()), user.getId());
     }
 
-    private void saveExpiredPetition(User petitionOwner, String tempUrl, List<User> alphabetUsers) {
-        Petition saved = petitionRepository.save(new Petition(PETITION_TITLE, CONTENT, Category.DORMITORY, Instant.now().plusSeconds(30), petitionOwner.getId(), tempUrl));
+    private void saveExpiredPetition(User petitionOwner, List<User> alphabetUsers) {
+        Long petitionId = savePetition(PETITION_TITLE, petitionOwner);
         for (int j = 0; j < REQUIRED_AGREEMENT_FOR_RELEASE; j++) {
             User user = alphabetUsers.get(j);
-            petitionCommandService.agree(AGREEMENT_REQUEST, saved.getId(), user.getId());
+            petitionCommandService.agree(AGREEMENT_REQUEST, petitionId, user.getId());
         }
-        petitionCommandService.releasePetition(saved.getId());
+        petitionCommandService.releasePetition(petitionId);
     }
 }

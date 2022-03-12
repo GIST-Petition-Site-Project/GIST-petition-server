@@ -19,17 +19,19 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import static com.gistpetition.api.petition.domain.QAgreeCount.agreeCount;
 import static com.gistpetition.api.petition.domain.QPetition.petition;
 
 @Repository
 @RequiredArgsConstructor
-public class CustomPetitionRepositoryImpl implements CustomPetitionRepository {
+public class PetitionQueryDslRepository {
     private final JPQLQueryFactory jpqlQueryFactory;
 
-    @Override
     public Page<PetitionPreviewResponse> findAll(Category category, Predicate predicate, Pageable pageable) {
         List<PetitionPreviewResponse> results = jpqlQueryFactory.select(buildPetitionPreviewResponse())
                 .from(petition)
+                .innerJoin(agreeCount)
+                .on(petition.id.eq(agreeCount.petitionId))
                 .where(categoryEq(category), predicate)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -41,14 +43,13 @@ public class CustomPetitionRepositoryImpl implements CustomPetitionRepository {
         return PageableExecutionUtils.getPage(results, pageable, petitionJPQLQuery::fetchCount);
     }
 
-    @Override
     public Long count(Category category, Predicate predicate) {
         return jpqlQueryFactory.selectFrom(petition)
                 .where(categoryEq(category), predicate).fetchCount();
     }
 
     private QPetitionPreviewResponse buildPetitionPreviewResponse() {
-        return new QPetitionPreviewResponse(petition.id, petition.title.title, petition.category, petition.createdAt, petition.expiredAt, petition.agreeCount.count, petition.tempUrl, petition.released, petition.answer.isNotNull());
+        return new QPetitionPreviewResponse(petition.id, petition.title.title, petition.category, petition.createdAt, petition.expiredAt, agreeCount.count, petition.tempUrl, petition.released, petition.answer.isNotNull());
     }
 
     private BooleanExpression categoryEq(Category category) {
