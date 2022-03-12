@@ -66,11 +66,11 @@ public class PetitionCommandService {
     @Transactional
     @DataIntegrityHandler(DuplicatedAgreementException.class)
     public void agree(AgreementRequest request, Long petitionId, Long userId) {
-        Petition petition = findPetitionByIdWithLock(petitionId);
+        Petition petition = findPetitionById(petitionId);
         User user = findUserById(userId);
         petition.agree(user.getId(), request.getDescription(), Instant.now());
 
-        AgreeCount agreeCount = agreeCountRepository.findByPetitionId(petitionId).orElseThrow();
+        AgreeCount agreeCount = agreeCountRepository.findByPetitionIdWithLock(petitionId).orElseThrow();
         agreeCount.increment();
     }
 
@@ -111,9 +111,5 @@ public class PetitionCommandService {
 
     private Petition findPetitionById(Long petitionId) {
         return petitionRepository.findById(petitionId).orElseThrow(NoSuchPetitionException::new);
-    }
-
-    private Petition findPetitionByIdWithLock(Long petitionId) {
-        return petitionRepository.findByIdWithPessimisticWriteLock(petitionId).orElseThrow(NoSuchPetitionException::new);
     }
 }
