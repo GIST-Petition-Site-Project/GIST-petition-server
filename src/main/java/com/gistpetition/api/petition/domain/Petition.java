@@ -36,10 +36,6 @@ public class Petition extends BaseEntity {
     private final Agreements agreements = new Agreements();
     @NotAudited
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST, orphanRemoval = true)
-    @JoinColumn(name = "agree_count_id", referencedColumnName = "id", nullable = false)
-    private final AgreeCount agreeCount = new AgreeCount(0);
-    @NotAudited
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST, orphanRemoval = true)
     @JoinColumn(name = "answer_id", referencedColumnName = "id")
     private Answer answer;
     @Version
@@ -62,7 +58,6 @@ public class Petition extends BaseEntity {
             throw new ExpiredPetitionException();
         }
         this.agreements.add(new Agreement(description, userId, this));
-        this.agreeCount.increment();
     }
 
     public boolean isAgreedBy(User user) {
@@ -76,7 +71,7 @@ public class Petition extends BaseEntity {
         if (released) {
             throw new AlreadyReleasedPetitionException();
         }
-        if (agreeCount.isLessThan(REQUIRED_AGREEMENT_FOR_RELEASE)) {
+        if (agreements.agreeLessThan(REQUIRED_AGREEMENT_FOR_RELEASE)) {
             throw new NotEnoughAgreementException();
         }
         this.released = true;
@@ -96,7 +91,7 @@ public class Petition extends BaseEntity {
         if (!released) {
             throw new NotReleasedPetitionException();
         }
-        if (agreeCount.isLessThan(REQUIRED_AGREEMENT_FOR_ANSWER)) {
+        if (agreements.agreeLessThan(REQUIRED_AGREEMENT_FOR_ANSWER)) {
             throw new NotEnoughAgreementException();
         }
         this.answer = new Answer(content, this);
@@ -144,6 +139,6 @@ public class Petition extends BaseEntity {
     }
 
     public int getAgreeCount() {
-        return agreeCount.getCount();
+        return agreements.size();
     }
 }
