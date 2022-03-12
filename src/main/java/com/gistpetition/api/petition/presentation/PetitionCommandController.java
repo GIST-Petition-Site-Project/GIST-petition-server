@@ -6,6 +6,7 @@ import com.gistpetition.api.config.annotation.ManagerPermissionRequired;
 import com.gistpetition.api.petition.application.PetitionCommandService;
 import com.gistpetition.api.petition.application.PetitionQueryService;
 import com.gistpetition.api.petition.dto.AgreementRequest;
+import com.gistpetition.api.petition.dto.AnswerRequest;
 import com.gistpetition.api.petition.dto.PetitionRequest;
 import com.gistpetition.api.user.domain.SimpleUser;
 import lombok.RequiredArgsConstructor;
@@ -67,5 +68,27 @@ public class PetitionCommandController {
                                               @LoginUser SimpleUser simpleUser) {
         petitionCommandService.agree(agreementRequest, petitionId, simpleUser.getId());
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/petitions/{petitionId}/answer")
+    public ResponseEntity<Object> createAnswer(@PathVariable Long petitionId,
+                                               @Validated @RequestBody AnswerRequest answerRequest) {
+        petitionCommandService.answerPetition(petitionId, answerRequest);
+        return ResponseEntity.created(URI.create("/v1/petitions/" + petitionId + "/answer")).build();
+    }
+
+    @ManagerPermissionRequired
+    @PutMapping("/petitions/{petitionId}/answer")
+    public ResponseEntity<Void> updateAnswer(@PathVariable Long petitionId,
+                                             @Validated @RequestBody AnswerRequest changeRequest) {
+        petitionCommandService.updateAnswer(petitionId, changeRequest);
+        return ResponseEntity.ok().build();
+    }
+
+    @ManagerPermissionRequired
+    @DeleteMapping("/petitions/{petitionId}/answer")
+    public ResponseEntity<Object> deleteAnswer(@PathVariable Long petitionId) {
+        petitionCommandService.deleteAnswer(petitionId);
+        return ResponseEntity.noContent().build();
     }
 }
