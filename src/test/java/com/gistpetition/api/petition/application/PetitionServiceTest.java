@@ -247,6 +247,31 @@ class PetitionServiceTest extends IntegrationTest {
     }
 
     @Test
+    void retrieveOngoingPetitionWithAgreeCountSort() {
+        int numOfPetition = 3;
+        List<Long> createdPetitionIds = new ArrayList<>();
+        for (int i = 0; i < numOfPetition; i++) {
+            createdPetitionIds.add(petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId()));
+        }
+        List<User> users = saveUsersNumberOf(REQUIRED_AGREEMENT_FOR_RELEASE);
+        createdPetitionIds.forEach(i -> {
+            agreePetitionBy(i, users);
+            petitionCommandService.releasePetition(i);
+        });
+
+        User user1 = userRepository.save(new User("new@gist.ac.kr", "password", UserRole.USER));
+        User user2 = userRepository.save(new User("new2@gist.ac.kr", "password", UserRole.USER));
+
+        agreePetitionBy(createdPetitionIds.get(0), List.of(user1));
+        agreePetitionBy(createdPetitionIds.get(1), List.of(user1, user2));
+
+        Page<PetitionPreviewResponse> petitions = petitionQueryService.retrieveOngoingPetition(PageRequest.of(0, 10, Sort.Direction.DESC, "agreeCount"));
+        assertThat(petitions.getContent()).hasSize(numOfPetition);
+        assertThat(petitions.getContent().stream().map(PetitionPreviewResponse::getId))
+                .containsExactly(createdPetitionIds.get(1), createdPetitionIds.get(0), createdPetitionIds.get(2));
+    }
+
+    @Test
     void retrieveAnsweredPetition() {
         int numOfPetition = 3;
         List<Long> createdPetitionIds = new ArrayList<>();
