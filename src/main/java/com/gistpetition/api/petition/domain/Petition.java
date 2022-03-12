@@ -20,11 +20,10 @@ public class Petition extends BaseEntity {
     public static final int REQUIRED_AGREEMENT_FOR_ANSWER = 20;
     public static final int POSTING_PERIOD_BY_SECONDS = 30 * 24 * 60 * 60;
 
-    @Column(name = "title", nullable = false)
-    private String title;
-    @Lob
-    @Column(name = "description", nullable = false)
-    private String description;
+    @Embedded
+    private Title title;
+    @Embedded
+    private Description description;
     @Enumerated(EnumType.STRING)
     private Category category;
     private Boolean released = false;
@@ -50,8 +49,8 @@ public class Petition extends BaseEntity {
     }
 
     public Petition(String title, String description, Category category, Instant expiredAt, Long userId, String tempUrl) {
-        this.title = title;
-        this.description = description;
+        this.title = new Title(title);
+        this.description = new Description(description);
         this.category = category;
         this.expiredAt = expiredAt;
         this.userId = userId;
@@ -117,16 +116,10 @@ public class Petition extends BaseEntity {
         this.answer = null;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public void setCategory(Category category) {
-        this.category = category;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
+    public void update(String title, String description, Long categoryId) {
+        this.title.update(title);
+        this.description.update(description);
+        this.category = Category.of(categoryId);
     }
 
     public boolean isReleased() {
@@ -139,6 +132,15 @@ public class Petition extends BaseEntity {
 
     public boolean isExpiredAt(Instant time) {
         return time.isAfter(expiredAt);
+    }
+
+
+    public String getTitle() {
+        return this.title.getTitle();
+    }
+
+    public String getDescription() {
+        return this.description.getDescription();
     }
 
     public int getAgreeCount() {
