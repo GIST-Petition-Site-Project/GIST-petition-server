@@ -92,17 +92,6 @@ class PetitionServiceTest extends IntegrationTest {
     }
 
     @Test
-    void findPageOfPetitions() {
-        petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
-        petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
-        petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
-
-        Pageable pageable = PageRequest.of(0, 10, Sort.Direction.DESC, "createdAt");
-        Page<PetitionPreviewResponse> petitionPreviewResponses = petitionQueryService.retrievePetition(pageable);
-        assertThat(petitionPreviewResponses).hasSize(3);
-    }
-
-    @Test
     void updatePetition() {
         Long petitionId = petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
         Petition petition = petitionRepository.findById(petitionId).orElseThrow(IllegalArgumentException::new);

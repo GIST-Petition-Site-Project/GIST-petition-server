@@ -127,14 +127,6 @@ public class PetitionQueryController {
         return ResponseEntity.ok().body(petitionQueryService.retrieveRevisionsOfPetition(petitionId, pageable));
     }
 
-    @GetMapping("/petitions/search")
-    public ResponseEntity<Page<PetitionPreviewResponse>> retrievePetitionsByKeyword(@RequestParam(defaultValue = "") String keyword, Pageable pageable) {
-        if (keyword.equals("")) {
-            return ResponseEntity.ok().body(petitionQueryService.retrievePetition(pageable));
-        }
-        return ResponseEntity.ok().body(petitionQueryService.retrievePetitionByKeyword(keyword, pageable));
-    }
-
     @GetMapping("/petitions/{petitionId}/agreements")
     public ResponseEntity<Page<AgreementResponse>> retrieveAgreements(@PathVariable Long petitionId, Pageable pageable) {
         return ResponseEntity.ok().body(petitionQueryService.retrieveAgreements(petitionId, pageable));

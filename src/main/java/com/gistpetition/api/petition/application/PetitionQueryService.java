@@ -35,10 +35,6 @@ public class PetitionQueryService {
     private final UserRepository userRepository;
     private final PetitionQueryDslRepository petitionQueryDslRepository;
 
-    public Page<PetitionPreviewResponse> retrievePetition(Pageable pageable) {
-        return petitionQueryDslRepository.findAll(null, null, pageable);
-    }
-
     public Page<PetitionPreviewResponse> retrieveReleasedPetition(Pageable pageable) {
         return petitionQueryDslRepository.findAll(null, RELEASED_NOT_EXPIRED.at(Instant.now()), pageable);
     }
@@ -131,11 +127,6 @@ public class PetitionQueryService {
             throw new NotReleasedPetitionException();
         }
         return PetitionResponse.of(petition);
-    }
-
-    @Transactional(readOnly = true)
-    public Page<PetitionPreviewResponse> retrievePetitionByKeyword(String keyword, Pageable pageable) {
-        return PetitionPreviewResponse.pageOf(petitionRepository.findByTitleContains(keyword, pageable));
     }
 
     @Transactional(readOnly = true)
