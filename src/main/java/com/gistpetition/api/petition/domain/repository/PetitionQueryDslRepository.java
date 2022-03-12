@@ -37,15 +37,22 @@ public class PetitionQueryDslRepository {
                 .limit(pageable.getPageSize())
                 .orderBy(orderCondition(pageable)).fetch();
 
-        JPQLQuery<Petition> petitionJPQLQuery = jpqlQueryFactory.selectFrom(petition)
+        JPQLQuery<Petition> petitionJPQLQuery = jpqlQueryFactory.select(petition)
+                .from(petition)
+                .innerJoin(agreeCount)
+                .on(petition.id.eq(agreeCount.petitionId))
                 .where(categoryEq(category), predicate);
 
         return PageableExecutionUtils.getPage(results, pageable, petitionJPQLQuery::fetchCount);
     }
 
     public Long count(Category category, Predicate predicate) {
-        return jpqlQueryFactory.selectFrom(petition)
-                .where(categoryEq(category), predicate).fetchCount();
+        return jpqlQueryFactory.select(petition)
+                .from(petition)
+                .innerJoin(agreeCount)
+                .on(petition.id.eq(agreeCount.petitionId))
+                .where(categoryEq(category), predicate)
+                .fetchCount();
     }
 
     private QPetitionPreviewResponse buildPetitionPreviewResponse() {
