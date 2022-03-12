@@ -2,6 +2,8 @@ package com.gistpetition.api.petition.application;
 
 import com.gistpetition.api.IntegrationTest;
 import com.gistpetition.api.exception.petition.DuplicatedAgreementException;
+import com.gistpetition.api.exception.petition.InvalidDescriptionLengthException;
+import com.gistpetition.api.exception.petition.InvalidTitleLengthException;
 import com.gistpetition.api.exception.petition.NoSuchPetitionException;
 import com.gistpetition.api.petition.PetitionBuilder;
 import com.gistpetition.api.petition.domain.Agreement;

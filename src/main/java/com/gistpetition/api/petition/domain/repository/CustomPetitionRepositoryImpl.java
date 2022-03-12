@@ -48,7 +48,7 @@ public class CustomPetitionRepositoryImpl implements CustomPetitionRepository {
     }
 
     private QPetitionPreviewResponse buildPetitionPreviewResponse() {
-        return new QPetitionPreviewResponse(petition.id, petition.title, petition.category, petition.createdAt, petition.expiredAt, petition.agreeCount.count, petition.tempUrl, petition.released, petition.answer.isNotNull());
+        return new QPetitionPreviewResponse(petition.id, petition.title.title, petition.category, petition.createdAt, petition.expiredAt, petition.agreeCount.count, petition.tempUrl, petition.released, petition.answer.isNotNull());
     }
 
     private BooleanExpression categoryEq(Category category) {
