@@ -19,11 +19,6 @@ spring:
     properties:
       hibernate:
         format_sql: true
-    hibernate:
-      ddl-auto: validate
-  flyway:
-    enabled: true
-    baseline-on-migrate: true
 
 ---
 
@@ -37,12 +32,6 @@ spring:
     properties:
       hibernate:
         format_sql: true
-    hibernate:
-      ddl-auto: validate
-  flyway:
-    enabled: true
-    baseline-on-migrate: true
-
 ---
 
 spring:
@@ -50,12 +39,6 @@ spring:
     activate:
       on-profile: dev
     import: datasoruce/application-docker-mysql.yml, ./privates/application-dev-mail.yml
-  jpa:
-    hibernate:
-      ddl-auto: validate
-  flyway:
-    enabled: true
-    baseline-on-migrate: true
 swagger:
   host: dev-api.gist-petition.com
   protocol: https

@@ -1,7 +1,7 @@
-package com.gistpetition.api.answer.dto;
+package com.gistpetition.api.petition.dto;
 
-import com.gistpetition.api.answer.domain.Answer;
 import com.gistpetition.api.common.persistence.CustomRevisionEntity;
+import com.gistpetition.api.petition.domain.Answer;
 import lombok.Data;
 import org.springframework.data.domain.Page;
 import org.springframework.data.history.Revision;

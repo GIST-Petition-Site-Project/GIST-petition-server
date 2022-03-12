@@ -2,6 +2,7 @@ package com.gistpetition.api.petition.domain;
 
 import com.gistpetition.api.exception.petition.DuplicatedAgreementException;
 import org.hibernate.annotations.BatchSize;
+import org.hibernate.envers.NotAudited;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
@@ -12,7 +13,7 @@ import java.util.List;
 
 @Embeddable
 public class Agreements {
-
+    @NotAudited
     @BatchSize(size = 10)
     @OneToMany(mappedBy = "petition", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private final List<Agreement> agreements = new ArrayList<>();
