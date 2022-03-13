@@ -4,7 +4,6 @@ import com.gistpetition.api.exception.petition.NoSuchPetitionException;
 import com.gistpetition.api.exception.petition.NotReleasedPetitionException;
 import com.gistpetition.api.exception.user.NoSuchUserException;
 import com.gistpetition.api.petition.domain.Agreement;
-import com.gistpetition.api.petition.domain.Answer;
 import com.gistpetition.api.petition.domain.Category;
 import com.gistpetition.api.petition.domain.Petition;
 import com.gistpetition.api.petition.domain.repository.AgreementRepository;
@@ -157,12 +156,6 @@ public class PetitionQueryService {
     public String retrieveTempUrlOf(Long petitionId) {
         Petition petition = findPetitionById(petitionId);
         return petition.getTempUrl();
-    }
-
-    @Transactional(readOnly = true)
-    public Answer retrieveAnswerByPetitionId(Long petitionId) {
-        Petition petition = findPetitionById(petitionId);
-        return petition.getAnswer();
     }
 
     @Transactional(readOnly = true)
