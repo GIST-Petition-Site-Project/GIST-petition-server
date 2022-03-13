@@ -21,7 +21,7 @@ public class AnswerRevisionResponse {
                 revision.getRequiredRevisionInstant().toEpochMilli(),
                 revision.getMetadata().getRevisionType(),
                 revision.getMetadata().<CustomRevisionEntity>getDelegate().getUserId(),
-                revision.getEntity().getContent()
+                revision.getEntity().getDescription()
         );
     }
 

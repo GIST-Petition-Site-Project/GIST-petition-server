@@ -55,7 +55,7 @@ public class PetitionResponse {
         public static AnswerResponse of(Answer answer) {
             return new AnswerResponse(
                     answer.getId(),
-                    answer.getContent(),
+                    answer.getDescription(),
                     answer.getCreatedAt().toEpochMilli(),
                     answer.getUpdatedAt().toEpochMilli()
             );
