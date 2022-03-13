@@ -1,5 +1,6 @@
 package com.gistpetition.api.petition.dto;
 
+import com.gistpetition.api.petition.domain.Answer;
 import com.gistpetition.api.petition.domain.Petition;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,9 +22,11 @@ public class PetitionResponse {
     private String tempUrl;
     private Boolean released;
     private Boolean answered;
+    private String answer;
     private Boolean expired;
 
     public static PetitionResponse of(Petition petition) {
+        Answer answer = petition.getAnswer();
         return new PetitionResponse(
                 petition.getId(),
                 petition.getTitle(),
@@ -35,6 +38,7 @@ public class PetitionResponse {
                 petition.getTempUrl(),
                 petition.isReleased(),
                 petition.isAnswered(),
+                answer != null ? answer.getContent() : null,
                 petition.isExpiredAt(Instant.now())
         );
     }

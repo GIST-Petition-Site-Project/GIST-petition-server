@@ -2,6 +2,7 @@ package com.gistpetition.api;
 
 import com.gistpetition.api.petition.application.PetitionCommandService;
 import com.gistpetition.api.petition.domain.Category;
+import com.gistpetition.api.petition.domain.repository.AgreeCountRepository;
 import com.gistpetition.api.petition.domain.repository.AgreementRepository;
 import com.gistpetition.api.petition.domain.repository.AnswerRepository;
 import com.gistpetition.api.petition.domain.repository.PetitionRepository;
@@ -67,12 +68,14 @@ public class DataLoader {
     private final AnswerRepository answerRepository;
     private final PetitionCommandService petitionCommandService;
     private final AgreementRepository agreementRepository;
+    private final AgreeCountRepository agreeCountRepository;
 
     @Transactional
     public void loadData() {
+        agreeCountRepository.deleteAllInBatch();
         agreementRepository.deleteAllInBatch();
-        answerRepository.deleteAllInBatch();
         petitionRepository.deleteAllInBatch();
+        answerRepository.deleteAllInBatch();
         userRepository.deleteAllInBatch();
 
         User admin = userRepository.save(new User("admin@gist.ac.kr", PASSWORD, UserRole.ADMIN));
