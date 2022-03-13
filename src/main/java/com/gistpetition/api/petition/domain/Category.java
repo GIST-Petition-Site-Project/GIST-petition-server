@@ -17,7 +17,6 @@ public enum Category {
     COMMUNICATION(8L, "권익소통"),
     ETC(9L, "기타");
 
-
     private final Long id;
     private final String name;
 

@@ -57,8 +57,6 @@ public final class PetitionBuilder {
     }
 
     public Petition build() {
-        Petition petition = new Petition(title, description, category, expiredAt, userId, tempUrl);
-        petition.setAnswered(answered);
-        return petition;
+        return new Petition(title, description, category, expiredAt, userId, tempUrl);
     }
 }

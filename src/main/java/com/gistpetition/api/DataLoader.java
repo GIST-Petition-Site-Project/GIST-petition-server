@@ -1,11 +1,13 @@
 package com.gistpetition.api;
 
-import com.gistpetition.api.answer.application.AnswerService;
-import com.gistpetition.api.answer.domain.AnswerRepository;
-import com.gistpetition.api.answer.dto.AnswerRequest;
-import com.gistpetition.api.petition.application.PetitionService;
-import com.gistpetition.api.petition.domain.*;
+import com.gistpetition.api.petition.application.PetitionCommandService;
+import com.gistpetition.api.petition.domain.Category;
+import com.gistpetition.api.petition.domain.repository.AgreeCountRepository;
+import com.gistpetition.api.petition.domain.repository.AgreementRepository;
+import com.gistpetition.api.petition.domain.repository.AnswerRepository;
+import com.gistpetition.api.petition.domain.repository.PetitionRepository;
 import com.gistpetition.api.petition.dto.AgreementRequest;
+import com.gistpetition.api.petition.dto.AnswerRequest;
 import com.gistpetition.api.petition.dto.PetitionRequest;
 import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRepository;
@@ -14,9 +16,8 @@ import com.gistpetition.api.utils.password.BcryptEncoder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -26,7 +27,7 @@ import java.util.stream.IntStream;
 import static com.gistpetition.api.petition.domain.Petition.REQUIRED_AGREEMENT_FOR_ANSWER;
 import static com.gistpetition.api.petition.domain.Petition.REQUIRED_AGREEMENT_FOR_RELEASE;
 
-@Profile("dev")
+@Profile("local | dev")
 @RequiredArgsConstructor
 @Component
 public class DataLoader {
@@ -65,15 +66,16 @@ public class DataLoader {
     private final UserRepository userRepository;
     private final PetitionRepository petitionRepository;
     private final AnswerRepository answerRepository;
-    private final PetitionService petitionService;
-    private final AnswerService answerService;
+    private final PetitionCommandService petitionCommandService;
     private final AgreementRepository agreementRepository;
+    private final AgreeCountRepository agreeCountRepository;
 
     @Transactional
     public void loadData() {
-        answerRepository.deleteAllInBatch();
+        agreeCountRepository.deleteAllInBatch();
         agreementRepository.deleteAllInBatch();
         petitionRepository.deleteAllInBatch();
+        answerRepository.deleteAllInBatch();
         userRepository.deleteAllInBatch();
 
         User admin = userRepository.save(new User("admin@gist.ac.kr", PASSWORD, UserRole.ADMIN));
@@ -95,59 +97,35 @@ public class DataLoader {
             if (petitionId < petitionIds.get(0) + WAITING_FOR_CHECK_RELEASE_COUNT) {
                 continue;
             }
-            petitionService.releasePetition(petitionId);
+            petitionCommandService.releasePetition(petitionId);
 
             if (petitionId < petitionIds.get(0) + WAITING_FOR_CHECK_RELEASE_COUNT + WAITING_FOR_CHECK_ANSWER_COUNT) {
                 continue;
             }
-            answerService.createAnswer(petitionId, new AnswerRequest(ANSWER_CONTENT));
+            petitionCommandService.answerPetition(petitionId, new AnswerRequest(ANSWER_CONTENT));
         }
 
-        IntStream.range(0, 25).forEach(i -> saveExpiredPetition(normal, "#AAAA" + i, alphabetUsers));
-
-        //for 김건호
-        addTemporaryData();
+        IntStream.range(0, 25).forEach(i -> saveExpiredPetition(normal, alphabetUsers));
     }
 
     private void randomlyAgreePetitionOverRequired(Long petitionId, List<User> alphabetUsers) {
         int agreeCount = RANDOM.nextInt(alphabetUsers.size() - REQUIRED_AGREEMENT_FOR_ANSWER) + REQUIRED_AGREEMENT_FOR_ANSWER;
         for (int j = 0; j < agreeCount; j++) {
             User user = alphabetUsers.get(j);
-            petitionService.agree(AGREEMENT_REQUEST, petitionId, user.getId());
+            petitionCommandService.agree(AGREEMENT_REQUEST, petitionId, user.getId());
         }
-    }
-
-    // for 김건호
-    private void addTemporaryData() {
-        User tempUser = userRepository.save(new User("tempUser", PASSWORD, UserRole.USER));
-        Long petitionId = savePetition("동의 300개 청원입니다", tempUser);
-
-        int numOfAgree = 300;
-        List<User> users = new ArrayList<>();
-        for (int i = 0; i < numOfAgree; i++) {
-            String username = String.format("%03d@gist.ac.kr", i);
-            users.add(new User(username, PASSWORD, UserRole.USER));
-        }
-        userRepository.saveAll(users);
-
-        for (User user : users) {
-            Long id = user.getId();
-            petitionService.agree(AGREEMENT_REQUEST, petitionId, id);
-        }
-
-        petitionService.releasePetition(petitionId);
     }
 
     private Long savePetition(String title, User user) {
-        return petitionService.createPetition(new PetitionRequest(title, CONTENT, Category.DORMITORY.getId()), user.getId());
+        return petitionCommandService.createPetition(new PetitionRequest(title, CONTENT, Category.DORMITORY.getId()), user.getId());
     }
 
-    private void saveExpiredPetition(User petitionOwner, String tempUrl, List<User> alphabetUsers) {
-        Petition saved = petitionRepository.save(new Petition(PETITION_TITLE, CONTENT, Category.DORMITORY, Instant.now().plusSeconds(30), petitionOwner.getId(), tempUrl));
+    private void saveExpiredPetition(User petitionOwner, List<User> alphabetUsers) {
+        Long petitionId = savePetition(PETITION_TITLE, petitionOwner);
         for (int j = 0; j < REQUIRED_AGREEMENT_FOR_RELEASE; j++) {
             User user = alphabetUsers.get(j);
-            petitionService.agree(AGREEMENT_REQUEST, saved.getId(), user.getId());
+            petitionCommandService.agree(AGREEMENT_REQUEST, petitionId, user.getId());
         }
-        petitionService.releasePetition(saved.getId());
+        petitionCommandService.releasePetition(petitionId);
     }
 }

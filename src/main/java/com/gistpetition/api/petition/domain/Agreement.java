@@ -4,7 +4,6 @@ import com.gistpetition.api.common.persistence.UnmodifiableEntity;
 import lombok.Getter;
 
 import javax.persistence.*;
-import java.time.Instant;
 import java.util.Objects;
 
 @Getter
@@ -13,12 +12,12 @@ import java.util.Objects;
 public class Agreement extends UnmodifiableEntity {
 
     @Lob
+    @Column(name = "description", nullable = false)
     private String description;
     @Column(name = "user_id")
     private Long userId;
-
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "petition_id")
+    @JoinColumn(name = "petition_id", referencedColumnName = "id")
     private Petition petition;
 
     protected Agreement() {
@@ -28,7 +27,7 @@ public class Agreement extends UnmodifiableEntity {
         this(description, userId, null);
     }
 
-    private Agreement(String description, Long userId, Petition petition) {
+    public Agreement(String description, Long userId, Petition petition) {
         this.description = description;
         this.userId = userId;
         this.petition = petition;
@@ -36,11 +35,6 @@ public class Agreement extends UnmodifiableEntity {
 
     public boolean writtenBy(Long userId) {
         return this.userId.equals(userId);
-    }
-
-    public void setPetition(Petition petition, Instant at) {
-        this.petition = petition;
-        petition.addAgreement(this, at);
     }
 
     @Override
