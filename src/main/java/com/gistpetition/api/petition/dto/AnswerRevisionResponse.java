@@ -13,7 +13,7 @@ public class AnswerRevisionResponse {
     private final Long revisionTime;
     private final RevisionMetadata.RevisionType revisionType;
     private final Long workedBy;
-    private final String answerContent;
+    private final String answerDescription;
 
     public static AnswerRevisionResponse of(Revision<Long, Answer> revision) {
         return new AnswerRevisionResponse(

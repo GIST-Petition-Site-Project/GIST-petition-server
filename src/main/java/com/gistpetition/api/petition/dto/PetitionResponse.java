@@ -48,7 +48,7 @@ public class PetitionResponse {
     @AllArgsConstructor
     public static class AnswerResponse {
         private Long id;
-        private String content;
+        private String description;
         private Long createdAt;
         private Long updatedAt;
 
