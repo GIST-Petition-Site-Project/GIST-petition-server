@@ -16,14 +16,14 @@ public class PetitionResponse {
     private String title;
     private String description;
     private String categoryName;
-    private Integer agreements;
+    private Integer agreeCount;
     private Long createdAt;
     private Long updatedAt;
     private String tempUrl;
     private Boolean released;
     private Boolean answered;
-    private String answer;
     private Boolean expired;
+    private AnswerResponse answer;
 
     public static PetitionResponse of(Petition petition) {
         Answer answer = petition.getAnswer();
@@ -38,8 +38,27 @@ public class PetitionResponse {
                 petition.getTempUrl(),
                 petition.isReleased(),
                 petition.isAnswered(),
-                answer != null ? answer.getContent() : null,
-                petition.isExpiredAt(Instant.now())
+                petition.isExpiredAt(Instant.now()),
+                answer != null ? AnswerResponse.of(answer) : null
         );
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class AnswerResponse {
+        private Long id;
+        private String description;
+        private Long createdAt;
+        private Long updatedAt;
+
+        public static AnswerResponse of(Answer answer) {
+            return new AnswerResponse(
+                    answer.getId(),
+                    answer.getDescription(),
+                    answer.getCreatedAt().toEpochMilli(),
+                    answer.getUpdatedAt().toEpochMilli()
+            );
+        }
     }
 }

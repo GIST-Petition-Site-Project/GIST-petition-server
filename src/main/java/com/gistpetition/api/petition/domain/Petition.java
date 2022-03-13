@@ -84,7 +84,7 @@ public class Petition extends BaseEntity {
         this.released = false;
     }
 
-    public void answer(String content) {
+    public void answer(String description) {
         if (isAnswered()) {
             throw new AlreadyAnswerException();
         }
@@ -94,14 +94,14 @@ public class Petition extends BaseEntity {
         if (agreements.agreeLessThan(REQUIRED_AGREEMENT_FOR_ANSWER)) {
             throw new NotEnoughAgreementException();
         }
-        this.answer = new Answer(content, this);
+        this.answer = new Answer(description, this);
     }
 
-    public void updateAnswer(String updateAnswerContent) {
+    public void updateAnswer(String description) {
         if (!isAnswered()) {
             throw new NotAnsweredPetitionException();
         }
-        this.answer.updateContent(updateAnswerContent);
+        this.answer.update(description);
     }
 
     public void deleteAnswer() {

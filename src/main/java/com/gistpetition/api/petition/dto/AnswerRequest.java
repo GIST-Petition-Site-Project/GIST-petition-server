@@ -5,16 +5,16 @@ import javax.validation.constraints.NotBlank;
 public class AnswerRequest {
 
     @NotBlank
-    private String content;
+    private String description;
 
     protected AnswerRequest() {
     }
 
-    public AnswerRequest(String content) {
-        this.content = content;
+    public AnswerRequest(String description) {
+        this.description = description;
     }
 
-    public String getContent() {
-        return content;
+    public String getDescription() {
+        return description;
     }
 }
