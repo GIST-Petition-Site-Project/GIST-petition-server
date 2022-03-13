@@ -16,7 +16,7 @@ public class PetitionResponse {
     private String title;
     private String description;
     private String categoryName;
-    private Integer agreements;
+    private Integer agreeCount;
     private Long createdAt;
     private Long updatedAt;
     private String tempUrl;
