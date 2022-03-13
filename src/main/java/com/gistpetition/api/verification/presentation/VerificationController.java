@@ -49,6 +49,4 @@ public class VerificationController {
         findPasswordVerificationService.confirmUsername(request);
         return ResponseEntity.noContent().build();
     }
-
-
 }
