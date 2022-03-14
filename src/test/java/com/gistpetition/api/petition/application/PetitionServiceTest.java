@@ -407,7 +407,7 @@ class PetitionServiceTest extends IntegrationTest {
 
         Petition petition = petitionRepository.findById(petitionId).orElseThrow();
         assertTrue(petition.isAnswered());
-        assertThat(petition.getAnswer().getContent()).isEqualTo(ANSWER_REQUEST.getContent());
+        assertThat(petition.getAnswer().getDescription()).isEqualTo(ANSWER_REQUEST.getDescription());
     }
 
     @Test
@@ -422,7 +422,7 @@ class PetitionServiceTest extends IntegrationTest {
 
         Petition petition = petitionRepository.findById(petitionId).orElseThrow();
         assertTrue(petition.isAnswered());
-        assertThat(petition.getAnswer().getContent()).isEqualTo(UPDATE_ANSWER_REQUEST.getContent());
+        assertThat(petition.getAnswer().getDescription()).isEqualTo(UPDATE_ANSWER_REQUEST.getDescription());
     }
 
     @Test

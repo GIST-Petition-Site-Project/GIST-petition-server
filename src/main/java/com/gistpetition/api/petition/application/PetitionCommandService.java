@@ -90,13 +90,13 @@ public class PetitionCommandService {
     @DataIntegrityHandler(AlreadyAnswerException.class)
     public void answerPetition(Long petitionId, AnswerRequest answerRequest) {
         Petition petition = findPetitionById(petitionId);
-        petition.answer(answerRequest.getContent());
+        petition.answer(answerRequest.getDescription());
     }
 
     @Transactional
     public void updateAnswer(Long petitionId, AnswerRequest updateAnswerRequest) {
         Petition petition = findPetitionById(petitionId);
-        petition.updateAnswer(updateAnswerRequest.getContent());
+        petition.updateAnswer(updateAnswerRequest.getDescription());
     }
 
     @Transactional

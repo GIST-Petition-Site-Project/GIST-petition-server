@@ -18,18 +18,18 @@ import javax.persistence.OneToOne;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Answer extends BaseEntity {
     @Lob
-    @Column(name = "content", nullable = false)
-    private String content;
+    @Column(name = "description", nullable = false)
+    private String description;
     @NotAudited
     @OneToOne(mappedBy = "answer")
     private Petition petition;
 
-    public Answer(String content, Petition petition) {
-        this.content = content;
+    public Answer(String description, Petition petition) {
+        this.description = description;
         this.petition = petition;
     }
 
-    public void updateContent(String updateAnswerContent) {
-        this.content = updateAnswerContent;
+    public void update(String description) {
+        this.description = description;
     }
 }
