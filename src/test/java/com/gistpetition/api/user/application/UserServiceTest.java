@@ -135,7 +135,7 @@ class UserServiceTest extends IntegrationTest {
         Long userId = userService.signUp(DEFAULT_SIGN_UP_REQUEST);
 
         UpdateUserRoleRequest userRoleRequest = new UpdateUserRoleRequest(inputUserRole);
-        userService.updateUserRole(userId, userRoleRequest);
+        userService.updateUserRole(DEFAULT_SIGN_UP_REQUEST.getUsername(), userRoleRequest);
 
         User user = userRepository.findById(userId).orElseThrow(IllegalArgumentException::new);
         Assertions.assertThat(user.getUserRole()).isEqualTo(UserRole.MANAGER);
@@ -147,7 +147,7 @@ class UserServiceTest extends IntegrationTest {
         Long userId = userService.signUp(DEFAULT_SIGN_UP_REQUEST);
 
         UpdateUserRoleRequest userRoleRequest = new UpdateUserRoleRequest(inputUserRole);
-        userService.updateUserRole(userId, userRoleRequest);
+        userService.updateUserRole(DEFAULT_SIGN_UP_REQUEST.getUsername(), userRoleRequest);
 
         User user = userRepository.findById(userId).orElseThrow(IllegalArgumentException::new);
         Assertions.assertThat(user.getUserRole()).isEqualTo(UserRole.ADMIN);

@@ -65,8 +65,8 @@ public class UserService {
     }
 
     @Transactional
-    public void updateUserRole(Long userId, UpdateUserRoleRequest userRoleRequest) {
-        User user = findUserById(userId);
+    public void updateUserRole(String username, UpdateUserRoleRequest userRoleRequest) {
+        User user = findUserByUsername(username);
         user.setUserRole(UserRole.ignoringCaseValueOf(userRoleRequest.getUserRole()));
     }
 

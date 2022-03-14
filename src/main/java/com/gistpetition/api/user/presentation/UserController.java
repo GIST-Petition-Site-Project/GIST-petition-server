@@ -56,10 +56,10 @@ public class UserController {
     }
 
     @AdminPermissionRequired
-    @PutMapping("/users/{userId}/userRole")
-    public ResponseEntity<Void> updateUserRole(@PathVariable Long userId,
+    @PutMapping("/users/{username}/userRole")
+    public ResponseEntity<Void> updateUserRole(@PathVariable String username,
                                                @Validated @RequestBody UpdateUserRoleRequest userRoleRequest) {
-        userService.updateUserRole(userId, userRoleRequest);
+        userService.updateUserRole(username, userRoleRequest);
         return ResponseEntity.noContent().build();
     }
 
