@@ -190,18 +190,15 @@ class UserServiceTest extends IntegrationTest {
     void deleteUser() {
         Long userId = userService.signUp(DEFAULT_SIGN_UP_REQUEST);
 
-        userService.deleteUser(userId);
+        userService.deleteUser(DEFAULT_SIGN_UP_REQUEST.getUsername());
 
         assertFalse(userRepository.existsById(userId));
     }
 
     @Test
     void deleteUserIfNotExisted() {
-        Long notExistedId = Long.MAX_VALUE;
-
-        assertThatThrownBy(() -> userService.deleteUser(notExistedId)).isInstanceOf(NoSuchUserException.class);
+        assertThatThrownBy(() -> userService.deleteUser("notSaved@gist.ac.kr")).isInstanceOf(NoSuchUserException.class);
     }
-
 
     @Test
     void deleteUserOfMine() {
@@ -219,14 +216,5 @@ class UserServiceTest extends IntegrationTest {
         assertThatThrownBy(
                 () -> userService.deleteUserOfMine(userId, new DeleteUserRequest("notPassword"))
         ).isInstanceOf(NotMatchedPasswordException.class);
-    }
-
-    @Test
-    void deleteUserOfUsername() {
-        Long userId = userService.signUp(DEFAULT_SIGN_UP_REQUEST);
-
-        userService.deleteUserOfUsername(DEFAULT_SIGN_UP_REQUEST.getUsername());
-
-        assertFalse(userRepository.existsById(userId));
     }
 }

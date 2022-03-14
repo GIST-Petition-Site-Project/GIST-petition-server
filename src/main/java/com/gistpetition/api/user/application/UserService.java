@@ -87,11 +87,9 @@ public class UserService {
     }
 
     @Transactional
-    public void deleteUser(Long userId) {
-        if (!userRepository.existsById(userId)) {
-            throw new NoSuchUserException();
-        }
-        userRepository.deleteById(userId);
+    public void deleteUser(String username) {
+        User user = findUserByUsername(username);
+        userRepository.delete(user);
     }
 
     @Transactional
@@ -101,11 +99,5 @@ public class UserService {
             throw new NotMatchedPasswordException();
         }
         userRepository.deleteById(userId);
-    }
-
-    @Transactional
-    public void deleteUserOfUsername(String username) {
-        User user = findUserByUsername(username);
-        userRepository.delete(user);
     }
 }
