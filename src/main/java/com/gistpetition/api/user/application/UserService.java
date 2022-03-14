@@ -9,6 +9,7 @@ import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRepository;
 import com.gistpetition.api.user.domain.UserRole;
 import com.gistpetition.api.user.dto.request.*;
+import com.gistpetition.api.user.dto.response.UserResponse;
 import com.gistpetition.api.utils.email.EmailDomain;
 import com.gistpetition.api.utils.email.EmailParser;
 import com.gistpetition.api.utils.password.Encoder;
@@ -54,25 +55,30 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public User findUserByEmail(String email) {
-        return userRepository.findByUsername(email)
+    public User findUserByUsername(String username) {
+        return userRepository.findByUsername(username)
                 .orElseThrow(NoSuchUserException::new);
     }
 
     @Transactional(readOnly = true)
-    public Page<User> retrieveUsers(Pageable pageable) {
-        return userRepository.findAll(pageable);
+    public Page<UserResponse> retrieveUsers(Pageable pageable) {
+        return UserResponse.pageOf(userRepository.findAll(pageable));
+    }
+
+    @Transactional(readOnly = true)
+    public Page<UserResponse> retrieveUsersOfUserRole(UserRole userRole, Pageable pageable) {
+        return UserResponse.pageOf(userRepository.findAllByUserRole(userRole, pageable));
     }
 
     @Transactional
-    public void updateUserRole(Long userId, UpdateUserRoleRequest userRoleRequest) {
-        User user = findUserById(userId);
+    public void updateUserRole(String username, UpdateUserRoleRequest userRoleRequest) {
+        User user = findUserByUsername(username);
         user.setUserRole(UserRole.ignoringCaseValueOf(userRoleRequest.getUserRole()));
     }
 
     @Transactional
     public void updatePasswordByVerificationCode(UpdatePasswordByVerificationRequest request) {
-        User user = findUserByEmail(request.getUsername());
+        User user = findUserByUsername(request.getUsername());
         passwordValidator.checkIsVerified(user.getUsername(), request.getVerificationCode());
         user.setPassword(encoder.hashPassword(request.getPassword()));
     }
@@ -87,11 +93,9 @@ public class UserService {
     }
 
     @Transactional
-    public void deleteUser(Long userId) {
-        if (!userRepository.existsById(userId)) {
-            throw new NoSuchUserException();
-        }
-        userRepository.deleteById(userId);
+    public void deleteUser(String username) {
+        User user = findUserByUsername(username);
+        userRepository.delete(user);
     }
 
     @Transactional
@@ -101,11 +105,5 @@ public class UserService {
             throw new NotMatchedPasswordException();
         }
         userRepository.deleteById(userId);
-    }
-
-    @Transactional
-    public void deleteUserOfUsername(String username) {
-        User user = findUserByEmail(username);
-        userRepository.delete(user);
     }
 }

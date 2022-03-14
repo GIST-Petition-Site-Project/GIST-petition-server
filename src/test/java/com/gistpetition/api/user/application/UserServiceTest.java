@@ -9,6 +9,7 @@ import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRepository;
 import com.gistpetition.api.user.domain.UserRole;
 import com.gistpetition.api.user.dto.request.*;
+import com.gistpetition.api.user.dto.response.UserResponse;
 import com.gistpetition.api.utils.password.Encoder;
 import com.gistpetition.api.verification.application.password.FindPasswordValidator;
 import com.gistpetition.api.verification.application.signup.SignUpValidator;
@@ -125,8 +126,27 @@ class UserServiceTest extends IntegrationTest {
         }
 
         PageRequest pageRequest = PageRequest.of(0, 20);
-        Page<User> users = userService.retrieveUsers(pageRequest);
-        assertThat(users).hasSize(10);
+        Page<UserResponse> userResponses = userService.retrieveUsers(pageRequest);
+        assertThat(userResponses).hasSize(10);
+    }
+
+    @Test
+    void retrieveUsersByUserRole() {
+        int userCount = 3;
+        int managerCount = 2;
+        for (int i = 0; i < userCount; i++) {
+            userRepository.save(new User(i + GIST_EMAIL, PASSWORD, UserRole.USER));
+        }
+        for (int i = userCount; i < userCount + managerCount; i++) {
+            userRepository.save(new User(i + GIST_EMAIL, PASSWORD, UserRole.MANAGER));
+        }
+        PageRequest pageRequest = PageRequest.of(0, 20);
+        Page<UserResponse> users = userService.retrieveUsersOfUserRole(UserRole.USER, pageRequest);
+        assertThat(users).hasSize(userCount);
+        Page<UserResponse> managers = userService.retrieveUsersOfUserRole(UserRole.MANAGER, pageRequest);
+        assertThat(managers).hasSize(managerCount);
+        Page<UserResponse> admins = userService.retrieveUsersOfUserRole(UserRole.ADMIN, pageRequest);
+        assertThat(admins).hasSize(0);
     }
 
     @ParameterizedTest
@@ -135,7 +155,7 @@ class UserServiceTest extends IntegrationTest {
         Long userId = userService.signUp(DEFAULT_SIGN_UP_REQUEST);
 
         UpdateUserRoleRequest userRoleRequest = new UpdateUserRoleRequest(inputUserRole);
-        userService.updateUserRole(userId, userRoleRequest);
+        userService.updateUserRole(DEFAULT_SIGN_UP_REQUEST.getUsername(), userRoleRequest);
 
         User user = userRepository.findById(userId).orElseThrow(IllegalArgumentException::new);
         Assertions.assertThat(user.getUserRole()).isEqualTo(UserRole.MANAGER);
@@ -147,7 +167,7 @@ class UserServiceTest extends IntegrationTest {
         Long userId = userService.signUp(DEFAULT_SIGN_UP_REQUEST);
 
         UpdateUserRoleRequest userRoleRequest = new UpdateUserRoleRequest(inputUserRole);
-        userService.updateUserRole(userId, userRoleRequest);
+        userService.updateUserRole(DEFAULT_SIGN_UP_REQUEST.getUsername(), userRoleRequest);
 
         User user = userRepository.findById(userId).orElseThrow(IllegalArgumentException::new);
         Assertions.assertThat(user.getUserRole()).isEqualTo(UserRole.ADMIN);
@@ -190,18 +210,15 @@ class UserServiceTest extends IntegrationTest {
     void deleteUser() {
         Long userId = userService.signUp(DEFAULT_SIGN_UP_REQUEST);
 
-        userService.deleteUser(userId);
+        userService.deleteUser(DEFAULT_SIGN_UP_REQUEST.getUsername());
 
         assertFalse(userRepository.existsById(userId));
     }
 
     @Test
     void deleteUserIfNotExisted() {
-        Long notExistedId = Long.MAX_VALUE;
-
-        assertThatThrownBy(() -> userService.deleteUser(notExistedId)).isInstanceOf(NoSuchUserException.class);
+        assertThatThrownBy(() -> userService.deleteUser("notSaved@gist.ac.kr")).isInstanceOf(NoSuchUserException.class);
     }
-
 
     @Test
     void deleteUserOfMine() {
@@ -219,14 +236,5 @@ class UserServiceTest extends IntegrationTest {
         assertThatThrownBy(
                 () -> userService.deleteUserOfMine(userId, new DeleteUserRequest("notPassword"))
         ).isInstanceOf(NotMatchedPasswordException.class);
-    }
-
-    @Test
-    void deleteUserOfUsername() {
-        Long userId = userService.signUp(DEFAULT_SIGN_UP_REQUEST);
-
-        userService.deleteUserOfUsername(DEFAULT_SIGN_UP_REQUEST.getUsername());
-
-        assertFalse(userRepository.existsById(userId));
     }
 }

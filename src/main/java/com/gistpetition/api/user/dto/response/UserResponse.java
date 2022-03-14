@@ -7,13 +7,11 @@ import org.springframework.data.domain.Page;
 
 @Data
 public class UserResponse {
-    private final Long id;
     private final String username;
     private final UserRole userRole;
 
     public static UserResponse of(User user) {
         return new UserResponse(
-                user.getId(),
                 user.getUsername(),
                 user.getUserRole()
         );
