@@ -9,6 +9,7 @@ import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRepository;
 import com.gistpetition.api.user.domain.UserRole;
 import com.gistpetition.api.user.dto.request.*;
+import com.gistpetition.api.user.dto.response.UserResponse;
 import com.gistpetition.api.utils.email.EmailDomain;
 import com.gistpetition.api.utils.email.EmailParser;
 import com.gistpetition.api.utils.password.Encoder;
@@ -60,13 +61,13 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public Page<User> retrieveUsers(Pageable pageable) {
-        return userRepository.findAll(pageable);
+    public Page<UserResponse> retrieveUsers(Pageable pageable) {
+        return UserResponse.pageOf(userRepository.findAll(pageable));
     }
 
     @Transactional(readOnly = true)
-    public Page<User> retrieveUsersOfUserRole(UserRole userRole, Pageable pageable) {
-        return userRepository.findAllByUserRole(userRole, pageable);
+    public Page<UserResponse> retrieveUsersOfUserRole(UserRole userRole, Pageable pageable) {
+        return UserResponse.pageOf(userRepository.findAllByUserRole(userRole, pageable));
     }
 
     @Transactional

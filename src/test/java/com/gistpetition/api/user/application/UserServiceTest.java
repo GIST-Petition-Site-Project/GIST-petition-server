@@ -9,6 +9,7 @@ import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRepository;
 import com.gistpetition.api.user.domain.UserRole;
 import com.gistpetition.api.user.dto.request.*;
+import com.gistpetition.api.user.dto.response.UserResponse;
 import com.gistpetition.api.utils.password.Encoder;
 import com.gistpetition.api.verification.application.password.FindPasswordValidator;
 import com.gistpetition.api.verification.application.signup.SignUpValidator;
@@ -125,8 +126,8 @@ class UserServiceTest extends IntegrationTest {
         }
 
         PageRequest pageRequest = PageRequest.of(0, 20);
-        Page<User> users = userService.retrieveUsers(pageRequest);
-        assertThat(users).hasSize(10);
+        Page<UserResponse> userResponses = userService.retrieveUsers(pageRequest);
+        assertThat(userResponses).hasSize(10);
     }
 
     @ParameterizedTest

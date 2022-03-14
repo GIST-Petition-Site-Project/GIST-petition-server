@@ -49,9 +49,9 @@ public class UserController {
     @GetMapping("/users")
     public ResponseEntity<Page<UserResponse>> retrieveUsers(@RequestParam(required = false) String userRole, Pageable pageable) {
         if (Objects.isNull(userRole)) {
-            return ResponseEntity.ok().body(UserResponse.pageOf(userService.retrieveUsers(pageable)));
+            return ResponseEntity.ok().body(userService.retrieveUsers(pageable));
         }
-        return ResponseEntity.ok().body(UserResponse.pageOf(userService.retrieveUsersOfUserRole(UserRole.ignoringCaseValueOf(userRole), pageable)));
+        return ResponseEntity.ok().body(userService.retrieveUsersOfUserRole(UserRole.ignoringCaseValueOf(userRole), pageable));
     }
 
     @LoginRequired
