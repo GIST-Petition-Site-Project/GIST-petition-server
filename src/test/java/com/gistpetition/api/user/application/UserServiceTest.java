@@ -130,6 +130,25 @@ class UserServiceTest extends IntegrationTest {
         assertThat(userResponses).hasSize(10);
     }
 
+    @Test
+    void retrieveUsersByUserRole() {
+        int userCount = 3;
+        int managerCount = 2;
+        for (int i = 0; i < userCount; i++) {
+            userRepository.save(new User(i + GIST_EMAIL, PASSWORD, UserRole.USER));
+        }
+        for (int i = userCount; i < userCount + managerCount; i++) {
+            userRepository.save(new User(i + GIST_EMAIL, PASSWORD, UserRole.MANAGER));
+        }
+        PageRequest pageRequest = PageRequest.of(0, 20);
+        Page<UserResponse> users = userService.retrieveUsersOfUserRole(UserRole.USER, pageRequest);
+        assertThat(users).hasSize(userCount);
+        Page<UserResponse> managers = userService.retrieveUsersOfUserRole(UserRole.MANAGER, pageRequest);
+        assertThat(managers).hasSize(managerCount);
+        Page<UserResponse> admins = userService.retrieveUsersOfUserRole(UserRole.ADMIN, pageRequest);
+        assertThat(admins).hasSize(0);
+    }
+
     @ParameterizedTest
     @ValueSource(strings = {"manager", "Manager", "MANAGER"})
     void updateUserRoleToManager(String inputUserRole) {
