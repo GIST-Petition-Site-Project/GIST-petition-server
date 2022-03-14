@@ -49,12 +49,6 @@ public class UserController {
         return ResponseEntity.ok().body(UserResponse.pageOf(userService.retrieveUsers(pageable)));
     }
 
-    @AdminPermissionRequired
-    @GetMapping("/users/{userId}")
-    public ResponseEntity<UserResponse> retrieveUser(@PathVariable Long userId) {
-        return ResponseEntity.ok().body(UserResponse.of(userService.findUserById(userId)));
-    }
-
     @LoginRequired
     @GetMapping("/users/me")
     public ResponseEntity<UserResponse> retrieveUserOfMine(@LoginUser SimpleUser simpleUser) {

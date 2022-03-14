@@ -54,8 +54,8 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public User findUserByEmail(String email) {
-        return userRepository.findByUsername(email)
+    public User findUserByUsername(String username) {
+        return userRepository.findByUsername(username)
                 .orElseThrow(NoSuchUserException::new);
     }
 
@@ -72,7 +72,7 @@ public class UserService {
 
     @Transactional
     public void updatePasswordByVerificationCode(UpdatePasswordByVerificationRequest request) {
-        User user = findUserByEmail(request.getUsername());
+        User user = findUserByUsername(request.getUsername());
         passwordValidator.checkIsVerified(user.getUsername(), request.getVerificationCode());
         user.setPassword(encoder.hashPassword(request.getPassword()));
     }
@@ -105,7 +105,7 @@ public class UserService {
 
     @Transactional
     public void deleteUserOfUsername(String username) {
-        User user = findUserByEmail(username);
+        User user = findUserByUsername(username);
         userRepository.delete(user);
     }
 }
