@@ -30,7 +30,7 @@ public class UserController {
     @PostMapping("/users")
     public ResponseEntity<Void> register(@Validated @RequestBody SignUpRequest signUpRequest) {
         userService.signUp(signUpRequest);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/login")
