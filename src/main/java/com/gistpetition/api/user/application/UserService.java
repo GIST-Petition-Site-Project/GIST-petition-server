@@ -64,6 +64,11 @@ public class UserService {
         return userRepository.findAll(pageable);
     }
 
+    @Transactional(readOnly = true)
+    public Page<User> retrieveUsersOfUserRole(UserRole userRole, Pageable pageable) {
+        return userRepository.findAllByUserRole(userRole, pageable);
+    }
+
     @Transactional
     public void updateUserRole(String username, UpdateUserRoleRequest userRoleRequest) {
         User user = findUserByUsername(username);

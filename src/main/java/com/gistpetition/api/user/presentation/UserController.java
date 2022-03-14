@@ -6,6 +6,7 @@ import com.gistpetition.api.config.annotation.LoginUser;
 import com.gistpetition.api.user.application.LoginService;
 import com.gistpetition.api.user.application.UserService;
 import com.gistpetition.api.user.domain.SimpleUser;
+import com.gistpetition.api.user.domain.UserRole;
 import com.gistpetition.api.user.dto.request.*;
 import com.gistpetition.api.user.dto.response.UserResponse;
 import lombok.AllArgsConstructor;
@@ -16,6 +17,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/v1")
@@ -45,8 +47,11 @@ public class UserController {
 
     @AdminPermissionRequired
     @GetMapping("/users")
-    public ResponseEntity<Page<UserResponse>> retrieveUsers(Pageable pageable) {
-        return ResponseEntity.ok().body(UserResponse.pageOf(userService.retrieveUsers(pageable)));
+    public ResponseEntity<Page<UserResponse>> retrieveUsers(@RequestParam(required = false) String userRole, Pageable pageable) {
+        if (Objects.isNull(userRole)) {
+            return ResponseEntity.ok().body(UserResponse.pageOf(userService.retrieveUsers(pageable)));
+        }
+        return ResponseEntity.ok().body(UserResponse.pageOf(userService.retrieveUsersOfUserRole(UserRole.ignoringCaseValueOf(userRole), pageable)));
     }
 
     @LoginRequired
