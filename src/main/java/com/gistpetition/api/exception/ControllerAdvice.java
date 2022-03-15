@@ -3,6 +3,7 @@ package com.gistpetition.api.exception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.TypeMismatchException;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -48,6 +49,12 @@ public class ControllerAdvice {
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<ErrorResponse> handle(HttpRequestMethodNotSupportedException ex) {
         LOGGER.info(String.format("HttpRequestMethodNotSupportedException: %s", ex.getMessage()));
+        return ResponseEntity.badRequest().body(new ErrorResponse(ex.getMessage()));
+    }
+
+    @ExceptionHandler(OptimisticLockingFailureException.class)
+    public ResponseEntity<ErrorResponse> handle(OptimisticLockingFailureException ex) {
+        LOGGER.info(String.format("OptimisticLockingFailureException: %s", ex.getMessage()));
         return ResponseEntity.badRequest().body(new ErrorResponse(ex.getMessage()));
     }
 
