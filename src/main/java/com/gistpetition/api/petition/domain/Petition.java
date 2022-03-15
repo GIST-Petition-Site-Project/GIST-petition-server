@@ -16,8 +16,8 @@ import java.util.Objects;
 @Getter
 @Entity
 public class Petition extends BaseEntity {
-    public static final int REQUIRED_AGREEMENT_FOR_RELEASE = 5;
-    public static final int REQUIRED_AGREEMENT_FOR_ANSWER = 50;
+    public static int REQUIRED_AGREEMENT_FOR_RELEASE = 5;
+    public static int REQUIRED_AGREEMENT_FOR_ANSWER = 50;
     public static final int POSTING_PERIOD_BY_SECONDS = 30 * 24 * 60 * 60;
 
     @Embedded
