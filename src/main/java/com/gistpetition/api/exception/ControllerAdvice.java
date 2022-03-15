@@ -2,7 +2,9 @@ package com.gistpetition.api.exception;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -34,6 +36,18 @@ public class ControllerAdvice {
     @ExceptionHandler(NoHandlerFoundException.class)
     public ResponseEntity<ErrorResponse> handle(NoHandlerFoundException ex) {
         LOGGER.info(String.format("NoHandlerFoundException: %s", ex.getMessage()));
+        return ResponseEntity.badRequest().body(new ErrorResponse(ex.getMessage()));
+    }
+
+    @ExceptionHandler(TypeMismatchException.class)
+    public ResponseEntity<ErrorResponse> handle(TypeMismatchException ex) {
+        LOGGER.info(String.format("TypeMismatchException: %s", ex.getMessage()));
+        return ResponseEntity.badRequest().body(new ErrorResponse(ex.getMessage()));
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ErrorResponse> handle(HttpRequestMethodNotSupportedException ex) {
+        LOGGER.info(String.format("HttpRequestMethodNotSupportedException: %s", ex.getMessage()));
         return ResponseEntity.badRequest().body(new ErrorResponse(ex.getMessage()));
     }
 
