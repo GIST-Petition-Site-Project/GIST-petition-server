@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 @RestControllerAdvice
 public class ControllerAdvice {
@@ -28,6 +29,12 @@ public class ControllerAdvice {
         String message = ex.getBindingResult().getAllErrors().get(0).getDefaultMessage();
         LOGGER.info(String.format("MethodArgumentNotValidException: %s", message));
         return ResponseEntity.badRequest().body(new ErrorResponse(message));
+    }
+
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public ResponseEntity<ErrorResponse> handle(NoHandlerFoundException ex) {
+        LOGGER.info(String.format("NoHandlerFoundException: %s", ex.getMessage()));
+        return ResponseEntity.badRequest().body(new ErrorResponse(ex.getMessage()));
     }
 
     @ExceptionHandler(Exception.class)
