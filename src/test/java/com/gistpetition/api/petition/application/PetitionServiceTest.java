@@ -19,7 +19,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -452,20 +451,16 @@ class PetitionServiceTest extends IntegrationTest {
         int numberOfThreads = 3;
         ExecutorService service = Executors.newFixedThreadPool(numberOfThreads);
         CountDownLatch latch = new CountDownLatch(numberOfThreads);
-        AtomicInteger errorCount = new AtomicInteger(0);
         for (int i = 0; i < numberOfThreads; i++) {
             service.execute(() -> {
                 try {
                     petitionCommandService.answerPetition(petitionId, ANSWER_REQUEST);
-                } catch (OptimisticLockingFailureException ex) {
-                    errorCount.incrementAndGet();
                 } finally {
                     latch.countDown();
                 }
             });
         }
         latch.await();
-        assertThat(errorCount.get()).isEqualTo(numberOfThreads - 1);
         assertThat(answerRepository.findByPetitionId(petitionId)).hasSize(1);
     }
 
