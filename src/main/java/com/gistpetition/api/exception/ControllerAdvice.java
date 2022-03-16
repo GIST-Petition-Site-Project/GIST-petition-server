@@ -17,7 +17,6 @@ public class ControllerAdvice {
 
     @ExceptionHandler(ApplicationException.class)
     public ResponseEntity<ErrorResponse> handle(ApplicationException ex) {
-        LOGGER.info(String.format("ApplicationException: %s", ex.getMessage()));
         return ResponseEntity.status(ex.getHttpStatus()).body(new ErrorResponse(ex.getMessage()));
     }
 
