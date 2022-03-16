@@ -18,7 +18,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -82,17 +81,16 @@ public class DataLoader {
         User manager = userRepository.save(new User("manager@gist.ac.kr", PASSWORD, UserRole.MANAGER));
         User normal = userRepository.save(new User("user@gist.ac.kr", PASSWORD, UserRole.USER));
 
-        ArrayList<User> alphabetUsers = new ArrayList<>();
-        for (char alphabet = 'a'; alphabet <= 'z'; alphabet++) {
-            alphabetUsers.add(userRepository.save(new User(alphabet + "@gist.ac.kr", PASSWORD, UserRole.USER)));
-        }
+        List<User> users = IntStream.range(0, REQUIRED_AGREEMENT_FOR_ANSWER + 10)
+                .mapToObj(this::savedUser)
+                .collect(Collectors.toList());
 
         List<Long> petitionIds = IntStream.range(0, PETITION_COUNT)
                 .mapToObj(i -> savePetition(PETITION_TITLE + i, normal))
                 .collect(Collectors.toList());
 
         for (Long petitionId : petitionIds) {
-            randomlyAgreePetitionOverRequired(petitionId, alphabetUsers);
+            randomlyAgreePetitionOverRequired(petitionId, users);
 
             if (petitionId < petitionIds.get(0) + WAITING_FOR_CHECK_RELEASE_COUNT) {
                 continue;
@@ -105,7 +103,11 @@ public class DataLoader {
             petitionCommandService.answerPetition(petitionId, new AnswerRequest(ANSWER_DESCRIPTION));
         }
 
-        IntStream.range(0, 25).forEach(i -> saveExpiredPetition(normal, alphabetUsers));
+        IntStream.range(0, 25).forEach(i -> saveExpiredPetition(normal, users));
+    }
+
+    private User savedUser(int i) {
+        return userRepository.save(new User(i + "gist.ac.kr", PASSWORD, UserRole.USER));
     }
 
     private void randomlyAgreePetitionOverRequired(Long petitionId, List<User> alphabetUsers) {
@@ -120,10 +122,10 @@ public class DataLoader {
         return petitionCommandService.createPetition(new PetitionRequest(title, DESCRIPTION, Category.DORMITORY.getId()), user.getId());
     }
 
-    private void saveExpiredPetition(User petitionOwner, List<User> alphabetUsers) {
+    private void saveExpiredPetition(User petitionOwner, List<User> users) {
         Long petitionId = savePetition(PETITION_TITLE, petitionOwner);
         for (int j = 0; j < REQUIRED_AGREEMENT_FOR_RELEASE; j++) {
-            User user = alphabetUsers.get(j);
+            User user = users.get(j);
             petitionCommandService.agree(AGREEMENT_REQUEST, petitionId, user.getId());
         }
         petitionCommandService.releasePetition(petitionId);
