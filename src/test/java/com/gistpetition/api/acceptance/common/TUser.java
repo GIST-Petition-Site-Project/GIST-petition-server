@@ -86,12 +86,9 @@ public enum TUser {
                 then().
                 statusCode(HttpStatus.NO_CONTENT.value());
 
-        String[] location = doRegisterWith(username, password, verificationCode).
+        doRegisterWith(username, password, verificationCode).
                 then().
-                statusCode(HttpStatus.CREATED.value()).
-                header(HttpHeaders.LOCATION, containsString("/users/")).
-                extract().header(HttpHeaders.LOCATION).split("/");
-        id = Long.valueOf(location[location.length - 1]);
+                statusCode(HttpStatus.NO_CONTENT.value());
     }
 
 

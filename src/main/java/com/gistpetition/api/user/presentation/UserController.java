@@ -6,6 +6,7 @@ import com.gistpetition.api.config.annotation.LoginUser;
 import com.gistpetition.api.user.application.LoginService;
 import com.gistpetition.api.user.application.UserService;
 import com.gistpetition.api.user.domain.SimpleUser;
+import com.gistpetition.api.user.domain.UserRole;
 import com.gistpetition.api.user.dto.request.*;
 import com.gistpetition.api.user.dto.response.UserResponse;
 import lombok.AllArgsConstructor;
@@ -16,6 +17,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/v1")
@@ -27,8 +29,8 @@ public class UserController {
 
     @PostMapping("/users")
     public ResponseEntity<Void> register(@Validated @RequestBody SignUpRequest signUpRequest) {
-        Long userId = userService.signUp(signUpRequest);
-        return ResponseEntity.created(URI.create("/users/" + userId)).build();
+        userService.signUp(signUpRequest);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/login")
@@ -45,14 +47,11 @@ public class UserController {
 
     @AdminPermissionRequired
     @GetMapping("/users")
-    public ResponseEntity<Page<UserResponse>> retrieveUsers(Pageable pageable) {
-        return ResponseEntity.ok().body(UserResponse.pageOf(userService.retrieveUsers(pageable)));
-    }
-
-    @AdminPermissionRequired
-    @GetMapping("/users/{userId}")
-    public ResponseEntity<UserResponse> retrieveUser(@PathVariable Long userId) {
-        return ResponseEntity.ok().body(UserResponse.of(userService.findUserById(userId)));
+    public ResponseEntity<Page<UserResponse>> retrieveUsers(@RequestParam(required = false) String userRole, Pageable pageable) {
+        if (Objects.isNull(userRole)) {
+            return ResponseEntity.ok().body(userService.retrieveUsers(pageable));
+        }
+        return ResponseEntity.ok().body(userService.retrieveUsersOfUserRole(UserRole.ignoringCaseValueOf(userRole), pageable));
     }
 
     @LoginRequired
@@ -62,10 +61,10 @@ public class UserController {
     }
 
     @AdminPermissionRequired
-    @PutMapping("/users/{userId}/userRole")
-    public ResponseEntity<Void> updateUserRole(@PathVariable Long userId,
+    @PutMapping("/users/{username}/userRole")
+    public ResponseEntity<Void> updateUserRole(@PathVariable String username,
                                                @Validated @RequestBody UpdateUserRoleRequest userRoleRequest) {
-        userService.updateUserRole(userId, userRoleRequest);
+        userService.updateUserRole(username, userRoleRequest);
         return ResponseEntity.noContent().build();
     }
 
@@ -84,9 +83,9 @@ public class UserController {
     }
 
     @AdminPermissionRequired
-    @DeleteMapping("/users/{userId}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long userId) {
-        userService.deleteUser(userId);
+    @DeleteMapping("/users/{username}")
+    public ResponseEntity<Void> deleteUser(@PathVariable String username) {
+        userService.deleteUser(username);
         return ResponseEntity.noContent().build();
     }
 

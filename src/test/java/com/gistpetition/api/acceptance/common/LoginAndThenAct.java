@@ -96,7 +96,7 @@ public class LoginAndThenAct {
                 contentType(ContentType.JSON).
                 body(updateUserRoleRequest).
                 when().
-                put("/v1/users/" + target.getId() + "/userRole").
+                put("/v1/users/" + target.getUsername() + "/userRole").
                 then().
                 statusCode(HttpStatus.NO_CONTENT.value()).extract().response();
         return this;
