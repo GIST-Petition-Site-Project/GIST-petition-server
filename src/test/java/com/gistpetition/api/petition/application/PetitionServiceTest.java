@@ -19,6 +19,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -456,7 +457,7 @@ class PetitionServiceTest extends IntegrationTest {
             service.execute(() -> {
                 try {
                     petitionCommandService.answerPetition(petitionId, ANSWER_REQUEST);
-                } catch (Exception ex) {
+                } catch (OptimisticLockingFailureException ex) {
                     errorCount.incrementAndGet();
                 } finally {
                     latch.countDown();
