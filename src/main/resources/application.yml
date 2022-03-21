@@ -48,9 +48,10 @@ spring:
 swagger:
   host: dev-api.gist-petition.com
   protocol: https
-
 request:
   origins: https://localhost:3000, https://localhost:3001, https://dev.gist-petition.com, https://dev-staff.gist-petition.com
+staff:
+  url: https://dev-staff.gist-petition.com
 
 ---
 
@@ -72,6 +73,7 @@ spring:
 swagger:
   host: api.gist-petition.com
   protocol: https
-
 request:
   origins: https://www.gist-petition.com, https://staff.gist-petition.com
+staff:
+  url: https://staff.gist-petition.com

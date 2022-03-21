@@ -17,7 +17,7 @@
         <td th:text="${petition.id}">1</td>
         <td th:text="${petition.title}">승인 대기 중인 청원</td>
         <td th:text="${petition.agreeCount}">5</td>
-        <td><a th:href="@{'https://staff.gist-petition.com/approve/' + ${petition.tempUrl}}">이동</a></td>
+        <td><a th:href="@{${baseLinkToRelease} + ${petition.tempUrl}}">이동</a></td>
     </tr>
 </table>
 <h1>답변 대기중인 청원</h1>
@@ -32,7 +32,7 @@
         <td th:text="${petition.id}">2</td>
         <td th:text="${petition.title}">답변 대기 중인 청원</td>
         <td th:text="${petition.agreeCount}">50</td>
-        <td><a th:href="@{'https://staff.gist-petition.com/answer/' + ${petition.id}}">이동</a></td>
+        <td><a th:href="@{${baseLinkToAnswer} + ${petition.id}}">이동</a></td>
     </tr>
 </table>
 
