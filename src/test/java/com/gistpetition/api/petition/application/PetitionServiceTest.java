@@ -457,7 +457,7 @@ class PetitionServiceTest extends IntegrationTest {
             service.execute(() -> {
                 try {
                     petitionCommandService.answerPetition(petitionId, ANSWER_REQUEST);
-                } catch (OptimisticLockingFailureException ex) {
+                } catch (Exception ex) {
                     errorCount.incrementAndGet();
                 } finally {
                     latch.countDown();
