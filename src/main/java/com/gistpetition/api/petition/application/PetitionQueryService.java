@@ -59,7 +59,6 @@ public class PetitionQueryService {
     }
 
     public Page<PetitionPreviewResponse> retrievePetitionsWaitingForRelease(Pageable pageable) {
-
         return petitionQueryDslRepository.findAll(null, WAITING_FOR_RELEASE.at(Instant.now()), pageable);
     }
 

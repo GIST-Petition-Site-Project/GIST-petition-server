@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>오늘의 지스트 청원 정보</title>
+</head>
+<body>
+<h1>승인 대기중인 청원</h1>
+<table>
+    <tr>
+        <th>#</th>
+        <th>청원 제목</th>
+        <th>동의 수</th>
+        <th>바로가기</th>
+    </tr>
+    <tr th:each="petition : ${waitingForRelease}">
+        <td th:text="${petition.id}">1</td>
+        <td th:text="${petition.title}">승인 대기 중인 청원</td>
+        <td th:text="${petition.agreeCount}">5</td>
+        <td><a th:href="@{'https://staff.gist-petition.com/approve/' + ${petition.tempUrl}}">이동</a></td>
+    </tr>
+</table>
+<h1>답변 대기중인 청원</h1>
+<table>
+    <tr>
+        <th>#</th>
+        <th>청원 제목</th>
+        <th>동의 수</th>
+        <th>바로가기</th>
+    </tr>
+    <tr th:each="petition : ${waitingForAnswer}">
+        <td th:text="${petition.id}">2</td>
+        <td th:text="${petition.title}">답변 대기 중인 청원</td>
+        <td th:text="${petition.agreeCount}">50</td>
+        <td><a th:href="@{'https://staff.gist-petition.com/answer/' + ${petition.id}}">이동</a></td>
+    </tr>
+</table>
+
+</body>
+</html>

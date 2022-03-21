@@ -28,6 +28,14 @@ import static com.gistpetition.api.petition.domain.QPetition.petition;
 public class PetitionQueryDslRepository {
     private final JPQLQueryFactory jpqlQueryFactory;
 
+    public List<PetitionPreviewResponse> findAll(Category category, Predicate predicate) {
+        return jpqlQueryFactory.select(buildPetitionPreviewResponse())
+                .from(petition)
+                .innerJoin(agreeCount)
+                .on(petition.id.eq(agreeCount.petitionId))
+                .where(categoryEq(category), predicate).fetch();
+    }
+
     public Page<PetitionPreviewResponse> findAll(Category category, Predicate predicate, Pageable pageable) {
         List<PetitionPreviewResponse> results = jpqlQueryFactory.select(buildPetitionPreviewResponse())
                 .from(petition)
