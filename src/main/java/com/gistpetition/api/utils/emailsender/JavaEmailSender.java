@@ -14,6 +14,7 @@ import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 @Profile("dev || prod")
 @Service
@@ -29,11 +30,27 @@ public class JavaEmailSender implements EmailSender {
     public void send(String to, String subject, String content) {
         try {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
-            MimeMessageHelper helper =
-                    new MimeMessageHelper(mimeMessage, "utf-8");
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
             helper.setSubject(subject);
             helper.setText(content, true);
             helper.setTo(to);
+            helper.setFrom(new InternetAddress("gist.petition@gmail.com", "GIST"));
+            mailSender.send(mimeMessage);
+        } catch (MessagingException | UnsupportedEncodingException e) {
+            LOGGER.error("이메일을 보내는데 실패했습니다.", e);
+            throw new WrappedException("이메일을 보내는데 실패했습니다.", e);
+        }
+    }
+
+    @Override
+    @Async
+    public void send(List<String> to, String subject, String content) {
+        try {
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
+            helper.setSubject(subject);
+            helper.setText(content, true);
+            helper.setTo(to.toArray(new String[0]));
             helper.setFrom(new InternetAddress("gist.petition@gmail.com", "GIST"));
             mailSender.send(mimeMessage);
         } catch (MessagingException | UnsupportedEncodingException e) {
