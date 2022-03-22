@@ -90,7 +90,7 @@ public class PetitionCommandService {
     @DataIntegrityHandler(AlreadyAnswerException.class)
     public void answerPetition(Long petitionId, AnswerRequest answerRequest) {
         Petition petition = findPetitionById(petitionId);
-        petition.answer(answerRequest.getDescription());
+        petition.answer(answerRequest.getDescription(), answerRequest.getVideoUrl());
     }
 
     @Transactional

@@ -134,7 +134,7 @@ class PetitionTest {
         agreePetitionByMultipleUsers(petition, REQUIRED_AGREEMENT_FOR_ANSWER);
         petition.release(PETITION_ONGOING_AT);
 
-        petition.answer(ANSWER_CONTENT);
+        petition.answer(ANSWER_CONTENT, null);
 
         assertTrue(petition.isAnswered());
         assertThat(petition.getAnswer().getDescription()).isEqualTo(ANSWER_CONTENT);
@@ -144,9 +144,9 @@ class PetitionTest {
     void answer_for_already_answered_petition() {
         agreePetitionByMultipleUsers(petition, REQUIRED_AGREEMENT_FOR_ANSWER);
         petition.release(PETITION_ONGOING_AT);
-        petition.answer(ANSWER_CONTENT);
+        petition.answer(ANSWER_CONTENT, null);
 
-        assertThatThrownBy(() -> petition.answer(ANSWER_CONTENT)).isInstanceOf(AlreadyAnswerException.class);
+        assertThatThrownBy(() -> petition.answer(ANSWER_CONTENT, null)).isInstanceOf(AlreadyAnswerException.class);
     }
 
     @Test
@@ -154,7 +154,7 @@ class PetitionTest {
         agreePetitionByMultipleUsers(petition, REQUIRED_AGREEMENT_FOR_ANSWER);
 
         assertThatThrownBy(() ->
-                petition.answer(ANSWER_CONTENT)
+                petition.answer(ANSWER_CONTENT, null)
         ).isInstanceOf(NotReleasedPetitionException.class);
 
         assertFalse(petition.isAnswered());
@@ -166,7 +166,7 @@ class PetitionTest {
         petition.release(PETITION_ONGOING_AT);
 
         assertThatThrownBy(() ->
-                petition.answer(ANSWER_CONTENT)
+                petition.answer(ANSWER_CONTENT, null)
         ).isInstanceOf(NotEnoughAgreementException.class);
 
         assertFalse(petition.isAnswered());
@@ -176,7 +176,7 @@ class PetitionTest {
     void update_answer() {
         agreePetitionByMultipleUsers(petition, REQUIRED_AGREEMENT_FOR_ANSWER);
         petition.release(PETITION_ONGOING_AT);
-        petition.answer(ANSWER_CONTENT);
+        petition.answer(ANSWER_CONTENT, null);
 
         String updateAnswerContent = "답변 수정을 진행했다.";
         petition.updateAnswer(updateAnswerContent);
@@ -199,7 +199,7 @@ class PetitionTest {
     void delete_answer() {
         agreePetitionByMultipleUsers(petition, REQUIRED_AGREEMENT_FOR_ANSWER);
         petition.release(PETITION_ONGOING_AT);
-        petition.answer(ANSWER_CONTENT);
+        petition.answer(ANSWER_CONTENT, null);
 
         petition.deleteAnswer();
 
