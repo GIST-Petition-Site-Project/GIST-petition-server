@@ -8,8 +8,8 @@ import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
 
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
-import javax.persistence.Lob;
 import javax.persistence.OneToOne;
 
 @Entity
@@ -17,9 +17,8 @@ import javax.persistence.OneToOne;
 @Audited
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Answer extends BaseEntity {
-    @Lob
-    @Column(name = "description", nullable = false)
-    private String description;
+    @Embedded
+    private Description description;
     @Column(name = "video_url")
     private String videoUrl;
     @NotAudited
@@ -31,12 +30,16 @@ public class Answer extends BaseEntity {
     }
 
     public Answer(String description, String videoUrl, Petition petition) {
-        this.description = description;
+        this.description = new Description(description);
         this.videoUrl = videoUrl;
         this.petition = petition;
     }
 
     public void update(String description) {
-        this.description = description;
+        this.description.update(description);
+    }
+
+    public String getDescription() {
+        return this.description.getDescription();
     }
 }
