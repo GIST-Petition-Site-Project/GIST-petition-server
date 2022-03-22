@@ -2,7 +2,6 @@ package com.gistpetition.api.petition.domain;
 
 import com.gistpetition.api.common.persistence.BaseEntity;
 import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
@@ -12,7 +11,6 @@ import javax.persistence.Entity;
 import javax.persistence.OneToOne;
 
 @Entity
-@Getter
 @Audited
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Answer extends BaseEntity {
@@ -36,5 +34,9 @@ public class Answer extends BaseEntity {
 
     public String getDescription() {
         return this.description.getDescription();
+    }
+
+    public String getVideoUrl() {
+        return videoUrl.getVideoUrl();
     }
 }
