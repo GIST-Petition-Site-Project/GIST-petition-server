@@ -10,18 +10,15 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class VideoUrlTest {
 
+    public static final String VALID_YOUTUBE_URL = "https://www.youtube.com/watch?v=XbL-AwYX8ME";
+
     @ParameterizedTest
-    @ValueSource(strings = {"http://youtu.be/t-ZRX8984sc",
+    @ValueSource(strings = {
+            "http://youtu.be/t-ZRX8984sc",
             "http://youtube.com/watch?v=iwGFalTRHDA",
             "http://www.youtube.com/watch?v=t-ZRX8984sc",
-            "http://www.youtube.com/watch?v=iwGFalTRHDA&feature=related",
-            "http://www.youtube.com/embed/watch?feature=player_embedded&v=r5nB9u4jjy4",
-            "https://www.youtube.com/channel/UCDZkgJZDyUnqwB070OyP72g",
             "youtube.com/n17B_uFF4cA",
-            "youtube.com/iwGFalTRHDA",
-            "http://youtu.be/n17B_uFF4cA",
-            "https://youtube.com/iwGFalTRHDA",
-            "https://youtube.com/channel/UCDZkgJZDyUnqwB070OyP72g"})
+            "http://youtu.be/n17B_uFF4cA"})
     void youtubePattern(String url) {
         VideoUrl videoUrl = VideoUrl.ofYoutube(url);
         assertThat(videoUrl).isNotNull();
@@ -31,17 +28,65 @@ class VideoUrlTest {
     @ParameterizedTest
     @ValueSource(strings = {"ttp://youtu.be/t-ZRX8984sc",
             "p://youtube.com/watch?v=iwGFalTRHDA",
-            "http://www.naver.com/watch?v=t-ZRX8984sc",
-            "http://www.kakao.com/watch?v=iwGFalTRHDA&feature=related",
             "http://www.gist-petition.com/",
-            "https://www.gist.ac.kr",
             "https://youtube.co"})
     void invalid_youtubePattern(String url) {
         assertThatThrownBy(() -> VideoUrl.ofYoutube(url)).isInstanceOf(NotYoutubeUrlPatternException.class);
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {"", "   "})
+    void videoUrl_if_blank(String string) {
+        assertThat(VideoUrl.ofYoutube(string).getVideoUrl()).isEqualTo("");
+    }
+
     @Test
     void videoUrl_if_null() {
-        assertThat(VideoUrl.ofYoutube(null)).isNull();
+        assertThat(VideoUrl.ofYoutube(null).getVideoUrl()).isEqualTo("");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "http://youtu.be/t-ZRX8984sc",
+            "http://youtube.com/watch?v=iwGFalTRHDA",
+            "http://www.youtube.com/watch?v=t-ZRX8984sc",
+            "youtube.com/n17B_uFF4cA",
+            "http://youtu.be/n17B_uFF4cA"})
+    void update_videoUrl(String url) {
+        VideoUrl videoUrl = new VideoUrl(VALID_YOUTUBE_URL);
+
+        videoUrl.update(url);
+
+        assertThat(videoUrl.getVideoUrl()).isEqualTo(url);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"ttp://youtu.be/t-ZRX8984sc",
+            "p://youtube.com/watch?v=iwGFalTRHDA",
+            "http://www.gist-petition.com/",
+            "https://youtube.co"})
+    void update_invalid_youtubePattern(String url) {
+        VideoUrl videoUrl = new VideoUrl(VALID_YOUTUBE_URL);
+
+        assertThatThrownBy(() -> videoUrl.update(url)).isInstanceOf(NotYoutubeUrlPatternException.class);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"", "   "})
+    void update_videoUrl_if_blank(String string) {
+        VideoUrl videoUrl = new VideoUrl(VALID_YOUTUBE_URL);
+
+        videoUrl.update(string);
+
+        assertThat(videoUrl.getVideoUrl()).isEqualTo("");
+    }
+
+    @Test
+    void update_videoUrl_if_null() {
+        VideoUrl videoUrl = new VideoUrl(VALID_YOUTUBE_URL);
+
+        videoUrl.update(null);
+
+        assertThat(videoUrl.getVideoUrl()).isEqualTo("");
     }
 }

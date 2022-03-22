@@ -96,7 +96,7 @@ public class PetitionCommandService {
     @Transactional
     public void updateAnswer(Long petitionId, AnswerRequest updateAnswerRequest) {
         Petition petition = findPetitionById(petitionId);
-        petition.updateAnswer(updateAnswerRequest.getDescription());
+        petition.updateAnswer(updateAnswerRequest.getDescription(), updateAnswerRequest.getVideoUrl());
     }
 
     @Transactional

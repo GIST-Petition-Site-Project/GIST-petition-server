@@ -28,8 +28,9 @@ public class Answer extends BaseEntity {
         this.petition = petition;
     }
 
-    public void update(String description) {
+    public void update(String description, String videoUrl) {
         this.description.update(description);
+        this.videoUrl.update(videoUrl);
     }
 
     public String getDescription() {

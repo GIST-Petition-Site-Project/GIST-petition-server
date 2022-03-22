@@ -97,11 +97,11 @@ public class Petition extends BaseEntity {
         this.answer = new Answer(description, VideoUrl.ofYoutube(videoUrl), this);
     }
 
-    public void updateAnswer(String description) {
+    public void updateAnswer(String description, String videoUrl) {
         if (!isAnswered()) {
             throw new NotAnsweredPetitionException();
         }
-        this.answer.update(description);
+        this.answer.update(description, videoUrl);
     }
 
     public void deleteAnswer() {

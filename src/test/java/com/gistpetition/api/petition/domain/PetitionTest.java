@@ -179,7 +179,7 @@ class PetitionTest {
         petition.answer(ANSWER_CONTENT, null);
 
         String updateAnswerContent = "답변 수정을 진행했다.";
-        petition.updateAnswer(updateAnswerContent);
+        petition.updateAnswer(updateAnswerContent, null);
 
         assertThat(petition.getAnswer().getDescription()).isEqualTo(updateAnswerContent);
     }
@@ -191,7 +191,7 @@ class PetitionTest {
 
         String updateAnswerContent = "답변 수정을 진행했다.";
         assertThatThrownBy(
-                () -> petition.updateAnswer(updateAnswerContent)
+                () -> petition.updateAnswer(updateAnswerContent, null)
         ).isInstanceOf(NotAnsweredPetitionException.class);
     }
 

@@ -21,17 +21,26 @@ public class VideoUrl {
         this.videoUrl = videoUrl;
     }
 
-    public static VideoUrl ofYoutube(String videoUrl) {
-        if (Objects.isNull(videoUrl)) {
-            return null;
+    public String getVideoUrl() {
+        return videoUrl;
+    }
+
+    public void update(String videoUrl) {
+        if (Objects.isNull(videoUrl) || videoUrl.isBlank()) {
+            this.videoUrl = "";
+            return;
         }
         if (!youtubePattern.matcher(videoUrl).matches()) {
             throw new NotYoutubeUrlPatternException();
         }
-        return new VideoUrl(videoUrl);
+        this.videoUrl = videoUrl;
     }
 
-    public String getVideoUrl() {
-        return videoUrl;
+    public static VideoUrl ofYoutube(String url) {
+        VideoUrl videourl = new VideoUrl();
+
+        videourl.update(url);
+
+        return videourl;
     }
 }
