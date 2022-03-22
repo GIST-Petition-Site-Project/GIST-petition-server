@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
 
-import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.OneToOne;
@@ -19,17 +18,13 @@ import javax.persistence.OneToOne;
 public class Answer extends BaseEntity {
     @Embedded
     private Description description;
-    @Column(name = "video_url")
-    private String videoUrl;
+    @Embedded
+    private VideoUrl videoUrl;
     @NotAudited
     @OneToOne(mappedBy = "answer")
     private Petition petition;
 
-    public Answer(String description, Petition petition) {
-        this(description, null, petition);
-    }
-
-    public Answer(String description, String videoUrl, Petition petition) {
+    public Answer(String description, VideoUrl videoUrl, Petition petition) {
         this.description = new Description(description);
         this.videoUrl = videoUrl;
         this.petition = petition;

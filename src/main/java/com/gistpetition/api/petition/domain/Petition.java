@@ -94,7 +94,7 @@ public class Petition extends BaseEntity {
         if (agreements.agreeLessThan(REQUIRED_AGREEMENT_FOR_ANSWER)) {
             throw new NotEnoughAgreementException();
         }
-        this.answer = new Answer(description, videoUrl, this);
+        this.answer = new Answer(description, VideoUrl.ofYoutube(videoUrl), this);
     }
 
     public void updateAnswer(String description) {
