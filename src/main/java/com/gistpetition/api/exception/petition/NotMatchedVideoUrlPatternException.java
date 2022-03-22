@@ -2,11 +2,11 @@ package com.gistpetition.api.exception.petition;
 
 import org.springframework.http.HttpStatus;
 
-public class NotYoutubeUrlPatternException extends PetitionException {
-    private static final String MESSAGE = "잘못된 형태의 유튜브 URL 입니다.";
+public class NotMatchedVideoUrlPatternException extends PetitionException {
+    private static final String MESSAGE = "잘못된 형태의 Video URL 입니다.";
     private static final HttpStatus HTTP_STATUS = HttpStatus.BAD_REQUEST;
 
-    public NotYoutubeUrlPatternException() {
+    public NotMatchedVideoUrlPatternException() {
         super(MESSAGE, HTTP_STATUS);
     }
 }

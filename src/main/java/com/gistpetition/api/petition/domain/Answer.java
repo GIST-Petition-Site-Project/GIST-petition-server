@@ -1,6 +1,7 @@
 package com.gistpetition.api.petition.domain;
 
 import com.gistpetition.api.common.persistence.BaseEntity;
+import com.gistpetition.api.utils.urlmatcher.UrlMatcher;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.hibernate.envers.Audited;
@@ -28,9 +29,9 @@ public class Answer extends BaseEntity {
         this.petition = petition;
     }
 
-    public void update(String description, String videoUrl) {
+    public void update(String description, String videoUrl, UrlMatcher urlMatcher) {
         this.description.update(description);
-        this.videoUrl.update(videoUrl);
+        this.videoUrl.update(videoUrl, urlMatcher);
     }
 
     public String getDescription() {

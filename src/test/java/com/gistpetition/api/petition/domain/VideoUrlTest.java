@@ -1,6 +1,7 @@
 package com.gistpetition.api.petition.domain;
 
-import com.gistpetition.api.exception.petition.NotYoutubeUrlPatternException;
+import com.gistpetition.api.exception.petition.NotMatchedVideoUrlPatternException;
+import com.gistpetition.api.utils.urlmatcher.UrlMatcher;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -9,83 +10,68 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class VideoUrlTest {
+    private static final String URL = "www.gist-petition.com";
+    private static final UrlMatcher ALWAYS_TRUE_URL_MATCHER = input -> true;
+    private static final UrlMatcher ALWAYS_FALSE_URL_MATCHER = input -> false;
 
-    public static final String VALID_YOUTUBE_URL = "https://www.youtube.com/watch?v=XbL-AwYX8ME";
-
-    @ParameterizedTest
-    @ValueSource(strings = {
-            "http://youtu.be/t-ZRX8984sc",
-            "http://youtube.com/watch?v=iwGFalTRHDA",
-            "http://www.youtube.com/watch?v=t-ZRX8984sc",
-            "youtube.com/n17B_uFF4cA",
-            "http://youtu.be/n17B_uFF4cA"})
-    void youtubePattern(String url) {
-        VideoUrl videoUrl = VideoUrl.ofYoutube(url);
+    @Test
+    void youtubePattern() {
+        VideoUrl videoUrl = VideoUrl.of(URL, ALWAYS_TRUE_URL_MATCHER);
         assertThat(videoUrl).isNotNull();
-        assertThat(videoUrl.getVideoUrl()).isEqualTo(url);
+        assertThat(videoUrl.getVideoUrl()).isEqualTo(URL);
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {"ttp://youtu.be/t-ZRX8984sc",
-            "p://youtube.com/watch?v=iwGFalTRHDA",
-            "http://www.gist-petition.com/",
-            "https://youtube.co"})
-    void invalid_youtubePattern(String url) {
-        assertThatThrownBy(() -> VideoUrl.ofYoutube(url)).isInstanceOf(NotYoutubeUrlPatternException.class);
+    @Test
+    void invalid_youtubePattern() {
+        assertThatThrownBy(() -> VideoUrl.of(URL, ALWAYS_FALSE_URL_MATCHER))
+                .isInstanceOf(NotMatchedVideoUrlPatternException.class);
+    }
+
+    @Test
+    void videoUrl_if_null() {
+        assertThat(VideoUrl.of(null, ALWAYS_TRUE_URL_MATCHER).getVideoUrl()).isEqualTo("");
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"", "   "})
     void videoUrl_if_blank(String string) {
-        assertThat(VideoUrl.ofYoutube(string).getVideoUrl()).isEqualTo("");
+        assertThat(VideoUrl.of(string, ALWAYS_TRUE_URL_MATCHER).getVideoUrl()).isEqualTo("");
+    }
+
+
+    @Test
+    void update_videoUrl() {
+        VideoUrl videoUrl = new VideoUrl(URL);
+
+        String updateUrl = URL + "update";
+        videoUrl.update(updateUrl, ALWAYS_TRUE_URL_MATCHER);
+
+        assertThat(videoUrl.getVideoUrl()).isEqualTo(updateUrl);
     }
 
     @Test
-    void videoUrl_if_null() {
-        assertThat(VideoUrl.ofYoutube(null).getVideoUrl()).isEqualTo("");
-    }
+    void update_invalid_youtubePattern() {
+        VideoUrl videoUrl = new VideoUrl(URL);
 
-    @ParameterizedTest
-    @ValueSource(strings = {
-            "http://youtu.be/t-ZRX8984sc",
-            "http://youtube.com/watch?v=iwGFalTRHDA",
-            "http://www.youtube.com/watch?v=t-ZRX8984sc",
-            "youtube.com/n17B_uFF4cA",
-            "http://youtu.be/n17B_uFF4cA"})
-    void update_videoUrl(String url) {
-        VideoUrl videoUrl = new VideoUrl(VALID_YOUTUBE_URL);
-
-        videoUrl.update(url);
-
-        assertThat(videoUrl.getVideoUrl()).isEqualTo(url);
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {"ttp://youtu.be/t-ZRX8984sc",
-            "p://youtube.com/watch?v=iwGFalTRHDA",
-            "http://www.gist-petition.com/",
-            "https://youtube.co"})
-    void update_invalid_youtubePattern(String url) {
-        VideoUrl videoUrl = new VideoUrl(VALID_YOUTUBE_URL);
-
-        assertThatThrownBy(() -> videoUrl.update(url)).isInstanceOf(NotYoutubeUrlPatternException.class);
+        assertThatThrownBy(() -> videoUrl.update(URL + "update", ALWAYS_FALSE_URL_MATCHER))
+                .isInstanceOf(NotMatchedVideoUrlPatternException.class);
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"", "   "})
-    void update_videoUrl_if_blank(String string) {
-        VideoUrl videoUrl = new VideoUrl(VALID_YOUTUBE_URL);
+    void update_videoUrl_if_blank(String url) {
+        VideoUrl videoUrl = new VideoUrl(URL);
 
-        videoUrl.update(string);
+        videoUrl.update(url, ALWAYS_TRUE_URL_MATCHER);
 
         assertThat(videoUrl.getVideoUrl()).isEqualTo("");
     }
 
     @Test
     void update_videoUrl_if_null() {
-        VideoUrl videoUrl = new VideoUrl(VALID_YOUTUBE_URL);
+        VideoUrl videoUrl = new VideoUrl(URL);
 
-        videoUrl.update(null);
+        videoUrl.update(null, ALWAYS_TRUE_URL_MATCHER);
 
         assertThat(videoUrl.getVideoUrl()).isEqualTo("");
     }

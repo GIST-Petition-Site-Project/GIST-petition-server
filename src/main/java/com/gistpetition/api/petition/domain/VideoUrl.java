@@ -1,18 +1,17 @@
 package com.gistpetition.api.petition.domain;
 
-import com.gistpetition.api.exception.petition.NotYoutubeUrlPatternException;
+import com.gistpetition.api.exception.petition.NotMatchedVideoUrlPatternException;
+import com.gistpetition.api.utils.urlmatcher.UrlMatcher;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import java.util.Objects;
-import java.util.regex.Pattern;
 
 @Embeddable
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class VideoUrl {
-    private static final Pattern youtubePattern = Pattern.compile("^(http(s)?://)?((w){3}.)?youtu(be|.be)?(.com)?/.+");
 
     @Column(name = "video_url")
     private String videoUrl;
@@ -25,22 +24,24 @@ public class VideoUrl {
         return videoUrl;
     }
 
-    public void update(String videoUrl) {
+    public void update(String videoUrl, UrlMatcher urlMatcher) {
         if (Objects.isNull(videoUrl) || videoUrl.isBlank()) {
             this.videoUrl = "";
             return;
         }
-        if (!youtubePattern.matcher(videoUrl).matches()) {
-            throw new NotYoutubeUrlPatternException();
+        if (!urlMatcher.isMatched(videoUrl)) {
+            throw new NotMatchedVideoUrlPatternException();
         }
         this.videoUrl = videoUrl;
     }
 
-    public static VideoUrl ofYoutube(String url) {
-        VideoUrl videourl = new VideoUrl();
-
-        videourl.update(url);
-
-        return videourl;
+    public static VideoUrl of(String url, UrlMatcher urlMatcher) {
+        if (Objects.isNull(url) || url.isBlank()) {
+            return new VideoUrl("");
+        }
+        if (!urlMatcher.isMatched(url)) {
+            throw new NotMatchedVideoUrlPatternException();
+        }
+        return new VideoUrl(url);
     }
 }
