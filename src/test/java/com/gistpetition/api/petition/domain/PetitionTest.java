@@ -2,6 +2,7 @@ package com.gistpetition.api.petition.domain;
 
 import com.gistpetition.api.exception.petition.*;
 import com.gistpetition.api.petition.PetitionBuilder;
+import com.gistpetition.api.utils.urlmatcher.UrlMatcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -27,7 +28,8 @@ class PetitionTest {
     public static final Instant PETITION_EXPIRED_AT = PETITION_CREATION_AT.plusSeconds(Petition.POSTING_PERIOD_BY_SECONDS);
     private static final String AGREEMENT_DESCRIPTION = "동의합니다.";
     private static final String TEMP_URL = "AAAAAA";
-    public static final String ANSWER_CONTENT = "답변을 달았습니다.";
+    private static final String ANSWER_CONTENT = "답변을 달았습니다.";
+    private static final UrlMatcher ALWAYS_TRUE_URL_MATCHER = url -> true;
 
     private Petition petition;
 
@@ -134,7 +136,7 @@ class PetitionTest {
         agreePetitionByMultipleUsers(petition, REQUIRED_AGREEMENT_FOR_ANSWER);
         petition.release(PETITION_ONGOING_AT);
 
-        petition.answer(ANSWER_CONTENT);
+        petition.answer(ANSWER_CONTENT, null, ALWAYS_TRUE_URL_MATCHER);
 
         assertTrue(petition.isAnswered());
         assertThat(petition.getAnswer().getDescription()).isEqualTo(ANSWER_CONTENT);
@@ -144,9 +146,9 @@ class PetitionTest {
     void answer_for_already_answered_petition() {
         agreePetitionByMultipleUsers(petition, REQUIRED_AGREEMENT_FOR_ANSWER);
         petition.release(PETITION_ONGOING_AT);
-        petition.answer(ANSWER_CONTENT);
+        petition.answer(ANSWER_CONTENT, null, ALWAYS_TRUE_URL_MATCHER);
 
-        assertThatThrownBy(() -> petition.answer(ANSWER_CONTENT)).isInstanceOf(AlreadyAnswerException.class);
+        assertThatThrownBy(() -> petition.answer(ANSWER_CONTENT, null, ALWAYS_TRUE_URL_MATCHER)).isInstanceOf(AlreadyAnswerException.class);
     }
 
     @Test
@@ -154,7 +156,7 @@ class PetitionTest {
         agreePetitionByMultipleUsers(petition, REQUIRED_AGREEMENT_FOR_ANSWER);
 
         assertThatThrownBy(() ->
-                petition.answer(ANSWER_CONTENT)
+                petition.answer(ANSWER_CONTENT, null, ALWAYS_TRUE_URL_MATCHER)
         ).isInstanceOf(NotReleasedPetitionException.class);
 
         assertFalse(petition.isAnswered());
@@ -166,7 +168,7 @@ class PetitionTest {
         petition.release(PETITION_ONGOING_AT);
 
         assertThatThrownBy(() ->
-                petition.answer(ANSWER_CONTENT)
+                petition.answer(ANSWER_CONTENT, null, ALWAYS_TRUE_URL_MATCHER)
         ).isInstanceOf(NotEnoughAgreementException.class);
 
         assertFalse(petition.isAnswered());
@@ -176,10 +178,10 @@ class PetitionTest {
     void update_answer() {
         agreePetitionByMultipleUsers(petition, REQUIRED_AGREEMENT_FOR_ANSWER);
         petition.release(PETITION_ONGOING_AT);
-        petition.answer(ANSWER_CONTENT);
+        petition.answer(ANSWER_CONTENT, null, ALWAYS_TRUE_URL_MATCHER);
 
         String updateAnswerContent = "답변 수정을 진행했다.";
-        petition.updateAnswer(updateAnswerContent);
+        petition.updateAnswer(updateAnswerContent, null, ALWAYS_TRUE_URL_MATCHER);
 
         assertThat(petition.getAnswer().getDescription()).isEqualTo(updateAnswerContent);
     }
@@ -191,7 +193,7 @@ class PetitionTest {
 
         String updateAnswerContent = "답변 수정을 진행했다.";
         assertThatThrownBy(
-                () -> petition.updateAnswer(updateAnswerContent)
+                () -> petition.updateAnswer(updateAnswerContent, null, ALWAYS_TRUE_URL_MATCHER)
         ).isInstanceOf(NotAnsweredPetitionException.class);
     }
 
@@ -199,7 +201,7 @@ class PetitionTest {
     void delete_answer() {
         agreePetitionByMultipleUsers(petition, REQUIRED_AGREEMENT_FOR_ANSWER);
         petition.release(PETITION_ONGOING_AT);
-        petition.answer(ANSWER_CONTENT);
+        petition.answer(ANSWER_CONTENT, null, ALWAYS_TRUE_URL_MATCHER);
 
         petition.deleteAnswer();
 

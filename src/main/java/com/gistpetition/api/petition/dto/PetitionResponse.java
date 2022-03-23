@@ -49,6 +49,7 @@ public class PetitionResponse {
     public static class AnswerResponse {
         private Long id;
         private String description;
+        private String videoUrl;
         private Long createdAt;
         private Long updatedAt;
 
@@ -56,6 +57,7 @@ public class PetitionResponse {
             return new AnswerResponse(
                     answer.getId(),
                     answer.getDescription(),
+                    answer.getVideoUrl(),
                     answer.getCreatedAt().toEpochMilli(),
                     answer.getUpdatedAt().toEpochMilli()
             );

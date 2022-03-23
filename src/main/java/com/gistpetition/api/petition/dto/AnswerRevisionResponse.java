@@ -14,6 +14,7 @@ public class AnswerRevisionResponse {
     private final RevisionMetadata.RevisionType revisionType;
     private final Long workedBy;
     private final String answerDescription;
+    private final String answerYoutubeUrl;
 
     public static AnswerRevisionResponse of(Revision<Long, Answer> revision) {
         return new AnswerRevisionResponse(
@@ -21,7 +22,8 @@ public class AnswerRevisionResponse {
                 revision.getRequiredRevisionInstant().toEpochMilli(),
                 revision.getMetadata().getRevisionType(),
                 revision.getMetadata().<CustomRevisionEntity>getDelegate().getUserId(),
-                revision.getEntity().getDescription()
+                revision.getEntity().getDescription(),
+                revision.getEntity().getVideoUrl()
         );
     }
 

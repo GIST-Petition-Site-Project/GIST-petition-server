@@ -61,6 +61,7 @@ public class DataLoader {
             "\n" +
             "국민청원에 함께해 주신 국민 여러분께 감사드립니다. ";
     public static final AgreementRequest AGREEMENT_REQUEST = new AgreementRequest("동의합니다");
+    public static final String SAMPLE_YOUTUBE_URL = "https://www.youtube.com/watch?v=XbL-AwYX8ME";
 
     private final UserRepository userRepository;
     private final PetitionRepository petitionRepository;
@@ -100,7 +101,7 @@ public class DataLoader {
             if (petitionId < petitionIds.get(0) + WAITING_FOR_CHECK_RELEASE_COUNT + WAITING_FOR_CHECK_ANSWER_COUNT) {
                 continue;
             }
-            petitionCommandService.answerPetition(petitionId, new AnswerRequest(ANSWER_DESCRIPTION));
+            petitionCommandService.answerPetition(petitionId, new AnswerRequest(ANSWER_DESCRIPTION, SAMPLE_YOUTUBE_URL));
         }
 
         IntStream.range(0, 25).forEach(i -> saveExpiredPetition(normal, users));
