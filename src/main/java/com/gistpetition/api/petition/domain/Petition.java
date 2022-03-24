@@ -87,6 +87,20 @@ public class Petition extends BaseEntity {
         this.rejection = new Rejection(description, this);
     }
 
+    public void updateRejection(String description) {
+        if (!isRejected()) {
+            throw new NotRejectedPetitionException();
+        }
+        this.rejection.update(description);
+    }
+
+    public void cancelRejection() {
+        if (!isRejected()) {
+            throw new NotRejectedPetitionException();
+        }
+        this.rejection = null;
+    }
+
     public void release(Instant at) {
         if (isExpiredAt(at)) {
             throw new ExpiredPetitionException();

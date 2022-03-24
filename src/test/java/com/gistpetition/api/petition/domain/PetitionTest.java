@@ -195,6 +195,27 @@ class PetitionTest {
     }
 
     @Test
+    void update_rejection() {
+        agreePetitionByMultipleUsers(petition, REQUIRED_AGREEMENT_FOR_ANSWER);
+        petition.reject(REJECT_DESCRIPTION, PETITION_NOT_EXPIRED_AT);
+
+        String updateRejectionDescription = "반려 내용 수정을 진행했다.";
+        petition.updateRejection(updateRejectionDescription);
+
+        assertThat(petition.getRejection().getDescription()).isEqualTo(updateRejectionDescription);
+    }
+
+    @Test
+    void cancel_rejection() {
+        agreePetitionByMultipleUsers(petition, REQUIRED_AGREEMENT_FOR_ANSWER);
+        petition.reject(REJECT_DESCRIPTION, PETITION_NOT_EXPIRED_AT);
+
+        petition.cancelRejection();
+
+        assertFalse(petition.isRejected());
+    }
+
+    @Test
     void answer() {
         agreePetitionByMultipleUsers(petition, REQUIRED_AGREEMENT_FOR_ANSWER);
         petition.release(PETITION_NOT_EXPIRED_AT);

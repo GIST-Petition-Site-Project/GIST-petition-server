@@ -24,4 +24,8 @@ public class Rejection extends BaseEntity {
     public String getDescription() {
         return description.getDescription();
     }
+
+    public void update(String description) {
+        this.description.update(description);
+    }
 }
