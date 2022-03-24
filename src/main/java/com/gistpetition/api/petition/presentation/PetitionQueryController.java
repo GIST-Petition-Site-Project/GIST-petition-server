@@ -62,6 +62,14 @@ public class PetitionQueryController {
         return ResponseEntity.ok().body(petitionQueryService.retrievePetitionsWaitingForAnswer(Category.of(categoryId), pageable));
     }
 
+    @GetMapping("/petitions/rejected")
+    public ResponseEntity<Page<PetitionPreviewResponse>> retrieveRejectedPetitions(@RequestParam(defaultValue = SEARCH_ALL) Long categoryId, Pageable pageable) {
+        if (categoryId.equals(Long.valueOf(SEARCH_ALL))) {
+            return ResponseEntity.ok().body(petitionQueryService.retrieveRejectedPetition(pageable));
+        }
+        return ResponseEntity.ok().body(petitionQueryService.retrieveRejectedPetition(Category.of(categoryId), pageable));
+    }
+
     @GetMapping("/petitions/answered")
     public ResponseEntity<Page<PetitionPreviewResponse>> retrieveAnsweredPetitions(@RequestParam(defaultValue = SEARCH_ALL) Long categoryId, Pageable pageable) {
         if (categoryId.equals(Long.valueOf(SEARCH_ALL))) {

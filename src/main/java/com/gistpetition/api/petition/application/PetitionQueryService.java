@@ -74,6 +74,14 @@ public class PetitionQueryService {
         return petitionQueryDslRepository.findAll(category, WAITING_FOR_ANSWER.at(Instant.now()), pageable);
     }
 
+    public Page<PetitionPreviewResponse> retrieveRejectedPetition(Pageable pageable) {
+        return petitionQueryDslRepository.findAll(null, REJECTED.at(Instant.now()), pageable);
+    }
+
+    public Page<PetitionPreviewResponse> retrieveRejectedPetition(Category category, Pageable pageable) {
+        return petitionQueryDslRepository.findAll(category, REJECTED.at(Instant.now()), pageable);
+    }
+
     public Page<PetitionPreviewResponse> retrieveAnsweredPetition(Pageable pageable) {
         return petitionQueryDslRepository.findAll(null, ANSWERED.at(Instant.now()), pageable);
     }
