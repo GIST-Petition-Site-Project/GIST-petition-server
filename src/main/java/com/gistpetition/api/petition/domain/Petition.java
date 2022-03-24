@@ -39,6 +39,7 @@ public class Petition extends BaseEntity {
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST, orphanRemoval = true)
     @JoinColumn(name = "answer_id", referencedColumnName = "id")
     private Answer answer;
+    @NotAudited
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST, orphanRemoval = true)
     @JoinColumn(name = "rejection_id", referencedColumnName = "id")
     private Rejection rejection;

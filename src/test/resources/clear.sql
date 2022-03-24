@@ -3,6 +3,8 @@ from agreement;
 DELETE
 from petition;
 DELETE
+from rejection;
+DELETE
 from answer;
 DELETE
 from agree_count;
