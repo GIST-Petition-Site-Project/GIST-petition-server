@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-    <component name="JpaLiquibaseChangesConfig">
-        <exclude-change idName="petition_aud" tagName="dropTable"/>
-        <exclude-change idName="answer_aud" tagName="dropTable"/>
-        <exclude-change idName="fk_petition_aud_revinfo_rev" tagName="dropForeignKeyConstraint"/>
-        <exclude-change idName="fk_answer_aud_revinfo_rev" tagName="dropForeignKeyConstraint"/>
-    </component>
-</project>
