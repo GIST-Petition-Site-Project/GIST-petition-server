@@ -1,7 +1,7 @@
 package com.gistpetition.api.petition.application;
 
 import com.gistpetition.api.config.annotation.DataIntegrityHandler;
-import com.gistpetition.api.exception.petition.AlreadyAnswerException;
+import com.gistpetition.api.exception.petition.AlreadyAnsweredPetitionException;
 import com.gistpetition.api.exception.petition.DuplicatedAgreementException;
 import com.gistpetition.api.exception.petition.NoSuchPetitionException;
 import com.gistpetition.api.exception.user.NoSuchUserException;
@@ -89,7 +89,7 @@ public class PetitionCommandService {
     }
 
     @Transactional
-    @DataIntegrityHandler(AlreadyAnswerException.class)
+    @DataIntegrityHandler(AlreadyAnsweredPetitionException.class)
     public void answerPetition(Long petitionId, AnswerRequest answerRequest) {
         Petition petition = findPetitionById(petitionId);
         petition.answer(answerRequest.getDescription(), answerRequest.getVideoUrl(), urlMatcher);

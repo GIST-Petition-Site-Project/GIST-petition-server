@@ -24,12 +24,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PetitionTest {
     public static final Instant PETITION_CREATION_AT = LocalDateTime.of(2002, 2, 2, 2, 2).toInstant(ZoneOffset.UTC);
-    public static final Instant PETITION_ONGOING_AT = PETITION_CREATION_AT.plusSeconds(Petition.POSTING_PERIOD_BY_SECONDS / 2);
+    public static final Instant PETITION_NOT_EXPIRED_AT = PETITION_CREATION_AT.plusSeconds(Petition.POSTING_PERIOD_BY_SECONDS / 2);
     public static final Instant PETITION_EXPIRED_AT = PETITION_CREATION_AT.plusSeconds(Petition.POSTING_PERIOD_BY_SECONDS);
     private static final String AGREEMENT_DESCRIPTION = "동의합니다.";
     private static final String TEMP_URL = "AAAAAA";
-    private static final String ANSWER_CONTENT = "답변을 달았습니다.";
+    private static final String ANSWER_DESCRIPTION = "답변을 달았습니다.";
     private static final UrlMatcher ALWAYS_TRUE_URL_MATCHER = url -> true;
+    public static final String REJECT_DESCRIPTION = "description";
 
     private Petition petition;
 
@@ -57,16 +58,16 @@ class PetitionTest {
 
     @Test
     void agree() {
-        petition.agree(1L, AGREEMENT_DESCRIPTION, PETITION_ONGOING_AT);
+        petition.agree(1L, AGREEMENT_DESCRIPTION, PETITION_NOT_EXPIRED_AT);
 
         assertThat(petition.getAgreeCount()).isEqualTo(1);
     }
 
     @Test
     void agreeByMultipleUser() {
-        petition.agree(1L, AGREEMENT_DESCRIPTION, PETITION_ONGOING_AT);
-        petition.agree(2L, AGREEMENT_DESCRIPTION, PETITION_ONGOING_AT);
-        petition.agree(3L, AGREEMENT_DESCRIPTION, PETITION_ONGOING_AT);
+        petition.agree(1L, AGREEMENT_DESCRIPTION, PETITION_NOT_EXPIRED_AT);
+        petition.agree(2L, AGREEMENT_DESCRIPTION, PETITION_NOT_EXPIRED_AT);
+        petition.agree(3L, AGREEMENT_DESCRIPTION, PETITION_NOT_EXPIRED_AT);
 
         assertThat(petition.getAgreeCount()).isEqualTo(3);
     }
@@ -79,10 +80,21 @@ class PetitionTest {
     }
 
     @Test
+    void agree_to_rejectedPetition() {
+        agreePetitionByMultipleUsers(petition, REQUIRED_AGREEMENT_FOR_RELEASE);
+        petition.reject(REJECT_DESCRIPTION, PETITION_NOT_EXPIRED_AT);
+
+        assertThatThrownBy(
+                () -> petition.agree(1L, AGREEMENT_DESCRIPTION, PETITION_NOT_EXPIRED_AT)
+        ).isInstanceOf(AlreadyRejectedPetitionException.class);
+    }
+
+
+    @Test
     void release() {
         agreePetitionByMultipleUsers(petition, REQUIRED_AGREEMENT_FOR_RELEASE);
 
-        petition.release(PETITION_ONGOING_AT);
+        petition.release(PETITION_NOT_EXPIRED_AT);
 
         assertTrue(petition.isReleased());
     }
@@ -90,16 +102,16 @@ class PetitionTest {
     @Test
     void releaseAlreadyReleased() {
         agreePetitionByMultipleUsers(petition, REQUIRED_AGREEMENT_FOR_RELEASE);
-        petition.release(PETITION_ONGOING_AT);
+        petition.release(PETITION_NOT_EXPIRED_AT);
 
         assertThatThrownBy(
-                () -> petition.release(PETITION_ONGOING_AT.plusSeconds(1))
+                () -> petition.release(PETITION_NOT_EXPIRED_AT.plusSeconds(1))
         ).isInstanceOf(AlreadyReleasedPetitionException.class);
     }
 
     @Test
     void releaseNotEnoughAgreement() {
-        assertThatThrownBy(() -> petition.release(PETITION_ONGOING_AT)
+        assertThatThrownBy(() -> petition.release(PETITION_NOT_EXPIRED_AT)
         ).isInstanceOf(NotEnoughAgreementException.class);
     }
 
@@ -107,7 +119,7 @@ class PetitionTest {
     void releaseExpiredPetition() {
         agreePetitionByMultipleUsers(petition, REQUIRED_AGREEMENT_FOR_RELEASE);
 
-        petition.release(PETITION_ONGOING_AT);
+        petition.release(PETITION_NOT_EXPIRED_AT);
 
         assertThatThrownBy(() ->
                 petition.release(PETITION_EXPIRED_AT.plusSeconds(1))
@@ -117,7 +129,7 @@ class PetitionTest {
     @Test
     void cancelRelease() {
         agreePetitionByMultipleUsers(petition, REQUIRED_AGREEMENT_FOR_RELEASE);
-        petition.release(PETITION_ONGOING_AT);
+        petition.release(PETITION_NOT_EXPIRED_AT);
 
         petition.cancelRelease();
 
@@ -132,23 +144,74 @@ class PetitionTest {
     }
 
     @Test
+    void reject_released() {
+        agreePetitionByMultipleUsers(petition, REQUIRED_AGREEMENT_FOR_RELEASE);
+        petition.release(PETITION_NOT_EXPIRED_AT);
+
+        petition.reject(REJECT_DESCRIPTION, PETITION_NOT_EXPIRED_AT);
+
+        assertTrue(petition.isRejected());
+        assertThat(petition.getRejection().getDescription()).isEqualTo(REJECT_DESCRIPTION);
+    }
+
+    @Test
+    void reject_not_released() {
+        agreePetitionByMultipleUsers(petition, REQUIRED_AGREEMENT_FOR_RELEASE);
+
+        petition.reject(REJECT_DESCRIPTION, PETITION_NOT_EXPIRED_AT);
+
+        assertTrue(petition.isRejected());
+        assertTrue(petition.isReleased());
+        assertThat(petition.getRejection().getDescription()).isEqualTo(REJECT_DESCRIPTION);
+    }
+
+    @Test
+    void reject_already_rejected() {
+        agreePetitionByMultipleUsers(petition, REQUIRED_AGREEMENT_FOR_RELEASE);
+        petition.reject(REJECT_DESCRIPTION, PETITION_NOT_EXPIRED_AT);
+
+        assertThatThrownBy(
+                () -> petition.reject(REJECT_DESCRIPTION, PETITION_NOT_EXPIRED_AT)
+        ).isInstanceOf(AlreadyRejectedPetitionException.class);
+    }
+
+    @Test
+    void reject_answered() {
+        agreePetitionByMultipleUsers(petition, REQUIRED_AGREEMENT_FOR_ANSWER);
+        petition.release(PETITION_NOT_EXPIRED_AT);
+        petition.answer(ANSWER_DESCRIPTION, null, ALWAYS_TRUE_URL_MATCHER);
+
+        assertThatThrownBy(
+                () -> petition.reject(REJECT_DESCRIPTION, PETITION_NOT_EXPIRED_AT)
+        ).isInstanceOf(AlreadyAnsweredPetitionException.class);
+    }
+
+    @Test
+    void reject_expired() {
+        agreePetitionByMultipleUsers(petition, REQUIRED_AGREEMENT_FOR_RELEASE);
+        assertThatThrownBy(
+                () -> petition.reject(REJECT_DESCRIPTION, PETITION_EXPIRED_AT.plusSeconds(1))
+        ).isInstanceOf(ExpiredPetitionException.class);
+    }
+
+    @Test
     void answer() {
         agreePetitionByMultipleUsers(petition, REQUIRED_AGREEMENT_FOR_ANSWER);
-        petition.release(PETITION_ONGOING_AT);
+        petition.release(PETITION_NOT_EXPIRED_AT);
 
-        petition.answer(ANSWER_CONTENT, null, ALWAYS_TRUE_URL_MATCHER);
+        petition.answer(ANSWER_DESCRIPTION, null, ALWAYS_TRUE_URL_MATCHER);
 
         assertTrue(petition.isAnswered());
-        assertThat(petition.getAnswer().getDescription()).isEqualTo(ANSWER_CONTENT);
+        assertThat(petition.getAnswer().getDescription()).isEqualTo(ANSWER_DESCRIPTION);
     }
 
     @Test
     void answer_for_already_answered_petition() {
         agreePetitionByMultipleUsers(petition, REQUIRED_AGREEMENT_FOR_ANSWER);
-        petition.release(PETITION_ONGOING_AT);
-        petition.answer(ANSWER_CONTENT, null, ALWAYS_TRUE_URL_MATCHER);
+        petition.release(PETITION_NOT_EXPIRED_AT);
+        petition.answer(ANSWER_DESCRIPTION, null, ALWAYS_TRUE_URL_MATCHER);
 
-        assertThatThrownBy(() -> petition.answer(ANSWER_CONTENT, null, ALWAYS_TRUE_URL_MATCHER)).isInstanceOf(AlreadyAnswerException.class);
+        assertThatThrownBy(() -> petition.answer(ANSWER_DESCRIPTION, null, ALWAYS_TRUE_URL_MATCHER)).isInstanceOf(AlreadyAnsweredPetitionException.class);
     }
 
     @Test
@@ -156,7 +219,7 @@ class PetitionTest {
         agreePetitionByMultipleUsers(petition, REQUIRED_AGREEMENT_FOR_ANSWER);
 
         assertThatThrownBy(() ->
-                petition.answer(ANSWER_CONTENT, null, ALWAYS_TRUE_URL_MATCHER)
+                petition.answer(ANSWER_DESCRIPTION, null, ALWAYS_TRUE_URL_MATCHER)
         ).isInstanceOf(NotReleasedPetitionException.class);
 
         assertFalse(petition.isAnswered());
@@ -165,20 +228,30 @@ class PetitionTest {
     @Test
     void answer_for_not_enough_agreed_petition() {
         agreePetitionByMultipleUsers(petition, REQUIRED_AGREEMENT_FOR_RELEASE);
-        petition.release(PETITION_ONGOING_AT);
+        petition.release(PETITION_NOT_EXPIRED_AT);
 
         assertThatThrownBy(() ->
-                petition.answer(ANSWER_CONTENT, null, ALWAYS_TRUE_URL_MATCHER)
+                petition.answer(ANSWER_DESCRIPTION, null, ALWAYS_TRUE_URL_MATCHER)
         ).isInstanceOf(NotEnoughAgreementException.class);
 
         assertFalse(petition.isAnswered());
     }
 
     @Test
+    void answer_to_rejectedPetition() {
+        agreePetitionByMultipleUsers(petition, REQUIRED_AGREEMENT_FOR_RELEASE);
+        petition.reject(REJECT_DESCRIPTION, PETITION_NOT_EXPIRED_AT);
+
+        assertThatThrownBy(() ->
+                petition.answer(ANSWER_DESCRIPTION, null, ALWAYS_TRUE_URL_MATCHER)
+        ).isInstanceOf(AlreadyRejectedPetitionException.class);
+    }
+
+    @Test
     void update_answer() {
         agreePetitionByMultipleUsers(petition, REQUIRED_AGREEMENT_FOR_ANSWER);
-        petition.release(PETITION_ONGOING_AT);
-        petition.answer(ANSWER_CONTENT, null, ALWAYS_TRUE_URL_MATCHER);
+        petition.release(PETITION_NOT_EXPIRED_AT);
+        petition.answer(ANSWER_DESCRIPTION, null, ALWAYS_TRUE_URL_MATCHER);
 
         String updateAnswerContent = "답변 수정을 진행했다.";
         petition.updateAnswer(updateAnswerContent, null, ALWAYS_TRUE_URL_MATCHER);
@@ -189,7 +262,7 @@ class PetitionTest {
     @Test
     void update_answer_not_answered_petition() {
         agreePetitionByMultipleUsers(petition, REQUIRED_AGREEMENT_FOR_ANSWER);
-        petition.release(PETITION_ONGOING_AT);
+        petition.release(PETITION_NOT_EXPIRED_AT);
 
         String updateAnswerContent = "답변 수정을 진행했다.";
         assertThatThrownBy(
@@ -200,8 +273,8 @@ class PetitionTest {
     @Test
     void delete_answer() {
         agreePetitionByMultipleUsers(petition, REQUIRED_AGREEMENT_FOR_ANSWER);
-        petition.release(PETITION_ONGOING_AT);
-        petition.answer(ANSWER_CONTENT, null, ALWAYS_TRUE_URL_MATCHER);
+        petition.release(PETITION_NOT_EXPIRED_AT);
+        petition.answer(ANSWER_DESCRIPTION, null, ALWAYS_TRUE_URL_MATCHER);
 
         petition.deleteAnswer();
 
@@ -211,13 +284,13 @@ class PetitionTest {
     @Test
     void delete_answer_not_answered_petition() {
         agreePetitionByMultipleUsers(petition, REQUIRED_AGREEMENT_FOR_ANSWER);
-        petition.release(PETITION_ONGOING_AT);
+        petition.release(PETITION_NOT_EXPIRED_AT);
 
         assertThatThrownBy(() -> petition.deleteAnswer()).isInstanceOf(NotAnsweredPetitionException.class);
     }
 
     private void agreePetitionByMultipleUsers(Petition target, int numberOfUsers) {
         LongStream.range(0, numberOfUsers)
-                .forEach(userId -> target.agree(userId, AGREEMENT_DESCRIPTION, PETITION_ONGOING_AT));
+                .forEach(userId -> target.agree(userId, AGREEMENT_DESCRIPTION, PETITION_NOT_EXPIRED_AT));
     }
 }
