@@ -28,10 +28,10 @@ import static com.gistpetition.api.petition.domain.Petition.REQUIRED_AGREEMENT_F
 @RequiredArgsConstructor
 @Component
 public class DataLoader {
-    public static final int PETITION_COUNT = 12;
-    public static final int REJECTED_COUNT = 3;
-    public static final int WAITING_FOR_CHECK_RELEASE_COUNT = 3;
-    public static final int WAITING_FOR_CHECK_ANSWER_COUNT = 3;
+    public static final int PETITION_COUNT = 100;
+    public static final int REJECTED_COUNT = 25;
+    public static final int WAITING_FOR_CHECK_RELEASE_COUNT = 25;
+    public static final int WAITING_FOR_CHECK_ANSWER_COUNT = 25;
 
     public static final String PASSWORD = new BcryptEncoder().hashPassword("test1234!");
     public static final Random RANDOM = new Random();

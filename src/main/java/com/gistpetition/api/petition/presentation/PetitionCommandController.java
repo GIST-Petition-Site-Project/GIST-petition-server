@@ -8,6 +8,7 @@ import com.gistpetition.api.petition.application.PetitionQueryService;
 import com.gistpetition.api.petition.dto.AgreementRequest;
 import com.gistpetition.api.petition.dto.AnswerRequest;
 import com.gistpetition.api.petition.dto.PetitionRequest;
+import com.gistpetition.api.petition.dto.RejectionRequest;
 import com.gistpetition.api.user.domain.SimpleUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -68,6 +69,29 @@ public class PetitionCommandController {
                                               @LoginUser SimpleUser simpleUser) {
         petitionCommandService.agree(agreementRequest, petitionId, simpleUser.getId());
         return ResponseEntity.ok().build();
+    }
+
+//    @ManagerPermissionRequired
+    @PostMapping("/petitions/{petitionId}/rejection")
+    public ResponseEntity<Object> rejectPetition(@PathVariable Long petitionId,
+                                               @Validated @RequestBody RejectionRequest rejectionRequest) {
+        petitionCommandService.rejectPetition(petitionId, rejectionRequest);
+        return ResponseEntity.created(URI.create("/v1/petitions/" + petitionId + "/rejection")).build();
+    }
+
+//    @ManagerPermissionRequired
+    @PutMapping("/petitions/{petitionId}/rejection")
+    public ResponseEntity<Void> updateRejection(@PathVariable Long petitionId,
+                                             @Validated @RequestBody RejectionRequest changeRequest) {
+        petitionCommandService.updateRejection(petitionId, changeRequest);
+        return ResponseEntity.ok().build();
+    }
+
+//    @ManagerPermissionRequired
+    @DeleteMapping("/petitions/{petitionId}/rejection")
+    public ResponseEntity<Object> cancelRejection(@PathVariable Long petitionId) {
+        petitionCommandService.cancelRejection(petitionId);
+        return ResponseEntity.noContent().build();
     }
 
     @ManagerPermissionRequired
