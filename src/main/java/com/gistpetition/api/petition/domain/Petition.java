@@ -36,9 +36,13 @@ public class Petition extends BaseEntity {
     @OptimisticLock(excluded = true)
     private final Agreements agreements = new Agreements();
     @NotAudited
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, orphanRemoval = true)
     @JoinColumn(name = "answer_id", referencedColumnName = "id")
     private Answer answer;
+    @NotAudited
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @JoinColumn(name = "rejection_id", referencedColumnName = "id")
+    private Rejection rejection;
     @Version
     private Long version;
 
@@ -55,6 +59,9 @@ public class Petition extends BaseEntity {
     }
 
     public void agree(Long userId, String description, Instant at) {
+        if (isRejected()) {
+            throw new AlreadyRejectedPetitionException();
+        }
         if (isExpiredAt(at)) {
             throw new ExpiredPetitionException();
         }
@@ -85,12 +92,45 @@ public class Petition extends BaseEntity {
         this.released = false;
     }
 
+    public void reject(String description, Instant at) {
+        if (isExpiredAt(at)) {
+            throw new ExpiredPetitionException();
+        }
+        if (isRejected()) {
+            throw new AlreadyRejectedPetitionException();
+        }
+        if (isAnswered()) {
+            throw new AlreadyAnsweredPetitionException();
+        }
+        if (!released) {
+            release(at);
+        }
+        this.rejection = new Rejection(description, this);
+    }
+
+    public void updateRejection(String description) {
+        if (!isRejected()) {
+            throw new NotRejectedPetitionException();
+        }
+        this.rejection.update(description);
+    }
+
+    public void cancelRejection() {
+        if (!isRejected()) {
+            throw new NotRejectedPetitionException();
+        }
+        this.rejection = null;
+    }
+
     public void answer(String description, String videoUrl, UrlMatcher urlMatcher) {
         if (isAnswered()) {
-            throw new AlreadyAnswerException();
+            throw new AlreadyAnsweredPetitionException();
         }
         if (!released) {
             throw new NotReleasedPetitionException();
+        }
+        if (isRejected()) {
+            throw new AlreadyRejectedPetitionException();
         }
         if (agreements.agreeLessThan(REQUIRED_AGREEMENT_FOR_ANSWER)) {
             throw new NotEnoughAgreementException();
@@ -120,6 +160,10 @@ public class Petition extends BaseEntity {
 
     public boolean isReleased() {
         return released;
+    }
+
+    public boolean isRejected() {
+        return !Objects.isNull(rejection);
     }
 
     public boolean isAnswered() {

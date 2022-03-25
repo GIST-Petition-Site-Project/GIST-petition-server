@@ -1,11 +1,9 @@
 package com.gistpetition.api.petition.dto;
 
 import com.gistpetition.api.petition.domain.Category;
-import com.gistpetition.api.petition.domain.Petition;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.domain.Page;
 
 import java.time.Instant;
 
@@ -19,11 +17,12 @@ public class PetitionPreviewResponse {
     private Long createdAt;
     private String tempUrl;
     private Boolean released;
+    private Boolean rejected;
     private Boolean answered;
     private Boolean expired;
 
     @QueryProjection
-    public PetitionPreviewResponse(Long id, String title, Category category, Instant createdAt, Instant expiredAt, Integer agreeCount, String tempUrl, Boolean released, Boolean answered) {
+    public PetitionPreviewResponse(Long id, String title, Category category, Instant createdAt, Instant expiredAt, Integer agreeCount, String tempUrl, Boolean released, Boolean rejected, Boolean answered) {
         this.id = id;
         this.title = title;
         this.categoryName = category.getName();
@@ -31,6 +30,7 @@ public class PetitionPreviewResponse {
         this.agreeCount = agreeCount;
         this.tempUrl = tempUrl;
         this.released = released;
+        this.rejected = rejected;
         this.answered = answered;
         this.expired = expiredAt.isBefore(Instant.now());
     }

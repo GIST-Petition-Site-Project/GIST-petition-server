@@ -2,13 +2,11 @@ package com.gistpetition.api;
 
 import com.gistpetition.api.petition.application.PetitionCommandService;
 import com.gistpetition.api.petition.domain.Category;
-import com.gistpetition.api.petition.domain.repository.AgreeCountRepository;
-import com.gistpetition.api.petition.domain.repository.AgreementRepository;
-import com.gistpetition.api.petition.domain.repository.AnswerRepository;
-import com.gistpetition.api.petition.domain.repository.PetitionRepository;
+import com.gistpetition.api.petition.domain.repository.*;
 import com.gistpetition.api.petition.dto.AgreementRequest;
 import com.gistpetition.api.petition.dto.AnswerRequest;
 import com.gistpetition.api.petition.dto.PetitionRequest;
+import com.gistpetition.api.petition.dto.RejectionRequest;
 import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRepository;
 import com.gistpetition.api.user.domain.UserRole;
@@ -30,7 +28,8 @@ import static com.gistpetition.api.petition.domain.Petition.REQUIRED_AGREEMENT_F
 @RequiredArgsConstructor
 @Component
 public class DataLoader {
-    public static final int PETITION_COUNT = 75;
+    public static final int PETITION_COUNT = 100;
+    public static final int REJECTED_COUNT = 25;
     public static final int WAITING_FOR_CHECK_RELEASE_COUNT = 25;
     public static final int WAITING_FOR_CHECK_ANSWER_COUNT = 25;
 
@@ -62,9 +61,11 @@ public class DataLoader {
             "국민청원에 함께해 주신 국민 여러분께 감사드립니다. ";
     public static final AgreementRequest AGREEMENT_REQUEST = new AgreementRequest("동의합니다");
     public static final String SAMPLE_YOUTUBE_URL = "https://www.youtube.com/watch?v=XbL-AwYX8ME";
+    public static final RejectionRequest REJECTION_REQUEST = new RejectionRequest("REJECTION" + DESCRIPTION);
 
     private final UserRepository userRepository;
     private final PetitionRepository petitionRepository;
+    private final RejectionRepository rejectionRepository;
     private final AnswerRepository answerRepository;
     private final PetitionCommandService petitionCommandService;
     private final AgreementRepository agreementRepository;
@@ -75,6 +76,7 @@ public class DataLoader {
         agreeCountRepository.deleteAllInBatch();
         agreementRepository.deleteAllInBatch();
         petitionRepository.deleteAllInBatch();
+        rejectionRepository.deleteAllInBatch();
         answerRepository.deleteAllInBatch();
         userRepository.deleteAllInBatch();
 
@@ -97,7 +99,12 @@ public class DataLoader {
             }
             petitionCommandService.releasePetition(petitionId);
 
-            if (petitionId < petitionIds.get(0) + WAITING_FOR_CHECK_RELEASE_COUNT + WAITING_FOR_CHECK_ANSWER_COUNT) {
+            if (petitionId < petitionIds.get(0) + WAITING_FOR_CHECK_RELEASE_COUNT + REJECTED_COUNT) {
+                petitionCommandService.rejectPetition(petitionId, REJECTION_REQUEST);
+                continue;
+            }
+
+            if (petitionId < petitionIds.get(0) + WAITING_FOR_CHECK_RELEASE_COUNT + REJECTED_COUNT + WAITING_FOR_CHECK_ANSWER_COUNT) {
                 continue;
             }
             petitionCommandService.answerPetition(petitionId, new AnswerRequest(ANSWER_DESCRIPTION, SAMPLE_YOUTUBE_URL));

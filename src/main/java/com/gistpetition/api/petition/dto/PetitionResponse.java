@@ -2,6 +2,7 @@ package com.gistpetition.api.petition.dto;
 
 import com.gistpetition.api.petition.domain.Answer;
 import com.gistpetition.api.petition.domain.Petition;
+import com.gistpetition.api.petition.domain.Rejection;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,11 +22,14 @@ public class PetitionResponse {
     private Long updatedAt;
     private String tempUrl;
     private Boolean released;
+    private Boolean rejected;
     private Boolean answered;
     private Boolean expired;
+    private RejectionResponse rejection;
     private AnswerResponse answer;
 
     public static PetitionResponse of(Petition petition) {
+        Rejection rejection = petition.getRejection();
         Answer answer = petition.getAnswer();
         return new PetitionResponse(
                 petition.getId(),
@@ -37,10 +41,31 @@ public class PetitionResponse {
                 petition.getUpdatedAt().toEpochMilli(),
                 petition.getTempUrl(),
                 petition.isReleased(),
+                petition.isRejected(),
                 petition.isAnswered(),
                 petition.isExpiredAt(Instant.now()),
+                rejection != null ? RejectionResponse.of(rejection) : null,
                 answer != null ? AnswerResponse.of(answer) : null
         );
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class RejectionResponse {
+        private Long id;
+        private String description;
+        private Long createdAt;
+        private Long updatedAt;
+
+        public static RejectionResponse of(Rejection rejection) {
+            return new RejectionResponse(
+                    rejection.getId(),
+                    rejection.getDescription(),
+                    rejection.getCreatedAt().toEpochMilli(),
+                    rejection.getUpdatedAt().toEpochMilli()
+            );
+        }
     }
 
     @Getter

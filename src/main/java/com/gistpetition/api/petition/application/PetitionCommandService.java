@@ -1,7 +1,6 @@
 package com.gistpetition.api.petition.application;
 
 import com.gistpetition.api.config.annotation.DataIntegrityHandler;
-import com.gistpetition.api.exception.petition.AlreadyAnswerException;
 import com.gistpetition.api.exception.petition.DuplicatedAgreementException;
 import com.gistpetition.api.exception.petition.NoSuchPetitionException;
 import com.gistpetition.api.exception.user.NoSuchUserException;
@@ -13,6 +12,7 @@ import com.gistpetition.api.petition.domain.repository.PetitionRepository;
 import com.gistpetition.api.petition.dto.AgreementRequest;
 import com.gistpetition.api.petition.dto.AnswerRequest;
 import com.gistpetition.api.petition.dto.PetitionRequest;
+import com.gistpetition.api.petition.dto.RejectionRequest;
 import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRepository;
 import com.gistpetition.api.utils.urlGenerator.UrlGenerator;
@@ -89,7 +89,24 @@ public class PetitionCommandService {
     }
 
     @Transactional
-    @DataIntegrityHandler(AlreadyAnswerException.class)
+    public void rejectPetition(Long petitionId, RejectionRequest rejectionRequest) {
+        Petition petition = findPetitionById(petitionId);
+        petition.reject(rejectionRequest.getDescription(), Instant.now());
+    }
+
+    @Transactional
+    public void updateRejection(Long petitionId, RejectionRequest rejectionRequest) {
+        Petition petition = findPetitionById(petitionId);
+        petition.updateRejection(rejectionRequest.getDescription());
+    }
+
+    @Transactional
+    public void cancelRejection(Long petitionId) {
+        Petition petition = findPetitionById(petitionId);
+        petition.cancelRejection();
+    }
+
+    @Transactional
     public void answerPetition(Long petitionId, AnswerRequest answerRequest) {
         Petition petition = findPetitionById(petitionId);
         petition.answer(answerRequest.getDescription(), answerRequest.getVideoUrl(), urlMatcher);
