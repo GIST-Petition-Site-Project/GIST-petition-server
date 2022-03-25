@@ -13,7 +13,7 @@ import java.util.Objects;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class VideoUrl {
 
-    @Column(name = "video_url")
+    @Column(name = "video_url", nullable = false)
     private String videoUrl;
 
     public VideoUrl(String videoUrl) {
