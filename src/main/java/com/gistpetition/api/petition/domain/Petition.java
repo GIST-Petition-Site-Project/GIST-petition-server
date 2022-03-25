@@ -72,6 +72,26 @@ public class Petition extends BaseEntity {
         return agreements.isAgreedBy(user.getId());
     }
 
+    public void release(Instant at) {
+        if (isExpiredAt(at)) {
+            throw new ExpiredPetitionException();
+        }
+        if (released) {
+            throw new AlreadyReleasedPetitionException();
+        }
+        if (agreements.agreeLessThan(REQUIRED_AGREEMENT_FOR_RELEASE)) {
+            throw new NotEnoughAgreementException();
+        }
+        this.released = true;
+    }
+
+    public void cancelRelease() {
+        if (!released) {
+            throw new NotReleasedPetitionException();
+        }
+        this.released = false;
+    }
+
     public void reject(String description, Instant at) {
         if (isExpiredAt(at)) {
             throw new ExpiredPetitionException();
@@ -100,26 +120,6 @@ public class Petition extends BaseEntity {
             throw new NotRejectedPetitionException();
         }
         this.rejection = null;
-    }
-
-    public void release(Instant at) {
-        if (isExpiredAt(at)) {
-            throw new ExpiredPetitionException();
-        }
-        if (released) {
-            throw new AlreadyReleasedPetitionException();
-        }
-        if (agreements.agreeLessThan(REQUIRED_AGREEMENT_FOR_RELEASE)) {
-            throw new NotEnoughAgreementException();
-        }
-        this.released = true;
-    }
-
-    public void cancelRelease() {
-        if (!released) {
-            throw new NotReleasedPetitionException();
-        }
-        this.released = false;
     }
 
     public void answer(String description, String videoUrl, UrlMatcher urlMatcher) {
