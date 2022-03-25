@@ -81,7 +81,6 @@ public class DataLoader {
         userRepository.deleteAllInBatch();
 
         User admin = userRepository.save(new User("admin@gist.ac.kr", PASSWORD, UserRole.ADMIN));
-        User manager = userRepository.save(new User("manager@gist.ac.kr", PASSWORD, UserRole.MANAGER));
         User normal = userRepository.save(new User("user@gist.ac.kr", PASSWORD, UserRole.USER));
 
         List<User> users = IntStream.range(0, REQUIRED_AGREEMENT_FOR_ANSWER + 10)
