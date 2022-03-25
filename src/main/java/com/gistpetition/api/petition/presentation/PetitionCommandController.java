@@ -71,7 +71,7 @@ public class PetitionCommandController {
         return ResponseEntity.ok().build();
     }
 
-//    @ManagerPermissionRequired
+    @ManagerPermissionRequired
     @PostMapping("/petitions/{petitionId}/rejection")
     public ResponseEntity<Object> rejectPetition(@PathVariable Long petitionId,
                                                @Validated @RequestBody RejectionRequest rejectionRequest) {
@@ -79,7 +79,7 @@ public class PetitionCommandController {
         return ResponseEntity.created(URI.create("/v1/petitions/" + petitionId + "/rejection")).build();
     }
 
-//    @ManagerPermissionRequired
+    @ManagerPermissionRequired
     @PutMapping("/petitions/{petitionId}/rejection")
     public ResponseEntity<Void> updateRejection(@PathVariable Long petitionId,
                                              @Validated @RequestBody RejectionRequest changeRequest) {
@@ -87,7 +87,7 @@ public class PetitionCommandController {
         return ResponseEntity.ok().build();
     }
 
-//    @ManagerPermissionRequired
+    @ManagerPermissionRequired
     @DeleteMapping("/petitions/{petitionId}/rejection")
     public ResponseEntity<Object> cancelRejection(@PathVariable Long petitionId) {
         petitionCommandService.cancelRejection(petitionId);
