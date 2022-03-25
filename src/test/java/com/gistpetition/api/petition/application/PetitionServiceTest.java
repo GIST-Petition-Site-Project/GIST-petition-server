@@ -409,7 +409,8 @@ class PetitionServiceTest extends IntegrationTest {
 
         Petition petition = petitionRepository.findById(petitionId).orElseThrow();
         assertTrue(petition.isRejected());
-        assertThat(petition.getRejection().getDescription()).isEqualTo(REJECTION_REQUEST.getDescription());
+        Rejection rejection = rejectionRepository.findByPetitionId(petitionId).orElseThrow();
+        assertThat(rejection.getDescription()).isEqualTo(REJECTION_REQUEST.getDescription());
     }
 
     @Test
@@ -424,7 +425,8 @@ class PetitionServiceTest extends IntegrationTest {
 
         Petition petition = petitionRepository.findById(petitionId).orElseThrow();
         assertTrue(petition.isRejected());
-        assertThat(petition.getRejection().getDescription()).isEqualTo(UPDATE_REJECTION_REQUEST.getDescription());
+        Rejection rejection = rejectionRepository.findByPetitionId(petitionId).orElseThrow();
+        assertThat(rejection.getDescription()).isEqualTo(UPDATE_REJECTION_REQUEST.getDescription());
     }
 
     @Test
@@ -454,7 +456,8 @@ class PetitionServiceTest extends IntegrationTest {
 
         Petition petition = petitionRepository.findById(petitionId).orElseThrow();
         assertTrue(petition.isAnswered());
-        assertThat(petition.getAnswer().getDescription()).isEqualTo(ANSWER_REQUEST.getDescription());
+        Answer answer = answerRepository.findByPetitionId(petitionId).orElseThrow();
+        assertThat(answer.getDescription()).isEqualTo(ANSWER_REQUEST.getDescription());
     }
 
     @Test
@@ -469,7 +472,8 @@ class PetitionServiceTest extends IntegrationTest {
 
         Petition petition = petitionRepository.findById(petitionId).orElseThrow();
         assertTrue(petition.isAnswered());
-        assertThat(petition.getAnswer().getDescription()).isEqualTo(UPDATE_ANSWER_REQUEST.getDescription());
+        Answer answer = answerRepository.findByPetitionId(petitionId).orElseThrow();
+        assertThat(answer.getDescription()).isEqualTo(UPDATE_ANSWER_REQUEST.getDescription());
     }
 
     @Test
@@ -512,7 +516,7 @@ class PetitionServiceTest extends IntegrationTest {
         }
         latch.await();
         assertThat(errorCount.get()).isEqualTo(numberOfThreads - 1);
-        assertThat(answerRepository.findByPetitionId(petitionId)).hasSize(1);
+        assertThat(answerRepository.findAllByPetitionId(petitionId)).hasSize(1);
     }
 
     @Test

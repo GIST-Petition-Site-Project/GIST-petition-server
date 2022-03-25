@@ -36,11 +36,11 @@ public class Petition extends BaseEntity {
     @OptimisticLock(excluded = true)
     private final Agreements agreements = new Agreements();
     @NotAudited
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, orphanRemoval = true)
     @JoinColumn(name = "answer_id", referencedColumnName = "id")
     private Answer answer;
     @NotAudited
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, orphanRemoval = true)
     @JoinColumn(name = "rejection_id", referencedColumnName = "id")
     private Rejection rejection;
     @Version
