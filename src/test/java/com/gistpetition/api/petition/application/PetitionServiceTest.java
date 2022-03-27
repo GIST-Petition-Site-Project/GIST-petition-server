@@ -5,10 +5,7 @@ import com.gistpetition.api.exception.petition.DuplicatedAgreementException;
 import com.gistpetition.api.exception.petition.NoSuchPetitionException;
 import com.gistpetition.api.petition.PetitionBuilder;
 import com.gistpetition.api.petition.domain.*;
-import com.gistpetition.api.petition.domain.repository.AgreeCountRepository;
-import com.gistpetition.api.petition.domain.repository.AgreementRepository;
-import com.gistpetition.api.petition.domain.repository.AnswerRepository;
-import com.gistpetition.api.petition.domain.repository.PetitionRepository;
+import com.gistpetition.api.petition.domain.repository.*;
 import com.gistpetition.api.petition.dto.*;
 import com.gistpetition.api.user.domain.SimpleUser;
 import com.gistpetition.api.user.domain.User;
@@ -19,7 +16,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -56,6 +52,9 @@ class PetitionServiceTest extends IntegrationTest {
     public static final String EMAIL = "email@gist.ac.kr";
     public static final String PASSWORD = "password";
     public static final AnswerRequest ANSWER_REQUEST = new AnswerRequest("답변을 달았다");
+    public static final String REJECTION_DESCRIPTION = "rejection_description";
+    public static final RejectionRequest REJECTION_REQUEST = new RejectionRequest(REJECTION_DESCRIPTION);
+    public static final RejectionRequest UPDATE_REJECTION_REQUEST = new RejectionRequest("update description");
     @Autowired
     private PetitionQueryService petitionQueryService;
     @Autowired
@@ -68,6 +67,8 @@ class PetitionServiceTest extends IntegrationTest {
     private AgreementRepository agreementRepository;
     @Autowired
     private AnswerRepository answerRepository;
+    @Autowired
+    private RejectionRepository rejectionRepository;
     @Autowired
     private AgreeCountRepository agreeCountRepository;
     @MockBean(name = "httpSession")
@@ -398,6 +399,53 @@ class PetitionServiceTest extends IntegrationTest {
     }
 
     @Test
+    void reject_petition() {
+        Long petitionId = petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
+        List<User> users = saveUsersNumberOf(REQUIRED_AGREEMENT_FOR_RELEASE);
+        agreePetitionBy(petitionId, users);
+        petitionCommandService.releasePetition(petitionId);
+
+        petitionCommandService.rejectPetition(petitionId, REJECTION_REQUEST);
+
+        Petition petition = petitionRepository.findById(petitionId).orElseThrow();
+        assertTrue(petition.isRejected());
+        Rejection rejection = rejectionRepository.findByPetitionId(petitionId).orElseThrow();
+        assertThat(rejection.getDescription()).isEqualTo(REJECTION_REQUEST.getDescription());
+    }
+
+    @Test
+    void update_rejection_of_petition() {
+        Long petitionId = petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
+        List<User> users = saveUsersNumberOf(REQUIRED_AGREEMENT_FOR_RELEASE);
+        agreePetitionBy(petitionId, users);
+        petitionCommandService.releasePetition(petitionId);
+        petitionCommandService.rejectPetition(petitionId, REJECTION_REQUEST);
+
+        petitionCommandService.updateRejection(petitionId, UPDATE_REJECTION_REQUEST);
+
+        Petition petition = petitionRepository.findById(petitionId).orElseThrow();
+        assertTrue(petition.isRejected());
+        Rejection rejection = rejectionRepository.findByPetitionId(petitionId).orElseThrow();
+        assertThat(rejection.getDescription()).isEqualTo(UPDATE_REJECTION_REQUEST.getDescription());
+    }
+
+    @Test
+    void cancel_rejection_of_petition() {
+        Long petitionId = petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
+        List<User> users = saveUsersNumberOf(REQUIRED_AGREEMENT_FOR_RELEASE);
+        agreePetitionBy(petitionId, users);
+        petitionCommandService.releasePetition(petitionId);
+        petitionCommandService.rejectPetition(petitionId, REJECTION_REQUEST);
+
+        petitionCommandService.cancelRejection(petitionId);
+
+        Petition petition = petitionRepository.findById(petitionId).orElseThrow();
+        assertFalse(petition.isRejected());
+        List<Rejection> rejections = rejectionRepository.findAll();
+        assertThat(rejections).hasSize(0);
+    }
+
+    @Test
     void answer_petition() {
         Long petitionId = petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
         List<User> users = saveUsersNumberOf(REQUIRED_AGREEMENT_FOR_ANSWER);
@@ -408,7 +456,8 @@ class PetitionServiceTest extends IntegrationTest {
 
         Petition petition = petitionRepository.findById(petitionId).orElseThrow();
         assertTrue(petition.isAnswered());
-        assertThat(petition.getAnswer().getDescription()).isEqualTo(ANSWER_REQUEST.getDescription());
+        Answer answer = answerRepository.findByPetitionId(petitionId).orElseThrow();
+        assertThat(answer.getDescription()).isEqualTo(ANSWER_REQUEST.getDescription());
     }
 
     @Test
@@ -423,7 +472,8 @@ class PetitionServiceTest extends IntegrationTest {
 
         Petition petition = petitionRepository.findById(petitionId).orElseThrow();
         assertTrue(petition.isAnswered());
-        assertThat(petition.getAnswer().getDescription()).isEqualTo(UPDATE_ANSWER_REQUEST.getDescription());
+        Answer answer = answerRepository.findByPetitionId(petitionId).orElseThrow();
+        assertThat(answer.getDescription()).isEqualTo(UPDATE_ANSWER_REQUEST.getDescription());
     }
 
     @Test
@@ -457,7 +507,7 @@ class PetitionServiceTest extends IntegrationTest {
             service.execute(() -> {
                 try {
                     petitionCommandService.answerPetition(petitionId, ANSWER_REQUEST);
-                } catch (OptimisticLockingFailureException ex) {
+                } catch (Exception ex) {
                     errorCount.incrementAndGet();
                 } finally {
                     latch.countDown();
@@ -466,7 +516,7 @@ class PetitionServiceTest extends IntegrationTest {
         }
         latch.await();
         assertThat(errorCount.get()).isEqualTo(numberOfThreads - 1);
-        assertThat(answerRepository.findByPetitionId(petitionId)).hasSize(1);
+        assertThat(answerRepository.findAllByPetitionId(petitionId)).hasSize(1);
     }
 
     @Test

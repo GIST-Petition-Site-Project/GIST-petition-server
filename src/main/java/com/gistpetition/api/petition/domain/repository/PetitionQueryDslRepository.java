@@ -28,6 +28,14 @@ import static com.gistpetition.api.petition.domain.QPetition.petition;
 public class PetitionQueryDslRepository {
     private final JPQLQueryFactory jpqlQueryFactory;
 
+    public List<PetitionPreviewResponse> findAll(Category category, Predicate predicate) {
+        return jpqlQueryFactory.select(buildPetitionPreviewResponse())
+                .from(petition)
+                .innerJoin(agreeCount)
+                .on(petition.id.eq(agreeCount.petitionId))
+                .where(categoryEq(category), predicate).fetch();
+    }
+
     public Page<PetitionPreviewResponse> findAll(Category category, Predicate predicate, Pageable pageable) {
         List<PetitionPreviewResponse> results = jpqlQueryFactory.select(buildPetitionPreviewResponse())
                 .from(petition)
@@ -57,7 +65,7 @@ public class PetitionQueryDslRepository {
     }
 
     private QPetitionPreviewResponse buildPetitionPreviewResponse() {
-        return new QPetitionPreviewResponse(petition.id, petition.title.title, petition.category, petition.createdAt, petition.expiredAt, agreeCount.count, petition.tempUrl, petition.released, petition.answer.isNotNull());
+        return new QPetitionPreviewResponse(petition.id, petition.title.title, petition.category, petition.createdAt, petition.expiredAt, agreeCount.count, petition.tempUrl, petition.released, petition.rejection.isNotNull(), petition.answer.isNotNull());
     }
 
     private BooleanExpression categoryEq(Category category) {

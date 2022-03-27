@@ -20,7 +20,8 @@ public enum PetitionQueryCondition {
     NOT_ANSWERED(none, notAnswered),
 
     WAITING_FOR_RELEASE(notExpired, notReleased, agreeEnoughToRelease),
-    ONGOING(notExpired, released, notAnswered),
+    ONGOING(notExpired, released, notAnswered, notRejected),
+    REJECTED(none, released, rejected),
     WAITING_FOR_ANSWER(none, released, notAnswered, agreeEnoughToAnswer),
 
     RELEASED_NOT_EXPIRED(notExpired, released),
@@ -44,8 +45,8 @@ public enum PetitionQueryCondition {
     }
 
     enum ExpirationCondition {
-        notExpired(i -> petition.expiredAt.after(i)),
-        expired(i -> petition.expiredAt.before(i)),
+        notExpired(petition.expiredAt::after),
+        expired(petition.expiredAt::before),
         none(i -> null);
 
         final Function<Instant, BooleanExpression> function;
@@ -62,6 +63,8 @@ public enum PetitionQueryCondition {
     enum PetitionStatus {
         released(petition.released.isTrue()),
         notReleased(petition.released.isFalse()),
+        rejected(petition.rejection.isNotNull()),
+        notRejected(petition.rejection.isNull()),
         answered(petition.answer.isNotNull()),
         notAnswered(petition.answer.isNull()),
         agreeEnoughToRelease(agreeCount.count.goe(Petition.REQUIRED_AGREEMENT_FOR_RELEASE)),

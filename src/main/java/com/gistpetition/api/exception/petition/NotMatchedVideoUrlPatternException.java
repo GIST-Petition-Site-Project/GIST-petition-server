@@ -2,11 +2,11 @@ package com.gistpetition.api.exception.petition;
 
 import org.springframework.http.HttpStatus;
 
-public class InvalidTitleLengthException extends PetitionException {
-    private static final String MESSAGE = "제목 길이가 올바르지 않습니다.";
+public class NotMatchedVideoUrlPatternException extends PetitionException {
+    private static final String MESSAGE = "잘못된 형태의 Video URL 입니다.";
     private static final HttpStatus HTTP_STATUS = HttpStatus.BAD_REQUEST;
 
-    public InvalidTitleLengthException() {
+    public NotMatchedVideoUrlPatternException() {
         super(MESSAGE, HTTP_STATUS);
     }
 }

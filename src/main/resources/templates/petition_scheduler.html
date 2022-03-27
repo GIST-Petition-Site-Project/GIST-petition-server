@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>오늘의 지스트 청원 정보</title>
+    <style>
+        h2 {
+            margin-bottom: 0.1em;
+        }
+
+        hr {
+            width: 180px;
+            margin-left: 0px;
+        }
+
+        .wating {
+            border-collapse: collapse;
+            text-align: left;
+            line-height: 1.5;
+            border-left: 1px solid #ccc;
+            table-layout: fixed;
+            width: 550px;
+        }
+
+        .wating thead th {
+            padding: 10px;
+            font-weight: bold;
+            text-align: center;
+            border-top: 1px solid #ccc;
+            border-right: 1px solid #ccc;
+            border-bottom: 2px solid #c00;
+            background: #ececec;
+        }
+
+        .wating tbody th {
+            padding: 10px;
+            font-weight: bold;
+            vertical-align: top;
+            text-align: center;
+            border-right: 1px solid #ccc;
+            border-bottom: 1px solid #ccc;
+            background: #ececec;
+        }
+
+        .wating td {
+            padding: 10px 5px;
+            vertical-align: top;
+            text-align: center;
+            border-right: 1px solid #ccc;
+            border-bottom: 1px solid #ccc;
+        }
+
+        #petition-title {
+            text-align: left;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+<h2>승인 대기중인 청원</h2>
+<hr/>
+<table class="wating">
+    <colgroup>
+        <col style="width: 10%"/>
+        <col style="width: 60%"/>
+        <col style="width: 15%"/>
+        <col style="width: 15%"/>
+    </colgroup>
+    <thead>
+    <tr>
+        <th scope="col">#</th>
+        <th scope="col">청원 제목</th>
+        <th scope="col">동의 수</th>
+        <th scope="col">바로 가기</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="petition : ${waitingForRelease}">
+        <th scope="row" th:text="${petition.id}">1</th>
+        <td id="petition-title" th:text="${petition.title}">승인 대기 중인 청원</td>
+        <td th:text="${petition.agreeCount}">5</td>
+        <td><a th:href="@{${baseLinkToRelease} + ${petition.tempUrl}}">이동</a></td>
+    </tr>
+    </tbody>
+</table>
+<h2>답변 대기중인 청원</h2>
+<hr/>
+<table class="wating">
+    <colgroup>
+        <col style="width: 10%"/>
+        <col style="width: 60%"/>
+        <col style="width: 15%"/>
+        <col style="width: 15%"/>
+    </colgroup>
+    <thead>
+    <tr>
+        <th scope="col">#</th>
+        <th scope="col">청원 제목</th>
+        <th scope="col">동의 수</th>
+        <th scope="col">바로 가기</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="petition : ${waitingForAnswer}">
+        <th scope="row" th:text="${petition.id}">2</th>
+        <td id="petition-title" th:text="${petition.title}">답변 대기 중인 청원</td>
+        <td th:text="${petition.agreeCount}">50</td>
+        <td><a th:href="@{${baseLinkToAnswer} + ${petition.id}}">이동</a></td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
