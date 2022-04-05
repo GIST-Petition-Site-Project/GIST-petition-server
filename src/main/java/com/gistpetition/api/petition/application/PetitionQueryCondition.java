@@ -19,10 +19,10 @@ public enum PetitionQueryCondition {
     ANSWERED(none, answered),
     NOT_ANSWERED(none, notAnswered),
 
-    WAITING_FOR_RELEASE(notExpired, notReleased, agreeEnoughToRelease),
+    WAITING_FOR_RELEASE(notExpired, notReleased, notRejected, agreeEnoughToRelease),
     ONGOING(notExpired, released, notAnswered, notRejected),
     REJECTED(none, released, rejected),
-    WAITING_FOR_ANSWER(none, released, notAnswered, agreeEnoughToAnswer),
+    WAITING_FOR_ANSWER(none, released, notRejected, notAnswered, agreeEnoughToAnswer),
 
     RELEASED_NOT_EXPIRED(notExpired, released),
     RELEASED_EXPIRED(expired, released);
