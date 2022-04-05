@@ -28,10 +28,10 @@ import static com.gistpetition.api.petition.domain.Petition.REQUIRED_AGREEMENT_F
 @RequiredArgsConstructor
 @Component
 public class DataLoader {
-    public static final int PETITION_COUNT = 100;
-    public static final int REJECTED_COUNT = 25;
-    public static final int WAITING_FOR_CHECK_RELEASE_COUNT = 25;
-    public static final int WAITING_FOR_CHECK_ANSWER_COUNT = 25;
+    public static final int PETITION_COUNT = 20;
+    public static final int REJECTED_COUNT = 5;
+    public static final int WAITING_FOR_CHECK_RELEASE_COUNT = 5;
+    public static final int WAITING_FOR_CHECK_ANSWER_COUNT = 5;
 
     public static final String PASSWORD = new BcryptEncoder().hashPassword("test1234!");
     public static final Random RANDOM = new Random();
@@ -110,7 +110,7 @@ public class DataLoader {
             petitionCommandService.answerPetition(petitionId, new AnswerRequest(ANSWER_DESCRIPTION, SAMPLE_YOUTUBE_URL));
         }
 
-        IntStream.range(0, 25).forEach(i -> saveExpiredPetition(normal, users));
+        IntStream.range(0, 5).forEach(i -> saveExpiredPetition(normal, users));
     }
 
     private User savedUser(int i) {
