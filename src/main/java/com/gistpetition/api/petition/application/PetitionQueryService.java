@@ -35,11 +35,11 @@ public class PetitionQueryService {
     private final PetitionQueryDslRepository petitionQueryDslRepository;
 
     public Page<PetitionPreviewResponse> retrieveReleasedPetition(Pageable pageable) {
-        return petitionQueryDslRepository.findAll(null, RELEASED_NOT_EXPIRED.at(Instant.now()), pageable);
+        return petitionQueryDslRepository.findAll(null, RELEASED.at(Instant.now()), pageable);
     }
 
     public Page<PetitionPreviewResponse> retrieveReleasedPetition(Category category, Pageable pageable) {
-        return petitionQueryDslRepository.findAll(category, RELEASED_NOT_EXPIRED.at(Instant.now()), pageable);
+        return petitionQueryDslRepository.findAll(category, RELEASED.at(Instant.now()), pageable);
     }
 
     public Page<PetitionPreviewResponse> retrieveReleasedAndExpiredPetition(Pageable pageable) {
