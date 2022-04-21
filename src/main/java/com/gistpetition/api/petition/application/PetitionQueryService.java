@@ -43,11 +43,11 @@ public class PetitionQueryService {
     }
 
     public Page<PetitionPreviewResponse> retrieveReleasedAndExpiredPetition(Pageable pageable) {
-        return petitionQueryDslRepository.findAll(null, RELEASED_EXPIRED.at(Instant.now()), pageable);
+        return petitionQueryDslRepository.findAll(null, RELEASED_NOT_REJECTED_EXPIRED.at(Instant.now()), pageable);
     }
 
     public Page<PetitionPreviewResponse> retrieveReleasedAndExpiredPetition(Category category, Pageable pageable) {
-        return petitionQueryDslRepository.findAll(category, RELEASED_EXPIRED.at(Instant.now()), pageable);
+        return petitionQueryDslRepository.findAll(category, RELEASED_NOT_REJECTED_EXPIRED.at(Instant.now()), pageable);
     }
 
     public Page<PetitionPreviewResponse> retrieveOngoingPetition(Pageable pageable) {
