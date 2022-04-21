@@ -53,7 +53,6 @@ public class PetitionQueryController {
         return ResponseEntity.ok().body(petitionQueryService.retrievePetitionsWaitingForRelease(Category.of(categoryId), pageable));
     }
 
-    @ManagerPermissionRequired
     @GetMapping("/petitions/waitingForAnswer")
     public ResponseEntity<Page<PetitionPreviewResponse>> retrievePetitionsWaitingForAnswer(@RequestParam(defaultValue = SEARCH_ALL) Long categoryId, Pageable pageable) {
         if (categoryId.equals(Long.valueOf(SEARCH_ALL))) {
