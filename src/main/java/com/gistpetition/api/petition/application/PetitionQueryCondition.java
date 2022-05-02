@@ -22,7 +22,7 @@ public enum PetitionQueryCondition {
     WAITING_FOR_RELEASE(notExpired, notReleased, notRejected, agreeEnoughToRelease),
     ONGOING(notExpired, released, notAnswered, notRejected),
     REJECTED(none, released, rejected),
-    RELEASED_NOT_REJECTED_EXPIRED(expired, released, notRejected),
+    RELEASED_NOT_REJECTED_NOT_ANSWERED_EXPIRED(expired, released, notAnswered, notRejected),
     WAITING_FOR_ANSWER(none, released, notRejected, notAnswered, agreeEnoughToAnswer),
 
     RELEASED_NOT_EXPIRED(notExpired, released),
