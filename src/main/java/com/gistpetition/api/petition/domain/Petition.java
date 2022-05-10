@@ -27,7 +27,10 @@ public class Petition extends BaseEntity {
     private Description description;
     @Enumerated(EnumType.STRING)
     private Category category;
+    @NotAudited
     private Boolean released = false;
+    @NotAudited
+    private Instant waitingForAnswerAt;
     private Instant expiredAt;
     private Long userId;
     @Column(unique = true)
@@ -66,6 +69,10 @@ public class Petition extends BaseEntity {
             throw new ExpiredPetitionException();
         }
         this.agreements.add(new Agreement(description, userId, this));
+
+        if (agreements.hasSize(REQUIRED_AGREEMENT_FOR_ANSWER)) {
+            this.waitingForAnswerAt = at;
+        }
     }
 
     public boolean isAgreedBy(User user) {
