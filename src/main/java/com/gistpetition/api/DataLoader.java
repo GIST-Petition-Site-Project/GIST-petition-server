@@ -111,6 +111,10 @@ public class DataLoader {
         }
 
         IntStream.range(0, 5).forEach(i -> saveExpiredPetition(normal, users));
+
+        Long oneLeftPetition = savePetition("동의 한개 남은 청원", normal);
+        agreePetitionOneLessThanRequiredForAnswer(oneLeftPetition, users);
+        petitionCommandService.releasePetition(oneLeftPetition);
     }
 
     private User savedUser(int i) {
@@ -119,6 +123,14 @@ public class DataLoader {
 
     private void randomlyAgreePetitionOverRequired(Long petitionId, List<User> alphabetUsers) {
         int agreeCount = RANDOM.nextInt(alphabetUsers.size() - REQUIRED_AGREEMENT_FOR_ANSWER) + REQUIRED_AGREEMENT_FOR_ANSWER;
+        for (int j = 0; j < agreeCount; j++) {
+            User user = alphabetUsers.get(j);
+            petitionCommandService.agree(AGREEMENT_REQUEST, petitionId, user.getId());
+        }
+    }
+
+    private void agreePetitionOneLessThanRequiredForAnswer(Long petitionId, List<User> alphabetUsers) {
+        int agreeCount = REQUIRED_AGREEMENT_FOR_ANSWER - 1;
         for (int j = 0; j < agreeCount; j++) {
             User user = alphabetUsers.get(j);
             petitionCommandService.agree(AGREEMENT_REQUEST, petitionId, user.getId());

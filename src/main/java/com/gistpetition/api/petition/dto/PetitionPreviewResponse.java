@@ -15,6 +15,7 @@ public class PetitionPreviewResponse {
     private String categoryName;
     private Integer agreeCount;
     private Long createdAt;
+    private Long waitingForAnswerAt;
     private String tempUrl;
     private Boolean released;
     private Boolean rejected;
@@ -22,11 +23,12 @@ public class PetitionPreviewResponse {
     private Boolean expired;
 
     @QueryProjection
-    public PetitionPreviewResponse(Long id, String title, Category category, Instant createdAt, Instant expiredAt, Integer agreeCount, String tempUrl, Boolean released, Boolean rejected, Boolean answered) {
+    public PetitionPreviewResponse(Long id, String title, Category category, Instant createdAt, Instant expiredAt, Instant waitingForAnswerAt, Integer agreeCount, String tempUrl, Boolean released, Boolean rejected, Boolean answered) {
         this.id = id;
         this.title = title;
         this.categoryName = category.getName();
         this.createdAt = createdAt.toEpochMilli();
+        this.waitingForAnswerAt = waitingForAnswerAt != null ? waitingForAnswerAt.toEpochMilli() : null;
         this.agreeCount = agreeCount;
         this.tempUrl = tempUrl;
         this.released = released;
