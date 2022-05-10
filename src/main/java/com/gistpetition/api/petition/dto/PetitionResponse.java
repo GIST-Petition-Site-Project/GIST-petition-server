@@ -20,6 +20,7 @@ public class PetitionResponse {
     private Integer agreeCount;
     private Long createdAt;
     private Long updatedAt;
+    private Long waitingForAnswerAt;
     private String tempUrl;
     private Boolean released;
     private Boolean rejected;
@@ -29,6 +30,7 @@ public class PetitionResponse {
     private AnswerResponse answer;
 
     public static PetitionResponse of(Petition petition) {
+        Instant waitingForAnswerAt = petition.getWaitingForAnswerAt();
         Rejection rejection = petition.getRejection();
         Answer answer = petition.getAnswer();
         return new PetitionResponse(
@@ -39,6 +41,7 @@ public class PetitionResponse {
                 petition.getAgreeCount(),
                 petition.getCreatedAt().toEpochMilli(),
                 petition.getUpdatedAt().toEpochMilli(),
+                waitingForAnswerAt != null ? waitingForAnswerAt.toEpochMilli() : null,
                 petition.getTempUrl(),
                 petition.isReleased(),
                 petition.isRejected(),
