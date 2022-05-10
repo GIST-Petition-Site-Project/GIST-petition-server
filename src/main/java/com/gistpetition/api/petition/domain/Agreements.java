@@ -43,4 +43,8 @@ public class Agreements {
     public int size() {
         return agreements.size();
     }
+
+    public boolean hasSize(int size) {
+        return agreements.size() == size;
+    }
 }

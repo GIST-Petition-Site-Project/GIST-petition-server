@@ -70,6 +70,17 @@ class PetitionTest {
         petition.agree(3L, AGREEMENT_DESCRIPTION, PETITION_NOT_EXPIRED_AT);
 
         assertThat(petition.getAgreeCount()).isEqualTo(3);
+        assertThat(petition.getWaitingForAnswerAt()).isNull();
+    }
+
+    @Test
+    void agreeByWaitingForAnswerTimes() {
+        for (long i = 0; i < REQUIRED_AGREEMENT_FOR_ANSWER; i++) {
+            petition.agree(i, AGREEMENT_DESCRIPTION, PETITION_NOT_EXPIRED_AT);
+        }
+
+        assertThat(petition.getAgreeCount()).isEqualTo(REQUIRED_AGREEMENT_FOR_ANSWER);
+        assertThat(petition.getWaitingForAnswerAt()).isEqualTo(PETITION_NOT_EXPIRED_AT);
     }
 
     @Test
