@@ -106,7 +106,6 @@ public class Petition extends BaseEntity {
         if (agreements.agreeLessThan(REQUIRED_AGREEMENT_FOR_RELEASE)) {
             throw new NotEnoughAgreementException();
         }
-        this.released = true;
         this.status = RELEASED;
     }
 
@@ -114,7 +113,6 @@ public class Petition extends BaseEntity {
         if (!isReleased()) {
             throw new NotReleasedPetitionException();
         }
-        this.released = false;
         this.status = TEMPORARY;
     }
 
@@ -124,9 +122,6 @@ public class Petition extends BaseEntity {
         }
         if (!isTemporary()) {
             throw new NotValidStatusToRejectPetitionException();
-        }
-        if (!released) {
-            release(at);
         }
         this.rejection = new Rejection(description, this);
         this.status = REJECTED;
