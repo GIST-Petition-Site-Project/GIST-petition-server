@@ -129,7 +129,7 @@ public class PetitionQueryService {
     @Transactional(readOnly = true)
     public PetitionResponse retrieveReleasedPetitionById(Long petitionId) {
         Petition petition = findPetitionById(petitionId);
-        if (!petition.isReleased()) {
+        if (petition.isTemporary()) {
             throw new NotReleasedPetitionException();
         }
         return PetitionResponse.of(petition);
