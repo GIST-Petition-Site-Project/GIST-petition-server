@@ -72,8 +72,7 @@ public class PetitionCommandService {
         User user = findUserById(userId);
         petition.agree(user.getId(), request.getDescription(), Instant.now());
 
-        AgreeCount agreeCount = agreeCountRepository.findByPetitionIdWithLock(petitionId).orElseThrow();
-        agreeCount.increment();
+        agreeCountRepository.incrementCount(petitionId);
     }
 
     @Transactional
