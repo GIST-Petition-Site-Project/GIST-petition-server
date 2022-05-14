@@ -1,6 +1,6 @@
 package com.gistpetition.api.scheduler;
 
-import com.gistpetition.api.petition.domain.repository.PetitionQueryDslRepository;
+import com.gistpetition.api.petition.application.PetitionQueryDslDao;
 import com.gistpetition.api.petition.dto.PetitionPreviewResponse;
 import com.gistpetition.api.user.domain.User;
 import com.gistpetition.api.user.domain.UserRepository;
@@ -30,15 +30,15 @@ public class PetitionScheduler {
     @Value("${staff.url:https://staff.gist-petition.com}")
     private String staffUrl;
     private final UserRepository userRepository;
-    private final PetitionQueryDslRepository petitionQueryDslRepository;
+    private final PetitionQueryDslDao petitionQueryDslDao;
     private final SpringTemplateEngine springTemplateEngine;
     private final EmailSender emailSender;
 
     @Scheduled(cron = "0 0 9 * * MON-FRI", zone = "Asia/Seoul")
     public void schedule() {
         List<User> managers = userRepository.findAllByUserRole(UserRole.MANAGER);
-        List<PetitionPreviewResponse> waitingForRelease = petitionQueryDslRepository.findAll(null, WAITING_FOR_RELEASE.at(Instant.now()));
-        List<PetitionPreviewResponse> waitingForAnswer = petitionQueryDslRepository.findAll(null, WAITING_FOR_ANSWER.at(Instant.now()));
+        List<PetitionPreviewResponse> waitingForRelease = petitionQueryDslDao.findAll(null, WAITING_FOR_RELEASE.at(Instant.now()));
+        List<PetitionPreviewResponse> waitingForAnswer = petitionQueryDslDao.findAll(null, WAITING_FOR_ANSWER.at(Instant.now()));
 
         List<String> usernames = managers.stream().map(User::getUsername).collect(Collectors.toList());
         String subject = String.format("[지스트 청원] 오늘의 승인 대기 중인 청원: %d, 답변 대기 중인 청원: %d", waitingForRelease.size(), waitingForAnswer.size());

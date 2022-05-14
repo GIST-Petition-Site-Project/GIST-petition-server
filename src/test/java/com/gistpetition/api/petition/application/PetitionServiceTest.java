@@ -32,8 +32,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
+import static com.gistpetition.api.petition.application.PetitionQueryCondition.ANSWERED;
+import static com.gistpetition.api.petition.application.PetitionQueryCondition.ONGOING;
 import static com.gistpetition.api.petition.domain.Petition.REQUIRED_AGREEMENT_FOR_ANSWER;
 import static com.gistpetition.api.petition.domain.Petition.REQUIRED_AGREEMENT_FOR_RELEASE;
+import static com.gistpetition.api.petition.domain.QPetition.petition;
 import static com.gistpetition.api.user.application.SessionLoginService.SESSION_KEY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -42,8 +45,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.BDDMockito.given;
 
 class PetitionServiceTest extends IntegrationTest {
-    public static final Instant PETITION_CREATION_AT = Instant.now();
-    public static final Instant PETITION_EXPIRED_AT = PETITION_CREATION_AT.plusSeconds(Petition.POSTING_PERIOD_BY_SECONDS);
     public static final AnswerRequest UPDATE_ANSWER_REQUEST = new AnswerRequest("답변 수정을 진행했다.");
     private static final PetitionRequest DORM_PETITION_REQUEST = new PetitionRequest("title", "description", Category.DORMITORY.getId());
     private static final AgreementRequest AGREEMENT_REQUEST = new AgreementRequest("동의합니다.");
@@ -228,77 +229,6 @@ class PetitionServiceTest extends IntegrationTest {
         Pageable pageableSizeAsTwo = PageRequest.of(0, 2, Sort.Direction.DESC, "createdAt");
         Page<AgreementResponse> twoOfAgreements = petitionQueryService.retrieveAgreements(petitionId, pageableSizeAsTwo);
         assertThat(twoOfAgreements).hasSize(2);
-    }
-
-    @Test
-    void retrieveOngoingPetition() {
-        int numOfPetition = 3;
-        List<Long> createdPetitionIds = new ArrayList<>();
-        for (int i = 0; i < numOfPetition; i++) {
-            createdPetitionIds.add(petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId()));
-        }
-        List<User> users = saveUsersNumberOf(REQUIRED_AGREEMENT_FOR_RELEASE);
-        createdPetitionIds.forEach(i -> {
-            agreePetitionBy(i, users);
-            petitionCommandService.releasePetition(i);
-        });
-
-        Page<PetitionPreviewResponse> petitions = petitionQueryService.retrieveOngoingPetition(PageRequest.of(0, 10));
-        assertThat(petitions.getContent()).hasSize(numOfPetition);
-    }
-
-    @Test
-    void retrieveOngoingPetitionWithAgreeCountSort() {
-        int numOfPetition = 3;
-        List<Long> createdPetitionIds = new ArrayList<>();
-        for (int i = 0; i < numOfPetition; i++) {
-            createdPetitionIds.add(petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId()));
-        }
-        List<User> users = saveUsersNumberOf(REQUIRED_AGREEMENT_FOR_RELEASE);
-        createdPetitionIds.forEach(i -> {
-            agreePetitionBy(i, users);
-            petitionCommandService.releasePetition(i);
-        });
-
-        User user1 = userRepository.save(new User("new@gist.ac.kr", "password", UserRole.USER));
-        User user2 = userRepository.save(new User("new2@gist.ac.kr", "password", UserRole.USER));
-
-        agreePetitionBy(createdPetitionIds.get(0), List.of(user1));
-        agreePetitionBy(createdPetitionIds.get(1), List.of(user1, user2));
-
-        Page<PetitionPreviewResponse> petitions = petitionQueryService.retrieveOngoingPetition(PageRequest.of(0, 10, Sort.Direction.DESC, "agreeCount"));
-        assertThat(petitions.getContent()).hasSize(numOfPetition);
-        assertThat(petitions.getContent().stream().map(PetitionPreviewResponse::getId))
-                .containsExactly(createdPetitionIds.get(1), createdPetitionIds.get(0), createdPetitionIds.get(2));
-    }
-
-    @Test
-    void retrieveAnsweredPetition() {
-        int numOfPetition = 3;
-        List<Long> createdPetitionIds = new ArrayList<>();
-        for (int i = 0; i < numOfPetition; i++) {
-            createdPetitionIds.add(petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId()));
-        }
-        List<User> users = saveUsersNumberOf(REQUIRED_AGREEMENT_FOR_ANSWER);
-        createdPetitionIds.forEach(i -> {
-            agreePetitionBy(i, users);
-            petitionCommandService.releasePetition(i);
-            petitionCommandService.answerPetition(i, ANSWER_REQUEST);
-        });
-
-        Page<PetitionPreviewResponse> petitions = petitionQueryService.retrieveAnsweredPetition(PageRequest.of(0, 10));
-        assertThat(petitions).hasSize(numOfPetition);
-    }
-
-    @Test
-    void retrievePetitionOfMine() {
-        int numOfPetition = 3;
-        for (int i = 0; i < numOfPetition; i++) {
-            petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
-        }
-
-        Page<PetitionPreviewResponse> petitions = petitionQueryService.retrievePetitionsByUserId(petitionOwner.getId(), PageRequest.of(0, 10));
-        assertThat(petitions).hasSize(numOfPetition);
     }
 
     @Test

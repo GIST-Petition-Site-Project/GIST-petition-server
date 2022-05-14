@@ -8,7 +8,6 @@ import com.gistpetition.api.petition.domain.Category;
 import com.gistpetition.api.petition.domain.Petition;
 import com.gistpetition.api.petition.domain.repository.AgreementRepository;
 import com.gistpetition.api.petition.domain.repository.AnswerRepository;
-import com.gistpetition.api.petition.domain.repository.PetitionQueryDslRepository;
 import com.gistpetition.api.petition.domain.repository.PetitionRepository;
 import com.gistpetition.api.petition.dto.*;
 import com.gistpetition.api.user.domain.User;
@@ -32,99 +31,6 @@ public class PetitionQueryService {
     private final AnswerRepository answerRepository;
     private final AgreementRepository agreementRepository;
     private final UserRepository userRepository;
-    private final PetitionQueryDslRepository petitionQueryDslRepository;
-
-    public Page<PetitionPreviewResponse> retrieveNotTemporaryPetition(Pageable pageable) {
-        return petitionQueryDslRepository.findAll(null, NOT_TEMPORARY.at(Instant.now()), pageable);
-    }
-
-    public Page<PetitionPreviewResponse> retrieveNotTemporaryPetition(Category category, Pageable pageable) {
-        return petitionQueryDslRepository.findAll(category, NOT_TEMPORARY.at(Instant.now()), pageable);
-    }
-
-    public Page<PetitionPreviewResponse> retrieveExpiredPetition(Pageable pageable) {
-        return petitionQueryDslRepository.findAll(null, EXPIRED.at(Instant.now()), pageable);
-    }
-
-    public Page<PetitionPreviewResponse> retrieveExpiredPetition(Category category, Pageable pageable) {
-        return petitionQueryDslRepository.findAll(category, EXPIRED.at(Instant.now()), pageable);
-    }
-
-    public Page<PetitionPreviewResponse> retrieveOngoingPetition(Pageable pageable) {
-        return petitionQueryDslRepository.findAll(null, ONGOING.at(Instant.now()), pageable);
-    }
-
-    public Page<PetitionPreviewResponse> retrieveOngoingPetition(Category category, Pageable pageable) {
-        return petitionQueryDslRepository.findAll(category, ONGOING.at(Instant.now()), pageable);
-    }
-
-    public Page<PetitionPreviewResponse> retrieveWaitingForReleasePetition(Pageable pageable) {
-        return petitionQueryDslRepository.findAll(null, WAITING_FOR_RELEASE.at(Instant.now()), pageable);
-    }
-
-    public Page<PetitionPreviewResponse> retrieveWaitingForReleasePetition(Category category, Pageable pageable) {
-        return petitionQueryDslRepository.findAll(category, WAITING_FOR_RELEASE.at(Instant.now()), pageable);
-    }
-
-    public Page<PetitionPreviewResponse> retrieveWaitingForAnswerPetition(Pageable pageable) {
-        return petitionQueryDslRepository.findAll(null, WAITING_FOR_ANSWER.at(Instant.now()), pageable);
-    }
-
-    public Page<PetitionPreviewResponse> retrieveWaitingForAnswerPetition(Category category, Pageable pageable) {
-        return petitionQueryDslRepository.findAll(category, WAITING_FOR_ANSWER.at(Instant.now()), pageable);
-    }
-
-    public Page<PetitionPreviewResponse> retrieveRejectedPetition(Pageable pageable) {
-        return petitionQueryDslRepository.findAll(null, REJECTED.at(Instant.now()), pageable);
-    }
-
-    public Page<PetitionPreviewResponse> retrieveRejectedPetition(Category category, Pageable pageable) {
-        return petitionQueryDslRepository.findAll(category, REJECTED.at(Instant.now()), pageable);
-    }
-
-    public Page<PetitionPreviewResponse> retrieveAnsweredPetition(Pageable pageable) {
-        return petitionQueryDslRepository.findAll(null, ANSWERED.at(Instant.now()), pageable);
-    }
-
-    public Page<PetitionPreviewResponse> retrieveAnsweredPetition(Category category, Pageable pageable) {
-        return petitionQueryDslRepository.findAll(category, ANSWERED.at(Instant.now()), pageable);
-    }
-
-    public Page<PetitionPreviewResponse> retrievePetitionsByUserId(Long userId, Pageable pageable) {
-        return petitionQueryDslRepository.findAll(null, petition.userId.eq(userId), pageable);
-    }
-
-    public Long retrieveReleasedPetitionCount() {
-        return petitionQueryDslRepository.count(null, NOT_TEMPORARY.at(Instant.now()));
-    }
-
-    public Long retrieveReleasedPetitionCount(Category category) {
-        return petitionQueryDslRepository.count(category, NOT_TEMPORARY.at(Instant.now()));
-    }
-
-    public Long retrieveWaitingForReleasePetitionCount() {
-        return petitionQueryDslRepository.count(null, WAITING_FOR_RELEASE.at(Instant.now()));
-    }
-
-    public Long retrieveWaitingForReleasePetitionCount(Category category) {
-        return petitionQueryDslRepository.count(category, WAITING_FOR_RELEASE.at(Instant.now()));
-    }
-
-    public Long retrieveWaitingForAnswerPetitionCount() {
-        return petitionQueryDslRepository.count(null, WAITING_FOR_ANSWER.at(Instant.now()));
-    }
-
-    public Long retrieveWaitingForAnswerPetitionCount(Category category) {
-        return petitionQueryDslRepository.count(category, WAITING_FOR_ANSWER.at(Instant.now()));
-    }
-
-    public Long retrieveAnsweredPetitionCount() {
-        return petitionQueryDslRepository.count(null, ANSWERED.at(Instant.now()));
-    }
-
-    public Long retrieveAnsweredPetitionCount(Category category) {
-        return petitionQueryDslRepository.count(category, ANSWERED.at(Instant.now()));
-    }
 
     @Transactional(readOnly = true)
     public PetitionResponse retrieveReleasedPetitionById(Long petitionId) {
