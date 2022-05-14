@@ -13,6 +13,8 @@ import javax.persistence.*;
 import java.time.Instant;
 import java.util.Objects;
 
+import static com.gistpetition.api.petition.domain.Status.TEMPORARY;
+
 @Audited
 @Getter
 @Entity
@@ -27,6 +29,8 @@ public class Petition extends BaseEntity {
     private Description description;
     @Enumerated(EnumType.STRING)
     private Category category;
+    @NotAudited
+    private Status status;
     @NotAudited
     private Boolean released = false;
     @NotAudited
@@ -52,6 +56,10 @@ public class Petition extends BaseEntity {
     protected Petition() {
     }
 
+    public Petition(String title, String description, Category category, Long userId) {
+        this(title, description, category, null, userId, null);
+    }
+
     public Petition(String title, String description, Category category, Instant expiredAt, Long userId, String tempUrl) {
         this.title = new Title(title);
         this.description = new Description(description);
@@ -59,6 +67,12 @@ public class Petition extends BaseEntity {
         this.expiredAt = expiredAt;
         this.userId = userId;
         this.tempUrl = tempUrl;
+    }
+
+    public void placeTemporary(String tempUrl, Instant at) {
+        this.status = TEMPORARY;
+        this.tempUrl = tempUrl;
+        this.expiredAt = at.plusSeconds(POSTING_PERIOD_BY_SECONDS);
     }
 
     public void agree(Long userId, String description, Instant at) {
