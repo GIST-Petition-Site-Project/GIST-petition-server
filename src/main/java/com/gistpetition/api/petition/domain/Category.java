@@ -29,6 +29,10 @@ public enum Category {
         return id;
     }
 
+    public String getName() {
+        return name;
+    }
+
     public static Category of(Long categoryId) {
         if (!lookup.containsKey(categoryId)) {
             throw new NoSuchCategoryException();
