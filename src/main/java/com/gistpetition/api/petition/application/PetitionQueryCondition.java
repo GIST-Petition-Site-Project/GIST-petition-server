@@ -1,6 +1,7 @@
 package com.gistpetition.api.petition.application;
 
 import com.gistpetition.api.petition.domain.Petition;
+import com.gistpetition.api.petition.domain.Status;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -14,19 +15,14 @@ import static com.gistpetition.api.petition.domain.QAgreeCount.agreeCount;
 import static com.gistpetition.api.petition.domain.QPetition.petition;
 
 public enum PetitionQueryCondition {
-    RELEASED(none, released),
-    NOT_RELEASED(none, notReleased),
-    ANSWERED(none, answered),
-    NOT_ANSWERED(none, notAnswered),
+    NOT_TEMPORARY(none, non_temporary),
 
-    WAITING_FOR_RELEASE(notExpired, notReleased, notRejected, agreeEnoughToRelease),
-    ONGOING(notExpired, released, notAnswered, notRejected),
-    REJECTED(none, released, rejected),
-    RELEASED_NOT_REJECTED_NOT_ANSWERED_EXPIRED(expired, released, notAnswered, notRejected),
-    WAITING_FOR_ANSWER(none, released, notRejected, notAnswered, agreeEnoughToAnswer),
-
-    RELEASED_NOT_EXPIRED(notExpired, released),
-    RELEASED_EXPIRED(expired, released);
+    WAITING_FOR_RELEASE(notExpired, non_temporary, agreeEnoughToRelease),
+    ONGOING(notExpired, released),
+    EXPIRED(expired, released),
+    REJECTED(none, rejected),
+    WAITING_FOR_ANSWER(none, released, agreeEnoughToAnswer),
+    ANSWERED(none, answered);
 
     private final ExpirationCondition expirationCondition;
     private final PetitionStatus[] conditions;
@@ -62,12 +58,11 @@ public enum PetitionQueryCondition {
     }
 
     enum PetitionStatus {
-        released(petition.released.isTrue()),
-        notReleased(petition.released.isFalse()),
-        rejected(petition.rejection.isNotNull()),
-        notRejected(petition.rejection.isNull()),
-        answered(petition.answer.isNotNull()),
-        notAnswered(petition.answer.isNull()),
+        temporary(petition.status.eq(Status.TEMPORARY)),
+        non_temporary(petition.status.ne(Status.TEMPORARY)),
+        released(petition.status.eq(Status.RELEASED)),
+        rejected(petition.status.eq(Status.REJECTED)),
+        answered(petition.status.eq(Status.ANSWERED)),
         agreeEnoughToRelease(agreeCount.count.goe(Petition.REQUIRED_AGREEMENT_FOR_RELEASE)),
         agreeEnoughToAnswer(agreeCount.count.goe(Petition.REQUIRED_AGREEMENT_FOR_ANSWER));
 

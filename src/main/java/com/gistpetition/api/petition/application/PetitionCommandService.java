@@ -23,8 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 
-import static com.gistpetition.api.petition.domain.Petition.POSTING_PERIOD_BY_SECONDS;
-
 @Service
 @RequiredArgsConstructor
 public class PetitionCommandService {
@@ -38,15 +36,16 @@ public class PetitionCommandService {
 
     @Transactional
     public Long createPetition(PetitionRequest petitionRequest, Long userId) {
+        Petition petition = new Petition(
+                petitionRequest.getTitle(),
+                petitionRequest.getDescription(),
+                Category.of(petitionRequest.getCategoryId()),
+                userId);
         String tempUrl = urlGenerator.generate(TEMP_URL_LENGTH);
-        Petition created = petitionRepository.save(
-                new Petition(
-                        petitionRequest.getTitle(),
-                        petitionRequest.getDescription(),
-                        Category.of(petitionRequest.getCategoryId()),
-                        Instant.now().plusSeconds(POSTING_PERIOD_BY_SECONDS),
-                        userId,
-                        tempUrl));
+
+        petition.placeTemporary(tempUrl, Instant.now());
+
+        Petition created = petitionRepository.save(petition);
         agreeCountRepository.save(new AgreeCount(created.getId()));
         return created.getId();
     }

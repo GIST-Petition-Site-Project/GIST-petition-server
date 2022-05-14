@@ -1,6 +1,7 @@
 package com.gistpetition.api.petition.dto;
 
 import com.gistpetition.api.petition.domain.Category;
+import com.gistpetition.api.petition.domain.Status;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,6 +14,7 @@ public class PetitionPreviewResponse {
     private Long id;
     private String title;
     private String categoryName;
+    private String status;
     private Integer agreeCount;
     private Long createdAt;
     private Long waitingForAnswerAt;
@@ -23,10 +25,11 @@ public class PetitionPreviewResponse {
     private Boolean expired;
 
     @QueryProjection
-    public PetitionPreviewResponse(Long id, String title, Category category, Instant createdAt, Instant expiredAt, Instant waitingForAnswerAt, Integer agreeCount, String tempUrl, Boolean released, Boolean rejected, Boolean answered) {
+    public PetitionPreviewResponse(Long id, String title, Category category, Status status, Instant createdAt, Instant expiredAt, Instant waitingForAnswerAt, Integer agreeCount, String tempUrl, Boolean released, Boolean rejected, Boolean answered) {
         this.id = id;
         this.title = title;
-        this.categoryName = category.getName();
+        this.categoryName = category.name();
+        this.status = status.name();
         this.createdAt = createdAt.toEpochMilli();
         this.waitingForAnswerAt = waitingForAnswerAt != null ? waitingForAnswerAt.toEpochMilli() : null;
         this.agreeCount = agreeCount;

@@ -16,6 +16,6 @@ public interface AgreeCountRepository extends JpaRepository<AgreeCount, Long> {
     Optional<AgreeCount> findByPetitionId(Long petitionId);
 
     @Modifying
-    @Query("update AgreeCount a  set a.count = a.count + 1 where a.petitionId = ?1")
+    @Query("update AgreeCount a set a.count = a.count + 1 where a.petitionId = ?1")
     void incrementCount(Long petitionId);
 }
