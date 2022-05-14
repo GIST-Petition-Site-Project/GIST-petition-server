@@ -32,8 +32,6 @@ public class Petition extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Status status;
     @NotAudited
-    private Boolean released = false;
-    @NotAudited
     private Instant waitingForAnswerAt;
     private Instant expiredAt;
     private Long userId;

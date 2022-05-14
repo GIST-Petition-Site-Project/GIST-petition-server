@@ -38,7 +38,7 @@ public class PetitionResponse {
                 petition.getId(),
                 petition.getTitle(),
                 petition.getDescription(),
-                petition.getCategory().name(),
+                petition.getCategory().getName(),
                 petition.getStatus().name(),
                 petition.getAgreeCount(),
                 petition.getCreatedAt().toEpochMilli(),
