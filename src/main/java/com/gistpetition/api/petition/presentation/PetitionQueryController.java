@@ -28,7 +28,7 @@ public class PetitionQueryController {
     private final PetitionQueryDslDao petitionQueryDslDao;
 
     @GetMapping("/petitions")
-    public ResponseEntity<Page<PetitionPreviewResponse>> retrieveNotTemporaryPetition(@RequestParam(defaultValue = SEARCH_ALL) Long categoryId, Pageable pageable) {
+    public ResponseEntity<Page<PetitionPreviewResponse>> retrieveNotTemporaryPetitions(@RequestParam(defaultValue = SEARCH_ALL) Long categoryId, Pageable pageable) {
         if (categoryId.equals(Long.valueOf(SEARCH_ALL))) {
             return ResponseEntity.ok().body(petitionQueryDslDao.findAll(null, NOT_TEMPORARY.at(Instant.now()), pageable));
         }
@@ -44,7 +44,7 @@ public class PetitionQueryController {
     }
 
     @GetMapping("/petitions/expired")
-    public ResponseEntity<Page<PetitionPreviewResponse>> retrieveExpiredPetition(@RequestParam(defaultValue = SEARCH_ALL) Long categoryId, Pageable pageable) {
+    public ResponseEntity<Page<PetitionPreviewResponse>> retrieveExpiredPetitions(@RequestParam(defaultValue = SEARCH_ALL) Long categoryId, Pageable pageable) {
         if (categoryId.equals(Long.valueOf(SEARCH_ALL))) {
             return ResponseEntity.ok().body(petitionQueryDslDao.findAll(null, EXPIRED.at(Instant.now()), pageable));
         }
@@ -53,7 +53,7 @@ public class PetitionQueryController {
 
     @ManagerPermissionRequired
     @GetMapping("/petitions/waitingForRelease")
-    public ResponseEntity<Page<PetitionPreviewResponse>> retrievePetitionsWaitingForRelease(@RequestParam(defaultValue = SEARCH_ALL) Long categoryId, Pageable pageable) {
+    public ResponseEntity<Page<PetitionPreviewResponse>> retrieveWaitingForReleasePetitions(@RequestParam(defaultValue = SEARCH_ALL) Long categoryId, Pageable pageable) {
         if (categoryId.equals(Long.valueOf(SEARCH_ALL))) {
             return ResponseEntity.ok().body(petitionQueryDslDao.findAll(null, WAITING_FOR_RELEASE.at(Instant.now()), pageable));
         }
@@ -61,7 +61,7 @@ public class PetitionQueryController {
     }
 
     @GetMapping("/petitions/waitingForAnswer")
-    public ResponseEntity<Page<PetitionPreviewResponse>> retrievePetitionsWaitingForAnswer(@RequestParam(defaultValue = SEARCH_ALL) Long categoryId, Pageable pageable) {
+    public ResponseEntity<Page<PetitionPreviewResponse>> retrieveWaitingForAnswerPetitions(@RequestParam(defaultValue = SEARCH_ALL) Long categoryId, Pageable pageable) {
         if (categoryId.equals(Long.valueOf(SEARCH_ALL))) {
             return ResponseEntity.ok().body(petitionQueryDslDao.findAll(null, WAITING_FOR_ANSWER.at(Instant.now()), pageable));
         }
@@ -119,8 +119,8 @@ public class PetitionQueryController {
     }
 
     @GetMapping("/petitions/{petitionId}")
-    public ResponseEntity<PetitionResponse> retrieveReleasedPetition(@PathVariable Long petitionId) {
-        return ResponseEntity.ok().body(petitionQueryService.retrieveReleasedPetitionById(petitionId));
+    public ResponseEntity<PetitionResponse> retrieveNotTemporaryPetition(@PathVariable Long petitionId) {
+        return ResponseEntity.ok().body(petitionQueryService.retrieveNotTemporaryPetitionById(petitionId));
     }
 
     @GetMapping("/petitions/temp/{tempUrl}")

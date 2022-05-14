@@ -4,7 +4,6 @@ import com.gistpetition.api.exception.petition.NoSuchPetitionException;
 import com.gistpetition.api.exception.petition.NotReleasedPetitionException;
 import com.gistpetition.api.exception.user.NoSuchUserException;
 import com.gistpetition.api.petition.domain.Agreement;
-import com.gistpetition.api.petition.domain.Category;
 import com.gistpetition.api.petition.domain.Petition;
 import com.gistpetition.api.petition.domain.repository.AgreementRepository;
 import com.gistpetition.api.petition.domain.repository.AnswerRepository;
@@ -18,11 +17,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
-
-import static com.gistpetition.api.petition.application.PetitionQueryCondition.*;
-import static com.gistpetition.api.petition.domain.QPetition.petition;
-
 @Service
 @RequiredArgsConstructor
 public class PetitionQueryService {
@@ -33,7 +27,7 @@ public class PetitionQueryService {
     private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
-    public PetitionResponse retrieveReleasedPetitionById(Long petitionId) {
+    public PetitionResponse retrieveNotTemporaryPetitionById(Long petitionId) {
         Petition petition = findPetitionById(petitionId);
         if (petition.isTemporary()) {
             throw new NotReleasedPetitionException();
