@@ -63,15 +63,6 @@ public class Petition extends BaseEntity {
         this.userId = userId;
     }
 
-    public Petition(String title, String description, Category category, Instant expiredAt, Long userId, String tempUrl) {
-        this.title = new Title(title);
-        this.description = new Description(description);
-        this.category = category;
-        this.expiredAt = expiredAt;
-        this.userId = userId;
-        this.tempUrl = tempUrl;
-    }
-
     public void placeTemporary(String tempUrl, Instant at) {
         this.status = TEMPORARY;
         this.tempUrl = tempUrl;
@@ -100,8 +91,8 @@ public class Petition extends BaseEntity {
         if (isExpiredAt(at)) {
             throw new ExpiredPetitionException();
         }
-        if (isReleased()) {
-            throw new AlreadyReleasedPetitionException();
+        if (!isTemporary()) {
+            throw new NotValidStatusToReleasePetitionException();
         }
         if (agreements.agreeLessThan(REQUIRED_AGREEMENT_FOR_RELEASE)) {
             throw new NotEnoughAgreementException();

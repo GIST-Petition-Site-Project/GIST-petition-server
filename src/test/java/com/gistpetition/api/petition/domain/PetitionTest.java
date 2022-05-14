@@ -53,7 +53,7 @@ class PetitionTest {
     @MethodSource("create_petition_invalid_condition")
     void create_petition_invalid_condition(String title, String description, Class<Exception> exceptionClass) {
         assertThatThrownBy(
-                () -> new Petition(title, description, Category.DORMITORY, Instant.now(), 1L, "AAAAAA")
+                () -> new Petition(title, description, Category.DORMITORY, 1L)
         ).isInstanceOf(exceptionClass);
     }
 
@@ -128,7 +128,7 @@ class PetitionTest {
 
         assertThatThrownBy(
                 () -> petition.release(PETITION_NOT_EXPIRED_AT.plusSeconds(1))
-        ).isInstanceOf(AlreadyReleasedPetitionException.class);
+        ).isInstanceOf(NotValidStatusToReleasePetitionException.class);
     }
 
     @Test
