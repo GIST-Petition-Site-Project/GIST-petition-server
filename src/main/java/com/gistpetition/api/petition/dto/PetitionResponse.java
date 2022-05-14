@@ -17,6 +17,7 @@ public class PetitionResponse {
     private String title;
     private String description;
     private String categoryName;
+    private String status;
     private Integer agreeCount;
     private Long createdAt;
     private Long updatedAt;
@@ -37,13 +38,14 @@ public class PetitionResponse {
                 petition.getId(),
                 petition.getTitle(),
                 petition.getDescription(),
-                petition.getCategory().getName(),
+                petition.getCategory().name(),
+                petition.getStatus().name(),
                 petition.getAgreeCount(),
                 petition.getCreatedAt().toEpochMilli(),
                 petition.getUpdatedAt().toEpochMilli(),
                 waitingForAnswerAt != null ? waitingForAnswerAt.toEpochMilli() : null,
                 petition.getTempUrl(),
-                petition.isReleased(),
+                !petition.isTemporary(),
                 petition.isRejected(),
                 petition.isAnswered(),
                 petition.isExpiredAt(Instant.now()),
