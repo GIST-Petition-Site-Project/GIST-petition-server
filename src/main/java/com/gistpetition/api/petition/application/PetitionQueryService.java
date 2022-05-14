@@ -34,20 +34,20 @@ public class PetitionQueryService {
     private final UserRepository userRepository;
     private final PetitionQueryDslRepository petitionQueryDslRepository;
 
-    public Page<PetitionPreviewResponse> retrieveReleasedPetition(Pageable pageable) {
-        return petitionQueryDslRepository.findAll(null, RELEASED.at(Instant.now()), pageable);
+    public Page<PetitionPreviewResponse> retrieveNotTemporaryPetition(Pageable pageable) {
+        return petitionQueryDslRepository.findAll(null, NOT_TEMPORARY.at(Instant.now()), pageable);
     }
 
-    public Page<PetitionPreviewResponse> retrieveReleasedPetition(Category category, Pageable pageable) {
-        return petitionQueryDslRepository.findAll(category, RELEASED.at(Instant.now()), pageable);
+    public Page<PetitionPreviewResponse> retrieveNotTemporaryPetition(Category category, Pageable pageable) {
+        return petitionQueryDslRepository.findAll(category, NOT_TEMPORARY.at(Instant.now()), pageable);
     }
 
-    public Page<PetitionPreviewResponse> retrieveReleasedAndExpiredPetition(Pageable pageable) {
-        return petitionQueryDslRepository.findAll(null, RELEASED_NOT_REJECTED_NOT_ANSWERED_EXPIRED.at(Instant.now()), pageable);
+    public Page<PetitionPreviewResponse> retrieveExpiredPetition(Pageable pageable) {
+        return petitionQueryDslRepository.findAll(null, EXPIRED.at(Instant.now()), pageable);
     }
 
-    public Page<PetitionPreviewResponse> retrieveReleasedAndExpiredPetition(Category category, Pageable pageable) {
-        return petitionQueryDslRepository.findAll(category, RELEASED_NOT_REJECTED_NOT_ANSWERED_EXPIRED.at(Instant.now()), pageable);
+    public Page<PetitionPreviewResponse> retrieveExpiredPetition(Category category, Pageable pageable) {
+        return petitionQueryDslRepository.findAll(category, EXPIRED.at(Instant.now()), pageable);
     }
 
     public Page<PetitionPreviewResponse> retrieveOngoingPetition(Pageable pageable) {
@@ -58,19 +58,19 @@ public class PetitionQueryService {
         return petitionQueryDslRepository.findAll(category, ONGOING.at(Instant.now()), pageable);
     }
 
-    public Page<PetitionPreviewResponse> retrievePetitionsWaitingForRelease(Pageable pageable) {
+    public Page<PetitionPreviewResponse> retrieveWaitingForReleasePetition(Pageable pageable) {
         return petitionQueryDslRepository.findAll(null, WAITING_FOR_RELEASE.at(Instant.now()), pageable);
     }
 
-    public Page<PetitionPreviewResponse> retrievePetitionsWaitingForRelease(Category category, Pageable pageable) {
+    public Page<PetitionPreviewResponse> retrieveWaitingForReleasePetition(Category category, Pageable pageable) {
         return petitionQueryDslRepository.findAll(category, WAITING_FOR_RELEASE.at(Instant.now()), pageable);
     }
 
-    public Page<PetitionPreviewResponse> retrievePetitionsWaitingForAnswer(Pageable pageable) {
+    public Page<PetitionPreviewResponse> retrieveWaitingForAnswerPetition(Pageable pageable) {
         return petitionQueryDslRepository.findAll(null, WAITING_FOR_ANSWER.at(Instant.now()), pageable);
     }
 
-    public Page<PetitionPreviewResponse> retrievePetitionsWaitingForAnswer(Category category, Pageable pageable) {
+    public Page<PetitionPreviewResponse> retrieveWaitingForAnswerPetition(Category category, Pageable pageable) {
         return petitionQueryDslRepository.findAll(category, WAITING_FOR_ANSWER.at(Instant.now()), pageable);
     }
 
@@ -95,11 +95,11 @@ public class PetitionQueryService {
     }
 
     public Long retrieveReleasedPetitionCount() {
-        return petitionQueryDslRepository.count(null, RELEASED.at(Instant.now()));
+        return petitionQueryDslRepository.count(null, NOT_TEMPORARY.at(Instant.now()));
     }
 
     public Long retrieveReleasedPetitionCount(Category category) {
-        return petitionQueryDslRepository.count(category, RELEASED.at(Instant.now()));
+        return petitionQueryDslRepository.count(category, NOT_TEMPORARY.at(Instant.now()));
     }
 
     public Long retrieveWaitingForReleasePetitionCount() {

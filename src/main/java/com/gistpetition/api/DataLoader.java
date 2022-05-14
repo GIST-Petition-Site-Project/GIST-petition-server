@@ -97,13 +97,11 @@ public class DataLoader {
             if (petitionId < petitionIds.get(0) + WAITING_FOR_CHECK_RELEASE_COUNT) {
                 continue;
             }
-            petitionCommandService.releasePetition(petitionId);
-
             if (petitionId < petitionIds.get(0) + WAITING_FOR_CHECK_RELEASE_COUNT + REJECTED_COUNT) {
                 petitionCommandService.rejectPetition(petitionId, REJECTION_REQUEST);
                 continue;
             }
-
+            petitionCommandService.releasePetition(petitionId);
             if (petitionId < petitionIds.get(0) + WAITING_FOR_CHECK_RELEASE_COUNT + REJECTED_COUNT + WAITING_FOR_CHECK_ANSWER_COUNT) {
                 continue;
             }

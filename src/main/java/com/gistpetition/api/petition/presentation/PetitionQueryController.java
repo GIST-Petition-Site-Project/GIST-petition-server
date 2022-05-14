@@ -23,9 +23,9 @@ public class PetitionQueryController {
     @GetMapping("/petitions")
     public ResponseEntity<Page<PetitionPreviewResponse>> retrieveReleasedPetitions(@RequestParam(defaultValue = SEARCH_ALL) Long categoryId, Pageable pageable) {
         if (categoryId.equals(Long.valueOf(SEARCH_ALL))) {
-            return ResponseEntity.ok().body(petitionQueryService.retrieveReleasedPetition(pageable));
+            return ResponseEntity.ok().body(petitionQueryService.retrieveNotTemporaryPetition(pageable));
         }
-        return ResponseEntity.ok().body(petitionQueryService.retrieveReleasedPetition(Category.of(categoryId), pageable));
+        return ResponseEntity.ok().body(petitionQueryService.retrieveNotTemporaryPetition(Category.of(categoryId), pageable));
     }
 
     @GetMapping("/petitions/ongoing")
@@ -39,26 +39,26 @@ public class PetitionQueryController {
     @GetMapping("/petitions/expired")
     public ResponseEntity<Page<PetitionPreviewResponse>> retrieveReleasedAndExpiredPetitions(@RequestParam(defaultValue = SEARCH_ALL) Long categoryId, Pageable pageable) {
         if (categoryId.equals(Long.valueOf(SEARCH_ALL))) {
-            return ResponseEntity.ok().body(petitionQueryService.retrieveReleasedAndExpiredPetition(pageable));
+            return ResponseEntity.ok().body(petitionQueryService.retrieveExpiredPetition(pageable));
         }
-        return ResponseEntity.ok().body(petitionQueryService.retrieveReleasedAndExpiredPetition(Category.of(categoryId), pageable));
+        return ResponseEntity.ok().body(petitionQueryService.retrieveExpiredPetition(Category.of(categoryId), pageable));
     }
 
     @ManagerPermissionRequired
     @GetMapping("/petitions/waitingForRelease")
     public ResponseEntity<Page<PetitionPreviewResponse>> retrievePetitionsWaitingForRelease(@RequestParam(defaultValue = SEARCH_ALL) Long categoryId, Pageable pageable) {
         if (categoryId.equals(Long.valueOf(SEARCH_ALL))) {
-            return ResponseEntity.ok().body(petitionQueryService.retrievePetitionsWaitingForRelease(pageable));
+            return ResponseEntity.ok().body(petitionQueryService.retrieveWaitingForReleasePetition(pageable));
         }
-        return ResponseEntity.ok().body(petitionQueryService.retrievePetitionsWaitingForRelease(Category.of(categoryId), pageable));
+        return ResponseEntity.ok().body(petitionQueryService.retrieveWaitingForReleasePetition(Category.of(categoryId), pageable));
     }
 
     @GetMapping("/petitions/waitingForAnswer")
     public ResponseEntity<Page<PetitionPreviewResponse>> retrievePetitionsWaitingForAnswer(@RequestParam(defaultValue = SEARCH_ALL) Long categoryId, Pageable pageable) {
         if (categoryId.equals(Long.valueOf(SEARCH_ALL))) {
-            return ResponseEntity.ok().body(petitionQueryService.retrievePetitionsWaitingForAnswer(pageable));
+            return ResponseEntity.ok().body(petitionQueryService.retrieveWaitingForAnswerPetition(pageable));
         }
-        return ResponseEntity.ok().body(petitionQueryService.retrievePetitionsWaitingForAnswer(Category.of(categoryId), pageable));
+        return ResponseEntity.ok().body(petitionQueryService.retrieveWaitingForAnswerPetition(Category.of(categoryId), pageable));
     }
 
     @GetMapping("/petitions/rejected")

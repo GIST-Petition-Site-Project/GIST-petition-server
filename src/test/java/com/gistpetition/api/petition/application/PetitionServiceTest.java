@@ -398,7 +398,6 @@ class PetitionServiceTest extends IntegrationTest {
         Long petitionId = petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
         List<User> users = saveUsersNumberOf(REQUIRED_AGREEMENT_FOR_RELEASE);
         agreePetitionBy(petitionId, users);
-        petitionCommandService.releasePetition(petitionId);
 
         petitionCommandService.rejectPetition(petitionId, REJECTION_REQUEST);
 
@@ -413,7 +412,7 @@ class PetitionServiceTest extends IntegrationTest {
         Long petitionId = petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
         List<User> users = saveUsersNumberOf(REQUIRED_AGREEMENT_FOR_RELEASE);
         agreePetitionBy(petitionId, users);
-        petitionCommandService.releasePetition(petitionId);
+
         petitionCommandService.rejectPetition(petitionId, REJECTION_REQUEST);
 
         petitionCommandService.updateRejection(petitionId, UPDATE_REJECTION_REQUEST);
@@ -429,7 +428,6 @@ class PetitionServiceTest extends IntegrationTest {
         Long petitionId = petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
         List<User> users = saveUsersNumberOf(REQUIRED_AGREEMENT_FOR_RELEASE);
         agreePetitionBy(petitionId, users);
-        petitionCommandService.releasePetition(petitionId);
         petitionCommandService.rejectPetition(petitionId, REJECTION_REQUEST);
 
         petitionCommandService.cancelRejection(petitionId);
