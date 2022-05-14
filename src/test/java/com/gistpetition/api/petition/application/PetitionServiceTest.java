@@ -3,7 +3,6 @@ package com.gistpetition.api.petition.application;
 import com.gistpetition.api.IntegrationTest;
 import com.gistpetition.api.exception.petition.DuplicatedAgreementException;
 import com.gistpetition.api.exception.petition.NoSuchPetitionException;
-import com.gistpetition.api.petition.PetitionBuilder;
 import com.gistpetition.api.petition.domain.*;
 import com.gistpetition.api.petition.domain.repository.*;
 import com.gistpetition.api.petition.dto.*;
@@ -316,18 +315,14 @@ class PetitionServiceTest extends IntegrationTest {
 
     @Test
     void deletePetition() {
-        Petition petition = petitionRepository.save(
-                PetitionBuilder.aPetition()
-                        .withExpiredAt(PETITION_EXPIRED_AT)
-                        .withUserId(petitionOwner.getId())
-                        .build());
-        agreeCountRepository.save(new AgreeCount(petition.getId()));
-        petitionCommandService.agree(AGREEMENT_REQUEST, petition.getId(), petitionOwner.getId());
+        Long petitionId = petitionCommandService.createPetition(DORM_PETITION_REQUEST, petitionOwner.getId());
 
-        petitionCommandService.deletePetition(petition.getId());
-        assertFalse(petitionRepository.existsById(petition.getId()));
+        petitionCommandService.agree(AGREEMENT_REQUEST, petitionId, petitionOwner.getId());
+
+        petitionCommandService.deletePetition(petitionId);
+        assertFalse(petitionRepository.existsById(petitionId));
         PageRequest pageRequest = PageRequest.of(0, 10);
-        assertThat(agreementRepository.findAgreementsByPetitionId(petition.getId(), pageRequest)).hasSize(0);
+        assertThat(agreementRepository.findAgreementsByPetitionId(petitionId, pageRequest)).hasSize(0);
     }
 
     @Test

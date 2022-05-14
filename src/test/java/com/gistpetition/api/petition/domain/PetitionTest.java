@@ -36,7 +36,8 @@ class PetitionTest {
 
     @BeforeEach
     void setUp() {
-        petition = PetitionBuilder.aPetition().withExpiredAt(PETITION_EXPIRED_AT).withTempUrl(TEMP_URL).build();
+        petition = PetitionBuilder.aPetition().build();
+        petition.placeTemporary(TEMP_URL, PETITION_CREATION_AT);
     }
 
     private static Stream<Arguments> create_petition_invalid_condition() {
@@ -54,6 +55,16 @@ class PetitionTest {
         assertThatThrownBy(
                 () -> new Petition(title, description, Category.DORMITORY, Instant.now(), 1L, "AAAAAA")
         ).isInstanceOf(exceptionClass);
+    }
+
+    @Test
+    void placeTemporary() {
+        Petition petitionA = new Petition("title", "description", Category.DORMITORY, 1L);
+        petitionA.placeTemporary(TEMP_URL, PETITION_CREATION_AT);
+
+        assertTrue(petitionA.isTemporary());
+        assertThat(petitionA.getTempUrl()).isEqualTo(TEMP_URL);
+        assertThat(petitionA.getExpiredAt()).isEqualTo(PETITION_EXPIRED_AT);
     }
 
     @Test
@@ -155,9 +166,8 @@ class PetitionTest {
     }
 
     @Test
-    void reject_released() {
+    void reject_temporary_success() {
         agreePetitionByMultipleUsers(petition, REQUIRED_AGREEMENT_FOR_RELEASE);
-        petition.release(PETITION_NOT_EXPIRED_AT);
 
         petition.reject(REJECT_DESCRIPTION, PETITION_NOT_EXPIRED_AT);
 
@@ -166,15 +176,14 @@ class PetitionTest {
     }
 
     @Test
-    void reject_not_released() {
+    void reject_released_failed() {
         agreePetitionByMultipleUsers(petition, REQUIRED_AGREEMENT_FOR_RELEASE);
+        petition.release(PETITION_NOT_EXPIRED_AT);
 
-        petition.reject(REJECT_DESCRIPTION, PETITION_NOT_EXPIRED_AT);
-
-        assertTrue(petition.isRejected());
-        assertTrue(petition.isReleased());
-        assertThat(petition.getRejection().getDescription()).isEqualTo(REJECT_DESCRIPTION);
+        assertThatThrownBy(() -> petition.reject(REJECT_DESCRIPTION, PETITION_NOT_EXPIRED_AT))
+                .isInstanceOf(NotValidStatusToRejectPetitionException.class);
     }
+
 
     @Test
     void reject_already_rejected() {
@@ -183,7 +192,7 @@ class PetitionTest {
 
         assertThatThrownBy(
                 () -> petition.reject(REJECT_DESCRIPTION, PETITION_NOT_EXPIRED_AT)
-        ).isInstanceOf(AlreadyRejectedPetitionException.class);
+        ).isInstanceOf(NotValidStatusToRejectPetitionException.class);
     }
 
     @Test
@@ -194,7 +203,7 @@ class PetitionTest {
 
         assertThatThrownBy(
                 () -> petition.reject(REJECT_DESCRIPTION, PETITION_NOT_EXPIRED_AT)
-        ).isInstanceOf(AlreadyAnsweredPetitionException.class);
+        ).isInstanceOf(NotValidStatusToRejectPetitionException.class);
     }
 
     @Test
@@ -243,7 +252,9 @@ class PetitionTest {
         petition.release(PETITION_NOT_EXPIRED_AT);
         petition.answer(ANSWER_DESCRIPTION, null, ALWAYS_TRUE_URL_MATCHER);
 
-        assertThatThrownBy(() -> petition.answer(ANSWER_DESCRIPTION, null, ALWAYS_TRUE_URL_MATCHER)).isInstanceOf(AlreadyAnsweredPetitionException.class);
+        assertThatThrownBy(
+                () -> petition.answer(ANSWER_DESCRIPTION, null, ALWAYS_TRUE_URL_MATCHER)
+        ).isInstanceOf(NotValidStatusToAnswerPetitionException.class);
     }
 
     @Test
@@ -252,7 +263,7 @@ class PetitionTest {
 
         assertThatThrownBy(() ->
                 petition.answer(ANSWER_DESCRIPTION, null, ALWAYS_TRUE_URL_MATCHER)
-        ).isInstanceOf(NotReleasedPetitionException.class);
+        ).isInstanceOf(NotValidStatusToAnswerPetitionException.class);
 
         assertFalse(petition.isAnswered());
     }
@@ -276,7 +287,7 @@ class PetitionTest {
 
         assertThatThrownBy(() ->
                 petition.answer(ANSWER_DESCRIPTION, null, ALWAYS_TRUE_URL_MATCHER)
-        ).isInstanceOf(AlreadyRejectedPetitionException.class);
+        ).isInstanceOf(NotValidStatusToAnswerPetitionException.class);
     }
 
     @Test

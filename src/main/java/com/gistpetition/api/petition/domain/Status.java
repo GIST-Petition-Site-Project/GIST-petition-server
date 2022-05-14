@@ -4,6 +4,5 @@ public enum Status {
     TEMPORARY,
     RELEASED,
     REJECTED,
-    ANSWERED,
-    EXPIRED
+    ANSWERED
 }

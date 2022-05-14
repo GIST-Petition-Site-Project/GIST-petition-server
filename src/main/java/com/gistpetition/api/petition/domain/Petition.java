@@ -11,9 +11,8 @@ import org.hibernate.envers.NotAudited;
 
 import javax.persistence.*;
 import java.time.Instant;
-import java.util.Objects;
 
-import static com.gistpetition.api.petition.domain.Status.TEMPORARY;
+import static com.gistpetition.api.petition.domain.Status.*;
 
 @Audited
 @Getter
@@ -30,6 +29,7 @@ public class Petition extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Category category;
     @NotAudited
+    @Enumerated(EnumType.STRING)
     private Status status;
     @NotAudited
     private Boolean released = false;
@@ -57,7 +57,10 @@ public class Petition extends BaseEntity {
     }
 
     public Petition(String title, String description, Category category, Long userId) {
-        this(title, description, category, null, userId, null);
+        this.title = new Title(title);
+        this.description = new Description(description);
+        this.category = category;
+        this.userId = userId;
     }
 
     public Petition(String title, String description, Category category, Instant expiredAt, Long userId, String tempUrl) {
@@ -97,36 +100,36 @@ public class Petition extends BaseEntity {
         if (isExpiredAt(at)) {
             throw new ExpiredPetitionException();
         }
-        if (released) {
+        if (isReleased()) {
             throw new AlreadyReleasedPetitionException();
         }
         if (agreements.agreeLessThan(REQUIRED_AGREEMENT_FOR_RELEASE)) {
             throw new NotEnoughAgreementException();
         }
         this.released = true;
+        this.status = RELEASED;
     }
 
     public void cancelRelease() {
-        if (!released) {
+        if (!isReleased()) {
             throw new NotReleasedPetitionException();
         }
         this.released = false;
+        this.status = TEMPORARY;
     }
 
     public void reject(String description, Instant at) {
         if (isExpiredAt(at)) {
             throw new ExpiredPetitionException();
         }
-        if (isRejected()) {
-            throw new AlreadyRejectedPetitionException();
-        }
-        if (isAnswered()) {
-            throw new AlreadyAnsweredPetitionException();
+        if (!isTemporary()) {
+            throw new NotValidStatusToRejectPetitionException();
         }
         if (!released) {
             release(at);
         }
         this.rejection = new Rejection(description, this);
+        this.status = REJECTED;
     }
 
     public void updateRejection(String description) {
@@ -141,22 +144,18 @@ public class Petition extends BaseEntity {
             throw new NotRejectedPetitionException();
         }
         this.rejection = null;
+        this.status = TEMPORARY;
     }
 
     public void answer(String description, String videoUrl, UrlMatcher urlMatcher) {
-        if (isAnswered()) {
-            throw new AlreadyAnsweredPetitionException();
-        }
-        if (!released) {
-            throw new NotReleasedPetitionException();
-        }
-        if (isRejected()) {
-            throw new AlreadyRejectedPetitionException();
+        if (!isReleased()) {
+            throw new NotValidStatusToAnswerPetitionException();
         }
         if (agreements.agreeLessThan(REQUIRED_AGREEMENT_FOR_ANSWER)) {
             throw new NotEnoughAgreementException();
         }
         this.answer = new Answer(description, VideoUrl.of(videoUrl, urlMatcher), this);
+        this.status = ANSWERED;
     }
 
     public void updateAnswer(String description, String videoUrl, UrlMatcher urlMatcher) {
@@ -171,6 +170,7 @@ public class Petition extends BaseEntity {
             throw new NotAnsweredPetitionException();
         }
         this.answer = null;
+        this.status = RELEASED;
     }
 
     public void update(String title, String description, Long categoryId) {
@@ -179,22 +179,25 @@ public class Petition extends BaseEntity {
         this.category = Category.of(categoryId);
     }
 
+    public boolean isTemporary() {
+        return status == TEMPORARY;
+    }
+
     public boolean isReleased() {
-        return released;
+        return status == RELEASED;
     }
 
     public boolean isRejected() {
-        return !Objects.isNull(rejection);
+        return status == REJECTED;
     }
 
     public boolean isAnswered() {
-        return !Objects.isNull(answer);
+        return status == ANSWERED;
     }
 
     public boolean isExpiredAt(Instant time) {
         return time.isAfter(expiredAt);
     }
-
 
     public String getTitle() {
         return this.title.getTitle();
