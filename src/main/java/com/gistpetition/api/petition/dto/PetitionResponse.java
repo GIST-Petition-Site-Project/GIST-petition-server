@@ -23,9 +23,6 @@ public class PetitionResponse {
     private Long updatedAt;
     private Long waitingForAnswerAt;
     private String tempUrl;
-    private Boolean released;
-    private Boolean rejected;
-    private Boolean answered;
     private Boolean expired;
     private RejectionResponse rejection;
     private AnswerResponse answer;
@@ -45,9 +42,6 @@ public class PetitionResponse {
                 petition.getUpdatedAt().toEpochMilli(),
                 waitingForAnswerAt != null ? waitingForAnswerAt.toEpochMilli() : null,
                 petition.getTempUrl(),
-                !petition.isTemporary(),
-                petition.isRejected(),
-                petition.isAnswered(),
                 petition.isExpiredAt(Instant.now()),
                 rejection != null ? RejectionResponse.of(rejection) : null,
                 answer != null ? AnswerResponse.of(answer) : null
