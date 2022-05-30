@@ -11,7 +11,8 @@ import org.hibernate.envers.NotAudited;
 
 import javax.persistence.*;
 import java.time.Instant;
-import java.util.Objects;
+
+import static com.gistpetition.api.petition.domain.Status.*;
 
 @Audited
 @Getter
@@ -28,7 +29,8 @@ public class Petition extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Category category;
     @NotAudited
-    private Boolean released = false;
+    @Enumerated(EnumType.STRING)
+    private Status status;
     @NotAudited
     private Instant waitingForAnswerAt;
     private Instant expiredAt;
@@ -52,13 +54,17 @@ public class Petition extends BaseEntity {
     protected Petition() {
     }
 
-    public Petition(String title, String description, Category category, Instant expiredAt, Long userId, String tempUrl) {
+    public Petition(String title, String description, Category category, Long userId) {
         this.title = new Title(title);
         this.description = new Description(description);
         this.category = category;
-        this.expiredAt = expiredAt;
         this.userId = userId;
+    }
+
+    public void placeTemporary(String tempUrl, Instant at) {
+        this.status = TEMPORARY;
         this.tempUrl = tempUrl;
+        this.expiredAt = at.plusSeconds(POSTING_PERIOD_BY_SECONDS);
     }
 
     public void agree(Long userId, String description, Instant at) {
@@ -83,36 +89,31 @@ public class Petition extends BaseEntity {
         if (isExpiredAt(at)) {
             throw new ExpiredPetitionException();
         }
-        if (released) {
-            throw new AlreadyReleasedPetitionException();
+        if (!isTemporary()) {
+            throw new NotValidStatusToReleasePetitionException();
         }
         if (agreements.agreeLessThan(REQUIRED_AGREEMENT_FOR_RELEASE)) {
             throw new NotEnoughAgreementException();
         }
-        this.released = true;
+        this.status = RELEASED;
     }
 
     public void cancelRelease() {
-        if (!released) {
+        if (!isReleased()) {
             throw new NotReleasedPetitionException();
         }
-        this.released = false;
+        this.status = TEMPORARY;
     }
 
     public void reject(String description, Instant at) {
         if (isExpiredAt(at)) {
             throw new ExpiredPetitionException();
         }
-        if (isRejected()) {
-            throw new AlreadyRejectedPetitionException();
-        }
-        if (isAnswered()) {
-            throw new AlreadyAnsweredPetitionException();
-        }
-        if (!released) {
-            release(at);
+        if (!isTemporary()) {
+            throw new NotValidStatusToRejectPetitionException();
         }
         this.rejection = new Rejection(description, this);
+        this.status = REJECTED;
     }
 
     public void updateRejection(String description) {
@@ -127,22 +128,18 @@ public class Petition extends BaseEntity {
             throw new NotRejectedPetitionException();
         }
         this.rejection = null;
+        this.status = TEMPORARY;
     }
 
     public void answer(String description, String videoUrl, UrlMatcher urlMatcher) {
-        if (isAnswered()) {
-            throw new AlreadyAnsweredPetitionException();
-        }
-        if (!released) {
-            throw new NotReleasedPetitionException();
-        }
-        if (isRejected()) {
-            throw new AlreadyRejectedPetitionException();
+        if (!isReleased()) {
+            throw new NotValidStatusToAnswerPetitionException();
         }
         if (agreements.agreeLessThan(REQUIRED_AGREEMENT_FOR_ANSWER)) {
             throw new NotEnoughAgreementException();
         }
         this.answer = new Answer(description, VideoUrl.of(videoUrl, urlMatcher), this);
+        this.status = ANSWERED;
     }
 
     public void updateAnswer(String description, String videoUrl, UrlMatcher urlMatcher) {
@@ -157,6 +154,7 @@ public class Petition extends BaseEntity {
             throw new NotAnsweredPetitionException();
         }
         this.answer = null;
+        this.status = RELEASED;
     }
 
     public void update(String title, String description, Long categoryId) {
@@ -165,22 +163,25 @@ public class Petition extends BaseEntity {
         this.category = Category.of(categoryId);
     }
 
+    public boolean isTemporary() {
+        return status == TEMPORARY;
+    }
+
     public boolean isReleased() {
-        return released;
+        return status == RELEASED;
     }
 
     public boolean isRejected() {
-        return !Objects.isNull(rejection);
+        return status == REJECTED;
     }
 
     public boolean isAnswered() {
-        return !Objects.isNull(answer);
+        return status == ANSWERED;
     }
 
     public boolean isExpiredAt(Instant time) {
         return time.isAfter(expiredAt);
     }
-
 
     public String getTitle() {
         return this.title.getTitle();

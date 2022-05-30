@@ -20,7 +20,7 @@ public class PetitionRevisionResponse {
     private Long workedBy;
     private String petitionTitle;
     private String petitionDescription;
-    private Category petitionCategory;
+    private Long petitionCategoryId;
 
     public static PetitionRevisionResponse of(Revision<Long, Petition> revision) {
         CustomRevisionEntity customRevisionEntity = revision.getMetadata().getDelegate();
@@ -31,7 +31,7 @@ public class PetitionRevisionResponse {
                 customRevisionEntity.getUserId(),
                 revision.getEntity().getTitle(),
                 revision.getEntity().getDescription(),
-                revision.getEntity().getCategory()
+                revision.getEntity().getCategory().getId()
         );
     }
 

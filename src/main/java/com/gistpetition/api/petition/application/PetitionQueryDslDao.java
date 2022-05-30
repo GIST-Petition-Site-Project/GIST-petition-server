@@ -1,7 +1,8 @@
-package com.gistpetition.api.petition.domain.repository;
+package com.gistpetition.api.petition.application;
 
 import com.gistpetition.api.petition.domain.Category;
 import com.gistpetition.api.petition.domain.Petition;
+import com.gistpetition.api.petition.domain.Status;
 import com.gistpetition.api.petition.dto.PetitionPreviewResponse;
 import com.gistpetition.api.petition.dto.QPetitionPreviewResponse;
 import com.querydsl.core.types.Order;
@@ -25,7 +26,7 @@ import static com.gistpetition.api.petition.domain.QPetition.petition;
 
 @Repository
 @RequiredArgsConstructor
-public class PetitionQueryDslRepository {
+public class PetitionQueryDslDao {
     private final JPQLQueryFactory jpqlQueryFactory;
 
     public List<PetitionPreviewResponse> findAll(Category category, Predicate predicate) {
@@ -65,7 +66,7 @@ public class PetitionQueryDslRepository {
     }
 
     private QPetitionPreviewResponse buildPetitionPreviewResponse() {
-        return new QPetitionPreviewResponse(petition.id, petition.title.title, petition.category, petition.createdAt, petition.expiredAt, petition.waitingForAnswerAt, agreeCount.count, petition.tempUrl, petition.released, petition.rejection.isNotNull(), petition.answer.isNotNull());
+        return new QPetitionPreviewResponse(petition.id, petition.title.title, petition.category, petition.status, petition.createdAt, petition.expiredAt, petition.waitingForAnswerAt, agreeCount.count, petition.tempUrl);
     }
 
     private BooleanExpression categoryEq(Category category) {

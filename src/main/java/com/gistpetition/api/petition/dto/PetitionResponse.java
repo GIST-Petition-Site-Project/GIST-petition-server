@@ -16,15 +16,13 @@ public class PetitionResponse {
     private Long id;
     private String title;
     private String description;
-    private String categoryName;
+    private Long categoryId;
+    private String status;
     private Integer agreeCount;
     private Long createdAt;
     private Long updatedAt;
     private Long waitingForAnswerAt;
     private String tempUrl;
-    private Boolean released;
-    private Boolean rejected;
-    private Boolean answered;
     private Boolean expired;
     private RejectionResponse rejection;
     private AnswerResponse answer;
@@ -37,15 +35,13 @@ public class PetitionResponse {
                 petition.getId(),
                 petition.getTitle(),
                 petition.getDescription(),
-                petition.getCategory().getName(),
+                petition.getCategory().getId(),
+                petition.getStatus().name(),
                 petition.getAgreeCount(),
                 petition.getCreatedAt().toEpochMilli(),
                 petition.getUpdatedAt().toEpochMilli(),
                 waitingForAnswerAt != null ? waitingForAnswerAt.toEpochMilli() : null,
                 petition.getTempUrl(),
-                petition.isReleased(),
-                petition.isRejected(),
-                petition.isAnswered(),
                 petition.isExpiredAt(Instant.now()),
                 rejection != null ? RejectionResponse.of(rejection) : null,
                 answer != null ? AnswerResponse.of(answer) : null
