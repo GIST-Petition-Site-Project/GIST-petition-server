@@ -16,7 +16,7 @@ public class PetitionResponse {
     private Long id;
     private String title;
     private String description;
-    private String categoryName;
+    private Long categoryId;
     private String status;
     private Integer agreeCount;
     private Long createdAt;
@@ -38,7 +38,7 @@ public class PetitionResponse {
                 petition.getId(),
                 petition.getTitle(),
                 petition.getDescription(),
-                petition.getCategory().getName(),
+                petition.getCategory().getId(),
                 petition.getStatus().name(),
                 petition.getAgreeCount(),
                 petition.getCreatedAt().toEpochMilli(),
