@@ -13,7 +13,7 @@ import java.time.Instant;
 public class PetitionPreviewResponse {
     private Long id;
     private String title;
-    private String categoryName;
+    private Long categoryId;
     private String status;
     private Integer agreeCount;
     private Long createdAt;
@@ -28,7 +28,7 @@ public class PetitionPreviewResponse {
     public PetitionPreviewResponse(Long id, String title, Category category, Status status, Instant createdAt, Instant expiredAt, Instant waitingForAnswerAt, Integer agreeCount, String tempUrl, Boolean released, Boolean rejected, Boolean answered) {
         this.id = id;
         this.title = title;
-        this.categoryName = category.getName();
+        this.categoryId = category.getId();
         this.status = status.name();
         this.createdAt = createdAt.toEpochMilli();
         this.waitingForAnswerAt = waitingForAnswerAt != null ? waitingForAnswerAt.toEpochMilli() : null;
