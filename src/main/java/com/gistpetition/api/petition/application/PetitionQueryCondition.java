@@ -17,7 +17,7 @@ import static com.gistpetition.api.petition.domain.QPetition.petition;
 public enum PetitionQueryCondition {
     NOT_TEMPORARY(none, non_temporary),
 
-    WAITING_FOR_RELEASE(notExpired, non_temporary, agreeEnoughToRelease),
+    WAITING_FOR_RELEASE(notExpired, temporary, agreeEnoughToRelease),
     ONGOING(notExpired, released),
     EXPIRED(expired, released),
     REJECTED(none, rejected),
