@@ -66,7 +66,7 @@ public class PetitionQueryDslDao {
     }
 
     private QPetitionPreviewResponse buildPetitionPreviewResponse() {
-        return new QPetitionPreviewResponse(petition.id, petition.title.title, petition.category, petition.status, petition.createdAt, petition.expiredAt, petition.waitingForAnswerAt, agreeCount.count, petition.tempUrl, petition.status.ne(Status.TEMPORARY), petition.status.eq(Status.REJECTED), petition.status.eq(Status.ANSWERED));
+        return new QPetitionPreviewResponse(petition.id, petition.title.title, petition.category, petition.status, petition.createdAt, petition.expiredAt, petition.waitingForAnswerAt, agreeCount.count, petition.tempUrl);
     }
 
     private BooleanExpression categoryEq(Category category) {
