@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum Category {
-    STUDENT_COUNCIL(0L, "자치회"),
     DORMITORY(1L, "기숙사"),
     FACILITY(2L, "시설운영"),
     CAREER(3L, "진로/취업"),
@@ -16,7 +15,8 @@ public enum Category {
     MANAGEMENT(6L, "기획/예산/홍보"),
     COOPERATION(7L, "대외협력"),
     COMMUNICATION(8L, "권익소통"),
-    ETC(9L, "기타");
+    STUDENT_COUNCIL(9L, "자치회"),
+    ETC(10L, "기타");
 
     private final Long id;
     private final String name;
