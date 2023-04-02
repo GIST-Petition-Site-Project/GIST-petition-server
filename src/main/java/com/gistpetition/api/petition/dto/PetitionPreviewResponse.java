@@ -14,6 +14,7 @@ public class PetitionPreviewResponse {
     private Long id;
     private String title;
     private Long categoryId;
+    private String categoryName;
     private String status;
     private Integer agreeCount;
     private Long createdAt;
@@ -26,6 +27,7 @@ public class PetitionPreviewResponse {
         this.id = id;
         this.title = title;
         this.categoryId = category.getId();
+        this.categoryName = category.getName();
         this.status = status.name();
         this.createdAt = createdAt.toEpochMilli();
         this.waitingForAnswerAt = waitingForAnswerAt != null ? waitingForAnswerAt.toEpochMilli() : null;
